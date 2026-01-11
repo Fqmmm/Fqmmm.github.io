@@ -209,7 +209,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-01-11 19:07:48 / Modified: 19:12:23" itemprop="dateCreated datePublished" datetime="2026-01-11T19:07:48+08:00">2026-01-11</time>
+      <time title="Created: 2026-01-11 19:07:48 / Modified: 19:14:06" itemprop="dateCreated datePublished" datetime="2026-01-11T19:07:48+08:00">2026-01-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -273,11 +273,11 @@ class="math inline"><em>右</em><em>子</em><em>树</em><em>高</em><em>度</em>
 <p><img src="/assets/image-20251205114858520.png" alt="image-20251205114858520" style="zoom: 50%;" /></p></li>
 <li><p>插入63，此时50不平衡。不平衡的原因（63）来源于50<strong>右</strong>孩子的<strong>左</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是50-68-66。于是进行<strong>RL型</strong>旋转：先把68围绕66右旋，再把50围绕66左旋。最后调整各子树。</p>
 <p><img src="/assets/image-20251205115326673.png" alt="image-20251205115326673" style="zoom:33%;" /><img src="/assets/image-20251205115411665.png" alt="image-20251205115411665" style="zoom:33%;" /><img src="/assets/image-20251205115346215.png" alt="image-20251205115346215" style="zoom:33%;" /></p></li>
-<li><p>插入57，此时66不平衡。不平衡的原因（57）来源于66<strong>左</strong>孩子的<strong>右</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是66-50-60。于是进行<strong>LR型</strong>旋转：选把50围绕60左旋，再把66围绕60右旋。最后调整各子树。（中间状态未给出，可恶的zdl）</p>
+<li><p>插入57，此时66不平衡。不平衡的原因（57）来源于66<strong>左</strong>孩子的<strong>右</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是66-50-60。于是进行<strong>LR型</strong>旋转：选把50围绕60左旋，再把66围绕60右旋。最后调整各子树。（中间状态未给出）</p>
 <p><img src="/assets/image-20251205115901873.png" alt="image-20251205115901873" style="zoom:50%;" /></p></li>
 </ul>
 <p>说了这么多可能有点晕。但实际做题的时候只需要：找到<strong>“爷爷-爸爸-孙子”对</strong>，然后根据三个节点的元素值进行重排，找到第二大的节点作为root，然后瞎几巴调整一通就可以了。<strong>人不像计算机，人是有上帝视角的。</strong></p>
-<p>以最后一个LR旋转为例。50&lt;60&lt;66，60是第二大的节点，因此作为根节点，左孩子是50，右孩子是66。然后把原来的子树瞎几把连到50和66上就可以了。</p>
+<p>以最后一个LR旋转为例。50&lt;60&lt;66，60是第二大的节点，因此作为根节点，左孩子是50，右孩子是66。然后把原来的子树连到50和66上就可以了。</p>
 <h3 id="删除-1">删除</h3>
 <p>按照BST树的删除方式进行删除即可（分为三种情况），最后检查一下是否平衡，如果不平衡就旋转。</p>
 <h2 id="伸展树">伸展树</h2>
@@ -290,9 +290,9 @@ class="math inline"><em>右</em><em>子</em><em>树</em><em>高</em><em>度</em>
 <p>那么怎么搞到根节点上去呢？关键也是找到<strong>“爷爷-爸爸-孙子”对</strong>。但和AVL树不同，AVL在寻找“爷爷-爸爸-孙子”对的时候，是从爷爷开始往下找的。但伸展树是<strong>从孙子开始往上找</strong>的。</p>
 <p>找到“爷爷-爸爸-孙子”对后，</p>
 <ul>
-<li><p>zig-zig型：孙子当爷爷，爷爷当孙子，倒反天罡。然后瞎几把调整子树。</p></li>
-<li><p>zig-zag型：以第二大的元素为根节点，左孩子连最小，右孩子连最大，然后瞎几把调整子树。</p></li>
-<li><p>zig型：<strong>退化为“爸爸-儿子”对</strong>，儿子当爸爸，爸爸当儿子，倒反天罡。然后瞎几把调整子树。</p></li>
+<li><p>zig-zig型：孙子当爷爷，爷爷当孙子，倒反天罡。然后调整子树。</p></li>
+<li><p>zig-zag型：以第二大的元素为根节点，左孩子连最小，右孩子连最大，然后调整子树。</p></li>
+<li><p>zig型：<strong>退化为“爸爸-儿子”对</strong>，儿子当爸爸，爸爸当儿子，倒反天罡。然后调整子树。</p></li>
 </ul>
 <p><strong>这两种旋转的根本目的，是把孙子搞到上面去。</strong>下图中，一开始X在最底下，旋转完之后就跑到最上面去了。</p>
 <p><img src="/assets/image-20251205121623430.png" alt="image-20251205121623430" style="zoom: 50%;" /></p>
