@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="本文档将深入解析二叉搜索树、AVL树、伸展树、红黑树、B树、B+树的查找、插入、删除操作。本文档并不涉及代码，而仅仅是从数学的角度展现这些过程。 二叉搜索树 英文名BST。这是最简单的一种搜索树。节点左子树的所有元素都比节点小，右子树的所有元素都比节点大。 查找 没什么好说的，比它小就往左走，比它大就往右走，直到找到&#x2F;遇到空指针为止。 插入 也没有什么好说的，比它小就往左走，比它大就往">
+<meta property="og:type" content="article">
+<meta property="og:title" content="二叉搜索树、AVL树、伸展树、红黑树、B树、B+树">
+<meta property="og:url" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="本文档将深入解析二叉搜索树、AVL树、伸展树、红黑树、B树、B+树的查找、插入、删除操作。本文档并不涉及代码，而仅仅是从数学的角度展现这些过程。 二叉搜索树 英文名BST。这是最简单的一种搜索树。节点左子树的所有元素都比节点小，右子树的所有元素都比节点大。 查找 没什么好说的，比它小就往左走，比它大就往右走，直到找到&#x2F;遇到空指针为止。 插入 也没有什么好说的，比它小就往左走，比它大就往">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205112905213.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205112912062.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205113138641.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205113127687.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205114210297.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205114858520.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205115326673.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205115411665.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205115346215.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205115901873.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205121623430.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205121641384.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205122306276.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205154449574.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205154539976.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205154634962.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205155348284.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205155629482.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205155813125.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205160045121.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205160147007.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205160418451.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171215631.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171413149.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171540853.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171551075.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171645909.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171815540.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171827963.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171859725.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171932809.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205171945643.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172022677.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172036945.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172202912.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172217099.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172228174.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172529190.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172558887.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172801137.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205172853568.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205173143914.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205173224050.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205173348391.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205173411478.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205173514245.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205173610657.png">
+<meta property="og:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205174724488.png">
+<meta property="article:published_time" content="2026-01-11T11:07:48.588Z">
+<meta property="article:modified_time" content="2026-01-11T11:09:04.152Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="AVL树">
+<meta property="article:tag" content="B树">
+<meta property="article:tag" content="二叉搜索树">
+<meta property="article:tag" content="伸展树">
+<meta property="article:tag" content="红黑树">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/assets/image-20251205112905213.png">
+
+
+<link rel="canonical" href="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/","path":"2026/01/11/data_structure/二叉搜索树、AVL树、伸展树、红黑树、B树、B+树/","title":"二叉搜索树、AVL树、伸展树、红黑树、B树、B+树"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>二叉搜索树、AVL树、伸展树、红黑树、B树、B+树 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">二叉搜索树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE"><span class="nav-number">1.1.</span> <span class="nav-text">查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5"><span class="nav-number">1.2.</span> <span class="nav-text">插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4"><span class="nav-number">1.3.</span> <span class="nav-text">删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#avl%E6%A0%91"><span class="nav-number">2.</span> <span class="nav-text">AVL树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B3%E8%A1%A1%E5%9B%A0%E5%AD%90"><span class="nav-number">2.1.</span> <span class="nav-text">平衡因子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE-1"><span class="nav-number">2.2.</span> <span class="nav-text">查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5-1"><span class="nav-number">2.3.</span> <span class="nav-text">插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4-1"><span class="nav-number">2.4.</span> <span class="nav-text">删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%B8%E5%B1%95%E6%A0%91"><span class="nav-number">3.</span> <span class="nav-text">伸展树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE-2"><span class="nav-number">3.1.</span> <span class="nav-text">查找</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5-2"><span class="nav-number">3.2.</span> <span class="nav-text">插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4-2"><span class="nav-number">3.3.</span> <span class="nav-text">删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-number">4.</span> <span class="nav-text">红黑树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5-3"><span class="nav-number">4.1.</span> <span class="nav-text">插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4-3"><span class="nav-number">4.2.</span> <span class="nav-text">删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b%E6%A0%91"><span class="nav-number">5.</span> <span class="nav-text">B树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5-4"><span class="nav-number">5.1.</span> <span class="nav-text">插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4-4"><span class="nav-number">5.2.</span> <span class="nav-text">删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b%E6%A0%91-1"><span class="nav-number">6.</span> <span class="nav-text">B+树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE-3"><span class="nav-number">6.1.</span> <span class="nav-text">查找</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="二叉搜索树、AVL树、伸展树、红黑树、B树、B+树 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          二叉搜索树、AVL树、伸展树、红黑树、B树、B+树
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-11 19:07:48 / Modified: 19:09:04" itemprop="dateCreated datePublished" datetime="2026-01-11T19:07:48+08:00">2026-01-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本文档将深入解析二叉搜索树、AVL树、伸展树、红黑树、B树、B+树的查找、插入、删除操作。本文档并不涉及代码，而仅仅是从数学的角度展现这些过程。</p>
+<h2 id="二叉搜索树">二叉搜索树</h2>
+<p>英文名BST。这是最简单的一种搜索树。节点左子树的所有元素都比节点小，右子树的所有元素都比节点大。</p>
+<h3 id="查找">查找</h3>
+<p>没什么好说的，比它小就往左走，比它大就往右走，直到找到/遇到空指针为止。</p>
+<h3 id="插入">插入</h3>
+<p>也没有什么好说的，比它小就往左走，比它大就往右走。如果遇到了相同元素，就不能插入，直接返回；如果遇到空指针，说明这棵树里原来没有这个要插入的元素，于是直接插入即可。</p>
+<h3 id="删除">删除</h3>
+<ul>
+<li><p>如果要删除的节点是叶节点，直接删除即可</p></li>
+<li><p>如果不是叶节点</p>
+<ul>
+<li><p>如果只有一个孩子，那么让孩子代替要删除的节点，成为新子树的根节点。例如删除60，直接删除即可。</p>
+<p><img src="assets/image-20251205112905213.png" alt="image-20251205112905213" style="zoom: 50%;" /><img src="assets/image-20251205112912062.png" alt="image-20251205112912062" style="zoom:50%;" /></p></li>
+<li><p>如果有两个孩子，那么让该节点的直接前驱/直接后继代替这个节点，然后删除直接前驱/直接后继。例如要删除50，就让50的直接后继60代替50，然后把60原来的右子树挂到66下。</p>
+<p><img src="assets/image-20251205113138641.png" alt="image-20251205113138641" style="zoom:50%;" /><img src="assets/image-20251205113127687.png" alt="image-20251205113127687" style="zoom:50%;" /></p></li>
+</ul></li>
+</ul>
+<h2 id="avl树">AVL树</h2>
+<p>BST树有一个重大的问题：不平衡。例如，根据数字序列1，2，3，4，5，6构建一颗BST树，那么2会挂到1右边，3会挂到2右边……依次下去，这棵树本质上是一个链表，查找的时间复杂度退化为
+<span
+class="math inline"><em>O</em>(<em>n</em>)</span>。究其根本，是因为这个树右边太重，左边太轻，不平衡。</p>
+<p>于是AVL树应运而生。它在插入后会进行旋转操作，确保这棵树是平衡的。那么究竟什么是”平衡“？怎样量化一棵树的”平衡程度“？</p>
+<h3 id="平衡因子">平衡因子</h3>
+<p>平衡因子就是量化平衡程度的一个指标。它的定义如下： <span
+class="math display"><em>节</em><em>点</em><em>的</em><em>平</em><em>衡</em><em>因</em><em>子</em> = <em>左</em><em>子</em><em>树</em><em>高</em><em>度</em> − <em>右</em><em>子</em><em>树</em><em>高</em><em>度</em></span></p>
+<blockquote>
+<p>殷人昆的书上定义为<span
+class="math inline"><em>右</em><em>子</em><em>树</em><em>高</em><em>度</em> − <em>左</em><em>子</em><em>树</em><em>高</em><em>度</em></span>，但是无伤大雅。</p>
+</blockquote>
+<p>一棵树中，如果每个节点的平衡因子的绝对值都小于等于1，那么就说这棵树是平衡的；否则，这棵树就是不平衡的。</p>
+<h3 id="查找-1">查找</h3>
+<p>同BST树。</p>
+<h3 id="插入-1">插入</h3>
+<p>首先按照BST的插入方式进行插入。但是这可能导致树不平衡。为此，要进行<strong>旋转</strong>操作。旋转的关键在于找到<strong>“爷爷-爸爸-孙子”对</strong>（我自创的名词，哈哈）。下面通过实例说明。</p>
+<ul>
+<li><p>初始状态</p>
+<p><img src="assets/image-20251205114210297.png" alt="image-20251205114210297" style="zoom:50%;" /></p></li>
+<li><p>插入90，此时66不平衡。不平衡的原因（90）来源于66<strong>右</strong>孩子的<strong>右</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是66-68-70。于是进行<strong>RR型</strong>旋转：把66围绕68左旋，然后调整各子树。LL型旋转同理，不再赘述。</p>
+<p><img src="assets/image-20251205114858520.png" alt="image-20251205114858520" style="zoom: 50%;" /></p></li>
+<li><p>插入63，此时50不平衡。不平衡的原因（63）来源于50<strong>右</strong>孩子的<strong>左</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是50-68-66。于是进行<strong>RL型</strong>旋转：先把68围绕66右旋，再把50围绕66左旋。最后调整各子树。</p>
+<p><img src="assets/image-20251205115326673.png" alt="image-20251205115326673" style="zoom:33%;" /><img src="assets/image-20251205115411665.png" alt="image-20251205115411665" style="zoom:33%;" /><img src="assets/image-20251205115346215.png" alt="image-20251205115346215" style="zoom:33%;" /></p></li>
+<li><p>插入57，此时66不平衡。不平衡的原因（57）来源于66<strong>左</strong>孩子的<strong>右</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是66-50-60。于是进行<strong>LR型</strong>旋转：选把50围绕60左旋，再把66围绕60右旋。最后调整各子树。（中间状态未给出，可恶的zdl）</p>
+<p><img src="assets/image-20251205115901873.png" alt="image-20251205115901873" style="zoom:50%;" /></p></li>
+</ul>
+<p>说了这么多可能有点晕。但实际做题的时候只需要：找到<strong>“爷爷-爸爸-孙子”对</strong>，然后根据三个节点的元素值进行重排，找到第二大的节点作为root，然后瞎几巴调整一通就可以了。<strong>人不像计算机，人是有上帝视角的。</strong></p>
+<p>以最后一个LR旋转为例。50&lt;60&lt;66，60是第二大的节点，因此作为根节点，左孩子是50，右孩子是66。然后把原来的子树瞎几把连到50和66上就可以了。</p>
+<h3 id="删除-1">删除</h3>
+<p>按照BST树的删除方式进行删除即可（分为三种情况），最后检查一下是否平衡，如果不平衡就旋转。</p>
+<h2 id="伸展树">伸展树</h2>
+<p>伸展树的基本思想和缓存类似，即“这次访问的东西在不久的未来很可能要再访问一次”。具体来说，</p>
+<ul>
+<li>如果这次访问了x，那么访问完之后就要把x<strong>搞到根节点上去</strong>（多么激进啊）</li>
+<li>如果这次插入了x，那么插入完之后就要把x<strong>搞到根节点上去</strong>（多么激进啊）</li>
+<li>如果这次删除了x，那么删除完之后就要被x的爸爸<strong>搞到根节点上去</strong>（多么激进啊）</li>
+</ul>
+<p>那么怎么搞到根节点上去呢？关键也是找到<strong>“爷爷-爸爸-孙子”对</strong>。但和AVL树不同，AVL在寻找“爷爷-爸爸-孙子”对的时候，是从爷爷开始往下找的。但伸展树是<strong>从孙子开始往上找</strong>的。</p>
+<p>找到“爷爷-爸爸-孙子”对后，</p>
+<ul>
+<li><p>zig-zig型：孙子当爷爷，爷爷当孙子，倒反天罡。然后瞎几把调整子树。</p></li>
+<li><p>zig-zag型：以第二大的元素为根节点，左孩子连最小，右孩子连最大，然后瞎几把调整子树。</p></li>
+<li><p>zig型：<strong>退化为“爸爸-儿子”对</strong>，儿子当爸爸，爸爸当儿子，倒反天罡。然后瞎几把调整子树。</p></li>
+</ul>
+<p><strong>这两种旋转的根本目的，是把孙子搞到上面去。</strong>下图中，一开始X在最底下，旋转完之后就跑到最上面去了。</p>
+<p><img src="assets/image-20251205121623430.png" alt="image-20251205121623430" style="zoom: 50%;" /></p>
+<p>下面具体说明。</p>
+<h3 id="查找-2">查找</h3>
+<p>同BST树。随后进行“把访问的节点搞到根节点”的操作。</p>
+<ul>
+<li>查找1，想把1搞到根节点。
+<ul>
+<li>3-2-1是zig-zig型的<strong>“爷爷-爸爸-孙子”对</strong>，于是孙子当爷爷，爷爷当孙子，1上移两层。</li>
+<li>但1还没有到根节点，于是继续。5-4-1是zig-zig型的<strong>“爷爷-爸爸-孙子”对</strong>，于是孙子当爷爷，爷爷当孙子，1上移两层。</li>
+<li>但1还没有到根节点，于是继续。6-1是zig型的<strong>“爸爸-儿子”对</strong>，于是把6转下来，1成为root。</li>
+</ul></li>
+</ul>
+<p><img src="assets/image-20251205121641384.png" alt="image-20251205121641384" style="zoom:50%;" /></p>
+<ul>
+<li><p>查找3，想把3搞到根节点。</p>
+<ul>
+<li><p>3-2-4是zig-zag型的<strong>“爷爷-爸爸-孙子”对</strong>，3为中间元素，于是6左子树的新root为3，3上移两层。</p></li>
+<li><p>但3还没有到根节点，于是继续。1-6-3是zig-zag型的<strong>“爷爷-爸爸-孙子”对</strong>，于是孙子当爷爷，爷爷当孙子，3上移两层。此时3成为root，结束。</p>
+<p><img src="assets/image-20251205122306276.png" alt="image-20251205122306276" style="zoom:50%;" /></p></li>
+</ul></li>
+</ul>
+<h3 id="插入-2">插入</h3>
+<p>同BST插入，然后按“查找”中的方法把插入的节点搞到根节点去。</p>
+<ul>
+<li>插入11</li>
+</ul>
+<p><img src="assets/image-20251205154449574.png" alt="image-20251205154449574" style="zoom:50%;" /></p>
+<ul>
+<li>插入4</li>
+</ul>
+<p><img src="assets/image-20251205154539976.png" alt="image-20251205154539976" style="zoom:50%;" /></p>
+<h3 id="删除-2">删除</h3>
+<p>先按照BST的删除，然后把被删节点的爸爸搞到根节点即可。</p>
+<ul>
+<li>删除3</li>
+</ul>
+<p><img src="assets/image-20251205154634962.png" alt="image-20251205154634962" style="zoom:50%;" /></p>
+<h2 id="红黑树">红黑树</h2>
+<p>红黑树具有以下性质：</p>
+<ul>
+<li>根节点和所有外部节点都是黑色</li>
+<li>根节点到所有外部节点的路径上没有两个连续红色</li>
+<li>根节点到所有外部节点的路径上的黑色节点个数相同</li>
+</ul>
+<blockquote>
+<p>把一些红色节点随机插到满二叉树里，可以得到一棵红黑树。</p>
+</blockquote>
+<p>画红黑树的时候，一般要把叶子节点的nullptr给画出来。</p>
+<h3 id="插入-3">插入</h3>
+<ul>
+<li>新插入的节点为红色</li>
+<li>如果根节点为红色，则改成黑色</li>
+<li>如果爸爸是黑色，则结束</li>
+<li>如果爸爸是红色
+<ul>
+<li>如果叔叔是红色，则将爸爸、叔叔、爷爷颜色反转</li>
+<li>如果叔叔是黑色，则旋转（LL，RR，LR，RL）后，<strong>最后一次旋转的旋转中心和旋转点颜色反转</strong>（本质上还是要找到<strong>“爷爷-爸爸-孙子”对</strong>）</li>
+</ul></li>
+</ul>
+<p>下面举一个例子：依次插入10，20，30，15，25，12，5，3，8（图中省略了黑色的nullptr）</p>
+<ul>
+<li>插入10，初始为红色。由于10是根节点，所以变成黑色。（图中省略了红变黑的过程）</li>
+<li>插入20，标为红色，不违反规则。</li>
+<li>插入30，出现两个连续红色20，30。30的叔叔是黑色（nullptr），所以需要旋转。把10绕着20左旋，并把10，20颜色反转。</li>
+</ul>
+<p><img src="assets/image-20251205155348284.png" alt="image-20251205155348284" style="zoom:50%;" /></p>
+<ul>
+<li>插入15，出现两个连续红色10，15。15的叔叔30是红色，因此把10，30，20颜色翻转。但翻转后根节点20为红色，违反规则，于是再把20变成黑色。</li>
+<li>插入25，没毛病。</li>
+</ul>
+<figure>
+<img src="assets/image-20251205155629482.png"
+alt="image-20251205155629482" />
+<figcaption aria-hidden="true">image-20251205155629482</figcaption>
+</figure>
+<ul>
+<li>插入12，出现两个连续红色12，15。12的叔叔是黑色，需要旋转。<strong>“爷爷-爸爸-孙子”对</strong>是10-15-12。最后一次旋转是10绕着12左旋，于是把10和12颜色反转。</li>
+</ul>
+<p><img src="assets/image-20251205155813125.png" alt="image-20251205155813125" style="zoom:50%;" /></p>
+<ul>
+<li>插入5，出现两个连续红色10，5。5的叔叔15是红色，于是把12，10，15颜色翻转。</li>
+</ul>
+<p><img src="assets/image-20251205160045121.png" alt="image-20251205160045121" style="zoom:50%;" /></p>
+<ul>
+<li>插入3，出现两个连续红色5，3。3的叔叔是黑色，因此需要旋转。“爷爷-爸爸-孙子”对是10-5-3。最后一次旋转是10绕着5右旋，因此5，10颜色反转。</li>
+</ul>
+<p><img src="assets/image-20251205160147007.png" alt="image-20251205160147007" style="zoom:50%;" /></p>
+<ul>
+<li>插入8，出现两个连续红色10，8。8的叔叔3是红色，因此将3，10，5颜色翻转。但此时5，12是连续红色，把5视作插入的节点。5的叔叔30是黑色，需要旋转。<strong>“爷爷-爸爸-孙子”对</strong>是20-12-5。最后一次旋转是20绕着12右旋，因此12，20颜色反转。</li>
+</ul>
+<p><img src="assets/image-20251205160418451.png" alt="image-20251205160418451" style="zoom:50%;" /></p>
+<h3 id="删除-3">删除</h3>
+<p>删除操作比较复杂，这里不做讨论。</p>
+<h2 id="b树">B树</h2>
+<p>B树是一种多叉排序树。为了保证查找效率，<span
+class="math inline"><em>m</em></span>
+叉排序树需保证：<strong>除了根节点之外，任何节点至少要有 <span
+class="math inline">$\lceil \frac{m}{2} \rceil$</span> 个分叉，即至少有
+<span class="math inline">$\lceil \frac{m}{2} \rceil-1$</span>
+个关键字。例如，5叉排序树除了根节点外，每个节点至少有3个分叉，2个关键字。</strong></p>
+<p><img src="assets/image-20251205171215631.png" alt="image-20251205171215631" style="zoom:50%;" /></p>
+<h3 id="插入-4">插入</h3>
+<p>先按照BST的思路正常插入。如果插入时上溢出，那么需要进行裂变。</p>
+<p>下面举例说明插入操作。</p>
+<ul>
+<li><p>插入25，38，49，60：<img src="assets/image-20251205171413149.png" alt="image-20251205171413149" style="zoom: 50%;" /></p></li>
+<li><p>插入80，此时超出了一个节点的最大容量。取中间位置（<span
+class="math inline">$\lceil \frac{m}{2}
+\rceil$</span>）处的关键字，将节点<strong>裂变</strong>为两部分。</p></li>
+</ul>
+<p><img src="assets/image-20251205171540853.png" alt="image-20251205171540853" style="zoom:50%;" /><img src="assets/image-20251205171551075.png" alt="image-20251205171551075" style="zoom:50%;" /></p>
+<ul>
+<li><p>插入90，99：<img src="assets/image-20251205171645909.png" alt="image-20251205171645909" style="zoom: 33%;" /></p></li>
+<li><p>插入88，节点溢出，取出中间元素88进行裂变。</p></li>
+</ul>
+<p><img src="assets/image-20251205171815540.png" alt="image-20251205171815540" style="zoom:50%;" /><img src="assets/image-20251205171827963.png" alt="image-20251205171827963" style="zoom: 33%;" /></p>
+<ul>
+<li><p>插入83，87：<img src="assets/image-20251205171859725.png" alt="image-20251205171859725" style="zoom:33%;" /></p></li>
+<li><p>插入80：<img src="assets/image-20251205171932809.png" alt="image-20251205171932809" style="zoom:33%;" /><img src="assets/image-20251205171945643.png" alt="image-20251205171945643" style="zoom:33%;" /></p></li>
+<li><p>插入93，94，99：</p>
+<p><img src="assets/image-20251205172022677.png" alt="image-20251205172022677" style="zoom: 40%;" /><img src="assets/image-20251205172036945.png" alt="image-20251205172036945" style="zoom: 50%;" /></p></li>
+<li><p>插入73，74，75，根节点也需要裂变</p></li>
+</ul>
+<p><img src="assets/image-20251205172202912.png" alt="image-20251205172202912" style="zoom: 50%;" /></p>
+<p><img src="assets/image-20251205172217099.png" alt="image-20251205172217099" style="zoom:50%;" /></p>
+<p><img src="assets/image-20251205172228174.png" alt="image-20251205172228174" style="zoom:50%;" /></p>
+<h3 id="删除-4">删除</h3>
+<ul>
+<li>若被删数字在叶子节点，则直接删除</li>
+<li>若被删数字在内部节点，则用它的前驱/后继代替</li>
+<li>最后检查是否下溢出（节点元素个数小于<span
+class="math inline">$\lceil \frac{m}{2} \rceil-1$</span>）
+<ul>
+<li>兄弟够借，则问兄弟借一个，然后调整</li>
+<li>兄弟不够借，则与兄弟合并，然后调整</li>
+</ul></li>
+</ul>
+<p>下面举例说明。</p>
+<ul>
+<li>初始状态</li>
+</ul>
+<p><img src="assets/image-20251205172529190.png" alt="image-20251205172529190" style="zoom: 50%;" /></p>
+<ul>
+<li>删除60，60在叶节点，直接删除</li>
+</ul>
+<p><img src="assets/image-20251205172558887.png" alt="image-20251205172558887" style="zoom: 50%;" /></p>
+<ul>
+<li>删除80，80不在叶节点，于是选择80的前驱77/后继82代替80，这里选择77</li>
+</ul>
+<p><img src="assets/image-20251205172801137.png" alt="image-20251205172801137" style="zoom:50%;" /></p>
+<ul>
+<li>删除77，77不在叶节点，于是选择77的前驱76/后继82代替77，这里选择82</li>
+</ul>
+<p><img src="assets/image-20251205172853568.png" alt="image-20251205172853568" style="zoom:50%;" /></p>
+<ul>
+<li>删除38，直接删除后左下角节点下溢出。兄弟节点70，71，72够借。但不能直接借，否则不符合查找树定义。于是49下去，70上来。</li>
+</ul>
+<p><img src="assets/image-20251205173143914.png" alt="image-20251205173143914" style="zoom:50%;" /></p>
+<p><img src="assets/image-20251205173224050.png" alt="image-20251205173224050" style="zoom:50%;" /></p>
+<ul>
+<li>删除90，发生下溢出。右兄弟不够借，但左兄弟够借，于是问左兄弟借。88下去，87上来。</li>
+</ul>
+<p><img src="assets/image-20251205173348391.png" alt="image-20251205173348391" style="zoom:50%;" /></p>
+<p><img src="assets/image-20251205173411478.png" alt="image-20251205173411478" style="zoom:50%;" /></p>
+<ul>
+<li>删除49，但是兄弟不够借。于是与兄弟合并，同时70下来。</li>
+</ul>
+<p><img src="assets/image-20251205173514245.png" alt="image-20251205173514245" style="zoom:50%;" /></p>
+<ul>
+<li>但此时73所在节点下溢出，右兄弟不够借，于是与右兄弟合并，同时82下来，根节点消失。</li>
+</ul>
+<p><img src="assets/image-20251205173610657.png" alt="image-20251205173610657" style="zoom:50%;" /></p>
+<h2 id="b树-1">B+树</h2>
+<figure>
+<img src="assets/image-20251205174724488.png"
+alt="image-20251205174724488" />
+<figcaption aria-hidden="true">image-20251205174724488</figcaption>
+</figure>
+<p>与B树最大的不同是，<strong>B树的指针是插在数字的缝隙里的，而B+树的指针是连在数字上的。</strong></p>
+<p>此外，每个格存储的是它的孩子的<strong>最大值</strong>。</p>
+<p>同时，叶子节点串成一个链表，可以看作数据库的<strong>“索引”</strong>；而非叶子节点可以看作<strong>“索引的索引”</strong>。</p>
+<h3 id="查找-3">查找</h3>
+<p>注意与BST的不同即可。</p>
+<p>插入与删除过于复杂，不作要求。</p>
+<h2 id="总结">总结</h2>
+<p>纵观这六种树形结构，我们可以清晰地看到数据结构演进的内在逻辑：<strong>一切都是为了在不同场景下实现更高效的查找</strong>。</p>
+<ul>
+<li><strong>BST</strong>
+是万物之源，提供了最基本的二分查找思想，但由于缺乏约束，在极端情况下难以对抗退化。</li>
+<li><strong>AVL树、伸展树、红黑树</strong>
+是在内存中对二叉树的改良。它们的核心手段都是<strong>旋转</strong>。
+<ul>
+<li>AVL追求<strong>极致的平衡</strong>（严格的高度限制）；</li>
+<li>伸展树追求<strong>访问的局部性</strong>（类似缓存，把热点数据搞上去）；</li>
+<li>红黑树追求<strong>统计意义上的平衡</strong>（通过颜色约束），是前两者在性能与维护成本上的折中方案。</li>
+<li><strong>做题心法</strong>：无论旋转规则多复杂，核心永远是精准定位<strong>“爷爷-爸爸-孙子”</strong>对，然后发挥人类的<strong>“上帝视角”</strong>直接重构局部连接。</li>
+</ul></li>
+<li><strong>B树、B+树</strong>
+则是为了应对海量数据和磁盘I/O而生的<strong>多叉树</strong>。它们不再局限于二叉，而是通过<strong>节点裂变</strong>（上溢）与<strong>合并</strong>（下溢）来维持树的“矮胖”形态，从而最大限度减少访问层级。</li>
+</ul>
+<p>掌握这些树，本质上就是掌握<strong>“如何通过动态调整结构，让数据在逻辑上始终保持有序和平衡”</strong>的艺术。希望本文档能帮你从数学和图形的角度，看清这些指针乱飞背后的规律。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91/" rel="tag"># 二叉搜索树</a>
+              <a href="/tags/AVL%E6%A0%91/" rel="tag"># AVL树</a>
+              <a href="/tags/%E4%BC%B8%E5%B1%95%E6%A0%91/" rel="tag"># 伸展树</a>
+              <a href="/tags/%E7%BA%A2%E9%BB%91%E6%A0%91/" rel="tag"># 红黑树</a>
+              <a href="/tags/B%E6%A0%91/" rel="tag"># B树</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/01/11/DCD/%E6%94%B9%E9%80%A0%E6%88%91%E4%BB%AC%E7%9A%84%E8%AE%A1%E6%95%B0%E5%99%A8/" rel="prev" title="改造我们的计数器">
+                  <i class="fa fa-angle-left"></i> 改造我们的计数器
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
