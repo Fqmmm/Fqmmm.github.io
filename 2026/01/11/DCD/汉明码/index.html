@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="书上216页对于汉明码的讲解过于勾史，所以特意写了一份文档，深入解析汉明码的工作原理。 为什么需要汉明码在计算机通信或内存存储（如ECC内存）中，数据以二进制（0和1）形式传输。由于电磁干扰等原因，原本的“0”可能会变成“1”，或者“1”变成“0”。已有一些检错机制，例如奇偶校验，但是奇偶校验只能检测传输过程中是否发生错误，但是无法指出错误发生在哪一位。而汉明码解决了这一问题，它不仅能检测出错误，">
+    <meta name="description" content="书上216页对于汉明码的讲解过于勾史，所以特意写了一份文档，深入解析汉明码的工作原理。 为什么需要汉明码 在计算机通信或内存存储（如ECC内存）中，数据以二进制（0和1）形式传输。由于电磁干扰等原因，原本的“0”可能会变成“1”，或者“1”变成“0”。已有一些检错机制，例如奇偶校验，但是奇偶校验只能检测传输过程中是否发生错误，但是无法指出错误发生在哪一位。而汉明码解决了这一问题，它不仅能检测出">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入理解汉明码">
 <meta property="og:url" content="http://example.com/2026/01/11/DCD/%E6%B1%89%E6%98%8E%E7%A0%81/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="书上216页对于汉明码的讲解过于勾史，所以特意写了一份文档，深入解析汉明码的工作原理。 为什么需要汉明码在计算机通信或内存存储（如ECC内存）中，数据以二进制（0和1）形式传输。由于电磁干扰等原因，原本的“0”可能会变成“1”，或者“1”变成“0”。已有一些检错机制，例如奇偶校验，但是奇偶校验只能检测传输过程中是否发生错误，但是无法指出错误发生在哪一位。而汉明码解决了这一问题，它不仅能检测出错误，">
+<meta property="og:description" content="书上216页对于汉明码的讲解过于勾史，所以特意写了一份文档，深入解析汉明码的工作原理。 为什么需要汉明码 在计算机通信或内存存储（如ECC内存）中，数据以二进制（0和1）形式传输。由于电磁干扰等原因，原本的“0”可能会变成“1”，或者“1”变成“0”。已有一些检错机制，例如奇偶校验，但是奇偶校验只能检测传输过程中是否发生错误，但是无法指出错误发生在哪一位。而汉明码解决了这一问题，它不仅能检测出">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/assets/image-20251220151134679.png">
 <meta property="og:image" content="http://example.com/assets/image-20251220152752175.png">
@@ -139,7 +139,8 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%B1%89%E6%98%8E%E7%A0%81"><span class="nav-number">1.</span> <span class="nav-text">为什么需要汉明码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%89%E6%98%8E%E7%A0%81%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">汉明码的工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E8%BF%87%E7%A8%8B%EF%BC%9A%E5%8E%9F%E5%A7%8B%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%BA%8F%E5%88%97%E2%86%92%E6%B1%89%E6%98%8E%E7%A0%81"><span class="nav-number">2.1.</span> <span class="nav-text">编码过程：原始二进制序列→汉明码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E9%94%99%E8%BF%87%E7%A8%8B%EF%BC%9A%E6%B1%89%E6%98%8E%E7%A0%81%E2%86%92%E9%94%99%E8%AF%AF%E4%BD%8D"><span class="nav-number">2.2.</span> <span class="nav-text">检错过程：汉明码→错误位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#n-%E5%92%8C-k-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">2.3.</span> <span class="nav-text">$n$ 和 $k$ 的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%A1%E9%AA%8C%E4%BD%8D%E9%94%99%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="nav-number">2.4.</span> <span class="nav-text">校验位错了怎么办</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E7%9A%84%E7%9C%9F%E9%9D%A2%E7%9B%AE"><span class="nav-number">2.5.</span> <span class="nav-text">异或的真面目</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%89%E6%98%8E%E7%A0%81%E7%9A%84%E5%B1%80%E9%99%90"><span class="nav-number">3.</span> <span class="nav-text">汉明码的局限</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%B1%89%E6%98%8E%E7%A0%81"><span class="nav-number">1.</span> <span class="nav-text">为什么需要汉明码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%89%E6%98%8E%E7%A0%81%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">汉明码的工作原理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E8%BF%87%E7%A8%8B%E5%8E%9F%E5%A7%8B%E4%BA%8C%E8%BF%9B%E5%88%B6%E5%BA%8F%E5%88%97%E6%B1%89%E6%98%8E%E7%A0%81"><span class="nav-number">2.1.</span> <span class="nav-text">编码过程：原始二进制序列→汉明码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E9%94%99%E8%BF%87%E7%A8%8B%E6%B1%89%E6%98%8E%E7%A0%81%E9%94%99%E8%AF%AF%E4%BD%8D"><span class="nav-number">2.2.</span> <span class="nav-text">检错过程：汉明码→错误位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#n-%E5%92%8C-k-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">2.3.</span> <span class="nav-text">n 和
+k 的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%A1%E9%AA%8C%E4%BD%8D%E9%94%99%E4%BA%86%E6%80%8E%E4%B9%88%E5%8A%9E"><span class="nav-number">2.4.</span> <span class="nav-text">校验位错了怎么办</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E6%88%96%E7%9A%84%E7%9C%9F%E9%9D%A2%E7%9B%AE"><span class="nav-number">2.5.</span> <span class="nav-text">异或的真面目</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B1%89%E6%98%8E%E7%A0%81%E7%9A%84%E5%B1%80%E9%99%90"><span class="nav-number">3.</span> <span class="nav-text">汉明码的局限</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -242,66 +243,155 @@
     
     
     <div class="post-body" itemprop="articleBody"><p>书上216页对于汉明码的讲解过于勾史，所以特意写了一份文档，深入解析汉明码的工作原理。</p>
-<h2 id="为什么需要汉明码"><a href="#为什么需要汉明码" class="headerlink" title="为什么需要汉明码"></a>为什么需要汉明码</h2><p>在计算机通信或内存存储（如ECC内存）中，数据以二进制（0和1）形式传输。由于电磁干扰等原因，原本的“0”可能会变成“1”，或者“1”变成“0”。已有一些检错机制，例如奇偶校验，但是奇偶校验只能检测传输过程中是否发生错误，但是无法指出错误发生在哪一位。而汉明码解决了这一问题，它不仅能检测出错误，还能指出错误发生在哪一位。</p>
-<h2 id="汉明码的工作原理"><a href="#汉明码的工作原理" class="headerlink" title="汉明码的工作原理"></a>汉明码的工作原理</h2><p>利用汉明码检错时，可以分为两个过程：编码过程和检错过程。编码过程在原始二进制序列加入若干校验位后变成汉明码；检错过程接受传输过来的汉明码，并检查是否有传输错误。</p>
+<h2 id="为什么需要汉明码">为什么需要汉明码</h2>
+<p>在计算机通信或内存存储（如ECC内存）中，数据以二进制（0和1）形式传输。由于电磁干扰等原因，原本的“0”可能会变成“1”，或者“1”变成“0”。已有一些检错机制，例如奇偶校验，但是奇偶校验只能检测传输过程中是否发生错误，但是无法指出错误发生在哪一位。而汉明码解决了这一问题，它不仅能检测出错误，还能指出错误发生在哪一位。</p>
+<h2 id="汉明码的工作原理">汉明码的工作原理</h2>
+<p>利用汉明码检错时，可以分为两个过程：编码过程和检错过程。编码过程在原始二进制序列加入若干校验位后变成汉明码；检错过程接受传输过来的汉明码，并检查是否有传输错误。</p>
 <p>下面通过一个例子讲解这一过程：我们要传输 11000100 的二进制序列。</p>
-<h3 id="编码过程：原始二进制序列→汉明码"><a href="#编码过程：原始二进制序列→汉明码" class="headerlink" title="编码过程：原始二进制序列→汉明码"></a>编码过程：原始二进制序列→汉明码</h3><p>首先，我们将 $k=4$ 个校验位插入 $n=8$ 个数据位中，最终形成 $k+n=12$ 位汉明码。在最终的12位汉明码中，第1，2，4，8（2的幂次）位是新插入的校验位，其它位是原始的二进制数。</p>
+<h3
+id="编码过程原始二进制序列汉明码">编码过程：原始二进制序列→汉明码</h3>
+<p>首先，我们将 <span class="math inline"><em>k</em> = 4</span>
+个校验位插入 <span class="math inline"><em>n</em> = 8</span>
+个数据位中，最终形成 <span
+class="math inline"><em>k</em> + <em>n</em> = 12</span>
+位汉明码。在最终的12位汉明码中，第1，2，4，8（2的幂次）位是新插入的校验位，其它位是原始的二进制数。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">index 1 2 3 4 5 6 7 8</span><br><span class="line">value 1 1 0 0 0 1 0 0</span><br><span class="line">		   ↓</span><br><span class="line">index 1  2  3 4  5 6 7 8  9 10 11 12</span><br><span class="line">value P1 P2 1 P4 1 0 0 P8 0  1  0  0</span><br></pre></td></tr></table></figure>
-<p>然后分别计算 $P_1$, $P_2$, $P_4$, $P_8$的值。$P_i$ 的计算方式是：</p>
+<p>然后分别计算 <span class="math inline"><em>P</em><sub>1</sub></span>,
+<span class="math inline"><em>P</em><sub>2</sub></span>, <span
+class="math inline"><em>P</em><sub>4</sub></span>, <span
+class="math inline"><em>P</em><sub>8</sub></span>的值。<span
+class="math inline"><em>P</em><sub><em>i</em></sub></span>
+的计算方式是：</p>
 <ul>
-<li>找出 $k=4$ 位二进制数中，右边第 $log_2i$ 位（从0开始数）是 1 的数（这个数大于 $i$，且不超过汉明码的位数 $n+k$），把这个数加入集合 $S$。</li>
-<li>$P_n=\text{Xor}(P_i), i \in S$。</li>
+<li>找出 <span class="math inline"><em>k</em> = 4</span>
+位二进制数中，右边第 <span
+class="math inline"><em>l</em><em>o</em><em>g</em><sub>2</sub><em>i</em></span>
+位（从0开始数）是 1 的数（这个数大于 <span
+class="math inline"><em>i</em></span>，且不超过汉明码的位数 <span
+class="math inline"><em>n</em> + <em>k</em></span>），把这个数加入集合
+<span class="math inline"><em>S</em></span>。</li>
+<li><span
+class="math inline"><em>P</em><sub><em>n</em></sub> = Xor(<em>P</em><sub><em>i</em></sub>), <em>i</em> ∈ <em>S</em></span>。</li>
 </ul>
-<p>例如，计算 $P_2$。我们要找到右边第 1 位（从0开始数）是 1 的数。这些数包括</p>
+<p>例如，计算 <span
+class="math inline"><em>P</em><sub>2</sub></span>。我们要找到右边第 1
+位（从0开始数）是 1 的数。这些数包括</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">3=0011</span><br><span class="line">6=0110</span><br><span class="line">7=0111</span><br><span class="line">10=1010</span><br><span class="line">11=1011</span><br><span class="line">(14=1110，15=1111都大于12)</span><br></pre></td></tr></table></figure>
-<p>于是 $S={3,6,7,10,11}$， $P<em>2=\text{Xor}(P_3,P_6, P_7, P</em>{10}, P_{11})$。</p>
-<p>通过这一算法，我们可以算出 $P_1, P_2, P_4, P_8$ 的值：</p>
-<script type="math/tex; mode=display">
-P_1=\text{Xor}(P_3,P_5, P_7, P_9, P_{11})=0    \\
-P_2=\text{Xor}(P_3,P_6, P_7, P_{10}, P_{11})=0    \\
-P_4=\text{Xor}(P_5,P_6, P_7, P_{12})=1    \\
-P_8=\text{Xor}(P_9,P_{10}, P_{11}, P_{12})=1</script><p>因此，最终得到的 $k+n=12$ 位汉明码为：</p>
+<p>于是 <span class="math inline"><em>S</em> = 3, 6, 7, 10, 11</span>，
+<span
+class="math inline"><em>P</em><sub>2</sub> = Xor(<em>P</em><sub>3</sub>, <em>P</em><sub>6</sub>, <em>P</em><sub>7</sub>, <em>P</em><sub>10</sub>, <em>P</em><sub>11</sub>)</span>。</p>
+<p>通过这一算法，我们可以算出 <span
+class="math inline"><em>P</em><sub>1</sub>, <em>P</em><sub>2</sub>, <em>P</em><sub>4</sub>, <em>P</em><sub>8</sub></span>
+的值： <span class="math display">$$
+P_1=\text{Xor}(P_3,P_5, P_7, P_9, P_{11})=0 \\
+P_2=\text{Xor}(P_3,P_6, P_7, P_{10}, P_{11})=0  \\
+P_4=\text{Xor}(P_5,P_6, P_7, P_{12})=1  \\
+P_8=\text{Xor}(P_9,P_{10}, P_{11}, P_{12})=1
+$$</span> 因此，最终得到的 <span
+class="math inline"><em>k</em> + <em>n</em> = 12</span> 位汉明码为：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">index 1 2 3 4 5 6 7 8 9 10 11 12</span><br><span class="line">value 0 0 1 1 1 0 0 1 0 1  0  0</span><br></pre></td></tr></table></figure>
-<h3 id="检错过程：汉明码→错误位"><a href="#检错过程：汉明码→错误位" class="headerlink" title="检错过程：汉明码→错误位"></a>检错过程：汉明码→错误位</h3><p>接收到二进制序列后，我们需要检查它们是否有误。检查规则如下：</p>
-<script type="math/tex; mode=display">
-C_1=\text{Xor}(P_1, P_3,P_5, P_7, P_9, P_{11})    \\
+<h3 id="检错过程汉明码错误位">检错过程：汉明码→错误位</h3>
+<p>接收到二进制序列后，我们需要检查它们是否有误。检查规则如下： <span
+class="math display">$$
+C_1=\text{Xor}(P_1, P_3,P_5, P_7, P_9, P_{11})  \\
 C_2=\text{Xor}(P_2, P_3,P_6, P_7, P_10, P_{11}) \\
 C_4=\text{Xor}(P_4, P_5, P_6, P_7,P_{12}) \\
-C_8=\text{Xor}(P_8, P_9, P_{10}, P_{11}, P_{12})</script><p>也就是</p>
-<script type="math/tex; mode=display">
+C_8=\text{Xor}(P_8, P_9, P_{10}, P_{11}, P_{12})
+$$</span> 也就是 <span class="math display">$$
 C_1=\text{Xor}(P_1, P_1^{'})    \\
 C_2=\text{Xor}(P_2, P_2^{'}) \\
 C_4=\text{Xor}(P_4, P_4^{'}) \\
-C_8=\text{Xor}(P_8, P_8^{'})</script><p>其中 $P_i^{‘}, i为2的幂次$ 表示接收到的二进制序列的校验位的<strong>“实然值”</strong>，$P_i, i为2的幂次$ 表示校验位的<strong>“应然值”</strong>。如果应然值=实然值（即$C_8C_4C_2C_1=0000$），那么信息传输没有出错。</p>
+C_8=\text{Xor}(P_8, P_8^{'})
+$$</span> 其中 <span
+class="math inline"><em>P</em><sub><em>i</em></sub><sup>′</sup>, <em>i</em><em>为</em>2<em>的</em><em>幂</em><em>次</em></span>
+表示接收到的二进制序列的校验位的<strong>“实然值”</strong>，<span
+class="math inline"><em>P</em><sub><em>i</em></sub>, <em>i</em><em>为</em>2<em>的</em><em>幂</em><em>次</em></span>
+表示校验位的<strong>“应然值”</strong>。如果应然值=实然值（即<span
+class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub> = 0000</span>），那么信息传输没有出错。</p>
 <p>那么传输出错时会发生什么呢？看一个例子。</p>
 <p><img src="/assets/image-20251220151134679.png" alt="image-20251220151134679" style="zoom:50%;" /></p>
-<p>假设第1位出错，那么 $C_8C_4C_2C_1=0001$，$0001=1$；</p>
-<p>假设第5为出错，那么 $C_8C_4C_2C_1=0101$，$0101=5$。</p>
+<p>假设第1位出错，那么 <span
+class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub> = 0001</span>，<span
+class="math inline">0001 = 1</span>；</p>
+<p>假设第5为出错，那么 <span
+class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub> = 0101</span>，<span
+class="math inline">0101 = 5</span>。</p>
 <p>为什么有这种巧妙的映射关系？这正来源于汉明码的精巧设计。</p>
-<p>我们以第 5 位出错为例。在编码过程中，位置 5 的信息实际流向了两个部分：$P_1$ 和 $P_4$。$P_1$ 和 $P_4$ 正是 5（0101）中为 1 的两位。在计算 $C_8C_4C_2C_1$ 的时候，我们发现 $C_1=1$，说明传输错误出现在3，5，7，9，11位；我们还发现 $C_4=1$，说明传输错误出现在5，6，7，12位。两者的交集是5，所以第 5 位出现了传输错误。</p>
-<h3 id="n-和-k-的关系"><a href="#n-和-k-的关系" class="headerlink" title="$n$ 和 $k$ 的关系"></a>$n$ 和 $k$ 的关系</h3><p>让我们追本溯源。为什么 $n=8$ 位二进制序列需要 $k=4$ 个校验位呢？更普遍的问题是，如何根据 $n$ 确定 $k$？$n$ 和 $k$ 有什么关系？</p>
-<p>这里的核心逻辑是，$C<em>kC</em>{k-1}…C<em>2C_1$ 要能够表示所有的错误情况。而全 0 代表没有出错，所以 $C_kC</em>{k-1}…C_2C_1$ 最多能表示 $2^k-1$ 种错误。而 $n+k$ 位汉明码最多出现 $n+k$ 种错误，因此 <strong>$2^k-1≥n+k$</strong>。这就是 $n$ 和 $k$ 的关系。</p>
-<p>因此，在确定校验位个数 $k$ 的时候，我们需要找到使 $2^k-1≥n+k$ 成立的最小 $k$。下表列出了一些常见情况：</p>
+<p>我们以第 5 位出错为例。在编码过程中，位置 5
+的信息实际流向了两个部分：<span
+class="math inline"><em>P</em><sub>1</sub></span> 和 <span
+class="math inline"><em>P</em><sub>4</sub></span>。<span
+class="math inline"><em>P</em><sub>1</sub></span> 和 <span
+class="math inline"><em>P</em><sub>4</sub></span> 正是 5（0101）中为 1
+的两位。在计算 <span
+class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub></span>
+的时候，我们发现 <span
+class="math inline"><em>C</em><sub>1</sub> = 1</span>，说明传输错误出现在3，5，7，9，11位；我们还发现
+<span
+class="math inline"><em>C</em><sub>4</sub> = 1</span>，说明传输错误出现在5，6，7，12位。两者的交集是5，所以第
+5 位出现了传输错误。</p>
+<h3 id="n-和-k-的关系"><span class="math inline"><em>n</em></span> 和
+<span class="math inline"><em>k</em></span> 的关系</h3>
+<p>让我们追本溯源。为什么 <span
+class="math inline"><em>n</em> = 8</span> 位二进制序列需要 <span
+class="math inline"><em>k</em> = 4</span>
+个校验位呢？更普遍的问题是，如何根据 <span
+class="math inline"><em>n</em></span> 确定 <span
+class="math inline"><em>k</em></span>？<span
+class="math inline"><em>n</em></span> 和 <span
+class="math inline"><em>k</em></span> 有什么关系？</p>
+<p>这里的核心逻辑是，<span
+class="math inline"><em>C</em><sub><em>k</em></sub><em>C</em><sub><em>k</em> − 1</sub>...<em>C</em><sub>2</sub><em>C</em><sub>1</sub></span>
+要能够表示所有的错误情况。而全 0 代表没有出错，所以 <span
+class="math inline"><em>C</em><sub><em>k</em></sub><em>C</em><sub><em>k</em> − 1</sub>...<em>C</em><sub>2</sub><em>C</em><sub>1</sub></span>
+最多能表示 <span class="math inline">2<sup><em>k</em></sup> − 1</span>
+种错误。而 <span class="math inline"><em>n</em> + <em>k</em></span>
+位汉明码最多出现 <span
+class="math inline"><em>n</em> + <em>k</em></span> 种错误，因此
+<strong><span
+class="math inline">2<sup><em>k</em></sup> − 1 ≥ <em>n</em> + <em>k</em></span></strong>。这就是
+<span class="math inline"><em>n</em></span> 和 <span
+class="math inline"><em>k</em></span> 的关系。</p>
+<p>因此，在确定校验位个数 <span class="math inline"><em>k</em></span>
+的时候，我们需要找到使 <span
+class="math inline">2<sup><em>k</em></sup> − 1 ≥ <em>n</em> + <em>k</em></span>
+成立的最小 <span
+class="math inline"><em>k</em></span>。下表列出了一些常见情况：</p>
 <p><img src="/assets/image-20251220152752175.png" alt="image-20251220152752175" style="zoom: 50%;" /></p>
-<h3 id="校验位错了怎么办"><a href="#校验位错了怎么办" class="headerlink" title="校验位错了怎么办"></a>校验位错了怎么办</h3><p>如果数据传输的过程中，出错的不是数据位，而是校验位怎么办？这样 $P_i, i为2的幂次$ 就不是校验位的“使然值”了，算法还正确吗？</p>
+<h3 id="校验位错了怎么办">校验位错了怎么办</h3>
+<p>如果数据传输的过程中，出错的不是数据位，而是校验位怎么办？这样 <span
+class="math inline"><em>P</em><sub><em>i</em></sub>, <em>i</em><em>为</em>2<em>的</em><em>幂</em><em>次</em></span>
+就不是校验位的“使然值”了，算法还正确吗？</p>
 <p>答案是肯定的：<strong>在汉明码看来，校验位和数据位是“平等”的。如果校验位本身在传输中出错了，汉明码同样能准确地定位到它，并把它纠正回来。</strong></p>
-<p>例如，$P_1$ 出错，$C_8C_4C_2C_1=0001$，表示第一位出错（其实上面也有写）</p>
-<h3 id="异或的真面目"><a href="#异或的真面目" class="headerlink" title="异或的真面目"></a>异或的真面目</h3><p>我们也许对于“异或”操作有些疑惑。为什么偏偏是异或呢？为什么不能是与、或、同或，甚至其它运算呢？</p>
+<p>例如，<span class="math inline"><em>P</em><sub>1</sub></span>
+出错，<span
+class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub> = 0001</span>，表示第一位出错（其实上面也有写）</p>
+<h3 id="异或的真面目">异或的真面目</h3>
+<p>我们也许对于“异或”操作有些疑惑。为什么偏偏是异或呢？为什么不能是与、或、同或，甚至其它运算呢？</p>
 <p>书上有一行不起眼的字：<strong>“异或运算执行检‘奇’功能，当变量中1的个数为奇数时，结果为1；为偶数个1时，结果为0”。</strong></p>
 <p>实际上，“异或”检查的是一串数中为1的个数。<strong>如果1有偶数个，那么异或出来就是0；如果1有奇数个，那么异或出来就是1。</strong>说白了，还是和奇偶校验有关。</p>
 <p>所以在实际做题的时候，我们没有必要老老实实地做异或运算，只需要数一数1有几个就可以了。</p>
 <blockquote>
-<p><strong>定理</strong> 设 $x_1, x_2, …, x_k$ 是一个二进制数序列，$x_i \in {0,1}$。则</p>
-<script type="math/tex; mode=display">
+<p><strong>定理</strong> 设 <span
+class="math inline"><em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, ..., <em>x</em><sub><em>k</em></sub></span>
+是一个二进制数序列，<span
+class="math inline"><em>x</em><sub><em>i</em></sub> ∈ {0, 1}</span>。则
+<span class="math display">$$
 \text{Xor}(x_1, x_2, ...,x_k)=
 \begin{cases}
-1 & x_1, x_2, ...,x_k中有奇数个1 \\
-0 & x_1, x_2, ...,x_k中有偶数个1
-\end{cases}</script></blockquote>
-<h2 id="汉明码的局限"><a href="#汉明码的局限" class="headerlink" title="汉明码的局限"></a>汉明码的局限</h2><p>虽然汉明码不担心校验位出错，但它有一个硬伤：<strong>它默认二进制序列只有一个位出错</strong>。如果有两个甚至多个位出错，汉明码检测不出来。因此，现代 ECC 内存通常使用 <strong>SEC-DED</strong>（扩展汉明码）。它在最后多加了一位“全总校验位”（全总校验位=前面所有位的异或），可以实现：</p>
+1 &amp; x_1, x_2, ...,x_k中有奇数个1 \\
+0 &amp; x_1, x_2, ...,x_k中有偶数个1
+\end{cases}
+$$</span></p>
+</blockquote>
+<h2 id="汉明码的局限">汉明码的局限</h2>
+<p>虽然汉明码不担心校验位出错，但它有一个硬伤：<strong>它默认二进制序列只有一个位出错</strong>。如果有两个甚至多个位出错，汉明码检测不出来。因此，现代
+ECC 内存通常使用
+<strong>SEC-DED</strong>（扩展汉明码）。它在最后多加了一位“全总校验位”（全总校验位=前面所有位的异或），可以实现：</p>
 <ul>
 <li>如果是 1 位错：定位并修好它。</li>
-<li>如果是 2 位错：总校验位会发现异常，大喊“错得太多了，我修不了，但我知道数据坏了”，从而避免系统读入错误数据。</li>
+<li>如果是 2
+位错：总校验位会发现异常，大喊“错得太多了，我修不了，但我知道数据坏了”，从而避免系统读入错误数据。</li>
 </ul>
 
     </div>
@@ -320,11 +410,14 @@ C_8=\text{Xor}(P_8, P_8^{'})</script><p>其中 $P_i^{‘}, i为2的幂次$ 表�
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2026/01/11/DCD/%E6%94%B9%E9%80%A0%E6%88%91%E4%BB%AC%E7%9A%84%E8%AE%A1%E6%95%B0%E5%99%A8/" rel="prev" title="改造我们的计数器">
-                  <i class="fa fa-angle-left"></i> 改造我们的计数器
+                <a href="/2026/01/11/DCD/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95%E4%B8%8E%E5%AD%97%E6%89%A9%E5%B1%95/" rel="prev" title="改造我们的存储器">
+                  <i class="fa fa-angle-left"></i> 改造我们的存储器
                 </a>
             </div>
             <div class="post-nav-item">
+                <a href="/2026/01/11/DCD/%E6%94%B9%E9%80%A0%E6%88%91%E4%BB%AC%E7%9A%84%E8%AE%A1%E6%95%B0%E5%99%A8/" rel="next" title="改造我们的计数器">
+                  改造我们的计数器 <i class="fa fa-angle-right"></i>
+                </a>
             </div>
           </div>
     </footer>

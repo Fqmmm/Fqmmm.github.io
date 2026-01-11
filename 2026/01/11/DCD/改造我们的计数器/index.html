@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="标准的计数器，例如4位计数器，只能从0数到15，然后归0。但是在某些条件下，我们希望它数到一个小于16的数就归0。例如模12计数器，它从0数到11，然后归0。在其它条件下，我们希望它能数到很大的数，例如256，这时候需要把两个4位计数器串联，$2^8&#x3D;256$。因此，我们需要改造我们的计数器。 反馈清零法74LS161是异步清零的，74LS163是同步清零的。因此，对于下面两张图，前者是模9计数器">
+    <meta name="description" content="标准的计数器，例如4位计数器，只能从0数到15，然后归0。但是在某些条件下，我们希望它数到一个小于16的数就归0。例如模12计数器，它从0数到11，然后归0。在其它条件下，我们希望它能数到很大的数，例如256，这时候需要把两个4位计数器串联，28 &#x3D; 256。因此，我们需要改造我们的计数器。 反馈清零法 74LS161是异步清零的，74LS163是同步清零的。因此，对于下面两张图，前者是模9计">
 <meta property="og:type" content="article">
 <meta property="og:title" content="改造我们的计数器">
 <meta property="og:url" content="http://example.com/2026/01/11/DCD/%E6%94%B9%E9%80%A0%E6%88%91%E4%BB%AC%E7%9A%84%E8%AE%A1%E6%95%B0%E5%99%A8/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="标准的计数器，例如4位计数器，只能从0数到15，然后归0。但是在某些条件下，我们希望它数到一个小于16的数就归0。例如模12计数器，它从0数到11，然后归0。在其它条件下，我们希望它能数到很大的数，例如256，这时候需要把两个4位计数器串联，$2^8&#x3D;256$。因此，我们需要改造我们的计数器。 反馈清零法74LS161是异步清零的，74LS163是同步清零的。因此，对于下面两张图，前者是模9计数器">
+<meta property="og:description" content="标准的计数器，例如4位计数器，只能从0数到15，然后归0。但是在某些条件下，我们希望它数到一个小于16的数就归0。例如模12计数器，它从0数到11，然后归0。在其它条件下，我们希望它能数到很大的数，例如256，这时候需要把两个4位计数器串联，28 &#x3D; 256。因此，我们需要改造我们的计数器。 反馈清零法 74LS161是异步清零的，74LS163是同步清零的。因此，对于下面两张图，前者是模9计">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/assets/image-20260101163912330.png">
 <meta property="og:image" content="http://example.com/assets/image-20260101163950205.png">
@@ -243,15 +243,23 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p>标准的计数器，例如4位计数器，只能从0数到15，然后归0。但是在某些条件下，我们希望它数到一个小于16的数就归0。例如模12计数器，它从0数到11，然后归0。在其它条件下，我们希望它能数到很大的数，例如256，这时候需要把两个4位计数器串联，$2^8=256$。因此，我们需要改造我们的计数器。</p>
-<h2 id="反馈清零法"><a href="#反馈清零法" class="headerlink" title="反馈清零法"></a>反馈清零法</h2><p>74LS161是异步清零的，74LS163是同步清零的。因此，对于下面两张图，前者是模9计数器，当$Q_3Q_2Q_1Q_0=1001$是会立刻触发reset，然后立即回到$0000$。而后者是模10计数器，当$Q_3Q_2Q_1Q_0=1001$时，下一个时钟上升沿到来时才会归零。</p>
+    <div class="post-body" itemprop="articleBody"><p>标准的计数器，例如4位计数器，只能从0数到15，然后归0。但是在某些条件下，我们希望它数到一个小于16的数就归0。例如模12计数器，它从0数到11，然后归0。在其它条件下，我们希望它能数到很大的数，例如256，这时候需要把两个4位计数器串联，<span
+class="math inline">2<sup>8</sup> = 256</span>。因此，我们需要改造我们的计数器。</p>
+<h2 id="反馈清零法">反馈清零法</h2>
+<p>74LS161是异步清零的，74LS163是同步清零的。因此，对于下面两张图，前者是模9计数器，当<span
+class="math inline"><em>Q</em><sub>3</sub><em>Q</em><sub>2</sub><em>Q</em><sub>1</sub><em>Q</em><sub>0</sub> = 1001</span>是会立刻触发reset，然后立即回到<span
+class="math inline">0000</span>。而后者是模10计数器，当<span
+class="math inline"><em>Q</em><sub>3</sub><em>Q</em><sub>2</sub><em>Q</em><sub>1</sub><em>Q</em><sub>0</sub> = 1001</span>时，下一个时钟上升沿到来时才会归零。</p>
 <p><img src="/assets/image-20260101163912330.png" alt="image-20260101163912330" style="zoom: 25%;" /></p>
 <p><img src="/assets/image-20260101163950205.png" alt="image-20260101163950205" style="zoom:25%;" /></p>
-<h2 id="反馈置数法"><a href="#反馈置数法" class="headerlink" title="反馈置数法"></a>反馈置数法</h2><p>把输入数据事先设成0，这样达到1001的时候就可以采用load代替reset了</p>
+<h2 id="反馈置数法">反馈置数法</h2>
+<p>把输入数据事先设成0，这样达到1001的时候就可以采用load代替reset了</p>
 <p><img src="/assets/image-20260101164449725.png" alt="image-20260101164449725" style="zoom:25%;" /></p>
-<h2 id="计数器的串联"><a href="#计数器的串联" class="headerlink" title="计数器的串联"></a>计数器的串联</h2><p>计数器串联后可以数到更大的数。</p>
+<h2 id="计数器的串联">计数器的串联</h2>
+<p>计数器串联后可以数到更大的数。</p>
 <p><img src="/assets/image-20260101164651401.png" alt="image-20260101164651401" style="zoom:25%;" /></p>
-<p>CO是carry output的意思，如果低位计数器溢出了，那么高位计数器就会开始工作。·</p>
+<p>CO是carry
+output的意思，如果低位计数器溢出了，那么高位计数器就会开始工作。·</p>
 
     </div>
 
@@ -269,14 +277,11 @@
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2026/01/11/DCD/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95%E4%B8%8E%E5%AD%97%E6%89%A9%E5%B1%95/" rel="prev" title="改造我们的存储器">
-                  <i class="fa fa-angle-left"></i> 改造我们的存储器
+                <a href="/2026/01/11/DCD/%E6%B1%89%E6%98%8E%E7%A0%81/" rel="prev" title="深入理解汉明码">
+                  <i class="fa fa-angle-left"></i> 深入理解汉明码
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2026/01/11/DCD/%E6%B1%89%E6%98%8E%E7%A0%81/" rel="next" title="深入理解汉明码">
-                  深入理解汉明码 <i class="fa fa-angle-right"></i>
-                </a>
             </div>
           </div>
     </footer>
