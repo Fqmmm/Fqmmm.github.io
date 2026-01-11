@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="改造我们的存储器存储器的位扩展  存储器的字扩展 如果有多个RAM，那么需要一个译码器，选择读取哪个RAM的数据   位扩展+字扩展 往右为字扩展，纸面向内为位扩展 （或者，位扩展往右画，字扩展往下画，这样形成一个二维矩阵，似乎更加直观）">
+    <meta name="description" content="存储器的位扩展  存储器的字扩展 如果有多个RAM，那么需要一个译码器，选择读取哪个RAM的数据   位扩展+字扩展 往右为字扩展，纸面向内为位扩展 （或者，位扩展往右画，字扩展往下画，这样形成一个二维矩阵，似乎更加直观）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Fqmmm&#39;s Blog">
+<meta property="og:title" content="改造我们的存储器">
 <meta property="og:url" content="http://example.com/2026/01/11/DCD/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95%E4%B8%8E%E5%AD%97%E6%89%A9%E5%B1%95/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="改造我们的存储器存储器的位扩展  存储器的字扩展 如果有多个RAM，那么需要一个译码器，选择读取哪个RAM的数据   位扩展+字扩展 往右为字扩展，纸面向内为位扩展 （或者，位扩展往右画，字扩展往下画，这样形成一个二维矩阵，似乎更加直观）">
+<meta property="og:description" content="存储器的位扩展  存储器的字扩展 如果有多个RAM，那么需要一个译码器，选择读取哪个RAM的数据   位扩展+字扩展 往右为字扩展，纸面向内为位扩展 （或者，位扩展往右画，字扩展往下画，这样形成一个二维矩阵，似乎更加直观）">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/assets/image-20260101153436918.png">
 <meta property="og:image" content="http://example.com/assets/image-20260101153556716.png">
@@ -34,8 +34,10 @@
 <meta property="og:image" content="http://example.com/assets/image-20260101153836375.png">
 <meta property="og:image" content="http://example.com/assets/image-20260101153911010.png">
 <meta property="article:published_time" content="2026-01-11T09:31:56.415Z">
-<meta property="article:modified_time" content="2026-01-11T09:33:21.362Z">
+<meta property="article:modified_time" content="2026-01-11T09:39:13.263Z">
 <meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="RAM">
+<meta property="article:tag" content="存储器">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/assets/image-20260101153436918.png">
 
@@ -43,10 +45,10 @@
 <link rel="canonical" href="http://example.com/2026/01/11/DCD/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95%E4%B8%8E%E5%AD%97%E6%89%A9%E5%B1%95/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/01/11/DCD/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95%E4%B8%8E%E5%AD%97%E6%89%A9%E5%B1%95/","path":"2026/01/11/DCD/存储器的位扩展与字扩展/","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/01/11/DCD/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95%E4%B8%8E%E5%AD%97%E6%89%A9%E5%B1%95/","path":"2026/01/11/DCD/存储器的位扩展与字扩展/","title":"改造我们的存储器"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title> | Fqmmm's Blog</title>
+<title>改造我们的存储器 | Fqmmm's Blog</title>
   
 
 
@@ -135,7 +137,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%94%B9%E9%80%A0%E6%88%91%E4%BB%AC%E7%9A%84%E5%AD%98%E5%82%A8%E5%99%A8"><span class="nav-number">1.</span> <span class="nav-text">改造我们的存储器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95"><span class="nav-number">1.1.</span> <span class="nav-text">存储器的位扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E5%AD%97%E6%89%A9%E5%B1%95"><span class="nav-number">1.2.</span> <span class="nav-text">存储器的字扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%8D%E6%89%A9%E5%B1%95-%E5%AD%97%E6%89%A9%E5%B1%95"><span class="nav-number">1.3.</span> <span class="nav-text">位扩展+字扩展</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95"><span class="nav-number">1.</span> <span class="nav-text">存储器的位扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E5%AD%97%E6%89%A9%E5%B1%95"><span class="nav-number">2.</span> <span class="nav-text">存储器的字扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%8D%E6%89%A9%E5%B1%95-%E5%AD%97%E6%89%A9%E5%B1%95"><span class="nav-number">3.</span> <span class="nav-text">位扩展+字扩展</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -148,7 +150,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">4</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -159,7 +161,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -199,12 +201,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="name" content="改造我们的存储器 | Fqmmm's Blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          
+          改造我们的存储器
         </h1>
 
         <div class="post-meta-container">
@@ -216,7 +218,16 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-01-11 17:31:56 / Modified: 17:33:21" itemprop="dateCreated datePublished" datetime="2026-01-11T17:31:56+08:00">2026-01-11</time>
+      <time title="Created: 2026-01-11 17:31:56 / Modified: 17:39:13" itemprop="dateCreated datePublished" datetime="2026-01-11T17:31:56+08:00">2026-01-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/DCD/" itemprop="url" rel="index"><span itemprop="name">DCD</span></a>
+        </span>
     </span>
 
   
@@ -228,7 +239,7 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><h1 id="改造我们的存储器"><a href="#改造我们的存储器" class="headerlink" title="改造我们的存储器"></a>改造我们的存储器</h1><h3 id="存储器的位扩展"><a href="#存储器的位扩展" class="headerlink" title="存储器的位扩展"></a>存储器的位扩展</h3><p><img src="/assets/image-20260101153436918.png" alt="image-20260101153436918"></p>
+    <div class="post-body" itemprop="articleBody"><h3 id="存储器的位扩展"><a href="#存储器的位扩展" class="headerlink" title="存储器的位扩展"></a>存储器的位扩展</h3><p><img src="/assets/image-20260101153436918.png" alt="image-20260101153436918"></p>
 <p><img src="/assets/image-20260101153556716.png" alt="image-20260101153556716"></p>
 <h3 id="存储器的字扩展"><a href="#存储器的字扩展" class="headerlink" title="存储器的字扩展"></a>存储器的字扩展</h3><p><img src="/assets/image-20260101153649870.png" alt="image-20260101153649870"></p>
 <p>如果有多个RAM，那么需要一个译码器，选择读取哪个RAM的数据</p>
@@ -245,6 +256,10 @@
     
 
     <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AD%98%E5%82%A8%E5%99%A8/" rel="tag"># 存储器</a>
+              <a href="/tags/RAM/" rel="tag"># RAM</a>
+          </div>
 
         
 
@@ -255,8 +270,8 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2026/01/11/DCD/%E6%B1%89%E6%98%8E%E7%A0%81/" rel="next" title="">
-                   <i class="fa fa-angle-right"></i>
+                <a href="/2026/01/11/DCD/%E6%B1%89%E6%98%8E%E7%A0%81/" rel="next" title="深入理解汉明码">
+                  深入理解汉明码 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
