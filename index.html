@@ -304,7 +304,7 @@ output的意思，如果低位计数器溢出了，那么高位计数器就会�
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-01-11 17:31:56 / Modified: 18:22:13" itemprop="dateCreated datePublished" datetime="2026-01-11T17:31:56+08:00">2026-01-11</time>
+      <time title="Created: 2026-01-11 17:31:56 / Modified: 18:24:48" itemprop="dateCreated datePublished" datetime="2026-01-11T17:31:56+08:00">2026-01-11</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -367,10 +367,12 @@ class="math inline"><em>P</em><sub>2</sub> = Xor(<em>P</em><sub>3</sub>, <
 <p>通过这一算法，我们可以算出 <span
 class="math inline"><em>P</em><sub>1</sub>, <em>P</em><sub>2</sub>, <em>P</em><sub>4</sub>, <em>P</em><sub>8</sub></span>
 的值： <span class="math display">$$
+\begin {aligned}
 P_1=\text{Xor}(P_3,P_5, P_7, P_9, P_{11})=0 \\\\
 P_2=\text{Xor}(P_3,P_6, P_7, P_{10}, P_{11})=0  \\\\
 P_4=\text{Xor}(P_5,P_6, P_7, P_{12})=1  \\\\
 P_8=\text{Xor}(P_9,P_{10}, P_{11}, P_{12})=1
+\end {aligned}
 $$</span> 因此，最终得到的 <span
 class="math inline"><em>k</em> + <em>n</em> = 12</span> 位汉明码为：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">index 1 2 3 4 5 6 7 8 9 10 11 12</span><br><span class="line">value 0 0 1 1 1 0 0 1 0 1  0  0</span><br></pre></td></tr></table></figure>
