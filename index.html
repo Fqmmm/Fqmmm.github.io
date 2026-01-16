@@ -209,7 +209,7 @@
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-01-16 15:17:32 / Modified: 15:20:04" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
+      <time title="Created: 2026-01-16 15:17:32 / Modified: 16:02:12" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -254,11 +254,13 @@ class="math inline"><em>μ</em><sub>2</sub> = 145</span></p></li>
 class="math inline">180</span>，我们就能立刻判断它属于大学组。</p></li>
 </ul>
 <p>如果我们一开始就知道 <span
-class="math inline"><em>μ</em><sub>1</sub> = 90, <em>μ</em><sub>2</sub> = 145, <em>μ</em><sub>3</sub> = 180</span>，那也简单：
-* <span class="math inline">85</span> 离 <span
-class="math inline">90</span> 最近，那它大概率是幼儿。 * <span
-class="math inline">175</span> 离 <span class="math inline">180</span>
-最近，那它大概率是大学生。</p>
+class="math inline"><em>μ</em><sub>1</sub> = 90, <em>μ</em><sub>2</sub> = 145, <em>μ</em><sub>3</sub> = 180</span>，那也简单：</p>
+<ul>
+<li><span class="math inline">85</span> 离 <span
+class="math inline">90</span> 最近，那它大概率是幼儿。</li>
+<li><span class="math inline">175</span> 离 <span
+class="math inline">180</span> 最近，那它大概率是大学生。</li>
+</ul>
 <p>然而，现在我们既不知道标签（即每个样本属于哪一类），也不知道每个类别的中心（均值）。这就像“鸡生蛋，蛋生鸡”，无法开始。</p>
 <h3 id="隶属度">6.1.2 隶属度</h3>
 <p>那么应该怎么办？一个朴素的想法是，先根据主观经验，猜测三个类别的中心（均值），然后慢慢修正。具体计算如下。</p>
@@ -603,11 +605,14 @@ $$</span></p>
 H(Z|X, \theta^{(t)}) = - \sum_{i=1}^{n} \sum_{k \in K} \gamma_{ik} \ln
 \gamma_{ik}
 $$</span></p>
-<p>则 <span
+<p>则</p>
+<p><span
 class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em>) ≥ <em>Q</em>(<em>θ</em>, <em>θ</em><sup>(<em>t</em>)</sup>) + <em>H</em>(<em>Z</em>|<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>)</span></p>
-<p>而理想状态下 <span
-class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>) = <em>Q</em>(<em>θ</em><sup>(<em>t</em>)</sup>, <em>θ</em><sup>(<em>t</em>)</sup>) + <em>H</em>(<em>Z</em>|<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>)</span>
-两式相减得 <span
+<p>而理想状态下</p>
+<p><span
+class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>) = <em>Q</em>(<em>θ</em><sup>(<em>t</em>)</sup>, <em>θ</em><sup>(<em>t</em>)</sup>) + <em>H</em>(<em>Z</em>|<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>)</span></p>
+<p>两式相减得</p>
+<p><span
 class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em>) − <em>L</em><em>L</em>(<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>) ≥ <em>Q</em>(<em>θ</em>, <em>θ</em><sup>(<em>t</em>)</sup>) − <em>Q</em>(<em>θ</em><sup>(<em>t</em>)</sup>, <em>θ</em><sup>(<em>t</em>)</sup>)</span></p>
 <p>也就是说，选择 <span class="math inline"><em>θ</em></span> 使 <span
 class="math inline"><em>Q</em></span> 增大，至少能让 <span
@@ -616,13 +621,15 @@ class="math inline"><em>L</em><em>L</em></span> 增大同样大小。</p>
 \mathop{\text{argmax}}\limits_{\theta} Q(\theta, \theta^{(t)})
 $$</span></p>
 <p>最终，EM算法可表达为</p>
-<p>E步： <span class="math display">$$
+<p>E步：</p>
+<p><span class="math display">$$
 \gamma_{ik}=P(Z_i=k|X_i;\theta)=\frac{P(Z_i=k,X_i;\theta)}{\sum
 \limits_{l \in K} P(Z_i=l,X_i;\theta)}
 $$</span> <span class="math display">$$Q(\theta, \theta^{(t)})=\sum
 \limits_{i=1}^{n} \sum \limits_{k \in K} \gamma_{ik} \ln P(X_i,
 Z_i=k;\theta)$$</span></p>
-<p>M步： <span class="math display">$$
+<p>M步：</p>
+<p><span class="math display">$$
 \theta^{(t+1)}=\mathop{\text{argmax}}\limits_{\theta} Q(\theta,
 \theta^{(t)})$$</span></p>
 <h2 id="例子">6.3 例子</h2>
@@ -795,16 +802,22 @@ class="math inline"><em>z</em><sub><em>i</em></sub> = <em>k</em></span>，�
 class="math inline"><em>k</em></span> 个高斯成分。</p>
 <p>模型参数为 <span class="math inline"><em>K</em></span>
 个三元组：<span
-class="math inline"><em>θ</em> = {<em>w</em><sub><em>k</em></sub>, <em>μ</em><sub><em>k</em></sub>, <em>σ</em><sub><em>k</em></sub><sup>2</sup>}<sub><em>k</em> = 1</sub><sup><em>K</em></sup></span>。
-* <span class="math inline"><em>w</em><sub><em>k</em></sub></span>：第
-<span class="math inline"><em>k</em></span>
+class="math inline"><em>θ</em> = {<em>w</em><sub><em>k</em></sub>, <em>μ</em><sub><em>k</em></sub>, <em>σ</em><sub><em>k</em></sub><sup>2</sup>}<sub><em>k</em> = 1</sub><sup><em>K</em></sup></span>。</p>
+<ul>
+<li><p><span
+class="math inline"><em>w</em><sub><em>k</em></sub></span>：第 <span
+class="math inline"><em>k</em></span>
 个成分的混合系数（权重），即先验概率 <span
 class="math inline"><em>P</em>(<em>z</em><sub><em>i</em></sub> = <em>k</em>)</span>。满足
-<span class="math inline">$\sum \limits_{k=1}^K w_k = 1$</span>。 *
-<span class="math inline"><em>μ</em><sub><em>k</em></sub></span>：第
-<span class="math inline"><em>k</em></span> 个成分的均值。 * <span
+<span class="math inline">$\sum \limits_{k=1}^K w_k =
+1$</span>。</p></li>
+<li><p><span
+class="math inline"><em>μ</em><sub><em>k</em></sub></span>：第 <span
+class="math inline"><em>k</em></span> 个成分的均值。</p></li>
+<li><p><span
 class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>：第
-<span class="math inline"><em>k</em></span> 个成分的方差。</p>
+<span class="math inline"><em>k</em></span> 个成分的方差。</p></li>
+</ul>
 <p>下面做一些准备工作。观测数据 <span
 class="math inline"><em>x</em><sub><em>i</em></sub></span>
 的概率密度函数为： <span class="math display">$$ P(x_i ; \theta) =
@@ -835,15 +848,19 @@ Q(\theta, \theta^{(t)}) &amp;= \sum_{i=1}^n E_{z_i} [\ln P(x_i, z_i;
 $$</span></p>
 <h4 id="m步最大化-q-函数更新参数-1">2. M步：最大化 Q
 函数（更新参数）</h4>
-<p>我们将 Q 函数拆解为两部分，分别优化. 1. 包含 <span
+<p>我们将 Q 函数拆解为两部分，分别优化。</p>
+<ol type="1">
+<li><p>包含 <span
 class="math inline"><em>w</em><sub><em>k</em></sub></span> 的项：<span
 class="math inline">$\sum \limits_{i=1}^n \sum \limits_{k=1}^K
-\gamma_{ik}^{(t)} \ln w_k$</span> 2. 包含高斯参数（均值 <span
+\gamma_{ik}^{(t)} \ln w_k$</span></p></li>
+<li><p>包含高斯参数（均值 <span
 class="math inline"><em>μ</em><sub><em>k</em></sub></span> 和方差 <span
 class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>）的项：<span
 class="math inline">$\sum \limits_{i=1}^n \sum \limits_{k=1}^K
 \gamma_{ik}^{(t)} \left[ -\ln(\sqrt{2\pi}\sigma_k) - \frac{(x_i -
-\mu_k)^2}{2\sigma_k^2} \right]$</span></p>
+\mu_k)^2}{2\sigma_k^2} \right]$</span></p></li>
+</ol>
 <hr />
 <h5 id="推导-1更新混合系数-w_k">推导 1：更新混合系数 <span
 class="math inline"><em>w</em><sub><em>k</em></sub></span></h5>
@@ -930,10 +947,11 @@ class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em> + 1)</s
 <span
 class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em>)</sup></span>。</p>
 <h4 id="算法流程总结">3. 算法流程总结</h4>
-<p>高斯混合模型的参数估计流程如下： 1. 初始化：随机选取 <span
+<p>高斯混合模型的参数估计流程如下：</p>
+<ol type="1">
+<li><p>初始化：随机选取 <span
 class="math inline"><em>w</em><sub><em>k</em></sub>, <em>μ</em><sub><em>k</em></sub>, <em>σ</em><sub><em>k</em></sub><sup>2</sup></span>
-的初值。</p>
-<ol start="2" type="1">
+的初值。</p></li>
 <li><p>E步：根据公式计算隶属度 <span
 class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub><sup>(<em>t</em>)</sup></span>。</p></li>
 <li><p>M步：</p>
@@ -997,10 +1015,12 @@ alt="混合模型与EM算法_31_2" />
 算法保证每一步迭代都能使似然函数增加（或至少不减少），直至收敛到局部最优。</p>
 <p>GMM
 处理的都是连续型数值数据（如身高）。但在人工智能领域，还有一类极重要的数据是离散且稀疏的，比如文本。</p>
-<p>试想这样一个场景： * GMM
-场景：全校混杂了不同年级（隐变量）的学生，表现为不同的身高分布（观测值）。
-*
-文本场景：图书馆混杂了不同<strong>话题</strong>（隐变量）的文章，表现为不同的<strong>单词分布</strong>（观测值）。</p>
+<p>试想这样一个场景：</p>
+<ul>
+<li><p>GMM
+场景：全校混杂了不同年级（隐变量）的学生，表现为不同的身高分布（观测值）。</p></li>
+<li><p>文本场景：图书馆混杂了不同<strong>话题</strong>（隐变量）的文章，表现为不同的<strong>单词分布</strong>（观测值）。</p></li>
+</ul>
 <p>如果我们把“身高数值”换成“单词计数”，把“高斯分布”换成“多项分布”，能不能用
 EM 算法来自动把文章分类？</p>
 <p>答案是肯定的。这就是著名的 <strong>概率潜在语义分析
@@ -1083,25 +1103,33 @@ class="math inline">#(<em>d</em><sub><em>m</em></sub>, <em>w</em><sub><em>n</e
 <p><span class="math display">$$ p_{k,n}^{(t+1)} = \frac{\sum
 \limits_{m=1}^M \#(d_m, w_n) \cdot \gamma_{m,n,k}^{(t)}}{\sum
 \limits_{n'=1}^N \sum \limits_{m=1}^M \#(d_m, w_{n'}) \cdot
-\gamma_{m,n',k}^{(t)}} $$</span> *
-<strong>分子</strong>：所有文档中，被判定为属于话题 <span
+\gamma_{m,n',k}^{(t)}} $$</span></p>
+<ul>
+<li><p><strong>分子</strong>：所有文档中，被判定为属于话题 <span
 class="math inline"><em>k</em></span> 的单词 <span
-class="math inline"><em>n</em></span> 的“期望频次”。 *
-<strong>分母</strong>：话题 <span class="math inline"><em>k</em></span>
-下所有单词的总期望频次（归一化）。</p>
+class="math inline"><em>n</em></span> 的“期望频次”。</p></li>
+<li><p><strong>分母</strong>：话题 <span
+class="math inline"><em>k</em></span>
+下所有单词的总期望频次（归一化）。</p></li>
+</ul>
 <p><span class="math display">$$ q_{m,k}^{(t+1)} = \frac{\sum
 \limits_{n=1}^N \#(d_m, w_n) \cdot \gamma_{m,n,k}^{(t)}}{\sum
 \limits_{n=1}^N \#(d_m, w_n)} $$</span> * <strong>分子</strong>：文档
 <span class="math inline"><em>d</em><sub><em>m</em></sub></span>
 中，被判定为属于话题 <span class="math inline"><em>k</em></span>
-的所有单词的总份量。 * <strong>分母</strong>：文档 <span
+的所有单词的总份量。</p>
+<ul>
+<li><strong>分母</strong>：文档 <span
 class="math inline"><em>d</em><sub><em>m</em></sub></span>
-的总词数（归一化）。</p>
+的总词数（归一化）。</li>
+</ul>
 <h3 id="代码实现-2">6.4.3 代码实现</h3>
-<p>在这个例子中，我们将模拟一个简单的场景： *
-词表：10个词（前5个是“食物”相关，后5个是“科技”相关）。 *
-文档：10篇文档（前5篇主要讲吃，后5篇主要讲技术）。 * 任务：看 PLSA
-能否自动把这 2 个话题（隐变量）找出来。</p>
+<p>在这个例子中，我们将模拟一个简单的场景：</p>
+<ul>
+<li><p>词表：10个词（前5个是“食物”相关，后5个是“科技”相关）。</p></li>
+<li><p>文档：10篇文档（前5篇主要讲吃，后5篇主要讲技术）。</p></li>
+<li><p>任务：看 PLSA 能否自动把这 2 个话题（隐变量）找出来。</p></li>
+</ul>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置中文字体（可选，如果乱码可去掉或换成英文）</span></span><br><span class="line">plt.rcParams[<span class="string">&#x27;font.sans-serif&#x27;</span>] = [<span class="string">&#x27;SimHei&#x27;</span>] </span><br><span class="line">plt.rcParams[<span class="string">&#x27;axes.unicode_minus&#x27;</span>] = <span class="literal">False</span></span><br><span class="line">sns.set_context(<span class="string">&quot;notebook&quot;</span>)</span><br></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 词表 (Vocab)</span></span><br><span class="line">vocab = [<span class="string">&quot;苹果&quot;</span>, <span class="string">&quot;香蕉&quot;</span>, <span class="string">&quot;牛排&quot;</span>, <span class="string">&quot;火锅&quot;</span>, <span class="string">&quot;面条&quot;</span>,    <span class="comment"># Topic 1: 食物</span></span><br><span class="line">         <span class="string">&quot;电脑&quot;</span>, <span class="string">&quot;芯片&quot;</span>, <span class="string">&quot;代码&quot;</span>, <span class="string">&quot;算法&quot;</span>, <span class="string">&quot;数据&quot;</span>]    <span class="comment"># Topic 2: 科技</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 真实意图: </span></span><br><span class="line"><span class="comment"># Doc 0-4: 谈论食物</span></span><br><span class="line"><span class="comment"># Doc 5-9: 谈论科技</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建共现矩阵 n(d, w)</span></span><br><span class="line"><span class="comment"># 行是文档，列是单词</span></span><br><span class="line">X = np.zeros((<span class="number">10</span>, <span class="number">10</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 填数据: </span></span><br><span class="line"><span class="comment"># &quot;食物文档&quot; (前5行) 频繁出现前5个词</span></span><br><span class="line">X[:<span class="number">5</span>, :<span class="number">5</span>] = np.random.randint(<span class="number">5</span>, <span class="number">10</span>, size=(<span class="number">5</span>, <span class="number">5</span>))  <span class="comment"># 高频</span></span><br><span class="line">X[:<span class="number">5</span>, <span class="number">5</span>:] = np.random.randint(<span class="number">0</span>, <span class="number">2</span>, size=(<span class="number">5</span>, <span class="number">5</span>))   <span class="comment"># 偶尔出现科技词(噪音)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># &quot;科技文档&quot; (后5行) 频繁出现后5个词</span></span><br><span class="line">X[<span class="number">5</span>:, :<span class="number">5</span>] = np.random.randint(<span class="number">0</span>, <span class="number">2</span>, size=(<span class="number">5</span>, <span class="number">5</span>))   <span class="comment"># 偶尔出现食物词(噪音)</span></span><br><span class="line">X[<span class="number">5</span>:, <span class="number">5</span>:] = np.random.randint(<span class="number">5</span>, <span class="number">10</span>, size=(<span class="number">5</span>, <span class="number">5</span>))  <span class="comment"># 高频</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;文档-单词共现矩阵 X (前5行):&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(X[:<span class="number">5</span>, :])</span><br></pre></td></tr></table></figure>
 <pre><code>文档-单词共现矩阵 X (前5行):
