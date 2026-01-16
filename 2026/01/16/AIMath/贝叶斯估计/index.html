@@ -28,7 +28,7 @@
 <meta property="og:description" content="5.1 极大似然估计的局限 在上一章中，我们学习了极大似然估计（MLE）。它的核心思想非常直观：既然现在的样本发生了，那我就认为参数取值应该是让这些样本出现概率最大的那个值。在数据量充足的情况下，MLE 的效果非常好。 然而，当观测数据较少甚至缺失时，MLE 就会暴露出严重的缺陷，甚至得出违背常识的结论。我们可以通过两个例子来看清这一点：  抛硬币。假设我们抛了 3 次硬币，运气不好，">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-01-16T07:17:32.495Z">
-<meta property="article:modified_time" content="2026-01-16T07:43:15.521Z">
+<meta property="article:modified_time" content="2026-01-16T07:52:18.943Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="MAP">
 <meta property="article:tag" content="概率论">
@@ -224,7 +224,7 @@ Gamma分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" 
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-01-16 15:17:32 / Modified: 15:43:15" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
+      <time title="Created: 2026-01-16 15:17:32 / Modified: 15:52:18" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -350,7 +350,7 @@ class="math display"><em>p</em>(<em>X</em>) = ∫<em>p</em>(<em>X</em>|<em>�
 <p>为了解决这个问题，在实际应用中，我们通常采用两条捷径：</p>
 <ol type="1">
 <li><strong>最大后验概率 (MAP)</strong>：既然分母与 <span
-class="math display"><em>θ</em></span>
+class="math inline"><em>θ</em></span>
 无关，那我们在求最大值时直接忽略分母，只关注分子。</li>
 <li><strong>共轭先验</strong>：挑选特殊的先验分布，使得我们可以通过代数运算直接推导出后验分布，从而避开积分。</li>
 </ol>
@@ -398,10 +398,12 @@ $$</span></p>
 class="math inline"><em>θ</em></span>（正面朝上的概率）服从正态分布
 <span class="math inline"><em>N</em>(0.5, 0.01)</span>，这就是 <span
 class="math inline"><em>θ</em></span> 的先验分布。</p>
-<p>似然函数：每个数据服从伯努利分布，进行 10 次试验，故$ L(X|) = ^7
-(1-)^3 $。</p>
-<p>先验分布：$ p() = e<sup>{-\frac{(-)</sup>2}{2^2}}
-e<sup>{-\frac{()</sup>2}{2 }} = e<sup>{-50()</sup>2} $</p>
+<p>似然函数：每个数据服从伯努利分布，进行 10 次试验，故 <span
+class="math inline"><em>L</em>(<em>X</em>|<em>θ</em>) = <em>θ</em><sup>7</sup>(1 − <em>θ</em>)<sup>3</sup></span>。</p>
+<p>先验分布：<span class="math inline">$p(\theta) =
+\frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(\theta-\mu)^2}{2\sigma^2}}
+\propto e^{-\frac{(\theta-0.5)^2}{2 \times 0.01}} =
+e^{-50(\theta-0.5)^2}$</span></p>
 <p>因此</p>
 <p><span class="math display">$$
 \begin{aligned}
@@ -409,7 +411,7 @@ e<sup>{-\frac{()</sup>2}{2 }} = e<sup>{-50()</sup>2} $</p>
 \theta^7 (1-\theta)^3 \cdot e^{-50(\theta-0.5)^2} \right)
 \end{aligned}
 $$</span></p>
-<p>求导得<span
+<p>求导得 <span
 class="math inline"><em>J</em>(<em>θ</em>) = 7ln <em>θ</em> + 3ln (1 − <em>θ</em>) − 50(<em>θ</em> − 0.5)<sup>2</sup></span></p>
 <p>令 <span class="math inline">$\frac{\partial J}{\partial \theta} =
 \frac{7}{\theta} - \frac{3}{1-\theta} - 100(\theta-0.5) = 0$</span>，得
@@ -496,13 +498,16 @@ class="math inline"><em>p</em>(<em>θ</em>|<em>X</em>)</span> 与先验分布
 属于同一种分布。这样做的好处是，我们完全不需要做积分，只需要做简单的加法来更新参数即可。</p>
 <p>我们先给出结论，并通过例子解释结论怎么用，最后推导结论。</p>
 <h3 id="共轭分布大全">5.4.1 共轭分布大全</h3>
-<p>符号说明： * <span class="math inline"><em>n</em></span>：样本数量 *
-<span
-class="math inline">∑<em>x</em><sub><em>i</em></sub></span>：样本观测值的总和
-* <span
-class="math inline"><em>α</em>, <em>β</em></span>：先验分布的参数（超参数）
-* <span
-class="math inline"><em>α</em><sup>′</sup>, <em>β</em><sup>′</sup></span>：后验分布的参数</p>
+<p>符号说明： * <span
+class="math inline"><em>n</em></span>：样本数量</p>
+<ul>
+<li><p><span
+class="math inline">∑<em>x</em><sub><em>i</em></sub></span>：样本观测值的总和</p></li>
+<li><p><span
+class="math inline"><em>α</em>, <em>β</em></span>：先验分布的参数（超参数）</p></li>
+<li><p><span
+class="math inline"><em>α</em><sup>′</sup>, <em>β</em><sup>′</sup></span>：后验分布的参数</p></li>
+</ul>
 <table>
 <colgroup>
 <col style="width: 25%" />
@@ -568,10 +573,10 @@ class="math inline">$\frac{1}{\sigma_n^2} = \frac{1}{\sigma_0^2} +
 </tr>
 <tr>
 <td style="text-align: left;"><span
-class="math inline">Dir(<em>α⃗</em>)</span></td>
+class="math inline">Dir(<strong>α</strong>)</span></td>
 <td style="text-align: left;">多项分布</td>
 <td style="text-align: left;"><span
-class="math inline">Dir(<em>α⃗</em><sup>′</sup>)</span></td>
+class="math inline">Dir(<strong>α</strong><sup>′</sup>)</span></td>
 <td style="text-align: left;"><span
 class="math inline"><em>α</em><sub><em>k</em></sub><sup>′</sup> = <em>α</em><sub><em>k</em></sub> + 第<em>k</em>类的计数</span></td>
 </tr>
@@ -591,18 +596,21 @@ class="math inline"><em>p</em></span> 的信心。 <span
 class="math inline"><em>α</em></span> 可以看作虚拟的成功次数，<span
 class="math inline"><em>β</em></span> 看作虚拟的失败次数。</p>
 <p>现在要估计硬币正面朝上的概率 <span
-class="math inline"><em>p</em></span>。 *
-先验：根据尝试，硬币正面朝上和反面朝上的概率是相等的。设先验为 <span
+class="math inline"><em>p</em></span>。</p>
+<ul>
+<li>先验：根据尝试，硬币正面朝上和反面朝上的概率是相等的。设先验为 <span
 class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(10, 10)</span>，这意味着我假装之前已经抛过
-20 次，10 正 10 反。 * 数据：新做了 <span
-class="math inline"><em>n</em> = 10</span> 次实验，7 正 3 反。 *
-后验：根据更新公式，<span
+20 次，10 正 10 反。</li>
+<li>数据：新做了 <span class="math inline"><em>n</em> = 10</span>
+次实验，7 正 3 反。</li>
+<li>后验：根据更新公式，<span
 class="math inline"><em>α</em><sup>′</sup> = 10 + 7 = 17, <em>β</em><sup>′</sup> = 10 + 3 = 13</span>。后验为
 <span
-class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(17, 13)</span>。
-* 估计：后验均值 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(17, 13)</span>。</li>
+<li>估计：后验均值 <span
 class="math inline">$\text{E}(p)=\frac{17}{17+13}=\frac{17}{30}$</span>。即硬币正面朝上的概率为
-<span class="math inline">$\frac{17}{30}$</span>。</p>
+<span class="math inline">$\frac{17}{30}$</span>。</li>
+</ul>
 <h4 id="gamma分布泊松分布gamma分布">2. Gamma分布+泊松分布=Gamma分布</h4>
 <p>Gamma 分布 <span
 class="math inline"><em>λ</em> ∼ <em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em>, <em>β</em>)</span>
@@ -631,42 +639,47 @@ class="math inline">13/3</span> 辆公交车。</li>
 </ul>
 <h4 id="gamma分布指数分布gamma分布">3. Gamma分布+指数分布=Gamma分布</h4>
 <p>设灯泡寿命 <span
-class="math inline"><em>X</em> ∼ <em>E</em><em>x</em><em>p</em>(<em>λ</em>)</span>。现在要估计灯泡的寿命。
-* 先验：<span
-class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(10, 1800)</span>，即根据经验，10个灯泡的总寿命是1800小时。
-* 数据：测试了 <span class="math inline"><em>n</em> = 5</span>
+class="math inline"><em>X</em> ∼ <em>E</em><em>x</em><em>p</em>(<em>λ</em>)</span>。现在要估计灯泡的寿命。</p>
+<ul>
+<li>先验：<span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(10, 1800)</span>，即根据经验，10个灯泡的总寿命是1800小时。</li>
+<li>数据：测试了 <span class="math inline"><em>n</em> = 5</span>
 个灯泡，寿命总和 <span class="math inline">∑<em>x</em> = 1000</span>
-小时。 * 后验：注意这里 <span class="math inline"><em>α</em></span>
+小时。</li>
+<li>后验：注意这里 <span class="math inline"><em>α</em></span>
 更新的是<strong>样本个数</strong>，<span
 class="math inline"><em>β</em></span>
 更新的是<strong>观测值总和</strong>。 根据更新公式，<span
-class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + 5 = 15,  <em>β</em><sup>′</sup> = <em>β</em> + 1000 = 2800</span>。
-* 估计：后验均值 <span class="math inline">$\text{E}(X) =
-\frac{2800}{15}=186.66$</span>，即灯泡的平均寿命是186.66小时。</p>
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + 5 = 15,  <em>β</em><sup>′</sup> = <em>β</em> + 1000 = 2800</span>。</li>
+<li>估计：后验均值 <span class="math inline">$\text{E}(X) =
+\frac{2800}{15}=186.66$</span>，即灯泡的平均寿命是186.66小时。</li>
+</ul>
 <p>需要注意的是，gamma+泊松与gamma+指数的更新公式正好相反。本质原因是，泊松分布中，时间是固定的（人为选取的，比如上面观察了<strong>2</strong>小时内进站的公交车数量），次数是随机变量（1小时内进站的公交车数量，是观测得到的）；而泊松分布中，时间是随机变量（观测到的灯泡寿命），次数是固定的（人为选取的，比如上面测试了5个灯泡）。两者的定义相反，导致更新公式正好相反。</p>
 <h4 id="dirichlet分布多项分布dirichlet分布">4.
 Dirichlet分布+多项分布=Dirichlet分布</h4>
 <p>Dirichlet分布是 Beta 分布在高维上的推广。Beta 是两面的硬币，Dirichlet
 是 <span class="math inline"><em>K</em></span>
 面的骰子。它描述的是多分类概率向量 <span
-class="math inline"><em>p⃗</em> = (<em>p</em><sub>1</sub>, ..., <em>p</em><sub><em>K</em></sub>)</span>
+class="math inline"><strong>p</strong> = (<em>p</em><sub>1</sub>, ..., <em>p</em><sub><em>K</em></sub>)</span>
 的分布。<span
 class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub>, <em>α</em><sub>2</sub>, ..., <em>α</em><sub><em>k</em></sub>)</span>
 的参数 <span
 class="math inline"><em>α</em><sub>1</sub>, <em>α</em><sub>2</sub>, ..., <em>α</em><sub><em>k</em></sub></span>
 分别代表事件 1,2,…,k 出现次数的伪计数。</p>
-<p>现在有一个三面的骰子。 * 先验：<span
-class="math inline"><em>D</em><em>i</em><em>r</em>(1, 1, 1)</span>。这代表均匀分布认为每一面出现的概率相等。
-*
-数据：现在投了若干次骰子，投掷结果为：1点出现2次，2点出现0次，3点出现1次。向量
-<span class="math inline"><em>m⃗</em> = (2, 0, 1)</span>。 *
-后验：根据更新公式，<span
-class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub><sup>′</sup>, <em>α</em><sub>2</sub><sup>′</sup>, <em>α</em><sub>3</sub><sup>′</sup>) = <em>D</em><em>i</em><em>r</em>(1 + 2, 1 + 0, 1 + 1) = <em>D</em><em>i</em><em>r</em>(3, 1, 2)</span>。
-* 估计：第1面朝上的概率为 <span
+<p>现在有一个三面的骰子。</p>
+<ul>
+<li>先验：<span
+class="math inline"><em>D</em><em>i</em><em>r</em>(1, 1, 1)</span>。这代表均匀分布认为每一面出现的概率相等。</li>
+<li>数据：现在投了若干次骰子，投掷结果为：1点出现2次，2点出现0次，3点出现1次。向量
+<span class="math inline"><strong>m</strong> = (2, 0, 1)</span>。</li>
+<li>后验：根据更新公式，<span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub><sup>′</sup>, <em>α</em><sub>2</sub><sup>′</sup>, <em>α</em><sub>3</sub><sup>′</sup>) = <em>D</em><em>i</em><em>r</em>(1 + 2, 1 + 0, 1 + 1) = <em>D</em><em>i</em><em>r</em>(3, 1, 2)</span>。</li>
+<li>估计：第1面朝上的概率为 <span
 class="math inline">$\frac{3}{3+1+2}=\frac{1}{2}$</span>，第2面朝上的概率为
 <span
 class="math inline">$\frac{1}{3+1+2}=\frac{1}{6}$</span>，第3面朝上的概率为
-<span class="math inline">$\frac{2}{3+1+2}=\frac{1}{3}$</span>。</p>
+<span class="math inline">$\frac{2}{3+1+2}=\frac{1}{3}$</span>。</li>
+</ul>
 <h4 id="正态分布正态分布正态分布">5. 正态分布+正态分布=正态分布</h4>
 <p>测量温度，假设已知温度计的测量误差方差为 <span
 class="math inline"><em>σ</em><sup>2</sup> = 1</span>（即精度为 <span
@@ -715,17 +728,11 @@ class="math inline"><em>θ</em>|<em>X</em></span> 服从后验分布 <span
 class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em> + <em>k</em>, <em>β</em> + <em>n</em> − <em>k</em>)</span>。</p>
 <p><em>proof</em>.</p>
 <p><span
-class="math inline"><em>p</em>(<em>θ</em>) = Beta(<em>α</em>, <em>β</em>) ∝ <em>θ</em><sup><em>α</em> − 1</sup>(1 − <em>θ</em>)<sup><em>β</em> − 1</sup></span>（根据
-Beta 分布的概率密度函数）</p>
+class="math display"><em>p</em>(<em>θ</em>) = Beta(<em>α</em>, <em>β</em>) ∝ <em>θ</em><sup><em>α</em> − 1</sup>(1 − <em>θ</em>)<sup><em>β</em> − 1</sup>（<em>根</em><em>据</em><em>B</em><em>e</em><em>t</em><em>a</em><em>分</em><em>布</em><em>的</em><em>概</em><em>率</em><em>密</em><em>度</em><em>函</em><em>数</em>）</span></p>
 <p><span
-class="math inline"><em>p</em>(<em>X</em>|<em>θ</em>) = <em>C</em><sub><em>n</em></sub><sup><em>k</em></sup><em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup> ∝ <em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup></span></p>
-<p><span
-class="math inline"><em>P</em>(<em>θ</em>|<em>X</em>) ∝ <em>P</em>(<em>θ</em>) ⋅ <em>P</em>(<em>X</em>|<em>θ</em>)</span></p>
-<p><span class="math inline">$\phantom{P(\theta|X)} \propto
-\theta^{\alpha-1}(1-\theta)^{\beta-1} \cdot \theta^k
-(1-\theta)^{n-k}$</span></p>
-<p><span class="math inline">$\phantom{P(\theta|X)} =
-\theta^{(\alpha+k)-1} (1-\theta)^{(\beta+n-k)-1}$</span></p>
+class="math display"><em>p</em>(<em>X</em>|<em>θ</em>) = <em>C</em><sub><em>n</em></sub><sup><em>k</em></sup><em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup> ∝ <em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup></span></p>
+$$
+<p>$$</p>
 <p>即 <span class="math inline"><em>θ</em>|<em>X</em></span> 服从 Beta
 分布 <span
 class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em> + <em>k</em>, <em>β</em> + <em>n</em> − <em>k</em>)</span>。</p>
