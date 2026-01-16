@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="5.1 极大似然估计的局限 在上一章中，我们学习了极大似然估计（MLE）。它的核心思想非常直观：既然现在的样本发生了，那我就认为参数取值应该是让这些样本出现概率最大的那个值。在数据量充足的情况下，MLE 的效果非常好。 然而，当观测数据较少甚至缺失时，MLE 就会暴露出严重的缺陷，甚至得出违背常识的结论。我们可以通过两个例子来看清这一点：  抛硬币。假设我们抛了 3 次硬币，运气不好，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="5 贝叶斯估计">
+<meta property="og:url" content="http://example.com/2026/01/16/AIMath/%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%B0%E8%AE%A1/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="5.1 极大似然估计的局限 在上一章中，我们学习了极大似然估计（MLE）。它的核心思想非常直观：既然现在的样本发生了，那我就认为参数取值应该是让这些样本出现概率最大的那个值。在数据量充足的情况下，MLE 的效果非常好。 然而，当观测数据较少甚至缺失时，MLE 就会暴露出严重的缺陷，甚至得出违背常识的结论。我们可以通过两个例子来看清这一点：  抛硬币。假设我们抛了 3 次硬币，运气不好，">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-01-16T07:17:32.495Z">
+<meta property="article:modified_time" content="2026-01-16T07:19:23.913Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="MAP">
+<meta property="article:tag" content="概率论">
+<meta property="article:tag" content="贝叶斯估计">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2026/01/16/AIMath/%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%B0%E8%AE%A1/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/01/16/AIMath/%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%B0%E8%AE%A1/","path":"2026/01/16/AIMath/贝叶斯估计/","title":"5 贝叶斯估计"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>5 贝叶斯估计 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1%E7%9A%84%E5%B1%80%E9%99%90"><span class="nav-number">1.</span> <span class="nav-text">5.1 极大似然估计的局限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B4%9D%E5%8F%B6%E6%96%AF%E5%85%AC%E5%BC%8F%E4%B8%8E%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%B0%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">5.2 贝叶斯公式与贝叶斯估计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E5%90%8E%E9%AA%8C%E6%A6%82%E7%8E%87map%E4%BC%B0%E8%AE%A1"><span class="nav-number">3.</span> <span class="nav-text">5.3 最大后验概率（MAP）估计</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#map-%E7%9A%84%E6%A0%B8%E5%BF%83%E5%85%AC%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">5.3.1 MAP 的核心公式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">3.2.</span> <span class="nav-text">5.3.2 例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-%E4%B8%8E-%E6%AD%A3%E5%88%99%E5%8C%96"><span class="nav-number">3.3.</span> <span class="nav-text">5.3.3 MAP 与 正则化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B1%E8%BD%AD%E5%85%88%E9%AA%8C%E5%88%86%E5%B8%83"><span class="nav-number">4.</span> <span class="nav-text">5.4 共轭先验分布</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B1%E8%BD%AD%E5%88%86%E5%B8%83%E5%A4%A7%E5%85%A8"><span class="nav-number">4.1.</span> <span class="nav-text">5.4.1 共轭分布大全</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="nav-number">4.2.</span> <span class="nav-text">5.4.2 例子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#beta%E5%88%86%E5%B8%83%E4%BA%8C%E9%A1%B9%E5%88%86%E5%B8%83beta%E5%88%86%E5%B8%83"><span class="nav-number">4.2.1.</span> <span class="nav-text">1. Beta分布+二项分布&#x3D;Beta分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gamma%E5%88%86%E5%B8%83%E6%B3%8A%E6%9D%BE%E5%88%86%E5%B8%83gamma%E5%88%86%E5%B8%83"><span class="nav-number">4.2.2.</span> <span class="nav-text">2. Gamma分布+泊松分布&#x3D;Gamma分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gamma%E5%88%86%E5%B8%83%E6%8C%87%E6%95%B0%E5%88%86%E5%B8%83gamma%E5%88%86%E5%B8%83"><span class="nav-number">4.2.3.</span> <span class="nav-text">3. Gamma分布+指数分布&#x3D;Gamma分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dirichlet%E5%88%86%E5%B8%83%E5%A4%9A%E9%A1%B9%E5%88%86%E5%B8%83dirichlet%E5%88%86%E5%B8%83"><span class="nav-number">4.2.4.</span> <span class="nav-text">4.
+Dirichlet分布+多项分布&#x3D;Dirichlet分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83"><span class="nav-number">4.2.5.</span> <span class="nav-text">5. 正态分布+正态分布&#x3D;正态分布</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86%E4%B8%8E%E6%8E%A8%E5%AF%BC"><span class="nav-number">4.3.</span> <span class="nav-text">5.4.3 数学原理与推导</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#beta%E5%88%86%E5%B8%83-%E4%BA%8C%E9%A1%B9%E5%88%86%E5%B8%83-beta%E5%88%86%E5%B8%83"><span class="nav-number">4.3.1.</span> <span class="nav-text">1. Beta分布 + 二项分布 &#x3D;
+Beta分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gamma%E5%88%86%E5%B8%83-%E6%B3%8A%E6%9D%BE%E5%88%86%E5%B8%83-gamma%E5%88%86%E5%B8%83"><span class="nav-number">4.3.2.</span> <span class="nav-text">2. Gamma分布 + 泊松分布 &#x3D;
+Gamma分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gamma%E5%88%86%E5%B8%83-%E6%8C%87%E6%95%B0%E5%88%86%E5%B8%83-gamma%E5%88%86%E5%B8%83"><span class="nav-number">4.3.3.</span> <span class="nav-text">3. Gamma分布 + 指数分布 &#x3D;
+Gamma分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#dirichlet%E5%88%86%E5%B8%83-%E5%A4%9A%E9%A1%B9%E5%88%86%E5%B8%83-dirichlet%E5%88%86%E5%B8%83"><span class="nav-number">4.3.4.</span> <span class="nav-text">4. Dirichlet分布 +
+多项分布 &#x3D; Dirichlet分布</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83-%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83-%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83-%E6%96%B9%E5%B7%AE%E5%B7%B2%E7%9F%A5"><span class="nav-number">4.3.5.</span> <span class="nav-text">5. 正态分布 + 正态分布 &#x3D;
+正态分布 (方差已知)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">5.5 总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/01/16/AIMath/%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%B0%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="5 贝叶斯估计 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          5 贝叶斯估计
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-16 15:17:32 / Modified: 15:19:23" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">人工智能的数学基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="极大似然估计的局限">5.1 极大似然估计的局限</h2>
+<p>在上一章中，我们学习了极大似然估计（MLE）。它的核心思想非常直观：既然现在的样本发生了，那我就认为参数取值应该是让这些样本出现概率最大的那个值。在数据量充足的情况下，MLE
+的效果非常好。</p>
+<p>然而，当观测数据较少甚至缺失时，MLE
+就会暴露出严重的缺陷，甚至得出违背常识的结论。我们可以通过两个例子来看清这一点：</p>
+<ol type="1">
+<li><p>抛硬币。假设我们抛了 3 次硬币，运气不好，3 次全是反面，正面次数为
+0。按照 MLE 的公式，硬币正面朝上的概率估计值 <span
+class="math inline">$\hat{p}=\frac{正面次数}{总次数}=0$</span>。此时 MLE
+计算出的概率 <span
+class="math inline"><em>p̂</em> = 0</span>。这显然违背了我们的常识，因为我们知道硬币通常都有两面，仅仅因为
+3 次实验没出现正面就断定它概率为 0 是极其武断的。</p></li>
+<li><p>交通事故的时间间隔。假设事故间隔服从指数分布，MLE
+估计的“平均间隔时间”就是样本的均值。如果路段刚开放，只发生了两次事故，观测到一个间隔数据
+<span class="math inline"><em>x</em><sub>1</sub></span>，MLE
+会直接认为该路段的平均事故间隔就是 <span
+class="math inline"><em>x</em><sub>1</sub></span>。这会因为样本太少而极不可靠。更极端的情况是，如果第二次事故还没发生，我们根本没有间隔数据，MLE
+就完全无法计算了。</p></li>
+</ol>
+<p>MLE
+的根本问题在于它完全依赖于当前的观测数据。当数据量太少时，观测到的特征可能只是偶然误差，不能代表总体规律。此时完全相信数据会导致估计值偏差巨大。在机器学习中，这种对有限样本过度拟合而忽略了普遍规律的现象，被称为“过拟合”。</p>
+<p>为了解决这个问题，我们需要在数据之外引入额外的判断依据（比如“硬币通常是均匀的”这种常识）。这便是贝叶斯估计的基本思想。</p>
+<h2 id="贝叶斯公式与贝叶斯估计">5.2 贝叶斯公式与贝叶斯估计</h2>
+<p>我们在第一章中讲过<strong>贝叶斯公式</strong>。设 <span
+class="math inline"><em>B</em><sub>1</sub>, <em>B</em><sub>2</sub>, …, <em>B</em><sub><em>n</em></sub></span>
+为完备事件群，则对于任意事件 <span
+class="math inline"><em>A</em></span>：</p>
+<p><span class="math display">$$
+P(B_i|A) = \frac{P(A|B_i)P(B_i)}{\sum_{j} P(A|B_j)P(B_j)}
+$$</span></p>
+<p>在统计推断（贝叶斯估计）中，我们将上述公式中的“事件”替换为“数据”和“参数”：
+* <span
+class="math inline"><em>X</em></span>：观测到的样本数据（Evidence/Data）。
+* <span class="math inline"><em>θ</em></span>：模型的参数（Unknown
+Parameter）。</p>
+<p>由此得到了贝叶斯估计的核心公式：</p>
+<p><span class="math display">$$
+p(\theta|X) = \frac{p(X|\theta)p(\theta)}{p(X)} =
+\frac{p(X|\theta)p(\theta)}{\int p(X|\theta)p(\theta) d\theta}
+$$</span></p>
+<p>这个公式中的每一项都有其特定的统计学含义：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">名称</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>θ</em>)</span></td>
+<td style="text-align: left;">先验分布</td>
+<td style="text-align: left;">在观测到数据之前，我们对参数 <span
+class="math inline"><em>θ</em></span>
+的认知或信念。这通常基于以往的经验、历史数据或主观判断，例如硬币正面朝上的概率是
+<span class="math inline">$\frac{1}{2}$</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>X</em>∥<em>θ</em>)</span></td>
+<td style="text-align: left;">似然函数</td>
+<td style="text-align: left;">假设参数已知时，当前数据出现的概率。这与
+MLE 中的似然函数完全一致。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>θ</em>∥<em>X</em>)</span></td>
+<td style="text-align: left;">后验分布</td>
+<td style="text-align: left;">在观测到数据之后，我们对参数 <span
+class="math inline"><em>θ</em></span>
+的新认知。这是贝叶斯估计的最终目标，它综合了先验知识和数据信息。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>X</em>)</span></td>
+<td style="text-align: left;">边缘似然</td>
+<td
+style="text-align: left;">数据的全概率（归一化常数）。它通过对所有可能的
+<span class="math inline"><em>θ</em></span> 积分得到：<span
+class="math inline"><em>p</em>(<em>X</em>) = ∫<em>p</em>(<em>X</em>∥<em>θ</em>)<em>p</em>(<em>θ</em>)<em>d</em><em>θ</em></span>。</td>
+</tr>
+</tbody>
+</table>
+<p>贝叶斯估计的理想目标是求出完整的后验分布 <span
+class="math inline"><em>p</em>(<em>θ</em>|<em>X</em>)</span>。然而，公式中的分母
+<span class="math inline"><em>p</em>(<em>X</em>)</span>
+是一个<strong>积分</strong>：</p>
+<p><span
+class="math display"><em>p</em>(<em>X</em>) = ∫<em>p</em>(<em>X</em>|<em>θ</em>)<em>p</em>(<em>θ</em>)<em>d</em><em>θ</em></span></p>
+<p>如果 <span class="math inline"><em>θ</em></span>
+是高维向量，这个积分在数学上通常是<strong>不可积的
+(Intractable)</strong>
+或者计算量极其巨大。既然分母算不出来，我们就无法得到标准的后验分布。</p>
+<p>为了解决这个问题，在实际应用中，我们通常采用两条捷径：</p>
+<ol type="1">
+<li><strong>最大后验概率 (MAP)</strong>：既然分母与 <span
+class="math inline"><em>θ</em></span>
+无关，那我们在求最大值时直接忽略分母，只关注分子。</li>
+<li><strong>共轭先验</strong>：挑选特殊的先验分布，使得我们可以通过代数运算直接推导出后验分布，从而避开积分。</li>
+</ol>
+<h2 id="最大后验概率map估计">5.3 最大后验概率（MAP）估计</h2>
+<p>正如前文所述，为了避开贝叶斯公式中分母（边缘似然 <span
+class="math inline"><em>p</em>(<em>X</em>)</span>）那个难以计算的积分，我们不再追求参数
+<span class="math inline"><em>θ</em></span>
+的完整分布，而是退而求其次，寻找后验分布中概率密度最大的那个点。这就是
+<strong>最大后验概率估计 (MAP)</strong>。</p>
+<h3 id="map-的核心公式">5.3.1 MAP 的核心公式</h3>
+<p>根据贝叶斯公式： <span class="math display">$$ p(\theta|X) =
+\frac{p(X|\theta)p(\theta)}{p(X)} $$</span></p>
+<p>由于我们要找的是让 <span
+class="math inline"><em>p</em>(<em>θ</em>|<em>X</em>)</span> 最大的
+<span class="math inline"><em>θ</em></span> 值，而分母 <span
+class="math inline"><em>p</em>(<em>X</em>)</span> 是关于数据 <span
+class="math inline"><em>X</em></span> 的积分，与参数 <span
+class="math inline"><em>θ</em></span> 无关（相对于 <span
+class="math inline"><em>θ</em></span>
+是常数）。因此，优化时可以忽略分母：</p>
+<p><span class="math display">$$
+\begin{aligned}
+\hat{\theta}_{\text{MAP}} &amp;= \operatorname*{argmax}_{\theta}
+p(\theta|X) \\
+&amp;= \operatorname*{argmax}_{\theta} \frac{p(X|\theta)p(\theta)}{p(X)}
+\\
+&amp;= \operatorname*{argmax}_{\theta}
+\underbrace{p(X|\theta)}_{\text{似然函数}} \cdot
+\underbrace{p(\theta)}_{\text{先验分布}}
+\end{aligned}
+$$</span></p>
+<p>与 MLE 一样，为了方便计算，我们通常对目标函数取对数：</p>
+<p><span
+class="math display"><em>θ̂</em><sub>MAP</sub> = argmax<sub><em>θ</em></sub>(ln <em>p</em>(<em>X</em>|<em>θ</em>) + ln <em>p</em>(<em>θ</em>))</span></p>
+<p>如果数据 <span
+class="math inline"><em>X</em> = {<em>x</em><sub>1</sub>, ..., <em>x</em><sub><em>n</em></sub>}</span>
+是独立同分布 (i.i.d.) 的（通常都是独立同分布的），则展开为：</p>
+<p><span class="math display">$$
+\hat{\theta}_{\text{MAP}} = \operatorname*{argmax}_{\theta} \left(
+\sum_{i=1}^n \ln f(x_i|\theta) + \ln p(\theta) \right)
+$$</span></p>
+<h3 id="例子">5.3.2 例子</h3>
+<p>抛 10 次硬币，其中正面（1）出现 7 次，反面（0）出现 3
+次。根据常识，硬币大概率是均匀的。我们假设参数 <span
+class="math inline"><em>θ</em></span>（正面朝上的概率）服从正态分布
+<span class="math inline"><em>N</em>(0.5, 0.01)</span>，这就是 <span
+class="math inline"><em>θ</em></span> 的先验分布。</p>
+<p>似然函数：每个数据服从伯努利分布，进行 10 次试验，故$ L(X|) = ^7
+(1-)^3 $。</p>
+<p>先验分布：$ p() = e<sup>{-\frac{(-)</sup>2}{2^2}}
+e<sup>{-\frac{()</sup>2}{2 }} = e<sup>{-50()</sup>2} $</p>
+<p>因此</p>
+<p><span class="math display">$$
+\begin{aligned}
+\hat{\theta}_{\text{MAP}} &amp;= \operatorname*{argmax}_{\theta} \left(
+\theta^7 (1-\theta)^3 \cdot e^{-50(\theta-0.5)^2} \right)
+\end{aligned}
+$$</span></p>
+<p>求导得<span
+class="math inline"><em>J</em>(<em>θ</em>) = 7ln <em>θ</em> + 3ln (1 − <em>θ</em>) − 50(<em>θ</em> − 0.5)<sup>2</sup></span></p>
+<p>令 <span class="math inline">$\frac{\partial J}{\partial \theta} =
+\frac{7}{\theta} - \frac{3}{1-\theta} - 100(\theta-0.5) = 0$</span>，得
+<span
+class="math inline"><em>θ</em> ≈ 0.558</span>，即硬币朝上的最大后验概率为
+<span class="math inline">0.558</span>。</p>
+<p>接下来让我们对比一下三种估计结果，就能理解 MAP 的作用。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">估计方法</th>
+<th style="text-align: left;">计算公式/来源</th>
+<th style="text-align: left;">结果</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>先验均值</strong></td>
+<td style="text-align: left;">仅凭经验</td>
+<td style="text-align: left;"><strong>0.500</strong></td>
+<td style="text-align: left;">我坚信硬币是均匀的</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>MLE 估计</strong></td>
+<td style="text-align: left;">仅凭数据 (<span
+class="math inline">7/10</span>)</td>
+<td style="text-align: left;"><strong>0.700</strong></td>
+<td style="text-align: left;">数据显示正面概率很高，我完全信数据</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>MAP 估计</strong></td>
+<td style="text-align: left;">数据 + 经验</td>
+<td style="text-align: left;"><strong>0.558</strong></td>
+<td style="text-align: left;"><strong>折中</strong>：数据把信念从 0.5
+拉向了 0.7，但先验的引力把它拽回了一点</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，MAP 估计值位于“先验均值”和“MLE
+估计值”之间。先验分布方差越小（越确信先验），MAP
+结果就越接近先验；数据量越大（<span
+class="math inline"><em>n</em></span> 越大），MAP 结果就越接近 MLE。</p>
+<h3 id="map-与-正则化">5.3.3 MAP 与 正则化</h3>
+<p>在机器学习（特别是深度学习）中，MAP
+有一个极其重要的等价解释：<strong>MAP 就是带正则项的 MLE。</strong></p>
+<p>观察 Log-MAP 的公式： <span class="math display">$$
+\hat{\theta}_{\text{MAP}} = \operatorname*{argmax}_{\theta}
+\underbrace{\ln L(\theta)}_{\text{Loss项}} + \underbrace{\ln
+p(\theta)}_{\text{正则项}} $$</span></p>
+<ul>
+<li><p>L2 正则化</p>
+<p>如果我们假设参数 <span class="math inline"><em>θ</em></span>
+服从正态分布 <span
+class="math inline"><em>θ</em> ∼ <em>N</em>(0, <em>σ</em><sup>2</sup>)</span>：
+<span class="math display">$$ \ln p(\theta) \propto -
+\frac{\theta^2}{2\sigma^2} = -\lambda \|\theta\|^2 = -\lambda
+\|\theta\|_2$$</span> 这正是我们熟悉的 <strong>L2
+正则化</strong>！在损失函数中加 L2
+正则，本质上就是假设权重参数服从高斯先验，然后做 MAP 估计。</p></li>
+<li><p>L1 正则化</p>
+<p>如果我们假设参数 <span class="math inline"><em>θ</em></span>
+服从拉普拉斯分布<span
+class="math display">ln <em>p</em>(<em>θ</em>) ∝ −|<em>θ</em>| = −<em>λ</em>∥<em>θ</em>∥<sub>1</sub></span>
+这正是 <strong>L1 正则化</strong>！</p></li>
+</ul>
+<p>因此，这一章学的 MAP 并不是什么过时的统计概念，它是现代 AI
+模型防止过拟合（Regularization）的数学基石。</p>
+<h2 id="共轭先验分布">5.4 共轭先验分布</h2>
+<p>在 MAP
+中，我们为了避开积分，选择了忽略分母。而在共轭先验的方法中，我们通过巧妙选择先验分布
+<span class="math inline"><em>p</em>(<em>θ</em>)</span>
+的形式，使得它和似然函数 <span
+class="math inline"><em>p</em>(<em>X</em>|<em>θ</em>)</span>
+共轭，生成的后验分布 <span
+class="math inline"><em>p</em>(<em>θ</em>|<em>X</em>)</span> 与先验分布
+<span class="math inline"><em>p</em>(<em>θ</em>)</span>
+属于同一种分布。这样做的好处是，我们完全不需要做积分，只需要做简单的加法来更新参数即可。</p>
+<p>我们先给出结论，并通过例子解释结论怎么用，最后推导结论。</p>
+<h3 id="共轭分布大全">5.4.1 共轭分布大全</h3>
+<p>符号说明： * <span class="math inline"><em>n</em></span>：样本数量 *
+<span
+class="math inline">∑<em>x</em><sub><em>i</em></sub></span>：样本观测值的总和
+* <span
+class="math inline"><em>α</em>, <em>β</em></span>：先验分布的参数（超参数）
+* <span
+class="math inline"><em>α</em><sup>′</sup>, <em>β</em><sup>′</sup></span>：后验分布的参数</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">先验分布</th>
+<th style="text-align: left;">似然函数</th>
+<th style="text-align: left;">后验分布</th>
+<th style="text-align: left;">更新公式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">Beta(<em>α</em>, <em>β</em>)</span></td>
+<td style="text-align: left;">二项分布 / 伯努利</td>
+<td style="text-align: left;"><span
+class="math inline">Beta(<em>α</em><sup>′</sup>, <em>β</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + 成功次数</span>
+<br> <span
+class="math inline"><em>β</em><sup>′</sup> = <em>β</em> + 失败次数</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">Gamma(<em>α</em>, <em>β</em>)</span></td>
+<td style="text-align: left;">泊松分布</td>
+<td style="text-align: left;"><span
+class="math inline">Gamma(<em>α</em><sup>′</sup>, <em>β</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + ∑<em>x</em><sub><em>i</em></sub></span>
+<br> <span
+class="math inline"><em>β</em><sup>′</sup> = <em>β</em> + <em>n</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">Gamma(<em>α</em>, <em>β</em>)</span></td>
+<td style="text-align: left;">指数分布</td>
+<td style="text-align: left;"><span
+class="math inline">Gamma(<em>α</em><sup>′</sup>, <em>β</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + <em>n</em></span>
+<br> <span
+class="math inline"><em>β</em><sup>′</sup> = <em>β</em> + ∑<em>x</em><sub><em>i</em></sub></span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">N(<em>μ</em><sub>0</sub>, <em>σ</em><sub>0</sub><sup>2</sup>)</span></td>
+<td style="text-align: left;">正态分布 (已知 <span
+class="math inline"><em>σ</em><sup>2</sup></span>)</td>
+<td style="text-align: left;"><span
+class="math inline">N(<em>μ</em><sub><em>n</em></sub>, <em>σ</em><sub><em>n</em></sub><sup>2</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline">$\frac{1}{\sigma_n^2} = \frac{1}{\sigma_0^2} +
+\frac{n}{\sigma^2}$</span> <br> <span class="math inline">$\mu_n =
+\frac{\frac{1}{\sigma_0^2}\mu_0 +
+\frac{n}{\sigma^2}\bar{x}}{\frac{1}{\sigma_0^2} +
+\frac{n}{\sigma^2}}$</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">Dir(<em>α⃗</em>)</span></td>
+<td style="text-align: left;">多项分布</td>
+<td style="text-align: left;"><span
+class="math inline">Dir(<em>α⃗</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>α</em><sub><em>k</em></sub><sup>′</sup> = <em>α</em><sub><em>k</em></sub> + 第<em>k</em>类的计数</span></td>
+</tr>
+</tbody>
+</table>
+<p>在贝叶斯统计中，如果后验分布与先验分布属于同类，则先验分布与后验分布互为<strong>共轭分布</strong>，先验分布称为似然函数的<strong>共轭先验</strong>。
+例如表格第一行，Beta 分布与
+Beta分布互为共轭分布，Beta分布是二项分布/伯努利分布的共轭先验。</p>
+<p>下面通过例子解释这个表格的用法。</p>
+<h3 id="例子-1">5.4.2 例子</h3>
+<h4 id="beta分布二项分布beta分布">1. Beta分布+二项分布=Beta分布</h4>
+<p>Beta 分布 <span
+class="math inline"><em>p</em> ∼ <em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em>, <em>β</em>)</span>
+定义在 <span class="math inline">[0, 1]</span>
+区间上，描述的是我们对某个事件发生概率 <span
+class="math inline"><em>p</em></span> 的信心。 <span
+class="math inline"><em>α</em></span> 可以看作虚拟的成功次数，<span
+class="math inline"><em>β</em></span> 看作虚拟的失败次数。</p>
+<p>现在要估计硬币正面朝上的概率 <span
+class="math inline"><em>p</em></span>。 *
+先验：根据尝试，硬币正面朝上和反面朝上的概率是相等的。设先验为 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(10, 10)</span>，这意味着我假装之前已经抛过
+20 次，10 正 10 反。 * 数据：新做了 <span
+class="math inline"><em>n</em> = 10</span> 次实验，7 正 3 反。 *
+后验：根据更新公式，<span
+class="math inline"><em>α</em><sup>′</sup> = 10 + 7 = 17, <em>β</em><sup>′</sup> = 10 + 3 = 13</span>。后验为
+<span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(17, 13)</span>。
+* 估计：后验均值 <span
+class="math inline">$\text{E}(p)=\frac{17}{17+13}=\frac{17}{30}$</span>。即硬币正面朝上的概率为
+<span class="math inline">$\frac{17}{30}$</span>。</p>
+<h4 id="gamma分布泊松分布gamma分布">2. Gamma分布+泊松分布=Gamma分布</h4>
+<p>Gamma 分布 <span
+class="math inline"><em>λ</em> ∼ <em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em>, <em>β</em>)</span>
+定义在 <span
+class="math inline">(0, +∞)</span>，通常用于描述单位时间内事件发生的次数
+<span class="math inline"><em>λ</em></span>，或事件发生的速率。其中
+<span class="math inline"><em>α</em></span> 代表总次数，<span
+class="math inline"><em>β</em></span> 代表总时间。</p>
+<p>现在要估计单位时间（这里取 1 小时）内进站的公交车数量 <span
+class="math inline"><em>λ</em></span>。</p>
+<ul>
+<li>先验：根据经验，每小时大概来 3 辆。设 Gamma(3, 1)（意思是 1
+小时观察到了 3 辆）。</li>
+<li>数据：观察了 <span class="math inline"><em>n</em> = 2</span>
+小时，分别来了 4 辆和 6 辆。总数 <span
+class="math inline">∑<em>x</em> = 10</span>。</li>
+<li>后验：根据更新公式，<span
+class="math inline"><em>α</em><sup>′</sup> = 3 + 10 = 13</span>
+(总共来了 13 辆), <span
+class="math inline"><em>β</em><sup>′</sup> = 1 + 2 = 3</span>
+(总共观察了 3 小时)。后验为 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(13, 3)</span>。</li>
+<li>估计：后验均值 <span
+class="math inline">E(<em>λ</em>) = 13/3</span>。即一小时内来了 <span
+class="math inline">13/3</span> 辆公交车。</li>
+</ul>
+<h4 id="gamma分布指数分布gamma分布">3. Gamma分布+指数分布=Gamma分布</h4>
+<p>设灯泡寿命 <span
+class="math inline"><em>X</em> ∼ <em>E</em><em>x</em><em>p</em>(<em>λ</em>)</span>。现在要估计灯泡的寿命。
+* 先验：<span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(10, 1800)</span>，即根据经验，10个灯泡的总寿命是1800小时。
+* 数据：测试了 <span class="math inline"><em>n</em> = 5</span>
+个灯泡，寿命总和 <span class="math inline">∑<em>x</em> = 1000</span>
+小时。 * 后验：注意这里 <span class="math inline"><em>α</em></span>
+更新的是<strong>样本个数</strong>，<span
+class="math inline"><em>β</em></span>
+更新的是<strong>观测值总和</strong>。 根据更新公式，<span
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + 5 = 15,  <em>β</em><sup>′</sup> = <em>β</em> + 1000 = 2800</span>。
+* 估计：后验均值 <span class="math inline">$\text{E}(X) =
+\frac{2800}{15}=186.66$</span>，即灯泡的平均寿命是186.66小时。</p>
+<p>需要注意的是，gamma+泊松与gamma+指数的更新公式正好相反。本质原因是，泊松分布中，时间是固定的（人为选取的，比如上面观察了<strong>2</strong>小时内进站的公交车数量），次数是随机变量（1小时内进站的公交车数量，是观测得到的）；而泊松分布中，时间是随机变量（观测到的灯泡寿命），次数是固定的（人为选取的，比如上面测试了5个灯泡）。两者的定义相反，导致更新公式正好相反。</p>
+<h4 id="dirichlet分布多项分布dirichlet分布">4.
+Dirichlet分布+多项分布=Dirichlet分布</h4>
+<p>Dirichlet分布是 Beta 分布在高维上的推广。Beta 是两面的硬币，Dirichlet
+是 <span class="math inline"><em>K</em></span>
+面的骰子。它描述的是多分类概率向量 <span
+class="math inline"><em>p⃗</em> = (<em>p</em><sub>1</sub>, ..., <em>p</em><sub><em>K</em></sub>)</span>
+的分布。<span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub>, <em>α</em><sub>2</sub>, ..., <em>α</em><sub><em>k</em></sub>)</span>
+的参数 <span
+class="math inline"><em>α</em><sub>1</sub>, <em>α</em><sub>2</sub>, ..., <em>α</em><sub><em>k</em></sub></span>
+分别代表事件 1,2,…,k 出现次数的伪计数。</p>
+<p>现在有一个三面的骰子。 * 先验：<span
+class="math inline"><em>D</em><em>i</em><em>r</em>(1, 1, 1)</span>。这代表均匀分布认为每一面出现的概率相等。
+*
+数据：现在投了若干次骰子，投掷结果为：1点出现2次，2点出现0次，3点出现1次。向量
+<span class="math inline"><em>m⃗</em> = (2, 0, 1)</span>。 *
+后验：根据更新公式，<span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub><sup>′</sup>, <em>α</em><sub>2</sub><sup>′</sup>, <em>α</em><sub>3</sub><sup>′</sup>) = <em>D</em><em>i</em><em>r</em>(1 + 2, 1 + 0, 1 + 1) = <em>D</em><em>i</em><em>r</em>(3, 1, 2)</span>。
+* 估计：第1面朝上的概率为 <span
+class="math inline">$\frac{3}{3+1+2}=\frac{1}{2}$</span>，第2面朝上的概率为
+<span
+class="math inline">$\frac{1}{3+1+2}=\frac{1}{6}$</span>，第3面朝上的概率为
+<span class="math inline">$\frac{2}{3+1+2}=\frac{1}{3}$</span>。</p>
+<h4 id="正态分布正态分布正态分布">5. 正态分布+正态分布=正态分布</h4>
+<p>测量温度，假设已知温度计的测量误差方差为 <span
+class="math inline"><em>σ</em><sup>2</sup> = 1</span>（即精度为 <span
+class="math inline">1/<em>σ</em><sup>2</sup> = 1</span>）。现在要估计真实气温
+<span class="math inline"><em>μ</em></span>。</p>
+<ul>
+<li>先验：根据天气预报或体感，我相信气温在 25 度左右，不确定度（方差）为
+<span
+class="math inline"><em>σ</em><sub>0</sub><sup>2</sup> = 2</span>。这意味着先验分布为
+<span class="math inline"><em>N</em>(25, 2)</span>，先验精度为 <span
+class="math inline">1/2 = 0.5</span>。</li>
+<li>数据：做了一次测量 (<span
+class="math inline"><em>n</em> = 1</span>)，温度计读数 <span
+class="math inline"><em>x</em> = 30</span>。数据的观测精度为 <span
+class="math inline">1/1 = 1</span>。</li>
+<li>后验：正态分布的后验均值是先验均值和观测数据的<strong>加权平均</strong>，权重是各自的<strong>精度</strong>（方差的倒数）；后验精度是先验精度与观测精度之和。
+<ul>
+<li>后验精度：<span class="math inline">$\frac{1}{\sigma'^2} =
+\frac{1}{\sigma_0^2} + \frac{n}{\sigma^2} = 0.5 + 1 =
+1.5$</span>。因此后验方差 <span class="math inline">$\sigma'^2 =
+\frac{1}{1.5} \approx 0.67$</span>。</li>
+<li>后验均值：<span class="math inline">$\mu' = \frac{\text{先验精度}
+\cdot \mu_0 + \text{数据精度} \cdot x}{\text{总精度}} = \frac{0.5 \times
+25 + 1 \times 30}{0.5 + 1} = \frac{12.5 + 30}{1.5} = \frac{42.5}{1.5}
+\approx 28.33$</span>。</li>
+<li>后验分布为 <span
+class="math inline"><em>N</em>(28.33, 0.67)</span>。</li>
+</ul></li>
+<li>估计：后验均值 <span
+class="math inline">E(<em>μ</em>) = 28.33</span>。</li>
+</ul>
+<h3 id="数学原理与推导">5.4.3 数学原理与推导</h3>
+<p>上面五个例子直观地展示了共轭分布与更新公式的用法。事实上，这五个例子非常符合人们的直觉，即在经验的基础上，根据新观测到的数据，更新信念。</p>
+<p>下面通过数学推导更新公式。 这里的核心逻辑是，写出 <span
+class="math inline"><em>先</em><em>验</em><em>分</em><em>布</em> × <em>似</em><em>然</em><em>函</em><em>数</em></span>，然后忽略常数，看剩下的部分像什么分布。</p>
+<h4 id="beta分布-二项分布-beta分布">1. Beta分布 + 二项分布 =
+Beta分布</h4>
+<p><em>Th</em>. 设 <span class="math inline"><em>θ</em></span>
+为事件成功的概率，且服从先验分布 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em>, <em>β</em>)</span>。现又做了
+<span class="math inline"><em>n</em></span> 次试验（即数据服从二项分布
+<span
+class="math inline"><em>X</em> ∼ <em>B</em>(<em>n</em>, <em>θ</em>)</span>），成功次数为
+<span class="math inline"><em>k</em></span>。则现在 <span
+class="math inline"><em>θ</em>|<em>X</em></span> 服从后验分布 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em> + <em>k</em>, <em>β</em> + <em>n</em> − <em>k</em>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span
+class="math inline"><em>p</em>(<em>θ</em>) = Beta(<em>α</em>, <em>β</em>) ∝ <em>θ</em><sup><em>α</em> − 1</sup>(1 − <em>θ</em>)<sup><em>β</em> − 1</sup></span>（根据
+Beta 分布的概率密度函数）</p>
+<p><span
+class="math inline"><em>p</em>(<em>X</em>|<em>θ</em>) = <em>C</em><sub><em>n</em></sub><sup><em>k</em></sup><em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup> ∝ <em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup></span></p>
+<p><span
+class="math inline"><em>P</em>(<em>θ</em>|<em>X</em>) ∝ <em>P</em>(<em>θ</em>) ⋅ <em>P</em>(<em>X</em>|<em>θ</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\theta|X)} \propto
+\theta^{\alpha-1}(1-\theta)^{\beta-1} \cdot \theta^k
+(1-\theta)^{n-k}$</span></p>
+<p><span class="math inline">$\phantom{P(\theta|X)} =
+\theta^{(\alpha+k)-1} (1-\theta)^{(\beta+n-k)-1}$</span></p>
+<p>即 <span class="math inline"><em>θ</em>|<em>X</em></span> 服从 Beta
+分布 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em> + <em>k</em>, <em>β</em> + <em>n</em> − <em>k</em>)</span>。</p>
+<h4 id="gamma分布-泊松分布-gamma分布">2. Gamma分布 + 泊松分布 =
+Gamma分布</h4>
+<p><em>Th</em>. 设 <span class="math inline"><em>λ</em></span>
+为单位时间内某事件发生的次数，且满足先验分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em>, <em>β</em>)</span>。现观测了
+<span class="math inline"><em>n</em></span> 单位时间（即数据服从泊松分布
+<span
+class="math inline"><em>X</em> ∼ <em>P</em><em>o</em><em>i</em>(<em>λ</em>)</span>），得到观测数据
+<span
+class="math inline"><em>X</em> = {<em>X</em><sub>1</sub>, <em>X</em><sub>2</sub>, ..., <em>X</em><sub><em>n</em></sub>}</span>，其中
+<span class="math inline"><em>X</em><sub><em>i</em></sub></span> 为第
+<span class="math inline"><em>i</em></span>
+个小时观测到的事件发生次数。则 <span
+class="math inline"><em>λ</em>|<em>X</em></span> 服从分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em> + ∑<em>X</em><sub><em>i</em></sub>, <em>β</em> + <em>n</em>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span
+class="math inline"><em>p</em>(<em>λ</em>) = Gamma(<em>α</em>, <em>β</em>) ∝ <em>λ</em><sup><em>α</em> − 1</sup><em>e</em><sup>−<em>β</em><em>λ</em></sup></span>（根据
+Gamma 分布的概率密度函数）</p>
+<p><span class="math inline">$p(X|\lambda) = p(X_1|\lambda)
+p(X_2|\lambda)... p(X_n|\lambda)=\prod
+\frac{\lambda^{x_i}e^{-\lambda}}{x_i!} \propto \lambda^{\sum x_i}
+e^{-n\lambda}$</span></p>
+<p><span
+class="math inline"><em>P</em>(<em>λ</em>|<em>X</em>) ∝ <em>P</em>(<em>λ</em>) ⋅ <em>P</em>(<em>X</em>|<em>λ</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\lambda|X)} \propto
+\lambda^{\alpha-1} e^{-\beta\lambda} \cdot \lambda^{\sum x_i}
+e^{-n\lambda}$</span></p>
+<p><span class="math inline">$\phantom{P(\lambda|X)} =
+\lambda^{(\alpha+\sum x_i)-1} e^{-(\beta+n)\lambda}$</span></p>
+<p>即 <span class="math inline"><em>λ</em>|<em>X</em></span> 服从 Gamma
+分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em> + ∑<em>x</em><sub><em>i</em></sub>, <em>β</em> + <em>n</em>)</span>。</p>
+<h4 id="gamma分布-指数分布-gamma分布">3. Gamma分布 + 指数分布 =
+Gamma分布</h4>
+<p><em>Th</em>. 设 <span class="math inline"><em>λ</em></span>
+为灯泡坏掉的速率，且 <span class="math inline"><em>λ</em></span>
+服从先验分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em>, <em>β</em>)</span>。现在又观测了
+<span class="math inline"><em>n</em></span> 个灯泡（即数据服从指数分布
+<span
+class="math inline"><em>X</em> ∼ <em>E</em><em>x</em><em>p</em>(<em>λ</em>)</span>），得到观测数据
+<span
+class="math inline"><em>X</em> = {<em>X</em><sub>1</sub>, <em>X</em><sub>2</sub>, ..., <em>X</em><sub><em>n</em></sub>}</span>，其中
+<span class="math inline"><em>X</em><sub><em>i</em></sub></span> 为第
+<span class="math inline"><em>i</em></span> 个灯泡的寿命。则 <span
+class="math inline"><em>λ</em>|<em>X</em></span> 服从 Gamma 分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em> + <em>n</em>, <em>β</em> + ∑<em>X</em><sub><em>i</em></sub>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span
+class="math inline"><em>p</em>(<em>λ</em>) = Gamma(<em>α</em>, <em>β</em>) ∝ <em>λ</em><sup><em>α</em> − 1</sup><em>e</em><sup>−<em>β</em><em>λ</em></sup></span>（根据
+Gamma 分布的概率密度函数）</p>
+<p><span
+class="math inline"><em>p</em>(<em>X</em>|<em>λ</em>) = <em>p</em>(<em>X</em><sub>1</sub>|<em>λ</em>)<em>p</em>(<em>X</em><sub>2</sub>|<em>λ</em>)...<em>p</em>(<em>X</em><sub><em>n</em></sub>|<em>λ</em>) = ∏<em>λ</em><em>e</em><sup>−<em>λ</em><em>x</em><sub><em>i</em></sub></sup> = <em>λ</em><sup><em>n</em></sup><em>e</em><sup>−<em>λ</em>∑<em>x</em><sub><em>i</em></sub></sup></span></p>
+<p><span
+class="math inline"><em>P</em>(<em>λ</em>|<em>X</em>) ∝ <em>P</em>(<em>λ</em>) ⋅ <em>P</em>(<em>X</em>|<em>λ</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\lambda|X)} \propto
+\lambda^{\alpha-1} e^{-\beta\lambda} \cdot \lambda^n e^{-\lambda \sum
+x_i}$</span></p>
+<p><span class="math inline">$\phantom{P(\lambda|X)} =
+\lambda^{(\alpha+n)-1} e^{-(\beta+\sum x_i)\lambda}$</span></p>
+<p>即 <span class="math inline"><em>λ</em>|<em>X</em></span> 服从 Gamma
+分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em> + <em>n</em>, <em>β</em> + ∑<em>x</em><sub><em>i</em></sub>)</span>。<strong>注意与泊松分布的区别。</strong></p>
+<h4 id="dirichlet分布-多项分布-dirichlet分布">4. Dirichlet分布 +
+多项分布 = Dirichlet分布</h4>
+<p><em>Th</em>. 设 <span
+class="math inline"><em>θ⃗</em> = (<em>θ</em><sub>1</sub>, …, <em>θ</em><sub><em>K</em></sub>)</span>
+为多分类概率向量，且服从先验分布 <span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub>, …, <em>α</em><sub><em>K</em></sub>)</span>。现进行
+<span class="math inline"><em>n</em></span>
+次试验（即数据服从多项分布），观测结果中第 <span
+class="math inline"><em>k</em></span> 类出现的次数为 <span
+class="math inline"><em>m</em><sub><em>k</em></sub></span>。则 <span
+class="math inline"><em>θ⃗</em>|<em>X</em></span> 服从后验分布 <span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub> + <em>m</em><sub>1</sub>, …, <em>α</em><sub><em>K</em></sub> + <em>m</em><sub><em>K</em></sub>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span class="math inline">$P(\vec{\theta}) = \text{Dir}(\vec{\alpha})
+\propto \prod_{k=1}^K \theta_k^{\alpha_k - 1}$</span>（根据 Dirichlet
+分布的概率密度函数）</p>
+<p><span class="math inline">$P(X|\vec{\theta}) =p(X_1|\vec{\theta})
+p(X_2|\vec{\theta})... p(X_n|\vec{\theta})\propto \prod_{k=1}^K
+\theta_k^{m_k}$</span></p>
+<p><span
+class="math inline"><em>P</em>(<em>θ⃗</em>|<em>X</em>) ∝ <em>P</em>(<em>θ⃗</em>) ⋅ <em>P</em>(<em>X</em>|<em>θ⃗</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\vec{\theta}|X)} \propto
+\prod_{k=1}^K \theta_k^{\alpha_k - 1} \cdot \prod_{k=1}^K
+\theta_k^{m_k}$</span></p>
+<p><span class="math inline">$\phantom{P(\vec{\theta}|X)} =
+\prod_{k=1}^K \theta_k^{(\alpha_k + m_k) - 1}$</span></p>
+<p>即 <span class="math inline"><em>θ⃗</em>|<em>X</em></span> 服从
+Dirichlet 分布 <span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub> + <em>m</em><sub>1</sub>, …, <em>α</em><sub><em>K</em></sub> + <em>m</em><sub><em>K</em></sub>)</span>。</p>
+<h4 id="正态分布-正态分布-正态分布-方差已知">5. 正态分布 + 正态分布 =
+正态分布 (方差已知)</h4>
+<p><em>Th</em>. 设 <span class="math inline"><em>μ</em></span>
+为正态分布的均值（观测方差 <span
+class="math inline"><em>σ</em><sup>2</sup></span> 已知），且 <span
+class="math inline"><em>μ</em></span> 服从先验分布 <span
+class="math inline"><em>N</em>(<em>μ</em><sub>0</sub>, <em>σ</em><sub>0</sub><sup>2</sup>)</span>。现观测到
+<span class="math inline"><em>n</em></span> 个样本数据 <span
+class="math inline"><em>X</em> = {<em>x</em><sub>1</sub>, …, <em>x</em><sub><em>n</em></sub>}</span>（均值为
+<span class="math inline"><em>x̄</em></span>）。则 <span
+class="math inline"><em>μ</em>|<em>X</em></span> 服从后验分布 <span
+class="math inline"><em>N</em>(<em>μ</em><sub><em>n</em></sub>, <em>σ</em><sub><em>n</em></sub><sup>2</sup>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span class="math inline">$P(\mu) = N(\mu_0, \sigma_0^2) \propto
+\exp\left( -\frac{(\mu-\mu_0)^2}{2\sigma_0^2} \right)$</span></p>
+<p><span class="math inline">$P(X|\mu) = \prod_{i=1}^n N(x_i|\mu,
+\sigma^2) \propto \exp\left( -\frac{\sum_{i=1}^n(x_i-\mu)^2}{2\sigma^2}
+\right)$</span></p>
+<p><span
+class="math inline"><em>P</em>(<em>μ</em>|<em>X</em>) ∝ <em>P</em>(<em>μ</em>) ⋅ <em>P</em>(<em>X</em>|<em>μ</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\mu|X)} \propto \exp\left(
+-\frac{(\mu-\mu_0)^2}{2\sigma_0^2} \right) \cdot \exp\left(
+-\frac{\sum(x_i-\mu)^2}{2\sigma^2} \right)$</span></p>
+<p><span class="math inline">$\phantom{P(\mu|X)} = \exp\left(
+-\frac{1}{2} \left[ \frac{(\mu-\mu_0)^2}{\sigma_0^2} +
+\frac{\sum(x_i-\mu)^2}{\sigma^2} \right] \right)$</span></p>
+<p>通过整理 <span class="math inline"><em>μ</em></span>
+的二次项系数和一次项系数，可得 <span
+class="math inline"><em>μ</em>|<em>X</em></span> 仍服从正态分布，且： *
+后验精度：<span class="math inline">$\frac{1}{\sigma_n^2} =
+\frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}$</span></p>
+<ul>
+<li>后验均值：<span class="math inline">$\mu_n =
+\frac{\frac{1}{\sigma_0^2}\mu_0 +
+\frac{n}{\sigma^2}\bar{x}}{\frac{1}{\sigma_0^2} +
+\frac{n}{\sigma^2}}$</span></li>
+</ul>
+<h2 id="总结">5.5 总结</h2>
+<p>本章系统地介绍了贝叶斯估计，旨在解决极大似然估计（MLE）在数据稀缺时容易过拟合及产生偏差的问题。</p>
+<p>我们从贝叶斯公式出发，确立了后验分布 <span
+class="math inline">∝</span> 似然函数 <span class="math inline">×</span>
+先验分布的核心推断框架。为了解决贝叶斯推断中分母（边缘似然）难以积分计算的痛点，本章重点讲解了两条捷径：
+1.
+最大后验概率（MAP）：通过寻找后验概率最大的点来代替完整分布，并揭示了它在机器学习中等价于带正则项（L1/L2）的
+MLE 这一重要本质。 2. 共轭先验：通过选择与似然函数匹配的特定先验分布（如
+Beta-二项、Gamma-泊松、正态-正态），使得后验分布保持相同的函数形式，从而将复杂的概率积分转化为简单的参数更新。</p>
+<p>归根结底，贝叶斯估计体现了数据与信念的动态折中。当数据不足时，先验知识能防止模型走偏；当数据充足时，观测事实则会主导结果。这是现代统计学习中处理不确定性和防止过拟合的数学基石。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%B0%E8%AE%A1/" rel="tag"># 贝叶斯估计</a>
+              <a href="/tags/MAP/" rel="tag"># MAP</a>
+              <a href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/" rel="tag"># 概率论</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/" rel="prev" title="二叉搜索树、AVL树、伸展树、红黑树、B树、B+树">
+                  <i class="fa fa-angle-left"></i> 二叉搜索树、AVL树、伸展树、红黑树、B树、B+树
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/01/16/AIMath/%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B%E4%B8%8EEM%E7%AE%97%E6%B3%95/" rel="next" title="6 混合模型与EM算法">
+                  6 混合模型与EM算法 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

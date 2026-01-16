@@ -142,18 +142,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">19</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -170,6 +170,1711 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/01/16/AIMath/%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B%E4%B8%8EEM%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/16/AIMath/%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B%E4%B8%8EEM%E7%AE%97%E6%B3%95/" class="post-title-link" itemprop="url">6 混合模型与EM算法</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-16 15:17:32 / Modified: 15:20:04" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">人工智能的数学基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>本节的内容也比较难。我们先通过一个简单的聚类问题了解混合模型与EM算法的基本思想，然后介绍混合模型、EM算法的一般形式，最后通过几个例子，介绍混合模型和EM算法的应用。</p>
+<h2 id="引入聚类问题">6.1 引入：聚类问题</h2>
+<h3 id="问题提出">6.1.1 问题提出</h3>
+<p>所谓聚类，就是把一组数据分成若干类，是一种无监督的机器学习方法。</p>
+<p>让我们看一个实际的聚类问题。假设医生通过体检采集了五名学生的身高数据
+<span
+class="math inline"><em>X</em> = {85, 95, 145, 175, 185}</span>。这五名学生分别来自幼儿组、小学组和大学组这三个类别。如何判断每个样本属于哪一类？</p>
+<p>要知道每个样本属于哪一类，需要先知道每个类别的中心值（即均值），这样一来，样本离哪个类别的中心点最近，样本就属于哪一类。</p>
+<p>然而，我们会发现逻辑陷入了一个死循环。</p>
+<p>如果我们知道 <span class="math inline">85, 95</span> 是幼儿，<span
+class="math inline">145</span> 是小学生，<span
+class="math inline">175, 185</span> 是大学生，那么</p>
+<ul>
+<li><p>幼儿平均 <span class="math inline">$\mu_1 = \frac{85+95}{2} =
+90$</span></p></li>
+<li><p>小学平均 <span
+class="math inline"><em>μ</em><sub>2</sub> = 145</span></p></li>
+<li><p>大学平均 <span class="math inline">$\mu_3 = \frac{175+185}{2} =
+180$</span></p></li>
+<li><p>这样，如果以后再来一个样本，例如 <span
+class="math inline">180</span>，我们就能立刻判断它属于大学组。</p></li>
+</ul>
+<p>如果我们一开始就知道 <span
+class="math inline"><em>μ</em><sub>1</sub> = 90, <em>μ</em><sub>2</sub> = 145, <em>μ</em><sub>3</sub> = 180</span>，那也简单：
+* <span class="math inline">85</span> 离 <span
+class="math inline">90</span> 最近，那它大概率是幼儿。 * <span
+class="math inline">175</span> 离 <span class="math inline">180</span>
+最近，那它大概率是大学生。</p>
+<p>然而，现在我们既不知道标签（即每个样本属于哪一类），也不知道每个类别的中心（均值）。这就像“鸡生蛋，蛋生鸡”，无法开始。</p>
+<h3 id="隶属度">6.1.2 隶属度</h3>
+<p>那么应该怎么办？一个朴素的想法是，先根据主观经验，猜测三个类别的中心（均值），然后慢慢修正。具体计算如下。</p>
+<p>我们需要先补充两个假设：</p>
+<ol type="1">
+<li>为了简化计算，假设三个组的身高都服从正态分布，且标准差都是 <span
+class="math inline"><em>σ</em> = 10</span>（即方差 <span
+class="math inline"><em>σ</em><sup>2</sup> = 100</span>）。</li>
+<li>假设任选一个学生，属于幼儿、小学、大学的概率相等，即 <span
+class="math inline"><em>π</em><sub>1</sub> = <em>π</em><sub>2</sub> = <em>π</em><sub>3</sub> = 1/3</span>。</li>
+</ol>
+<p>对于给定的身高 <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span>，它属于第
+<span class="math inline"><em>k</em></span> 个组（中心为 <span
+class="math inline"><em>μ</em><sub><em>k</em></sub></span>）的概率由正态分布的概率密度函数给出：
+<span class="math display">$$ P(Z_i=k, X_i) =
+\frac{1}{\sqrt{2\pi\sigma^2}} e^{ -\frac{(X_i - \mu_k)^2}{2\sigma^2} }
+$$</span> 其中 <span
+class="math inline"><em>Z</em><sub><em>i</em></sub></span> 表示样本
+<span class="math inline"><em>X</em><sub><em>i</em></sub></span>
+的类别，<span
+class="math inline"><em>Z</em><sub><em>i</em></sub> = <em>k</em></span>
+表示第 <span class="math inline"><em>i</em></span> 个样本 <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span> 属于第 <span
+class="math inline"><em>k</em></span> 类。</p>
+<p>下面给出隶属度的定义。 <span class="math display">$$ \gamma_{ik}
+=P(Z_i=k | X_i)= \frac{P(Z_i=k, X_i)}{\sum\limits_{l \in \{1,2,3\}}
+P(Z_i=l, X_i)} $$</span> 其中 <span class="math inline">{1, 2, 3}</span>
+是三个类别的下标，可以人为规定类别1是幼儿组，类别2是小学组，类别3是大学组。隶属度
+<span
+class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub></span>
+代表第 <span class="math inline"><em>i</em></span> 个样本 <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span> 属于第 <span
+class="math inline"><em>k</em></span> 类的可能性，或者样本 <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span> 在第 <span
+class="math inline"><em>k</em></span> 类上的得分。相较 <span
+class="math inline"><em>P</em>(<em>Z</em><sub><em>i</em></sub> = <em>k</em>, <em>X</em><sub><em>i</em></sub>)</span>，隶属度做了归一化处理。</p>
+<p>代入正态分布的概率密度函数可得</p>
+<p><span class="math display">$$
+\begin{aligned}
+\gamma_{ik} &amp;= \frac{P(Z_i=k, X_i)}{\sum\limits_{l \in \{1,2,3\}}
+P(Z_i=l, X_i)} \\[0.8em]
+&amp;= \frac{ \frac{1}{3} \cdot \frac{1}{\sqrt{2\pi\sigma^2}} \cdot
+\exp\left( -\frac{(x_i - \mu_k)^2}{2\sigma^2} \right) }{ \sum\limits_{l
+\in \{1,2,3\}} \left[ \frac{1}{3} \cdot \frac{1}{\sqrt{2\pi\sigma^2}}
+\cdot \exp\left( -\frac{(x_i - \mu_l)^2}{2\sigma^2} \right) \right] }
+\\[0.8em]
+&amp;= \frac{\exp\left( -\frac{(x_i - \mu_k)^2}{2\sigma^2} \right)}{
+\exp\left( -\frac{(x_i - \mu_1)^2}{2\sigma^2} \right) + \exp\left(
+-\frac{(x_i - \mu_2)^2}{2\sigma^2} \right) + \exp\left( -\frac{(x_i -
+\mu_3)^2}{2\sigma^2} \right) }
+\end{aligned}
+$$</span></p>
+<p>下面以 <span class="math inline"><em>X</em><sub>3</sub> = 145</span>
+为例，计算三个隶属度 <span
+class="math inline"><em>γ</em><sub>31</sub>, <em>γ</em><sub>32</sub>, <em>γ</em><sub>33</sub></span>。我们不妨猜测
+<span
+class="math inline"><em>μ</em><sub>1</sub> = 100, <em>μ</em><sub>2</sub> = 140, <em>μ</em><sub>3</sub> = 170</span>。</p>
+<p><span class="math display">$$
+\text{Score}_1 = \exp\left( -\frac{(145 - 100)^2}{200} \right) =
+\exp\left( -\frac{2025}{200} \right) = e^{-10.125} \approx
+\mathbf{0.00004}
+$$</span></p>
+<p><span class="math display">$$
+\text{Score}_2 = \exp\left( -\frac{(145 - 140)^2}{200} \right) =
+\exp\left( -\frac{25}{200} \right) = e^{-0.125} \approx \mathbf{0.88250}
+$$</span></p>
+<p><span class="math display">$$
+\text{Score}_3 = \exp\left( -\frac{(145 - 170)^2}{200} \right) =
+\exp\left( -\frac{625}{200} \right) = e^{-3.125} \approx
+\mathbf{0.04394}
+$$</span></p>
+<p><span class="math display">$$
+\begin{aligned}
+\text{Sum} &amp;= \text{Score}_1 + \text{Score}_2 + \text{Score}_3 \\
+&amp;= 0.00004 + 0.88250 + 0.04394 \\
+&amp;\approx \mathbf{0.92648}
+\end{aligned}
+$$</span></p>
+<p>于是 <span class="math display">$$
+\gamma_{31} = \frac{0.00004}{0.92648} \approx 0.00
+$$</span></p>
+<p><span class="math display">$$
+\gamma_{32} = \frac{0.88250}{0.92648} \approx 0.95
+$$</span></p>
+<p><span class="math display">$$
+\gamma_{33} = \frac{0.04394}{0.92648} \approx 0.05
+$$</span></p>
+<p>对所有样本应用上述计算，我们得到全部样本的隶属度：</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 21%" />
+<col style="width: 17%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">数据 <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span></th>
+<th style="text-align: center;"><span
+class="math inline"><em>μ</em><sub>1</sub> = 100</span> (幼儿)</th>
+<th style="text-align: center;"><span
+class="math inline"><em>μ</em><sub>2</sub> = 140</span> (小学)</th>
+<th style="text-align: center;"><span
+class="math inline"><em>μ</em><sub>3</sub> = 170</span> (大学)</th>
+<th style="text-align: left;">计算结果解读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">85</td>
+<td style="text-align: center;">0.99</td>
+<td style="text-align: center;">0.01</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: left;">毫无悬念，肯定是幼儿</td>
+</tr>
+<tr>
+<td style="text-align: left;">95</td>
+<td style="text-align: center;">0.99</td>
+<td style="text-align: center;">0.01</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: left;">毫无悬念，肯定还是幼儿</td>
+</tr>
+<tr>
+<td style="text-align: left;">145</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0.95</td>
+<td style="text-align: center;">0.05</td>
+<td
+style="text-align: left;">极大概率是小学，有微小可能是“矮个大学生”</td>
+</tr>
+<tr>
+<td style="text-align: left;">175</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0.05</td>
+<td style="text-align: center;">0.95</td>
+<td
+style="text-align: left;">有微小可能是“发育极好的小学生”，主要是大学</td>
+</tr>
+<tr>
+<td style="text-align: left;">185</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">0.00</td>
+<td style="text-align: center;">1.00</td>
+<td style="text-align: left;">毫无悬念，肯定是大学生</td>
+</tr>
+</tbody>
+</table>
+<h3 id="更新参数">6.1.3 更新参数</h3>
+<p>算了大半天的隶属度有什么用？用来更新参数。</p>
+<p><span class="math display">$$ \mu_k^{new} =
+\frac{\sum\limits_{i=1}^{n} \gamma_{ik} \cdot x_i}{\sum\limits_{i=1}^{n}
+\gamma_{ik}} $$</span></p>
+<p>这个公式其实比较直观，说的就是“新的中心 = 加权总身高 / 总权重”。</p>
+<p>于是我们可以计算 <span
+class="math inline"><em>μ</em><sub>1</sub><sup><em>n</em><em>e</em><em>w</em></sup>, <em>μ</em><sub>2</sub><sup><em>n</em><em>e</em><em>w</em></sup>, <em>μ</em><sub>3</sub><sup><em>n</em><em>e</em><em>w</em></sup></span>：
+<span class="math display">$$
+\begin{aligned}
+\mu_1^{new} &amp;= \frac{\sum\limits_{i=1}^{5} \gamma_{i1} \cdot
+x_i}{\sum\limits_{i=1}^{5} \gamma_{i1}} \\[1em]
+&amp;= \frac{0.99 \times 85 + 0.99 \times 95 + 0.00 \times 145 + 0.00
+\times 175 + 0.00 \times 185}{0.99 + 0.99 + 0.00 + 0.00 + 0.00} \\[1em]
+&amp;= \frac{84.15 + 94.05 + 0 + 0 + 0}{1.98} \\[1em]
+&amp;= \frac{178.2}{1.98} \\[1em]
+&amp;= 90
+\end{aligned}
+$$</span> 初始猜测是 <span
+class="math inline">100</span>，一轮迭代后迅速修正为 <span
+class="math inline">90</span>，完美符合真实数据。</p>
+<p><span class="math display">$$
+\begin{aligned}
+\mu_2^{new} &amp;= \frac{\sum\limits_{i=1}^{5} \gamma_{i2} \cdot
+x_i}{\sum\limits_{i=1}^{5} \gamma_{i2}} \\[1em]
+&amp;= \frac{0.01 \times 85 + 0.01 \times 95 + 0.95 \times 145 + 0.05
+\times 175 + 0.00 \times 185}{0.01 + 0.01 + 0.95 + 0.05 + 0.00} \\[1em]
+&amp;= \frac{0.85 + 0.95 + 137.75 + 8.75 + 0}{1.02} \\[1em]
+&amp;= \frac{148.3}{1.02} \\[1em]
+&amp;\approx 145.39
+\end{aligned}
+$$</span> 初始猜测是 <span class="math inline">140</span>，真实值是
+<span class="math inline">145</span>。由于受到右侧 <span
+class="math inline">175</span> cm数据（权重 <span
+class="math inline">0.05</span>）的拉动，新均值略高于 <span
+class="math inline">145</span>，变为 <span
+class="math inline">145.39</span>。随着后续迭代，均值会进一步逼近 <span
+class="math inline">145</span>。</p>
+<p><span class="math display">$$
+\begin{aligned}
+\mu_3^{new} &amp;= \frac{\sum\limits_{i=1}^{5} \gamma_{i3} \cdot
+x_i}{\sum\limits_{i=1}^{5} \gamma_{i3}} \\[1em]
+&amp;= \frac{0.00 \times 85 + 0.00 \times 95 + 0.05 \times 145 + 0.95
+\times 175 + 1.00 \times 185}{0.00 + 0.00 + 0.05 + 0.95 + 1.00} \\[1em]
+&amp;= \frac{0 + 0 + 7.25 + 166.25 + 185}{2.00} \\[1em]
+&amp;= \frac{358.5}{2.00} \\[1em]
+&amp;= 179.25
+\end{aligned}
+$$</span> 初始猜测是 <span class="math inline">170</span>，真实均值是
+<span class="math inline">$\frac{175+185}{2} = 180$</span>。计算结果
+<span class="math inline">179.25</span> 非常接近真实值。</p>
+<p>多迭代几轮，三个均值会逐步收敛，收敛的结果即可作为三个类别的均值。以后，如果有新的数据进来，只需要计算它和这三个类别的隶属度（或者score，省得归一化），哪个隶属度最大，这个样本就属于哪一类。</p>
+<p>例如，学校来了一位新同学，测量身高为 <span
+class="math inline"><em>x</em><sub><em>n</em><em>e</em><em>w</em></sub> = 160</span>
+cm。我们需要判断他最可能属于哪个类别。</p>
+<p><span
+class="math display">Score<sub>1</sub> ∝ exp (−70<sup>2</sup>/200) = <em>e</em><sup>−24.5</sup> ≈ 0</span></p>
+<p><span
+class="math display">Score<sub>2</sub> ∝ exp (−15<sup>2</sup>/200) = <em>e</em><sup>−1.125</sup> ≈ 0.324</span></p>
+<p><span
+class="math display">Score<sub>3</sub> ∝ exp (−20<sup>2</sup>/200) = <em>e</em><sup>−2.0</sup> ≈ 0.135</span></p>
+<p>虽然 <span class="math inline">160</span> cm 介于小学生(<span
+class="math inline">145</span>)和大学生(<span
+class="math inline">180</span>)之间，但数学告诉我们，它离小学生更近。
+因此我们将这位同学归类为小学组。</p>
+<h2 id="混合模型与em算法">6.2 混合模型与EM算法</h2>
+<p>在上一节中，我们通过一个简单的例子，初步了解了混合模型与EM算法的基本思想。本节将通过严格的数学推导，给出混合模型与EM算法的一般形式。</p>
+<h3 id="混合模型">6.2.1 混合模型</h3>
+<p>混合模型的定义源于概率论中的全概率公式。假如我们观察到的数据 <span
+class="math inline"><em>X</em></span>（如身高）看起来很复杂，单用一个分布无法描述（比如身高有90、145、180三个峰值，不能用一个正态分布描述）。但在其内部，数据其实是由
+<span class="math inline"><em>K</em></span>
+个简单的基础分布混合而成的。</p>
+<p>混合模型的数学定义如下： <span class="math display">$$ f_X(x) =
+\sum_{k=1}^K \underbrace{P(Z=z_k)}_{\text{混合系数}} \cdot
+\underbrace{f_{X|Z}(x|z_k)}_{\text{成分分布}} $$</span></p>
+<p>下面解释一下公式里的参数。</p>
+<ul>
+<li><p>隐变量 <span class="math inline"><em>Z</em></span>
+是一个离散型随机变量，取值为 <span
+class="math inline">{1, 2, ..., <em>K</em>}</span>。它指示观测数据 <span
+class="math inline"><em>x</em></span>
+具体来自哪一个成分。因为我们在收集数据时通常不知道它，所以叫“隐”变量。在
+6.1
+的聚类问题中，每个样本的类别（幼儿组、小学组、大学组）就是隐变量，<span
+class="math inline"><em>Z</em></span> 的取值为 <span
+class="math inline">{1, 2, 3}</span>。</p></li>
+<li><p>成分分布 <span
+class="math inline"><em>f</em><sub><em>X</em>|<em>Z</em></sub>(<em>x</em>|<em>z</em><sub><em>k</em></sub>)</span>
+是第 <span class="math inline"><em>k</em></span>
+个成分内部的数据分布规律，在 6.1
+中即为每个类别内部的身高分布。通常假设所有子群体服从同一种分布形式（例如都是高斯分布），但参数不同。</p></li>
+<li><p>混合系数/先验概率 <span
+class="math inline"><em>P</em>(<em>Z</em> = <em>z</em><sub><em>k</em></sub>)</span>
+也常记作 <span
+class="math inline"><em>π</em><sub><em>k</em></sub></span> 或 <span
+class="math inline"><em>w</em><sub><em>k</em></sub></span>，表示第 <span
+class="math inline"><em>k</em></span> 个成分在总体中占的比例（权重）。在
+6.1 节中，它对应各类别学生的人数比例。混合系数必须满足非负且和为1，即
+<span class="math inline">$\sum_{k=1}^K P(Z=z_k) = 1$</span>。</p></li>
+</ul>
+<h3 id="em-算法的数学推导">6.2.2 EM 算法的数学推导</h3>
+<p>这一部分比较复杂，但考试不考，可以跳过，但建议还是看一看。</p>
+<p>设 <span
+class="math inline"><em>X</em> = {<em>X</em><sub>1</sub>, <em>X</em><sub>2</sub>, ..., <em>X</em><sub><em>n</em></sub>}</span>
+为观测到的独立同分布的样本。<span
+class="math inline"><em>Z</em> = {<em>Z</em><sub>1</sub>, <em>Z</em><sub>2</sub>, ..., <em>Z</em><sub><em>n</em></sub>}</span>
+为隐变量，其中 <span
+class="math inline"><em>Z</em><sub><em>i</em></sub></span> 为 <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span>
+对应的隐变量。<span
+class="math inline"><em>Z</em><sub><em>i</em></sub> ∈ {1, 2, 3, ..., <em>k</em>} = <em>K</em></span>，<span
+class="math inline"><em>K</em></span> 是隐变量的取值范围。 设 <span
+class="math inline"><em>θ</em></span> 为需要估计的参数，它在 <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span>
+的概率密度函数中。</p>
+<p>下面通过极大似然估计（MLE）来估计 <span
+class="math inline"><em>θ</em></span>。 设 <span
+class="math display"><em>L</em>(<em>X</em>; <em>θ</em>) = <em>P</em>(<em>X</em><sub>1</sub>; <em>θ</em>)<em>P</em>(<em>X</em><sub>2</sub>; <em>θ</em>)...<em>P</em>(<em>X</em><sub><em>n</em></sub>; <em>θ</em>)</span>
+其中 <span
+class="math inline"><em>P</em>(<em>X</em><sub><em>i</em></sub>; <em>θ</em>)</span>
+为 <span
+class="math inline"><em>X</em><sub><em>i</em></sub></span>的概率密度函数。</p>
+<p>对似然函数取对数 <span class="math display">$$
+LL(X; \theta)=\ln L(X;\theta)=\sum \limits_{i=1}^{n} \ln
+P(X_i;\theta)=\sum \limits_{i=1}^{n}\ln \sum \limits_{Z_i \in K} P(X_i,
+Z_i; \theta)
+$$</span></p>
+<p>设隐变量 <span
+class="math inline"><em>Z</em><sub><em>i</em></sub></span> 满足分布
+<span
+class="math inline"><em>Q</em><sub><em>i</em></sub>(<em>Z</em><sub><em>i</em></sub>)</span>。对上式进行变形，可得
+<span class="math display">$$
+LL(X; \theta)=\sum \limits_{i=1}^{n} \ln \sum \limits_{Z_i \in K}
+Q_i(Z_i) \frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}
+$$</span></p>
+<p>式中 <span class="math inline">$\sum \limits_{Z_i \in K} Q_i(Z_i)
+\frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}$</span> 即为 <span
+class="math inline">$\frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}$</span>
+的期望。因此</p>
+<p><span class="math display">$$
+LL(X;\theta)=\sum \limits_{i=1}^{n} \ln E_{Z_i}(\frac{P(X_i, Z_i;
+\theta)}{Q_i(Z_i)})
+$$</span></p>
+<p><span class="math inline"><em>y</em> = ln (<em>x</em>)</span> 在
+<span class="math inline">(0, +inf )</span> 上为凹函数。由 Jensen
+不等式，可知 <span class="math display">$$
+LL(X;\theta)=\sum \limits_{i=1}^{n} \ln E_{Z_i}(\frac{P(X_i, Z_i;
+\theta)}{Q_i(Z_i)}) ≥ \sum \limits_{i=1}^{n} E_{Z_i}(\ln\frac{P(X_i,
+Z_i; \theta)}{Q_i(Z_i)})
+$$</span></p>
+<p>将 <span
+class="math inline"><em>E</em><sub><em>Z</em><sub><em>i</em></sub></sub></span>
+展开，可得 <span class="math display">$$
+LL(X;\theta)≥\sum \limits_{i=1}^{n} \sum \limits_{Z_i \in K} Q_i(Z_i)
+\ln \frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}    ①
+$$</span></p>
+<p>故原始问题转化为：寻找合适的 <span
+class="math inline"><em>Q</em><sub><em>i</em></sub></span>
+使该下界变紧（等号成立），以及寻找 <span
+class="math inline"><em>θ</em></span> 最大化该下界。</p>
+<p>等号成立条件为 <span class="math display">$$\frac{P(X_i, Z_i;
+\theta)}{Q_i(Z_i)}=C, \forall i=1,2,...,n$$</span> 其中 <span
+class="math inline"><em>C</em></span> 为常数。 于是 <span
+class="math display"><em>P</em>(<em>X</em><sub><em>i</em></sub>, <em>Z</em><sub><em>i</em></sub>; <em>θ</em>) = <em>C</em> ⋅ <em>Q</em><sub><em>i</em></sub>(<em>Z</em><sub><em>i</em></sub>), ∀<em>i</em> = 1, 2, ..., <em>n</em></span>
+两边对 <span class="math inline"><em>Z</em><sub><em>i</em></sub></span>
+求和得 <span class="math display">$$ \sum \limits_{Z_i \in K}P(X_i,
+Z_i;\theta)=C \cdot \sum \limits_{Z_i \in K} Q_i(Z_i)=C
+$$</span></p>
+<p>故 <span class="math display">$$
+Q_i(Z_i)=\frac{P(X_i, Z_i; \theta)}{C}=\frac{P(X_i, Z_i; \theta)}{\sum
+\limits_{Z_i \in K}P(X_i, Z_i; \theta)}=\frac{P(X_i, Z_i;
+\theta)}{P(X_i;\theta)}=P(Z_i|X_i;\theta)
+$$</span> 事实上，这就是隶属度 <span
+class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub> = <em>P</em>(<em>Z</em><sub><em>i</em></sub> = <em>k</em>|<em>X</em><sub><em>i</em></sub>; <em>θ</em>)</span>。因此
+<span
+class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub> = <em>Q</em><sub><em>i</em></sub>(<em>Z</em><sub><em>i</em></sub>)|<sub><em>Z</em><sub><em>i</em></sub> = <em>k</em></sub> = <em>Q</em><sub><em>i</em></sub>(<em>k</em>)</span>。</p>
+<p>把这一结果代回①式，得 <span class="math display">$$
+\begin{align*}
+&amp;\sum_{i=1}^{n} \sum_{Z_i \in K} Q_i(Z_i) \ln \frac{P(X_i, Z_i;
+\theta)}{Q_i(Z_i)} \\
+&amp;= \sum_{i=1}^{n} \sum_{k \in K} \gamma_{ik} \ln \frac{P(X_i,
+Z_i=k;\theta)}{\gamma_{ik}} \\
+&amp;= \sum_{i=1}^{n} \sum_{k \in K} \left( \gamma_{ik} \ln P(X_i,
+Z_i=k;\theta) - \gamma_{ik} \ln \gamma_{ik} \right)
+\end{align*}
+$$</span></p>
+<p>令 <span class="math display">$$
+Q(\theta,\theta^{(t)})=\sum_{i=1}^{n} \sum_{k \in K}  \gamma_{ik} \ln
+P(X_i, Z_i=k;\theta)
+$$</span></p>
+<p><span class="math display">$$
+H(Z|X, \theta^{(t)}) = - \sum_{i=1}^{n} \sum_{k \in K} \gamma_{ik} \ln
+\gamma_{ik}
+$$</span></p>
+<p>则 <span
+class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em>) ≥ <em>Q</em>(<em>θ</em>, <em>θ</em><sup>(<em>t</em>)</sup>) + <em>H</em>(<em>Z</em>|<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>)</span></p>
+<p>而理想状态下 <span
+class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>) = <em>Q</em>(<em>θ</em><sup>(<em>t</em>)</sup>, <em>θ</em><sup>(<em>t</em>)</sup>) + <em>H</em>(<em>Z</em>|<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>)</span>
+两式相减得 <span
+class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em>) − <em>L</em><em>L</em>(<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>) ≥ <em>Q</em>(<em>θ</em>, <em>θ</em><sup>(<em>t</em>)</sup>) − <em>Q</em>(<em>θ</em><sup>(<em>t</em>)</sup>, <em>θ</em><sup>(<em>t</em>)</sup>)</span></p>
+<p>也就是说，选择 <span class="math inline"><em>θ</em></span> 使 <span
+class="math inline"><em>Q</em></span> 增大，至少能让 <span
+class="math inline"><em>L</em><em>L</em></span> 增大同样大小。</p>
+<p>因此，最终目标变成了 <span class="math display">$$
+\mathop{\text{argmax}}\limits_{\theta} Q(\theta, \theta^{(t)})
+$$</span></p>
+<p>最终，EM算法可表达为</p>
+<p>E步： <span class="math display">$$
+\gamma_{ik}=P(Z_i=k|X_i;\theta)=\frac{P(Z_i=k,X_i;\theta)}{\sum
+\limits_{l \in K} P(Z_i=l,X_i;\theta)}
+$$</span> <span class="math display">$$Q(\theta, \theta^{(t)})=\sum
+\limits_{i=1}^{n} \sum \limits_{k \in K} \gamma_{ik} \ln P(X_i,
+Z_i=k;\theta)$$</span></p>
+<p>M步： <span class="math display">$$
+\theta^{(t+1)}=\mathop{\text{argmax}}\limits_{\theta} Q(\theta,
+\theta^{(t)})$$</span></p>
+<h2 id="例子">6.3 例子</h2>
+<p>EM
+算法不仅仅可以用于聚类问题。本节将介绍三硬币模型和高斯混合模型这两个经典模型，解释EM算法的完整流程。</p>
+<h3 id="三硬币模型">6.3.1 三硬币模型</h3>
+<p>三硬币模型由两个不同的伯努利分布混合而成，本质上是一个伯努利混合模型。</p>
+<p>假设有三枚硬币，分别记作 <span
+class="math inline"><em>A</em>, <em>B</em>, <em>C</em></span>。硬币
+<span class="math inline"><em>A</em>, <em>B</em>, <em>C</em></span>
+正面朝上的概率分别为 <span
+class="math inline"><em>π</em>, <em>p</em>, <em>q</em></span>。规则如下：先掷硬币
+<span class="math inline"><em>A</em></span>。若 <span
+class="math inline"><em>A</em></span> 出现正面，则选择硬币 <span
+class="math inline"><em>B</em></span> 掷出；若 <span
+class="math inline"><em>A</em></span> 出现反面，则选择硬币 <span
+class="math inline"><em>C</em></span> 掷出。记录第 2
+次掷出的结果（正面记为 <span class="math inline">1</span>，反面记为
+<span class="math inline">0</span>）。</p>
+<p>在这个问题中，观测数据集合为 <span
+class="math inline"><em>X</em> = {<em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, ..., <em>x</em><sub><em>n</em></sub>}</span>，其中
+<span
+class="math inline"><em>x</em><sub><em>i</em></sub> ∈ {0, 1}</span>。<span
+class="math inline"><em>Z</em> = {<em>z</em><sub>1</sub>, <em>z</em><sub>2</sub>, ..., <em>z</em><sub><em>n</em></sub>}</span>
+是隐变量，指示观测数据来源于哪枚硬币。<span
+class="math inline"><em>z</em><sub><em>i</em></sub> ∈ {0, 1}</span>。我们规定
+<span class="math inline"><em>z</em><sub><em>i</em></sub> = 1</span>
+表示选择了硬币 <span class="math inline"><em>B</em></span>，则硬币 <span
+class="math inline"><em>A</em></span> 是正面；<span
+class="math inline"><em>z</em><sub><em>i</em></sub> = 0</span>
+表示选择了硬币 <span class="math inline"><em>C</em></span>，则硬币 <span
+class="math inline"><em>A</em></span> 是反面。需要估计的参数 <span
+class="math inline"><em>θ</em> = {<em>π</em>, <em>p</em>, <em>q</em>}</span>。</p>
+<p>先做一些准备工作。观测变量 <span
+class="math inline"><em>x</em><sub><em>i</em></sub></span> 的概率分布为
+<span
+class="math display"><em>P</em>(<em>X</em> = <em>x</em><sub><em>i</em></sub>; <em>θ</em>) = ∑<sub><em>z</em><sub><em>i</em></sub> ∈ {0, 1}</sub><em>P</em>(<em>Z</em> = <em>z</em><sub><em>i</em></sub>)<em>P</em>(<em>X</em> = <em>x</em><sub><em>i</em></sub>|<em>Z</em> = <em>z</em><sub><em>i</em></sub>)</span>
+即 <span
+class="math display"><em>P</em>(<em>X</em> = <em>x</em><sub><em>i</em></sub>; <em>θ</em>) = <em>π</em><em>p</em><sup><em>x</em><sub><em>i</em></sub></sup>(1 − <em>p</em>)<sup>1 − <em>x</em><sub><em>i</em></sub></sup> + (1 − <em>π</em>)<em>q</em><sup><em>x</em><sub><em>i</em></sub></sup>(1 − <em>q</em>)<sup>1 − <em>x</em><sub><em>i</em></sub></sup></span></p>
+<p>选取参数的初始值 <span
+class="math inline"><em>θ</em><sup>(0)</sup> = {<em>π</em><sup>(0)</sup>, <em>p</em><sup>(0)</sup>, <em>q</em><sup>(0)</sup>}</span>。</p>
+<h4 id="e步计算隶属度和-q-函数">1. E步：计算隶属度和 Q 函数</h4>
+<p>设观测数据 <span
+class="math inline"><em>x</em><sub><em>i</em></sub></span> 来自硬币
+<span class="math inline"><em>B</em></span>（即 <span
+class="math inline"><em>z</em><sub><em>i</em></sub> = 1</span>）的隶属度为
+<span
+class="math inline"><em>γ</em><sub><em>i</em>1</sub><sup>(<em>t</em>)</sup></span>，上标
+<span class="math inline">(<em>t</em>)</span> 表示第 <span
+class="math inline"><em>t</em></span> 次迭代中隶属度的值，而非次方。</p>
+<p>根据贝叶斯公式 <span class="math display">$$
+\begin{aligned}
+\gamma_{i1}^{(t)} &amp;= P(z_i=1 | x_i; \theta^{(t)}) \\[1em]
+&amp;= \frac{P(z_i=1; \theta^{(t)}) P(x_i | z_i=1; \theta^{(t)})}{P(x_i;
+\theta^{(t)})} \\[1em]
+&amp;= \frac{P(z_i=1; \theta^{(t)}) P(x_i | z_i=1;
+\theta^{(t)})}{P(z_i=1; \theta^{(t)}) P(x_i | z_i=1; \theta^{(t)}) +
+P(z_i=0; \theta^{(t)}) P(x_i | z_i=0; \theta^{(t)})}
+\end{aligned}
+$$</span></p>
+<p>代入具体的概率公式： <span class="math display">$$ \gamma_{i1}^{(t)}
+= \frac{\pi^{(t)} (p^{(t)})^{x_i} (1-p^{(t)})^{1-x_i}}{\pi^{(t)}
+(p^{(t)})^{x_i} (1-p^{(t)})^{1-x_i} + (1-\pi^{(t)}) (q^{(t)})^{x_i}
+(1-q^{(t)})^{1-x_i}} $$</span></p>
+<p>同理可得 <span class="math display">$$ \gamma_{i0}^{(t)} =
+\frac{(1-\pi^{(t)}) (q^{(t)})^{x_i} (1-q^{(t)})^{1-x_i}}{\pi^{(t)}
+(p^{(t)})^{x_i} (1-p^{(t)})^{1-x_i} + (1-\pi^{(t)}) (q^{(t)})^{x_i}
+(1-q^{(t)})^{1-x_i}} $$</span></p>
+<p>根据上面两条公式，或根据隶属度的定义可知 <span
+class="math inline"><em>γ</em><sub><em>i</em>0</sub> + <em>γ</em><sub><em>i</em>1</sub> = 1</span>。
+于是 <span class="math inline"><em>Q</em></span> 函数为 <span
+class="math display">$$
+\begin{aligned}
+Q(\theta, \theta^{(t)})
+&amp;= \sum_{i=1}^n \sum_{k \in \{0,1\}} \gamma_{ik}^{(t)} \ln P(x_i,
+z_i=k; \theta) \\
+&amp;= \sum_{i=1}^n \left[ \gamma_{i1}^{(t)} \ln P(x_i, z_i=1; \theta) +
+\gamma_{i0}^{(t)} \ln P(x_i, z_i=0; \theta) \right]    \\
+&amp;= \sum_{i=1}^n \Big\{ \gamma_{i1}^{(t)} \big[ \ln \pi + x_i \ln p +
+(1-x_i) \ln(1-p) \big] + (1-\gamma_{i1}^{(t)}) \big[ \ln (1-\pi) + x_i
+\ln q + (1-x_i) \ln(1-q) \big] \Big\}
+\end{aligned}
+$$</span></p>
+<h4 id="m步最大化-q-函数更新参数">2. M步：最大化 Q 函数（更新参数）</h4>
+<p>我们需要分别对 <span
+class="math inline"><em>π</em>, <em>p</em>, <em>q</em></span>
+求偏导并令其为 0。</p>
+<p><span class="math display">$$ \frac{\partial Q}{\partial \pi} =
+\sum_{i=1}^n \left[ \frac{\gamma_{i1}^{(t)}}{\pi} -
+\frac{1-\gamma_{i1}^{(t)}}{1-\pi} \right] = 0 $$</span> 解得： <span
+class="math display">$$ \pi^{(t+1)} = \frac{1}{n} \sum_{i=1}^n
+\gamma_{i1}^{(t)} $$</span> 即新的 <span
+class="math inline"><em>π</em></span> 是所有样本属于硬币 <span
+class="math inline"><em>B</em></span> 的概率的平均值。</p>
+<p><span class="math display">$$ \frac{\partial Q}{\partial p} =
+\sum_{i=1}^n \gamma_{i1}^{(t)} \left[ \frac{x_i}{p} - \frac{1-x_i}{1-p}
+\right] = 0 $$</span> 解得： <span class="math display">$$ p^{(t+1)} =
+\frac{\sum \limits_{i=1}^n \gamma_{i1}^{(t)} x_i}{\sum \limits_{i=1}^n
+\gamma_{i1}^{(t)}} $$</span> 即新的 <span
+class="math inline"><em>p</em></span> 是硬币 <span
+class="math inline"><em>B</em></span> 产生正面的加权比例，权重为样本属于
+<span class="math inline"><em>B</em></span> 的概率。</p>
+<p><span class="math display">$$ \frac{\partial Q}{\partial q} = \sum
+\limits_{i=1}^n (1-\gamma_{i1}^{(t)}) \left[ \frac{x_i}{q} -
+\frac{1-x_i}{1-q} \right] = 0 $$</span> 解得： <span
+class="math display">$$ q^{(t+1)} = \frac{\sum \limits_{i=1}^n
+(1-\gamma_{i1}^{(t)}) x_i}{\sum \limits_{i=1}^n (1-\gamma_{i1}^{(t)})}
+$$</span></p>
+<p>其实际意义同 <span
+class="math inline"><em>p</em><sup>(<em>t</em> + 1)</sup></span>。</p>
+<h4 id="代码实现">3. 代码实现</h4>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置绘图风格</span></span><br><span class="line">sns.set_style(<span class="string">&quot;whitegrid&quot;</span>)</span><br><span class="line">%matplotlib inline</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 数据生成函数与生成过程</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_data</span>(<span class="params">n_samples, pi_true, p_true, q_true</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    生成三硬币模型的模拟数据</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    X = []</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n_samples):</span><br><span class="line">        <span class="comment"># 1. 掷硬币 A (z)</span></span><br><span class="line">        z = <span class="number">1</span> <span class="keyword">if</span> np.random.rand() &lt; pi_true <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 2. 根据 A 的结果选择掷 B 还是 C</span></span><br><span class="line">        <span class="keyword">if</span> z == <span class="number">1</span>:</span><br><span class="line">            x = <span class="number">1</span> <span class="keyword">if</span> np.random.rand() &lt; p_true <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            x = <span class="number">1</span> <span class="keyword">if</span> np.random.rand() &lt; q_true <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        X.append(x)</span><br><span class="line">    <span class="keyword">return</span> np.array(X)</span><br><span class="line"></span><br><span class="line"><span class="comment"># --- 执行数据生成 ---</span></span><br><span class="line">np.random.seed(<span class="number">42</span>) <span class="comment"># 固定随机种子</span></span><br><span class="line">N = <span class="number">1000</span></span><br><span class="line">true_pi, true_p, true_q = <span class="number">0.4</span>, <span class="number">0.8</span>, <span class="number">0.2</span></span><br><span class="line"></span><br><span class="line">X = generate_data(N, true_pi, true_p, true_q)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;生成样本数量: <span class="subst">&#123;N&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;观测数据均值 (正面频率): <span class="subst">&#123;np.mean(X):<span class="number">.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;理论均值 (pi*p + (1-pi)*q): <span class="subst">&#123;true_pi*true_p + (<span class="number">1</span>-true_pi)*true_q:<span class="number">.4</span>f&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>生成样本数量: 1000
+观测数据均值 (正面频率): 0.4330
+理论均值 (pi*p + (1-pi)*q): 0.4400</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># EM 算法实现 (增加了历史记录功能)</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">calculate_log_likelihood</span>(<span class="params">X, pi, p, q</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    计算当前参数下的对数似然函数值 L(theta)</span></span><br><span class="line"><span class="string">    L = sum( log( P(x_i) ) )</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># P(x=1) = pi*p + (1-pi)*q</span></span><br><span class="line">    <span class="comment"># P(x=0) = pi*(1-p) + (1-pi)*(1-q)</span></span><br><span class="line">    <span class="comment"># 为了向量化计算，利用技巧: P(x_i) = prob_1 * x_i + prob_0 * (1 - x_i)</span></span><br><span class="line">    </span><br><span class="line">    prob_1 = pi * p + (<span class="number">1</span> - pi) * q</span><br><span class="line">    prob_0 = pi * (<span class="number">1</span> - p) + (<span class="number">1</span> - pi) * (<span class="number">1</span> - q)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 避免 log(0)</span></span><br><span class="line">    prob_1 = np.clip(prob_1, <span class="number">1e-10</span>, <span class="number">1.0</span>) </span><br><span class="line">    prob_0 = np.clip(prob_0, <span class="number">1e-10</span>, <span class="number">1.0</span>)</span><br><span class="line">    </span><br><span class="line">    likelihoods = X * prob_1 + (<span class="number">1</span> - X) * prob_0</span><br><span class="line">    <span class="keyword">return</span> np.<span class="built_in">sum</span>(np.log(likelihoods))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">em_three_coins_trace</span>(<span class="params">observations, init_params, tol=<span class="number">1e-6</span>, max_iter=<span class="number">50</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    执行 EM 算法并记录轨迹</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    pi, p, q = init_params</span><br><span class="line">    n = <span class="built_in">len</span>(observations)</span><br><span class="line">    x = observations</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 用于记录每次迭代的参数和似然值，方便画图</span></span><br><span class="line">    history = &#123;</span><br><span class="line">        <span class="string">&#x27;pi&#x27;</span>: [pi], <span class="string">&#x27;p&#x27;</span>: [p], <span class="string">&#x27;q&#x27;</span>: [q],</span><br><span class="line">        <span class="string">&#x27;ll&#x27;</span>: [calculate_log_likelihood(x, pi, p, q)]</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> iteration <span class="keyword">in</span> <span class="built_in">range</span>(max_iter):</span><br><span class="line">        old_params = np.array([pi, p, q])</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># --- E步: 计算隶属度 gamma ---</span></span><br><span class="line">        prob_x_given_B = (p ** x) * ((<span class="number">1</span> - p) ** (<span class="number">1</span> - x))</span><br><span class="line">        prob_x_given_C = (q ** x) * ((<span class="number">1</span> - q) ** (<span class="number">1</span> - x))</span><br><span class="line">        </span><br><span class="line">        numerator = pi * prob_x_given_B</span><br><span class="line">        denominator = numerator + (<span class="number">1</span> - pi) * prob_x_given_C + <span class="number">1e-10</span> <span class="comment"># 防止除零</span></span><br><span class="line">        gamma = numerator / denominator</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># --- M步: 更新参数 ---</span></span><br><span class="line">        pi_new = np.mean(gamma)</span><br><span class="line">        p_new = np.<span class="built_in">sum</span>(gamma * x) / (np.<span class="built_in">sum</span>(gamma) + <span class="number">1e-10</span>)</span><br><span class="line">        q_new = np.<span class="built_in">sum</span>((<span class="number">1</span> - gamma) * x) / (np.<span class="built_in">sum</span>(<span class="number">1</span> - gamma) + <span class="number">1e-10</span>)</span><br><span class="line">        </span><br><span class="line">        pi, p, q = pi_new, p_new, q_new</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># --- 记录历史 ---</span></span><br><span class="line">        history[<span class="string">&#x27;pi&#x27;</span>].append(pi)</span><br><span class="line">        history[<span class="string">&#x27;p&#x27;</span>].append(p)</span><br><span class="line">        history[<span class="string">&#x27;q&#x27;</span>].append(q)</span><br><span class="line">        history[<span class="string">&#x27;ll&#x27;</span>].append(calculate_log_likelihood(x, pi, p, q))</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># --- 收敛判定 ---</span></span><br><span class="line">        diff = np.linalg.norm(np.array([pi, p, q]) - old_params)</span><br><span class="line">        <span class="keyword">if</span> diff &lt; tol:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;算法在第 <span class="subst">&#123;iteration+<span class="number">1</span>&#125;</span> 次迭代收敛。&quot;</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">            </span><br><span class="line">    <span class="keyword">return</span> pi, p, q, history</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 可视化绘图函数</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">plot_em_trajectory</span>(<span class="params">history, true_params</span>):</span><br><span class="line">    true_pi, true_p, true_q = true_params</span><br><span class="line">    iterations = <span class="built_in">range</span>(<span class="built_in">len</span>(history[<span class="string">&#x27;ll&#x27;</span>]))</span><br><span class="line">    </span><br><span class="line">    fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">16</span>, <span class="number">6</span>))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 图1: 参数收敛过程</span></span><br><span class="line">    ax1 = axes[<span class="number">0</span>]</span><br><span class="line">    ax1.plot(iterations, history[<span class="string">&#x27;pi&#x27;</span>], <span class="string">&#x27;r-o&#x27;</span>, label=<span class="string">&#x27;Estimated $\pi$&#x27;</span>, markersize=<span class="number">4</span>)</span><br><span class="line">    ax1.plot(iterations, history[<span class="string">&#x27;p&#x27;</span>], <span class="string">&#x27;g-o&#x27;</span>, label=<span class="string">&#x27;Estimated $p$&#x27;</span>, markersize=<span class="number">4</span>)</span><br><span class="line">    ax1.plot(iterations, history[<span class="string">&#x27;q&#x27;</span>], <span class="string">&#x27;b-o&#x27;</span>, label=<span class="string">&#x27;Estimated $q$&#x27;</span>, markersize=<span class="number">4</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 绘制真实值参考线 (虚线)</span></span><br><span class="line">    ax1.axhline(true_pi, color=<span class="string">&#x27;r&#x27;</span>, linestyle=<span class="string">&#x27;--&#x27;</span>, alpha=<span class="number">0.5</span>, label=<span class="string">&#x27;True $\pi$&#x27;</span>)</span><br><span class="line">    ax1.axhline(true_p, color=<span class="string">&#x27;g&#x27;</span>, linestyle=<span class="string">&#x27;--&#x27;</span>, alpha=<span class="number">0.5</span>, label=<span class="string">&#x27;True $p$&#x27;</span>)</span><br><span class="line">    ax1.axhline(true_q, color=<span class="string">&#x27;b&#x27;</span>, linestyle=<span class="string">&#x27;--&#x27;</span>, alpha=<span class="number">0.5</span>, label=<span class="string">&#x27;True $q$&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    ax1.set_title(<span class="string">&quot;Parameter Convergence Trajectory&quot;</span>, fontsize=<span class="number">14</span>)</span><br><span class="line">    ax1.set_xlabel(<span class="string">&quot;Iteration&quot;</span>)</span><br><span class="line">    ax1.set_ylabel(<span class="string">&quot;Probability Value&quot;</span>)</span><br><span class="line">    ax1.legend()</span><br><span class="line">    ax1.set_ylim(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 图2: 对数似然函数变化</span></span><br><span class="line">    ax2 = axes[<span class="number">1</span>]</span><br><span class="line">    ax2.plot(iterations, history[<span class="string">&#x27;ll&#x27;</span>], <span class="string">&#x27;k-o&#x27;</span>, markersize=<span class="number">4</span>)</span><br><span class="line">    ax2.set_title(<span class="string">&quot;Log-Likelihood Optimization&quot;</span>, fontsize=<span class="number">14</span>)</span><br><span class="line">    ax2.set_xlabel(<span class="string">&quot;Iteration&quot;</span>)</span><br><span class="line">    ax2.set_ylabel(<span class="string">&quot;Log-Likelihood&quot;</span>)</span><br><span class="line">    ax2.grid(<span class="literal">True</span>)</span><br><span class="line">    </span><br><span class="line">    plt.tight_layout()</span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure>
+<pre><code>&lt;&gt;:10: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+&lt;&gt;:15: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+&lt;&gt;:10: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+&lt;&gt;:15: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+C:\Users\24930\AppData\Local\Temp\ipykernel_60784\4213694819.py:10: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+  ax1.plot(iterations, history[&#39;pi&#39;], &#39;r-o&#39;, label=&#39;Estimated $\pi$&#39;, markersize=4)
+C:\Users\24930\AppData\Local\Temp\ipykernel_60784\4213694819.py:15: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+  ax1.axhline(true_pi, color=&#39;r&#39;, linestyle=&#39;--&#39;, alpha=0.5, label=&#39;True $\pi$&#39;)</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 运行并展示结果</span></span><br><span class="line"><span class="comment"># 1. 设定初始值</span></span><br><span class="line">init_params = [<span class="number">0.5</span>, <span class="number">0.3</span>, <span class="number">0.7</span>] </span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 运行算法</span></span><br><span class="line">est_pi, est_p, est_q, history = em_three_coins_trace(X, init_params)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 打印最终结果</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\n--- 最终估计结果 ---&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;pi: <span class="subst">&#123;est_pi:<span class="number">.4</span>f&#125;</span> (True: <span class="subst">&#123;true_pi&#125;</span>)&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;p : <span class="subst">&#123;est_p:<span class="number">.4</span>f&#125;</span>  (True: <span class="subst">&#123;true_p&#125;</span>)&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;q : <span class="subst">&#123;est_q:<span class="number">.4</span>f&#125;</span>  (True: <span class="subst">&#123;true_q&#125;</span>)&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 可视化</span></span><br><span class="line">plot_em_trajectory(history, [true_pi, true_p, true_q])</span><br></pre></td></tr></table></figure>
+<pre><code>算法在第 2 次迭代收敛。
+
+--- 最终估计结果 ---
+pi: 0.5268 (True: 0.4)
+p : 0.2466  (True: 0.8)
+q : 0.6405  (True: 0.2)</code></pre>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260116151335685.png"
+alt="混合模型与EM算法_16_1" />
+<figcaption aria-hidden="true">混合模型与EM算法_16_1</figcaption>
+</figure>
+<p>经实验，如果 init_params = [0.5, 0.7, 0.3]，似乎效果还可以；但如果
+init_params = [0.5, 0.3,
+0.7]，反而估计值与实际值相去甚远（左图中蓝色实线与蓝色虚线距离很远，绿色实线与绿色虚线距离很远）。这说明三硬币模型（伯努利混合模型）对初始值极其敏感，很容易陷入局部最优解。</p>
+<p>这并非 EM
+算法本身无能，而是数据类型限制了算法的发挥。在三硬币模型中，观测数据是离散的
+0 或
+1。一个“正面（1）”，除此之外没有更多信息，它无法告诉我们它是“很强的正面”还是“勉强的正面”。此外，当
+<span class="math inline"><em>π</em>, <em>p</em>, <em>q</em></span>
+的参数设置得稍有不慎（比如 <span class="math inline"><em>p</em></span>
+和 <span class="math inline"><em>q</em></span>
+接近），算法很难区分一个“1”到底更像来自于硬币 B 还是硬币
+C。在算法眼中，B 和 C 的分布重叠度太高，难以剥离。</p>
+<p>相比之下，高斯混合模型 (GMM)
+处理的是连续型数据，连续数据蕴含了丰富的距离信息。在三硬币模型中，1 和 1
+是完全一样的。但在身高聚类中，175cm 和 185cm
+虽然都属于“高个子”，但它们在坐标轴上的位置不同。此外，EM
+算法在计算隶属度时，利用了高斯分布的<strong>尾部衰减特性</strong>（距离越远，概率指数级下降）。这种显著差异使得
+EM 算法能迅速把混在一起的数据拉开。</p>
+<p>因此，在实际应用中，处理连续数据的 高斯混合模型 (GMM) 才是 EM
+算法真正大展拳脚的舞台。接下来，我们将推导 GMM
+的参数更新公式。虽然数学推导变复杂了（引入了高斯公式），但算法的收敛稳定性却变强了。</p>
+<h3 id="高斯混合模型">6.3.2 高斯混合模型</h3>
+<p>设观测变量 <span
+class="math inline"><em>X</em> = {<em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, ..., <em>x</em><sub><em>n</em></sub>}</span>，其中
+<span class="math inline"><em>x</em><sub><em>i</em></sub> ∈ ℝ</span>
+为连续值（例如身高）。隐变量 <span
+class="math inline"><em>Z</em> = {<em>z</em><sub>1</sub>, <em>z</em><sub>2</sub>, ..., <em>z</em><sub><em>n</em></sub>}</span>。<span
+class="math inline"><em>z</em><sub><em>i</em></sub> ∈ {1, 2, ..., <em>K</em>}</span>。<span
+class="math inline"><em>z</em><sub><em>i</em></sub> = <em>k</em></span>，表示第
+<span class="math inline"><em>i</em></span> 个样本来自第 <span
+class="math inline"><em>k</em></span> 个高斯成分。</p>
+<p>模型参数为 <span class="math inline"><em>K</em></span>
+个三元组：<span
+class="math inline"><em>θ</em> = {<em>w</em><sub><em>k</em></sub>, <em>μ</em><sub><em>k</em></sub>, <em>σ</em><sub><em>k</em></sub><sup>2</sup>}<sub><em>k</em> = 1</sub><sup><em>K</em></sup></span>。
+* <span class="math inline"><em>w</em><sub><em>k</em></sub></span>：第
+<span class="math inline"><em>k</em></span>
+个成分的混合系数（权重），即先验概率 <span
+class="math inline"><em>P</em>(<em>z</em><sub><em>i</em></sub> = <em>k</em>)</span>。满足
+<span class="math inline">$\sum \limits_{k=1}^K w_k = 1$</span>。 *
+<span class="math inline"><em>μ</em><sub><em>k</em></sub></span>：第
+<span class="math inline"><em>k</em></span> 个成分的均值。 * <span
+class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>：第
+<span class="math inline"><em>k</em></span> 个成分的方差。</p>
+<p>下面做一些准备工作。观测数据 <span
+class="math inline"><em>x</em><sub><em>i</em></sub></span>
+的概率密度函数为： <span class="math display">$$ P(x_i ; \theta) =
+\sum_{k=1}^K P(z_i=k) P(x_i | z_i=k) = \sum_{k=1}^K w_k \cdot
+\mathcal{N}(x_i; \mu_k, \sigma_k^2) $$</span></p>
+<p>其中高斯分布的概率密度函数为： <span class="math display">$$
+\mathcal{N}(x_i; \mu_k, \sigma_k^2) = \frac{1}{\sqrt{2\pi}\sigma_k}
+\exp\left( -\frac{(x_i - \mu_k)^2}{2\sigma_k^2} \right) $$</span></p>
+<h4 id="e步计算隶属度和-q-函数-1">1. E步：计算隶属度和 Q 函数</h4>
+<p>根据贝叶斯公式 <span class="math display">$$
+\begin{aligned}
+\gamma_{ik}^{(t)} &amp;= P(z_i=k | x_i; \theta^{(t)}) \\[1em]
+&amp;= \frac{w_k^{(t)} \cdot \mathcal{N}(x_i; \mu_k^{(t)},
+(\sigma_k^2)^{(t)})}{\sum \limits_{j=1}^K w_j^{(t)} \cdot
+\mathcal{N}(x_i; \mu_j^{(t)}, (\sigma_j^2)^{(t)})}
+\end{aligned}
+$$</span></p>
+<p><span class="math inline"><em>Q</em></span> 函数为 <span
+class="math display">$$
+\begin{aligned}
+Q(\theta, \theta^{(t)}) &amp;= \sum_{i=1}^n E_{z_i} [\ln P(x_i, z_i;
+\theta)] \\
+&amp;= \sum_{i=1}^n \sum_{k=1}^K \gamma_{ik}^{(t)} \ln \left[ w_k \cdot
+\mathcal{N}(x_i; \mu_k, \sigma_k^2) \right] \\
+&amp;= \sum_{i=1}^n \sum_{k=1}^K \gamma_{ik}^{(t)} \big( \ln w_k + \ln
+\mathcal{N}(x_i; \mu_k, \sigma_k^2) \big)
+\end{aligned}
+$$</span></p>
+<h4 id="m步最大化-q-函数更新参数-1">2. M步：最大化 Q
+函数（更新参数）</h4>
+<p>我们将 Q 函数拆解为两部分，分别优化. 1. 包含 <span
+class="math inline"><em>w</em><sub><em>k</em></sub></span> 的项：<span
+class="math inline">$\sum \limits_{i=1}^n \sum \limits_{k=1}^K
+\gamma_{ik}^{(t)} \ln w_k$</span> 2. 包含高斯参数（均值 <span
+class="math inline"><em>μ</em><sub><em>k</em></sub></span> 和方差 <span
+class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>）的项：<span
+class="math inline">$\sum \limits_{i=1}^n \sum \limits_{k=1}^K
+\gamma_{ik}^{(t)} \left[ -\ln(\sqrt{2\pi}\sigma_k) - \frac{(x_i -
+\mu_k)^2}{2\sigma_k^2} \right]$</span></p>
+<hr />
+<h5 id="推导-1更新混合系数-w_k">推导 1：更新混合系数 <span
+class="math inline"><em>w</em><sub><em>k</em></sub></span></h5>
+<p>这是一个带约束的优化问题，约束条件为 <span class="math inline">$\sum
+\limits_{k=1}^K w_k = 1$</span>。我们需要使用 Lagrange 乘子法。</p>
+<p>构造拉格朗日函数： <span class="math display">$$ \mathcal{L}(w,
+\lambda) = \sum_{i=1}^n \sum_{k=1}^K \gamma_{ik}^{(t)} \ln w_k + \lambda
+\left( \sum_{k=1}^K w_k - 1 \right) $$</span></p>
+<p>对 <span class="math inline"><em>w</em><sub><em>k</em></sub></span>
+求偏导并令其为 0： <span class="math display">$$ \frac{\partial
+\mathcal{L}}{\partial w_k} = \sum_{i=1}^n \frac{\gamma_{ik}^{(t)}}{w_k}
++ \lambda = 0 \quad \Longrightarrow \quad w_k = -\frac{\sum
+\limits_{i=1}^n \gamma_{ik}^{(t)}}{\lambda} $$</span></p>
+<p>为了求 <span class="math inline"><em>λ</em></span>，对上式两边关于
+<span class="math inline"><em>k</em></span> 求和： <span
+class="math display">$$ \sum_{k=1}^K w_k = \sum_{k=1}^K \left(
+-\frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)}}{\lambda} \right)
+$$</span> 利用 <span class="math inline">$\sum \limits_{k=1}^K w_k =
+1$</span> 和 <span class="math inline">$\sum \limits_{k=1}^K
+\gamma_{ik}^{(t)} = 1$</span>： <span class="math display">$$ 1 =
+-\frac{1}{\lambda} \sum_{i=1}^n \underbrace{\sum \limits_{k=1}^K
+\gamma_{ik}^{(t)}}_{1} = -\frac{n}{\lambda} \quad \Longrightarrow \quad
+\lambda = -n $$</span></p>
+<p>代回原式，得到更新公式： <span class="math display">$$ w_k^{(t+1)} =
+\frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)}}{n} $$</span> 实际意义：第
+<span class="math inline"><em>k</em></span> 个成分的权重 =
+该成分所有隶属度之和 / 样本总数。即“属于该类的平均人数比例”。</p>
+<hr />
+<h5 id="推导-2更新均值-mu_k">推导 2：更新均值 <span
+class="math inline"><em>μ</em><sub><em>k</em></sub></span></h5>
+<p>我们只关注 <span class="math inline"><em>Q</em></span> 函数中包含
+<span class="math inline"><em>μ</em><sub><em>k</em></sub></span> 的项：
+<span class="math display">$$ \mathcal{J}(\mu_k) = \sum_{i=1}^n
+\gamma_{ik}^{(t)} \left( -\frac{(x_i - \mu_k)^2}{2\sigma_k^2} \right)
+$$</span></p>
+<p>对 <span class="math inline"><em>μ</em><sub><em>k</em></sub></span>
+求偏导并令其为 0： <span class="math display">$$ \frac{\partial
+\mathcal{J}}{\partial \mu_k} = \sum_{i=1}^n \gamma_{ik}^{(t)}
+\frac{2(x_i - \mu_k)}{2\sigma_k^2} = 0 $$</span> 消去常数 <span
+class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>，整理方程：
+<span class="math display">$$ \sum_{i=1}^n \gamma_{ik}^{(t)} x_i -
+\sum_{i=1}^n \gamma_{ik}^{(t)} \mu_k = 0 $$</span> <span
+class="math display">$$ \mu_k \sum_{i=1}^n \gamma_{ik}^{(t)} =
+\sum_{i=1}^n \gamma_{ik}^{(t)} x_i $$</span></p>
+<p>得到更新公式： <span class="math display">$$ \mu_k^{(t+1)} =
+\frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)} x_i}{\sum \limits_{i=1}^n
+\gamma_{ik}^{(t)}} $$</span> 实际意义：第 <span
+class="math inline"><em>k</em></span>
+个成分的均值等于所有样本的加权平均值，每个样本的权重就是它属于该类的隶属度。这与
+6.1 节中给出的更新公式完全一致。</p>
+<hr />
+<h5 id="推导-3更新方差-sigma_k2"><strong>推导 3：更新方差 <span
+class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span></strong></h5>
+<p>我们只关注 Q 函数中包含 <span
+class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>
+的项（注意 <span class="math inline">$\ln(\sqrt{2\pi}\sigma_k) =
+\frac{1}{2}\ln(2\pi) + \frac{1}{2}\ln(\sigma_k^2)$</span>）： <span
+class="math display">$$ \mathcal{J}(\sigma_k^2) = \sum_{i=1}^n
+\gamma_{ik}^{(t)} \left( -\frac{1}{2}\ln(\sigma_k^2) - \frac{(x_i -
+\mu_k)^2}{2\sigma_k^2} \right) $$</span></p>
+<p>令 <span
+class="math inline"><em>V</em> = <em>σ</em><sub><em>k</em></sub><sup>2</sup></span>，对
+<span class="math inline"><em>V</em></span> 求偏导并令其为 0： <span
+class="math display">$$ \frac{\partial \mathcal{J}}{\partial V} =
+\sum_{i=1}^n \gamma_{ik}^{(t)} \left( -\frac{1}{2V} + \frac{(x_i -
+\mu_k)^2}{2V^2} \right) = 0 $$</span> 两边同乘 <span
+class="math inline">2<em>V</em><sup>2</sup></span>： <span
+class="math display">$$ \sum_{i=1}^n \gamma_{ik}^{(t)} \left( -V + (x_i
+- \mu_k)^2 \right) = 0 $$</span> <span class="math display">$$ -V
+\sum_{i=1}^n \gamma_{ik}^{(t)} + \sum_{i=1}^n \gamma_{ik}^{(t)} (x_i -
+\mu_k)^2 = 0 $$</span></p>
+<p>得到更新公式： <span class="math display">$$ (\sigma_k^2)^{(t+1)} =
+\frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)} (x_i -
+\mu_k^{(t+1)})^2}{\sum \limits_{i=1}^n \gamma_{ik}^{(t)}} $$</span>
+物理意义：第 <span class="math inline"><em>k</em></span>
+个成分的方差等于每个样本偏离中心距离的加权平方和，权重还是隶属度。</p>
+<p>注意公式里的均值是 <span
+class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em> + 1)</sup></span>
+而不是 <span
+class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em>)</sup></span>。方差的定义是数据偏离中心的距离平方的期望；对于第
+<span class="math inline"><em>t</em> + 1</span>
+轮迭代，最能代表这组数据中心的，显然是刚刚求出来的最新均值 <span
+class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em> + 1)</sup></span>，而不是上一轮的旧均值
+<span
+class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em>)</sup></span>。</p>
+<h4 id="算法流程总结">3. 算法流程总结</h4>
+<p>高斯混合模型的参数估计流程如下： 1. 初始化：随机选取 <span
+class="math inline"><em>w</em><sub><em>k</em></sub>, <em>μ</em><sub><em>k</em></sub>, <em>σ</em><sub><em>k</em></sub><sup>2</sup></span>
+的初值。</p>
+<ol start="2" type="1">
+<li><p>E步：根据公式计算隶属度 <span
+class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub><sup>(<em>t</em>)</sup></span>。</p></li>
+<li><p>M步：</p>
+<ul>
+<li><p><span class="math inline">$w_k^{(t+1)} = \frac{\sum
+\limits_{i=1}^n \gamma_{ik}^{(t)}}{n}$</span></p></li>
+<li><p><span class="math inline">$\mu_k^{(t+1)} = \frac{\sum
+\limits_{i=1}^n \gamma_{ik}^{(t)} x_i}{\sum \limits_{i=1}^n
+\gamma_{ik}^{(t)}}$</span></p></li>
+<li><p><span class="math inline">$(\sigma_k^2)^{(t+1)} = \frac{\sum
+\limits_{i=1}^n \gamma_{ik}^{(t)} (x_i - \mu_k^{(t+1)})^2}{\sum
+\limits_{i=1}^n \gamma_{ik}^{(t)}}$</span></p></li>
+</ul></li>
+<li><p>循环，直至收敛。</p></li>
+</ol>
+<p>下面用代码实现这一算法。</p>
+<h4 id="代码实现-1">4. 代码实现</h4>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line"><span class="keyword">from</span> scipy.stats <span class="keyword">import</span> norm <span class="comment"># 用于生成标准的高斯分布概率密度</span></span><br><span class="line"><span class="keyword">import</span> matplotlib.cm <span class="keyword">as</span> cm</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置绘图风格</span></span><br><span class="line">sns.set_style(<span class="string">&quot;whitegrid&quot;</span>)</span><br><span class="line">%matplotlib inline</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生成模拟数据</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_mixture_data</span>(<span class="params">n_samples=<span class="number">1000</span>, seed=<span class="number">42</span></span>):</span><br><span class="line">    np.random.seed(seed)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 设定真实参数 (上帝视角)</span></span><br><span class="line">    <span class="comment"># Component 1 (比如: 女生身高)</span></span><br><span class="line">    mu1, sigma1 = <span class="number">160</span>, <span class="number">5</span> </span><br><span class="line">    <span class="comment"># Component 2 (比如: 男生身高)</span></span><br><span class="line">    mu2, sigma2 = <span class="number">175</span>, <span class="number">6</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 混合比例: 60% 的数据来自组1, 40% 来自组2</span></span><br><span class="line">    pi1 = <span class="number">0.6</span></span><br><span class="line">    </span><br><span class="line">    data = []</span><br><span class="line">    labels = [] <span class="comment"># 真实标签(用于验证，训练时不用)</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n_samples):</span><br><span class="line">        <span class="keyword">if</span> np.random.rand() &lt; pi1:</span><br><span class="line">            x = np.random.normal(mu1, sigma1)</span><br><span class="line">            labels.append(<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            x = np.random.normal(mu2, sigma2)</span><br><span class="line">            labels.append(<span class="number">1</span>)</span><br><span class="line">        data.append(x)</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">return</span> np.array(data), np.array(labels)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成数据</span></span><br><span class="line">X, true_labels = generate_mixture_data()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制原始数据分布</span></span><br><span class="line">plt.figure(figsize=(<span class="number">10</span>, <span class="number">6</span>))</span><br><span class="line">sns.histplot(X, bins=<span class="number">50</span>, kde=<span class="literal">True</span>, color=<span class="string">&#x27;gray&#x27;</span>, alpha=<span class="number">0.4</span>, label=<span class="string">&#x27;Observed Data&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&quot;Original Data Distribution (Mixed)&quot;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&quot;Value (e.g., Height)&quot;</span>)</span><br><span class="line">plt.legend()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260116151456317.png"
+alt="混合模型与EM算法_26_0" />
+<figcaption aria-hidden="true">混合模型与EM算法_26_0</figcaption>
+</figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 定义高斯公式与初始化函数</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">gaussian_pdf</span>(<span class="params">x, mu, sigma_sq</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    计算一维高斯分布的概率密度</span></span><br><span class="line"><span class="string">    对应公式: N(x; mu, sigma^2)</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">return</span> (<span class="number">1</span> / np.sqrt(<span class="number">2</span> * np.pi * sigma_sq)) * np.exp(- (x - mu)**<span class="number">2</span> / (<span class="number">2</span> * sigma_sq))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">initialize_parameters</span>(<span class="params">X, K=<span class="number">2</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    随机初始化参数</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># 随机选 K 个点作为初始均值</span></span><br><span class="line">    mu = np.random.choice(X, K, replace=<span class="literal">False</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 初始方差设为整体方差的 1/K (经验值，防止初始方差过小)</span></span><br><span class="line">    sigma_sq = np.ones(K) * np.var(X) / K</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 初始权重设为均匀分布</span></span><br><span class="line">    weights = np.ones(K) / K</span><br><span class="line">    </span><br><span class="line">    params = &#123;</span><br><span class="line">        <span class="string">&#x27;mu&#x27;</span>: mu,</span><br><span class="line">        <span class="string">&#x27;sigma_sq&#x27;</span>: sigma_sq,</span><br><span class="line">        <span class="string">&#x27;weights&#x27;</span>: weights</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> params</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试初始化</span></span><br><span class="line">K_components = <span class="number">2</span></span><br><span class="line">params = initialize_parameters(X, K=K_components)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;初始参数:&quot;</span>, params)</span><br></pre></td></tr></table></figure>
+<pre><code>初始参数: {&#39;mu&#39;: array([174.8142505 , 161.95126634]), &#39;sigma_sq&#39;: array([42.93554301, 42.93554301]), &#39;weights&#39;: array([0.5, 0.5])}</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># EM 算法核心步骤</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">e_step</span>(<span class="params">X, params</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    E-Step: 计算隶属度 gamma</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    N = <span class="built_in">len</span>(X)</span><br><span class="line">    K = <span class="built_in">len</span>(params[<span class="string">&#x27;weights&#x27;</span>])</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 初始化 gamma 矩阵 (N x K)</span></span><br><span class="line">    gamma = np.zeros((N, K))</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">        <span class="comment"># 分子: pi_k * N(x | mu_k, sigma_k^2)</span></span><br><span class="line">        <span class="comment"># 对应讲义公式中的分子部分</span></span><br><span class="line">        gamma[:, k] = params[<span class="string">&#x27;weights&#x27;</span>][k] * gaussian_pdf(X, params[<span class="string">&#x27;mu&#x27;</span>][k], params[<span class="string">&#x27;sigma_sq&#x27;</span>][k])</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 分母: 对所有 K 求和</span></span><br><span class="line">    gamma_sum = np.<span class="built_in">sum</span>(gamma, axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 归一化得到最终隶属度</span></span><br><span class="line">    gamma = gamma / (gamma_sum + <span class="number">1e-10</span>) <span class="comment"># 加一个小数值防止除以0</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> gamma</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">m_step</span>(<span class="params">X, gamma</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    M-Step: 更新参数 mu, sigma^2, weights</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    N = <span class="built_in">len</span>(X)</span><br><span class="line">    K = gamma.shape[<span class="number">1</span>]</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 计算每个组的“有效样本数” Nk</span></span><br><span class="line">    <span class="comment"># Nk = sum(gamma_ik)</span></span><br><span class="line">    N_k = np.<span class="built_in">sum</span>(gamma, axis=<span class="number">0</span>)</span><br><span class="line">    </span><br><span class="line">    new_params = &#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 1. 更新均值 mu</span></span><br><span class="line">    <span class="comment"># mu_k = sum(gamma * x) / Nk</span></span><br><span class="line">    new_mu = np.<span class="built_in">sum</span>(gamma * X[:, np.newaxis], axis=<span class="number">0</span>) / N_k</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 2. 更新方差 sigma^2</span></span><br><span class="line">    <span class="comment"># sigma_k^2 = sum(gamma * (x - mu)^2) / Nk</span></span><br><span class="line">    new_sigma_sq = np.zeros(K)</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">        diff = (X - new_mu[k]) ** <span class="number">2</span></span><br><span class="line">        new_sigma_sq[k] = np.<span class="built_in">sum</span>(gamma[:, k] * diff) / N_k[k]</span><br><span class="line">        </span><br><span class="line">    <span class="comment"># 3. 更新权重 weights</span></span><br><span class="line">    <span class="comment"># w_k = Nk / N</span></span><br><span class="line">    new_weights = N_k / N</span><br><span class="line">    </span><br><span class="line">    new_params[<span class="string">&#x27;mu&#x27;</span>] = new_mu</span><br><span class="line">    new_params[<span class="string">&#x27;sigma_sq&#x27;</span>] = new_sigma_sq</span><br><span class="line">    new_params[<span class="string">&#x27;weights&#x27;</span>] = new_weights</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> new_params</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">compute_log_likelihood</span>(<span class="params">X, params</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    计算对数似然函数，用于观察收敛情况</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    N = <span class="built_in">len</span>(X)</span><br><span class="line">    K = <span class="built_in">len</span>(params[<span class="string">&#x27;weights&#x27;</span>])</span><br><span class="line">    prob = np.zeros(N)</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">        prob += params[<span class="string">&#x27;weights&#x27;</span>][k] * gaussian_pdf(X, params[<span class="string">&#x27;mu&#x27;</span>][k], params[<span class="string">&#x27;sigma_sq&#x27;</span>][k])</span><br><span class="line">    <span class="keyword">return</span> np.<span class="built_in">sum</span>(np.log(prob + <span class="number">1e-10</span>))</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 可视化绘制函数</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">plot_gmm_state</span>(<span class="params">X, params, iteration, ax=<span class="literal">None</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    绘制当前迭代的数据直方图和高斯曲线</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> ax <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        fig, ax = plt.subplots(figsize=(<span class="number">10</span>, <span class="number">6</span>))</span><br><span class="line">        </span><br><span class="line">    <span class="comment"># 1. 绘制数据背景 (直方图)</span></span><br><span class="line">    sns.histplot(X, bins=<span class="number">50</span>, stat=<span class="string">&quot;density&quot;</span>, color=<span class="string">&#x27;lightgray&#x27;</span>, alpha=<span class="number">0.5</span>, ax=ax, label=<span class="string">&#x27;Data&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 准备 x 轴坐标用于画线</span></span><br><span class="line">    x_axis = np.linspace(np.<span class="built_in">min</span>(X)-<span class="number">10</span>, np.<span class="built_in">max</span>(X)+<span class="number">10</span>, <span class="number">1000</span>)</span><br><span class="line">    </span><br><span class="line">    K = <span class="built_in">len</span>(params[<span class="string">&#x27;weights&#x27;</span>])</span><br><span class="line">    colors = cm.rainbow(np.linspace(<span class="number">0</span>, <span class="number">1</span>, K))</span><br><span class="line">    </span><br><span class="line">    total_pdf = np.zeros_like(x_axis)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">        <span class="comment"># 计算当前 component 的 PDF 曲线</span></span><br><span class="line">        mu = params[<span class="string">&#x27;mu&#x27;</span>][k]</span><br><span class="line">        sig_sq = params[<span class="string">&#x27;sigma_sq&#x27;</span>][k]</span><br><span class="line">        weight = params[<span class="string">&#x27;weights&#x27;</span>][k]</span><br><span class="line">        </span><br><span class="line">        pdf = weight * gaussian_pdf(x_axis, mu, sig_sq)</span><br><span class="line">        total_pdf += pdf</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 绘制分量曲线 (虚线)</span></span><br><span class="line">        ax.plot(x_axis, pdf, linestyle=<span class="string">&#x27;--&#x27;</span>, color=colors[k], linewidth=<span class="number">2</span>, label=<span class="string">f&#x27;Comp <span class="subst">&#123;k+<span class="number">1</span>&#125;</span>&#x27;</span>)</span><br><span class="line">        <span class="comment"># 绘制中心位置 (竖线)</span></span><br><span class="line">        ax.axvline(mu, linestyle=<span class="string">&#x27;:&#x27;</span>, color=colors[k], alpha=<span class="number">0.6</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 绘制混合后的总曲线 (实线)</span></span><br><span class="line">    ax.plot(x_axis, total_pdf, color=<span class="string">&#x27;black&#x27;</span>, linewidth=<span class="number">3</span>, label=<span class="string">&#x27;Mixture Model&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    ax.set_title(<span class="string">f&quot;Iteration <span class="subst">&#123;iteration&#125;</span>&quot;</span>, fontsize=<span class="number">14</span>)</span><br><span class="line">    ax.set_xlabel(<span class="string">&quot;Value&quot;</span>)</span><br><span class="line">    ax.set_ylabel(<span class="string">&quot;Density&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> iteration == <span class="number">0</span>:</span><br><span class="line">        ax.legend()</span><br></pre></td></tr></table></figure>
+<p>这里我们把所有东西串起来，并展示第 0, 1, 3, 10 次迭代的结果。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 运行主循环并绘图</span></span><br><span class="line"><span class="comment"># 1. 初始化</span></span><br><span class="line">K = <span class="number">2</span></span><br><span class="line">params = initialize_parameters(X, K)</span><br><span class="line">max_iter = <span class="number">20</span></span><br><span class="line">log_likelihoods = []</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置画布: 我们画 4 张图来看看过程 (初始, 第1次, 第3次, 第10次)</span></span><br><span class="line">plot_iters = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">3</span>, <span class="number">10</span>]</span><br><span class="line">fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, figsize=(<span class="number">16</span>, <span class="number">12</span>))</span><br><span class="line">axes = axes.flatten()</span><br><span class="line">plot_idx = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;开始 EM 迭代...&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 迭代循环</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(max_iter + <span class="number">1</span>):</span><br><span class="line">    <span class="comment"># 记录日志似然</span></span><br><span class="line">    ll = compute_log_likelihood(X, params)</span><br><span class="line">    log_likelihoods.append(ll)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 如果是指定的迭代轮次，进行绘图</span></span><br><span class="line">    <span class="keyword">if</span> i <span class="keyword">in</span> plot_iters:</span><br><span class="line">        plot_gmm_state(X, params, i, ax=axes[plot_idx])</span><br><span class="line">        plot_idx += <span class="number">1</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Iteration <span class="subst">&#123;i&#125;</span>: Log-Likelihood = <span class="subst">&#123;ll:<span class="number">.2</span>f&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 执行 EM</span></span><br><span class="line">    gamma = e_step(X, params)</span><br><span class="line">    params = m_step(X, gamma)</span><br><span class="line"></span><br><span class="line">plt.tight_layout()</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘制似然函数变化曲线</span></span><br><span class="line">plt.figure(figsize=(<span class="number">8</span>, <span class="number">4</span>))</span><br><span class="line">plt.plot(log_likelihoods, marker=<span class="string">&#x27;o&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&quot;Log-Likelihood Convergence&quot;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&quot;Iteration&quot;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&quot;Log-Likelihood&quot;</span>)</span><br><span class="line">plt.grid(<span class="literal">True</span>)</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;最终收敛参数:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;均值: <span class="subst">&#123;params[<span class="string">&#x27;mu&#x27;</span>]&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;方差: <span class="subst">&#123;params[<span class="string">&#x27;sigma_sq&#x27;</span>]&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;权重: <span class="subst">&#123;params[<span class="string">&#x27;weights&#x27;</span>]&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>开始 EM 迭代...
+Iteration 0: Log-Likelihood = -3685.33
+Iteration 1: Log-Likelihood = -3610.01
+Iteration 3: Log-Likelihood = -3589.98
+Iteration 10: Log-Likelihood = -3571.32</code></pre>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260116151515668.png"
+alt="混合模型与EM算法_31_1" />
+<figcaption aria-hidden="true">混合模型与EM算法_31_1</figcaption>
+</figure>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260116151541389.png"
+alt="混合模型与EM算法_31_2" />
+<figcaption aria-hidden="true">混合模型与EM算法_31_2</figcaption>
+</figure>
+<pre><code>最终收敛参数:
+均值: [159.53631918 174.56978659]
+方差: [20.58644282 41.38855796]
+权重: [0.55028945 0.44971054]</code></pre>
+<p>通过运行上述代码，我们可以清晰地观察到 EM 算法的迭代过程。 *
+在初始阶段（Iter
+0），高斯曲线可能完全偏离数据中心。但仅经过一次迭代（Iter
+1），两条曲线就迅速跳到了两个波峰附近。这说明EM
+算法在初期具有极高的收敛效率。 *
+随后的迭代中，曲线不再大幅移动，而是进行微调。方差和权重在不断调整，直到黑色实线（混合分布）完美贴合灰色直方图（真实数据分布）。
+* 观察 Log-Likelihood Convergence
+图，曲线始终单调上升，最终趋于平缓。这完美验证了 6.2 节中的数学推导：EM
+算法保证每一步迭代都能使似然函数增加（或至少不减少），直至收敛到局部最优。</p>
+<p>GMM
+处理的都是连续型数值数据（如身高）。但在人工智能领域，还有一类极重要的数据是离散且稀疏的，比如文本。</p>
+<p>试想这样一个场景： * GMM
+场景：全校混杂了不同年级（隐变量）的学生，表现为不同的身高分布（观测值）。
+*
+文本场景：图书馆混杂了不同<strong>话题</strong>（隐变量）的文章，表现为不同的<strong>单词分布</strong>（观测值）。</p>
+<p>如果我们把“身高数值”换成“单词计数”，把“高斯分布”换成“多项分布”，能不能用
+EM 算法来自动把文章分类？</p>
+<p>答案是肯定的。这就是著名的 <strong>概率潜在语义分析
+(PLSA)</strong>，也就是我们下一节要介绍的<strong>话题模型</strong>。它本质上就是<strong>离散版本、高维版本的混合模型</strong>。</p>
+<h2 id="话题模型">6.4 话题模型</h2>
+<p><a
+target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%B8%BB%E9%A2%98%E6%A8%A1%E5%9E%8B">话题模型</a>在机器学习和自然语言处理等领域是用来在一系列文档中发现抽象主题的一种统计模型。直观来讲，如果一篇文章有一个中心思想，那么一些特定词语会更频繁的出现。比方说，如果一篇文章是在讲狗的，那“狗”和“骨头”等词出现的频率会高些。如果一篇文章是在讲猫的，那“猫”和“鱼”等词出现的频率会高些。而有些词例如“这个”、“和”大概在两篇文章中出现的频率会大致相等。但真实的情况是，一篇文章通常包含多种主题，而且每个主题所占比例各不相同。因此，如果一篇文章10%和猫有关，90%和狗有关，那么和狗相关的关键字出现的次数大概会是和猫相关的关键字出现次数的9倍。</p>
+<p>一个话题模型试图用数学框架来体现文档的这种特点。主题模型自动分析每个文档，统计文档内的词语，根据统计的信息来断定当前文档含有哪些主题，以及每个主题所占的比例各为多少。（复制自维基百科）</p>
+<h3 id="问题定义">6.4.1 问题定义</h3>
+<h4 id="参数定义">1. 参数定义</h4>
+<ul>
+<li><span
+class="math inline"><em>D</em> = {<em>d</em><sub>1</sub>, ..., <em>d</em><sub><em>M</em></sub>}</span>：文档集合（<span
+class="math inline"><em>M</em></span> 篇文档）。</li>
+<li><span
+class="math inline"><em>W</em> = {<em>w</em><sub>1</sub>, ..., <em>w</em><sub><em>N</em></sub>}</span>：词表集合（<span
+class="math inline"><em>N</em></span> 个单词）。</li>
+<li><span
+class="math inline"><em>Z</em> = {<em>z</em><sub>1</sub>, ..., <em>z</em><sub><em>K</em></sub>}</span>：话题集合（<span
+class="math inline"><em>K</em></span> 个话题，隐变量）。</li>
+<li><span
+class="math inline">#(<em>d</em><sub><em>m</em></sub>, <em>w</em><sub><em>n</em></sub>)</span>：观测数据。单词
+<span class="math inline"><em>w</em><sub><em>n</em></sub></span> 在文档
+<span class="math inline"><em>d</em><sub><em>m</em></sub></span>
+中出现的次数。</li>
+<li><span
+class="math inline"><em>P</em>(<em>z</em><sub><em>k</em></sub>|<em>d</em><sub><em>m</em></sub>)</span>：文档-话题分布，即文档
+<span class="math inline"><em>d</em><sub><em>m</em></sub></span>
+中包含话题 <span
+class="math inline"><em>z</em><sub><em>k</em></sub></span>
+的概率，也记作 <span
+class="math inline"><em>q</em><sub><em>m</em>, <em>k</em></sub></span>。</li>
+<li><span
+class="math inline"><em>P</em>(<em>w</em><sub><em>n</em></sub>|<em>z</em><sub><em>k</em></sub>)</span>：话题-单词分布，即给定话题
+<span
+class="math inline"><em>z</em><sub><em>k</em></sub></span>，生成单词
+<span class="math inline"><em>w</em><sub><em>n</em></sub></span>
+的概率，也记作 <span
+class="math inline"><em>p</em><sub><em>k</em>, <em>n</em></sub></span>。</li>
+<li><span
+class="math inline"><em>γ</em><sub><em>m</em>, <em>n</em>, <em>k</em></sub></span>：单词
+<span class="math inline"><em>w</em><sub><em>n</em></sub></span>
+出现在文档 <span
+class="math inline"><em>d</em><sub><em>m</em></sub></span>
+中时，它是由话题 <span
+class="math inline"><em>z</em><sub><em>k</em></sub></span>
+生成的概率，也就是隶属度。</li>
+</ul>
+<h4 id="生成模型">2. 生成模型</h4>
+<p>我们观测到的样本是共现矩阵 <span
+class="math inline"><strong>X</strong> ∈ ℕ<sup><em>M</em> × <em>N</em></sup></span>，其中
+<span
+class="math inline"><em>x</em><sub><em>m</em><em>n</em></sub> = #(<em>d</em><sub><em>m</em></sub>, <em>w</em><sub><em>n</em></sub>)</span>。
+PLSA 假设文档和单词的生成过程如下（本质上还是全概率公式）： <span
+class="math display">$$ P(d, w) = P(d) \sum_{k=1}^K P(w|z_k) P(z_k|d)
+$$</span></p>
+<h3 id="em-算法推导">6.4.2 EM 算法推导</h3>
+<h4 id="e步计算隶属度和-q-函数-2">1. E步：计算隶属度和 Q 函数</h4>
+<p>根据贝叶斯公式<br />
+<span class="math display">$$ \gamma_{m,n,k} = P(z_k | d_m, w_n) =
+\frac{P(w_n | z_k) P(z_k | d_m)}{\sum \limits_{j=1}^K P(w_n | z_j) P(z_j
+| d_m)} $$</span></p>
+<p>即 <span class="math display">$$ \gamma_{m,n,k}^{(t)} =
+\frac{p_{k,n}^{(t)} q_{m,k}^{(t)}}{\sum \limits_{j=1}^K p_{j,n}^{(t)}
+q_{m,j}^{(t)}} $$</span></p>
+<p>我们的目标是最大化 Q 函数 <span class="math display">$$
+\begin{aligned}
+Q &amp;= \sum_{m=1}^M \sum_{n=1}^N \#(d_m, w_n) \sum_{k=1}^K
+\gamma_{m,n,k} \ln ( P(w_n|z_k) P(z_k|d_m)) \\
+&amp;= \sum_{m=1}^M \sum_{n=1}^N \#(d_m, w_n) \sum_{k=1}^K
+\gamma_{m,n,k} \ln (p_{k,n} \cdot q_{m,k} \big)
+\end{aligned}
+$$</span> 这里之所以要乘上 <span
+class="math inline">#(<em>d</em><sub><em>m</em></sub>, <em>w</em><sub><em>n</em></sub>)</span>，是因为极大似然估计本质上是对每一个观测到的样本求积（取
+<span class="math inline">ln </span>
+后变成求和）。而为了计算方便，我们把相同的样本合并了。</p>
+<h4 id="m步更新参数">2. M步：更新参数</h4>
+<p>这一步和 GMM 的 M 步类似，需要利用 $<em>{n=1}^{N} p</em>{k,n}=1 和 $
+构造 Lagrange 函数，然后求偏导。这里不再给出具体过程，直接给出结论。</p>
+<p><span class="math display">$$ p_{k,n}^{(t+1)} = \frac{\sum
+\limits_{m=1}^M \#(d_m, w_n) \cdot \gamma_{m,n,k}^{(t)}}{\sum
+\limits_{n'=1}^N \sum \limits_{m=1}^M \#(d_m, w_{n'}) \cdot
+\gamma_{m,n',k}^{(t)}} $$</span> *
+<strong>分子</strong>：所有文档中，被判定为属于话题 <span
+class="math inline"><em>k</em></span> 的单词 <span
+class="math inline"><em>n</em></span> 的“期望频次”。 *
+<strong>分母</strong>：话题 <span class="math inline"><em>k</em></span>
+下所有单词的总期望频次（归一化）。</p>
+<p><span class="math display">$$ q_{m,k}^{(t+1)} = \frac{\sum
+\limits_{n=1}^N \#(d_m, w_n) \cdot \gamma_{m,n,k}^{(t)}}{\sum
+\limits_{n=1}^N \#(d_m, w_n)} $$</span> * <strong>分子</strong>：文档
+<span class="math inline"><em>d</em><sub><em>m</em></sub></span>
+中，被判定为属于话题 <span class="math inline"><em>k</em></span>
+的所有单词的总份量。 * <strong>分母</strong>：文档 <span
+class="math inline"><em>d</em><sub><em>m</em></sub></span>
+的总词数（归一化）。</p>
+<h3 id="代码实现-2">6.4.3 代码实现</h3>
+<p>在这个例子中，我们将模拟一个简单的场景： *
+词表：10个词（前5个是“食物”相关，后5个是“科技”相关）。 *
+文档：10篇文档（前5篇主要讲吃，后5篇主要讲技术）。 * 任务：看 PLSA
+能否自动把这 2 个话题（隐变量）找出来。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置中文字体（可选，如果乱码可去掉或换成英文）</span></span><br><span class="line">plt.rcParams[<span class="string">&#x27;font.sans-serif&#x27;</span>] = [<span class="string">&#x27;SimHei&#x27;</span>] </span><br><span class="line">plt.rcParams[<span class="string">&#x27;axes.unicode_minus&#x27;</span>] = <span class="literal">False</span></span><br><span class="line">sns.set_context(<span class="string">&quot;notebook&quot;</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 词表 (Vocab)</span></span><br><span class="line">vocab = [<span class="string">&quot;苹果&quot;</span>, <span class="string">&quot;香蕉&quot;</span>, <span class="string">&quot;牛排&quot;</span>, <span class="string">&quot;火锅&quot;</span>, <span class="string">&quot;面条&quot;</span>,    <span class="comment"># Topic 1: 食物</span></span><br><span class="line">         <span class="string">&quot;电脑&quot;</span>, <span class="string">&quot;芯片&quot;</span>, <span class="string">&quot;代码&quot;</span>, <span class="string">&quot;算法&quot;</span>, <span class="string">&quot;数据&quot;</span>]    <span class="comment"># Topic 2: 科技</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 真实意图: </span></span><br><span class="line"><span class="comment"># Doc 0-4: 谈论食物</span></span><br><span class="line"><span class="comment"># Doc 5-9: 谈论科技</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 构建共现矩阵 n(d, w)</span></span><br><span class="line"><span class="comment"># 行是文档，列是单词</span></span><br><span class="line">X = np.zeros((<span class="number">10</span>, <span class="number">10</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 填数据: </span></span><br><span class="line"><span class="comment"># &quot;食物文档&quot; (前5行) 频繁出现前5个词</span></span><br><span class="line">X[:<span class="number">5</span>, :<span class="number">5</span>] = np.random.randint(<span class="number">5</span>, <span class="number">10</span>, size=(<span class="number">5</span>, <span class="number">5</span>))  <span class="comment"># 高频</span></span><br><span class="line">X[:<span class="number">5</span>, <span class="number">5</span>:] = np.random.randint(<span class="number">0</span>, <span class="number">2</span>, size=(<span class="number">5</span>, <span class="number">5</span>))   <span class="comment"># 偶尔出现科技词(噪音)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># &quot;科技文档&quot; (后5行) 频繁出现后5个词</span></span><br><span class="line">X[<span class="number">5</span>:, :<span class="number">5</span>] = np.random.randint(<span class="number">0</span>, <span class="number">2</span>, size=(<span class="number">5</span>, <span class="number">5</span>))   <span class="comment"># 偶尔出现食物词(噪音)</span></span><br><span class="line">X[<span class="number">5</span>:, <span class="number">5</span>:] = np.random.randint(<span class="number">5</span>, <span class="number">10</span>, size=(<span class="number">5</span>, <span class="number">5</span>))  <span class="comment"># 高频</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;文档-单词共现矩阵 X (前5行):&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(X[:<span class="number">5</span>, :])</span><br></pre></td></tr></table></figure>
+<pre><code>文档-单词共现矩阵 X (前5行):
+[[8. 6. 8. 8. 9. 1. 0. 0. 0. 0.]
+ [8. 8. 7. 9. 5. 0. 1. 1. 1. 1.]
+ [6. 8. 6. 5. 6. 1. 1. 1. 0. 1.]
+ [5. 7. 8. 5. 6. 0. 0. 1. 0. 0.]
+ [8. 7. 8. 5. 7. 0. 0. 1. 1. 1.]]</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># PLSA 核心算法</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">plsa_em</span>(<span class="params">doc_word_matrix, n_topics, max_iter=<span class="number">50</span>, tol=<span class="number">1e-5</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    doc_word_matrix: (M, N) 矩阵</span></span><br><span class="line"><span class="string">    n_topics: K</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    M, N = doc_word_matrix.shape</span><br><span class="line">    K = n_topics</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># --- 1. 初始化 ---</span></span><br><span class="line">    <span class="comment"># 随机初始化 P(z|d) -&gt; shape (M, K)</span></span><br><span class="line">    doc_topic_prob = np.random.rand(M, K)</span><br><span class="line">    <span class="comment"># 归一化行 (sum=1)</span></span><br><span class="line">    doc_topic_prob /= doc_topic_prob.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 随机初始化 P(w|z) -&gt; shape (K, N)</span></span><br><span class="line">    topic_word_prob = np.random.rand(K, N)</span><br><span class="line">    <span class="comment"># 归一化行 (sum=1)</span></span><br><span class="line">    topic_word_prob /= topic_word_prob.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> it <span class="keyword">in</span> <span class="built_in">range</span>(max_iter):</span><br><span class="line">        old_topic_word = topic_word_prob.copy()</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># --- E Step: 计算 gamma (M, N, K) ---</span></span><br><span class="line">        <span class="comment"># gamma[m, n, k] = P(z_k | d_m, w_n)</span></span><br><span class="line">        <span class="comment"># 分子: P(w|z) * P(z|d)</span></span><br><span class="line">        <span class="comment"># 维度变换: (K, N) -&gt; (1, N, K) 和 (M, K) -&gt; (M, 1, K)</span></span><br><span class="line">        <span class="comment"># 这里用循环写便于理解公式</span></span><br><span class="line">        </span><br><span class="line">        numerator = np.zeros((M, N, K))</span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> <span class="built_in">range</span>(M):</span><br><span class="line">            <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">                <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">                    numerator[m, n, k] = topic_word_prob[k, n] * doc_topic_prob[m, k]</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 分母: 对 k 求和</span></span><br><span class="line">        denominator = numerator.<span class="built_in">sum</span>(axis=<span class="number">2</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 得到 gamma</span></span><br><span class="line">        gamma = numerator / (denominator + <span class="number">1e-10</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># --- M Step: 更新参数 ---</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 1. 更新 P(w|z) (Topic-Word)</span></span><br><span class="line">        <span class="comment"># 对应 Slide 20: p_&#123;k,n&#125; 公式</span></span><br><span class="line">        new_topic_word = np.zeros((K, N))</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">            <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">                <span class="comment"># sum_m n(d,w) * gamma</span></span><br><span class="line">                weight = <span class="number">0</span></span><br><span class="line">                <span class="keyword">for</span> m <span class="keyword">in</span> <span class="built_in">range</span>(M):</span><br><span class="line">                    weight += doc_word_matrix[m, n] * gamma[m, n, k]</span><br><span class="line">                new_topic_word[k, n] = weight</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 归一化</span></span><br><span class="line">        new_topic_word /= (new_topic_word.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>) + <span class="number">1e-10</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 2. 更新 P(z|d) (Doc-Topic)</span></span><br><span class="line">        <span class="comment"># 对应 Slide 20: q_&#123;m,k&#125; 公式</span></span><br><span class="line">        new_doc_topic = np.zeros((M, K))</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> m <span class="keyword">in</span> <span class="built_in">range</span>(M):</span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">                <span class="comment"># sum_n n(d,w) * gamma</span></span><br><span class="line">                weight = <span class="number">0</span></span><br><span class="line">                <span class="keyword">for</span> n <span class="keyword">in</span> <span class="built_in">range</span>(N):</span><br><span class="line">                    weight += doc_word_matrix[m, n] * gamma[m, n, k]</span><br><span class="line">                new_doc_topic[m, k] = weight</span><br><span class="line">                </span><br><span class="line">        <span class="comment"># 归一化 (分母其实就是文档总词数)</span></span><br><span class="line">        new_doc_topic /= (new_doc_topic.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>) + <span class="number">1e-10</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 更新参数</span></span><br><span class="line">        topic_word_prob = new_topic_word</span><br><span class="line">        doc_topic_prob = new_doc_topic</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 检查收敛</span></span><br><span class="line">        diff = np.linalg.norm(topic_word_prob - old_topic_word)</span><br><span class="line">        <span class="keyword">if</span> diff &lt; tol:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;PLSA 在第 <span class="subst">&#123;it+<span class="number">1</span>&#125;</span> 轮收敛。&quot;</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">            </span><br><span class="line">    <span class="keyword">return</span> doc_topic_prob, topic_word_prob</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设定寻找 2 个话题</span></span><br><span class="line">K_topics = <span class="number">2</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行算法</span></span><br><span class="line">doc_topic_dist, topic_word_dist = plsa_em(X, K_topics)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 绘图</span></span><br><span class="line">fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">18</span>, <span class="number">6</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 1. 文档-话题分布 (Document-Topic Distribution)</span></span><br><span class="line">sns.heatmap(doc_topic_dist, ax=axes[<span class="number">0</span>], cmap=<span class="string">&quot;Blues&quot;</span>, annot=<span class="literal">True</span>, fmt=<span class="string">&quot;.2f&quot;</span>,</span><br><span class="line">            yticklabels=[<span class="string">f&quot;Doc <span class="subst">&#123;i&#125;</span>&quot;</span> <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>)],</span><br><span class="line">            xticklabels=[<span class="string">f&quot;Topic <span class="subst">&#123;k&#125;</span>&quot;</span> <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K_topics)])</span><br><span class="line">axes[<span class="number">0</span>].set_title(<span class="string">&quot;P(z|d): 文档属于哪个话题？&quot;</span>)</span><br><span class="line">axes[<span class="number">0</span>].set_ylabel(<span class="string">&quot;文档 ID&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 话题-单词分布 (Topic-Word Distribution)</span></span><br><span class="line">sns.heatmap(topic_word_dist, ax=axes[<span class="number">1</span>], cmap=<span class="string">&quot;Reds&quot;</span>, annot=<span class="literal">True</span>, fmt=<span class="string">&quot;.2f&quot;</span>,</span><br><span class="line">            yticklabels=[<span class="string">f&quot;Topic <span class="subst">&#123;k&#125;</span>&quot;</span> <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K_topics)],</span><br><span class="line">            xticklabels=vocab)</span><br><span class="line">axes[<span class="number">1</span>].set_title(<span class="string">&quot;P(w|z): 话题包含哪些词？&quot;</span>)</span><br><span class="line">axes[<span class="number">1</span>].set_xlabel(<span class="string">&quot;单词&quot;</span>)</span><br><span class="line"></span><br><span class="line">plt.tight_layout()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260116151643106.png"
+alt="混合模型与EM算法_41_0" />
+<figcaption aria-hidden="true">混合模型与EM算法_41_0</figcaption>
+</figure>
+<p>运行这段代码，你会看到非常漂亮的结果：</p>
+<ol type="1">
+<li>左边的蓝图 <span
+class="math inline">(<em>P</em>(<em>z</em>|<em>d</em>))</span>：
+<ul>
+<li>矩阵呈现出明显的分块结构。</li>
+<li>Doc 0-4 在某一列（比如 Topic 0）数值接近 1.0。</li>
+<li>Doc 5-9 在另一列（比如 Topic 1）数值接近 1.0。</li>
+<li>结论：模型成功发现了前5篇是一类，后5篇是另一类。</li>
+</ul></li>
+<li>右边的红图 <span
+class="math inline">(<em>P</em>(<em>w</em>|<em>z</em>))</span>：
+<ul>
+<li>Topic 0 对应的行，在“苹果、香蕉…”等食物词上颜色很深。</li>
+<li>Topic 1 对应的行，在“电脑、芯片…”等科技词上颜色很深。</li>
+<li>结论：模型成功提取出了“食物”和“科技”两个语义概念，尽管我们从未告诉它这些词是什么意思。</li>
+</ul></li>
+</ol>
+<p>这就是 EM
+算法在无监督学习中的强大之处：从杂乱的共现数据中，自动发现潜在的语义结构。</p>
+<h2 id="总结">6.5 总结</h2>
+<p>至此，我们完成了对 EM
+算法的深度探索。我们从一个简单的“身高之谜”出发，最终构建出了能够自动理解文本语义的“话题模型”。</p>
+<p>EM 算法解决的是统计学中著名的 “鸡生蛋，蛋生鸡”
+难题——当数据缺失（隐变量）时，我们无法直接估计参数；而没有参数，我们又无法填补缺失的数据。而
+EM
+算法给出的答案是：不要试图一步到位，而是交替迭代。E步进行软性猜测，在当前参数下，计算隐变量的后验概率（隶属度
+<span
+class="math inline"><em>γ</em></span>）。M步进行加权更新，基于这些软性猜测，用加权极大似然估计来更新模型参数。这种“软分类
+<span class="math inline">↔︎</span>
+重估参数”的循环，将一个无法求解的非凸优化问题，拆解成了两个易于求解的子问题。</p>
+<p>我们通过三个经典案例展示了 EM 算法的通用性。三硬币模型是 EM 的“Hello
+World”，揭示了离散数据的混合估计逻辑。高斯混合模型
+(GMM)利用连续数据的距离信息，实现了比 K-Means 更细腻的“软聚类”。话题模型
+(PLSA) 在稀疏的高维文本数据中，成功挖掘出了潜在的语义结构。</p>
+<p>在代码实践环节，我们也看到了 EM 算法的局限性。EM
+算法对初值敏感，不同的初始值很可能导致收敛到不同的局部最优点。此外，EM
+算法很容易陷入局部最优点，而错失全局最优点。</p>
+<p>因此，在实际使用 EM 算法时，多次随机初始化和结合其他算法（如先用
+K-Means 初始化）是打破僵局、提升效果的标准范式。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/01/16/AIMath/%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%B0%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/01/16/AIMath/%E8%B4%9D%E5%8F%B6%E6%96%AF%E4%BC%B0%E8%AE%A1/" class="post-title-link" itemprop="url">5 贝叶斯估计</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-01-16 15:17:32 / Modified: 15:19:23" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD%E7%9A%84%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index"><span itemprop="name">人工智能的数学基础</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="极大似然估计的局限">5.1 极大似然估计的局限</h2>
+<p>在上一章中，我们学习了极大似然估计（MLE）。它的核心思想非常直观：既然现在的样本发生了，那我就认为参数取值应该是让这些样本出现概率最大的那个值。在数据量充足的情况下，MLE
+的效果非常好。</p>
+<p>然而，当观测数据较少甚至缺失时，MLE
+就会暴露出严重的缺陷，甚至得出违背常识的结论。我们可以通过两个例子来看清这一点：</p>
+<ol type="1">
+<li><p>抛硬币。假设我们抛了 3 次硬币，运气不好，3 次全是反面，正面次数为
+0。按照 MLE 的公式，硬币正面朝上的概率估计值 <span
+class="math inline">$\hat{p}=\frac{正面次数}{总次数}=0$</span>。此时 MLE
+计算出的概率 <span
+class="math inline"><em>p̂</em> = 0</span>。这显然违背了我们的常识，因为我们知道硬币通常都有两面，仅仅因为
+3 次实验没出现正面就断定它概率为 0 是极其武断的。</p></li>
+<li><p>交通事故的时间间隔。假设事故间隔服从指数分布，MLE
+估计的“平均间隔时间”就是样本的均值。如果路段刚开放，只发生了两次事故，观测到一个间隔数据
+<span class="math inline"><em>x</em><sub>1</sub></span>，MLE
+会直接认为该路段的平均事故间隔就是 <span
+class="math inline"><em>x</em><sub>1</sub></span>。这会因为样本太少而极不可靠。更极端的情况是，如果第二次事故还没发生，我们根本没有间隔数据，MLE
+就完全无法计算了。</p></li>
+</ol>
+<p>MLE
+的根本问题在于它完全依赖于当前的观测数据。当数据量太少时，观测到的特征可能只是偶然误差，不能代表总体规律。此时完全相信数据会导致估计值偏差巨大。在机器学习中，这种对有限样本过度拟合而忽略了普遍规律的现象，被称为“过拟合”。</p>
+<p>为了解决这个问题，我们需要在数据之外引入额外的判断依据（比如“硬币通常是均匀的”这种常识）。这便是贝叶斯估计的基本思想。</p>
+<h2 id="贝叶斯公式与贝叶斯估计">5.2 贝叶斯公式与贝叶斯估计</h2>
+<p>我们在第一章中讲过<strong>贝叶斯公式</strong>。设 <span
+class="math inline"><em>B</em><sub>1</sub>, <em>B</em><sub>2</sub>, …, <em>B</em><sub><em>n</em></sub></span>
+为完备事件群，则对于任意事件 <span
+class="math inline"><em>A</em></span>：</p>
+<p><span class="math display">$$
+P(B_i|A) = \frac{P(A|B_i)P(B_i)}{\sum_{j} P(A|B_j)P(B_j)}
+$$</span></p>
+<p>在统计推断（贝叶斯估计）中，我们将上述公式中的“事件”替换为“数据”和“参数”：
+* <span
+class="math inline"><em>X</em></span>：观测到的样本数据（Evidence/Data）。
+* <span class="math inline"><em>θ</em></span>：模型的参数（Unknown
+Parameter）。</p>
+<p>由此得到了贝叶斯估计的核心公式：</p>
+<p><span class="math display">$$
+p(\theta|X) = \frac{p(X|\theta)p(\theta)}{p(X)} =
+\frac{p(X|\theta)p(\theta)}{\int p(X|\theta)p(\theta) d\theta}
+$$</span></p>
+<p>这个公式中的每一项都有其特定的统计学含义：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">名称</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>θ</em>)</span></td>
+<td style="text-align: left;">先验分布</td>
+<td style="text-align: left;">在观测到数据之前，我们对参数 <span
+class="math inline"><em>θ</em></span>
+的认知或信念。这通常基于以往的经验、历史数据或主观判断，例如硬币正面朝上的概率是
+<span class="math inline">$\frac{1}{2}$</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>X</em>∥<em>θ</em>)</span></td>
+<td style="text-align: left;">似然函数</td>
+<td style="text-align: left;">假设参数已知时，当前数据出现的概率。这与
+MLE 中的似然函数完全一致。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>θ</em>∥<em>X</em>)</span></td>
+<td style="text-align: left;">后验分布</td>
+<td style="text-align: left;">在观测到数据之后，我们对参数 <span
+class="math inline"><em>θ</em></span>
+的新认知。这是贝叶斯估计的最终目标，它综合了先验知识和数据信息。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>X</em>)</span></td>
+<td style="text-align: left;">边缘似然</td>
+<td
+style="text-align: left;">数据的全概率（归一化常数）。它通过对所有可能的
+<span class="math inline"><em>θ</em></span> 积分得到：<span
+class="math inline"><em>p</em>(<em>X</em>) = ∫<em>p</em>(<em>X</em>∥<em>θ</em>)<em>p</em>(<em>θ</em>)<em>d</em><em>θ</em></span>。</td>
+</tr>
+</tbody>
+</table>
+<p>贝叶斯估计的理想目标是求出完整的后验分布 <span
+class="math inline"><em>p</em>(<em>θ</em>|<em>X</em>)</span>。然而，公式中的分母
+<span class="math inline"><em>p</em>(<em>X</em>)</span>
+是一个<strong>积分</strong>：</p>
+<p><span
+class="math display"><em>p</em>(<em>X</em>) = ∫<em>p</em>(<em>X</em>|<em>θ</em>)<em>p</em>(<em>θ</em>)<em>d</em><em>θ</em></span></p>
+<p>如果 <span class="math inline"><em>θ</em></span>
+是高维向量，这个积分在数学上通常是<strong>不可积的
+(Intractable)</strong>
+或者计算量极其巨大。既然分母算不出来，我们就无法得到标准的后验分布。</p>
+<p>为了解决这个问题，在实际应用中，我们通常采用两条捷径：</p>
+<ol type="1">
+<li><strong>最大后验概率 (MAP)</strong>：既然分母与 <span
+class="math inline"><em>θ</em></span>
+无关，那我们在求最大值时直接忽略分母，只关注分子。</li>
+<li><strong>共轭先验</strong>：挑选特殊的先验分布，使得我们可以通过代数运算直接推导出后验分布，从而避开积分。</li>
+</ol>
+<h2 id="最大后验概率map估计">5.3 最大后验概率（MAP）估计</h2>
+<p>正如前文所述，为了避开贝叶斯公式中分母（边缘似然 <span
+class="math inline"><em>p</em>(<em>X</em>)</span>）那个难以计算的积分，我们不再追求参数
+<span class="math inline"><em>θ</em></span>
+的完整分布，而是退而求其次，寻找后验分布中概率密度最大的那个点。这就是
+<strong>最大后验概率估计 (MAP)</strong>。</p>
+<h3 id="map-的核心公式">5.3.1 MAP 的核心公式</h3>
+<p>根据贝叶斯公式： <span class="math display">$$ p(\theta|X) =
+\frac{p(X|\theta)p(\theta)}{p(X)} $$</span></p>
+<p>由于我们要找的是让 <span
+class="math inline"><em>p</em>(<em>θ</em>|<em>X</em>)</span> 最大的
+<span class="math inline"><em>θ</em></span> 值，而分母 <span
+class="math inline"><em>p</em>(<em>X</em>)</span> 是关于数据 <span
+class="math inline"><em>X</em></span> 的积分，与参数 <span
+class="math inline"><em>θ</em></span> 无关（相对于 <span
+class="math inline"><em>θ</em></span>
+是常数）。因此，优化时可以忽略分母：</p>
+<p><span class="math display">$$
+\begin{aligned}
+\hat{\theta}_{\text{MAP}} &amp;= \operatorname*{argmax}_{\theta}
+p(\theta|X) \\
+&amp;= \operatorname*{argmax}_{\theta} \frac{p(X|\theta)p(\theta)}{p(X)}
+\\
+&amp;= \operatorname*{argmax}_{\theta}
+\underbrace{p(X|\theta)}_{\text{似然函数}} \cdot
+\underbrace{p(\theta)}_{\text{先验分布}}
+\end{aligned}
+$$</span></p>
+<p>与 MLE 一样，为了方便计算，我们通常对目标函数取对数：</p>
+<p><span
+class="math display"><em>θ̂</em><sub>MAP</sub> = argmax<sub><em>θ</em></sub>(ln <em>p</em>(<em>X</em>|<em>θ</em>) + ln <em>p</em>(<em>θ</em>))</span></p>
+<p>如果数据 <span
+class="math inline"><em>X</em> = {<em>x</em><sub>1</sub>, ..., <em>x</em><sub><em>n</em></sub>}</span>
+是独立同分布 (i.i.d.) 的（通常都是独立同分布的），则展开为：</p>
+<p><span class="math display">$$
+\hat{\theta}_{\text{MAP}} = \operatorname*{argmax}_{\theta} \left(
+\sum_{i=1}^n \ln f(x_i|\theta) + \ln p(\theta) \right)
+$$</span></p>
+<h3 id="例子">5.3.2 例子</h3>
+<p>抛 10 次硬币，其中正面（1）出现 7 次，反面（0）出现 3
+次。根据常识，硬币大概率是均匀的。我们假设参数 <span
+class="math inline"><em>θ</em></span>（正面朝上的概率）服从正态分布
+<span class="math inline"><em>N</em>(0.5, 0.01)</span>，这就是 <span
+class="math inline"><em>θ</em></span> 的先验分布。</p>
+<p>似然函数：每个数据服从伯努利分布，进行 10 次试验，故$ L(X|) = ^7
+(1-)^3 $。</p>
+<p>先验分布：$ p() = e<sup>{-\frac{(-)</sup>2}{2^2}}
+e<sup>{-\frac{()</sup>2}{2 }} = e<sup>{-50()</sup>2} $</p>
+<p>因此</p>
+<p><span class="math display">$$
+\begin{aligned}
+\hat{\theta}_{\text{MAP}} &amp;= \operatorname*{argmax}_{\theta} \left(
+\theta^7 (1-\theta)^3 \cdot e^{-50(\theta-0.5)^2} \right)
+\end{aligned}
+$$</span></p>
+<p>求导得<span
+class="math inline"><em>J</em>(<em>θ</em>) = 7ln <em>θ</em> + 3ln (1 − <em>θ</em>) − 50(<em>θ</em> − 0.5)<sup>2</sup></span></p>
+<p>令 <span class="math inline">$\frac{\partial J}{\partial \theta} =
+\frac{7}{\theta} - \frac{3}{1-\theta} - 100(\theta-0.5) = 0$</span>，得
+<span
+class="math inline"><em>θ</em> ≈ 0.558</span>，即硬币朝上的最大后验概率为
+<span class="math inline">0.558</span>。</p>
+<p>接下来让我们对比一下三种估计结果，就能理解 MAP 的作用。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">估计方法</th>
+<th style="text-align: left;">计算公式/来源</th>
+<th style="text-align: left;">结果</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>先验均值</strong></td>
+<td style="text-align: left;">仅凭经验</td>
+<td style="text-align: left;"><strong>0.500</strong></td>
+<td style="text-align: left;">我坚信硬币是均匀的</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>MLE 估计</strong></td>
+<td style="text-align: left;">仅凭数据 (<span
+class="math inline">7/10</span>)</td>
+<td style="text-align: left;"><strong>0.700</strong></td>
+<td style="text-align: left;">数据显示正面概率很高，我完全信数据</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>MAP 估计</strong></td>
+<td style="text-align: left;">数据 + 经验</td>
+<td style="text-align: left;"><strong>0.558</strong></td>
+<td style="text-align: left;"><strong>折中</strong>：数据把信念从 0.5
+拉向了 0.7，但先验的引力把它拽回了一点</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，MAP 估计值位于“先验均值”和“MLE
+估计值”之间。先验分布方差越小（越确信先验），MAP
+结果就越接近先验；数据量越大（<span
+class="math inline"><em>n</em></span> 越大），MAP 结果就越接近 MLE。</p>
+<h3 id="map-与-正则化">5.3.3 MAP 与 正则化</h3>
+<p>在机器学习（特别是深度学习）中，MAP
+有一个极其重要的等价解释：<strong>MAP 就是带正则项的 MLE。</strong></p>
+<p>观察 Log-MAP 的公式： <span class="math display">$$
+\hat{\theta}_{\text{MAP}} = \operatorname*{argmax}_{\theta}
+\underbrace{\ln L(\theta)}_{\text{Loss项}} + \underbrace{\ln
+p(\theta)}_{\text{正则项}} $$</span></p>
+<ul>
+<li><p>L2 正则化</p>
+<p>如果我们假设参数 <span class="math inline"><em>θ</em></span>
+服从正态分布 <span
+class="math inline"><em>θ</em> ∼ <em>N</em>(0, <em>σ</em><sup>2</sup>)</span>：
+<span class="math display">$$ \ln p(\theta) \propto -
+\frac{\theta^2}{2\sigma^2} = -\lambda \|\theta\|^2 = -\lambda
+\|\theta\|_2$$</span> 这正是我们熟悉的 <strong>L2
+正则化</strong>！在损失函数中加 L2
+正则，本质上就是假设权重参数服从高斯先验，然后做 MAP 估计。</p></li>
+<li><p>L1 正则化</p>
+<p>如果我们假设参数 <span class="math inline"><em>θ</em></span>
+服从拉普拉斯分布<span
+class="math display">ln <em>p</em>(<em>θ</em>) ∝ −|<em>θ</em>| = −<em>λ</em>∥<em>θ</em>∥<sub>1</sub></span>
+这正是 <strong>L1 正则化</strong>！</p></li>
+</ul>
+<p>因此，这一章学的 MAP 并不是什么过时的统计概念，它是现代 AI
+模型防止过拟合（Regularization）的数学基石。</p>
+<h2 id="共轭先验分布">5.4 共轭先验分布</h2>
+<p>在 MAP
+中，我们为了避开积分，选择了忽略分母。而在共轭先验的方法中，我们通过巧妙选择先验分布
+<span class="math inline"><em>p</em>(<em>θ</em>)</span>
+的形式，使得它和似然函数 <span
+class="math inline"><em>p</em>(<em>X</em>|<em>θ</em>)</span>
+共轭，生成的后验分布 <span
+class="math inline"><em>p</em>(<em>θ</em>|<em>X</em>)</span> 与先验分布
+<span class="math inline"><em>p</em>(<em>θ</em>)</span>
+属于同一种分布。这样做的好处是，我们完全不需要做积分，只需要做简单的加法来更新参数即可。</p>
+<p>我们先给出结论，并通过例子解释结论怎么用，最后推导结论。</p>
+<h3 id="共轭分布大全">5.4.1 共轭分布大全</h3>
+<p>符号说明： * <span class="math inline"><em>n</em></span>：样本数量 *
+<span
+class="math inline">∑<em>x</em><sub><em>i</em></sub></span>：样本观测值的总和
+* <span
+class="math inline"><em>α</em>, <em>β</em></span>：先验分布的参数（超参数）
+* <span
+class="math inline"><em>α</em><sup>′</sup>, <em>β</em><sup>′</sup></span>：后验分布的参数</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">先验分布</th>
+<th style="text-align: left;">似然函数</th>
+<th style="text-align: left;">后验分布</th>
+<th style="text-align: left;">更新公式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">Beta(<em>α</em>, <em>β</em>)</span></td>
+<td style="text-align: left;">二项分布 / 伯努利</td>
+<td style="text-align: left;"><span
+class="math inline">Beta(<em>α</em><sup>′</sup>, <em>β</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + 成功次数</span>
+<br> <span
+class="math inline"><em>β</em><sup>′</sup> = <em>β</em> + 失败次数</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">Gamma(<em>α</em>, <em>β</em>)</span></td>
+<td style="text-align: left;">泊松分布</td>
+<td style="text-align: left;"><span
+class="math inline">Gamma(<em>α</em><sup>′</sup>, <em>β</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + ∑<em>x</em><sub><em>i</em></sub></span>
+<br> <span
+class="math inline"><em>β</em><sup>′</sup> = <em>β</em> + <em>n</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">Gamma(<em>α</em>, <em>β</em>)</span></td>
+<td style="text-align: left;">指数分布</td>
+<td style="text-align: left;"><span
+class="math inline">Gamma(<em>α</em><sup>′</sup>, <em>β</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + <em>n</em></span>
+<br> <span
+class="math inline"><em>β</em><sup>′</sup> = <em>β</em> + ∑<em>x</em><sub><em>i</em></sub></span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">N(<em>μ</em><sub>0</sub>, <em>σ</em><sub>0</sub><sup>2</sup>)</span></td>
+<td style="text-align: left;">正态分布 (已知 <span
+class="math inline"><em>σ</em><sup>2</sup></span>)</td>
+<td style="text-align: left;"><span
+class="math inline">N(<em>μ</em><sub><em>n</em></sub>, <em>σ</em><sub><em>n</em></sub><sup>2</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline">$\frac{1}{\sigma_n^2} = \frac{1}{\sigma_0^2} +
+\frac{n}{\sigma^2}$</span> <br> <span class="math inline">$\mu_n =
+\frac{\frac{1}{\sigma_0^2}\mu_0 +
+\frac{n}{\sigma^2}\bar{x}}{\frac{1}{\sigma_0^2} +
+\frac{n}{\sigma^2}}$</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">Dir(<em>α⃗</em>)</span></td>
+<td style="text-align: left;">多项分布</td>
+<td style="text-align: left;"><span
+class="math inline">Dir(<em>α⃗</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>α</em><sub><em>k</em></sub><sup>′</sup> = <em>α</em><sub><em>k</em></sub> + 第<em>k</em>类的计数</span></td>
+</tr>
+</tbody>
+</table>
+<p>在贝叶斯统计中，如果后验分布与先验分布属于同类，则先验分布与后验分布互为<strong>共轭分布</strong>，先验分布称为似然函数的<strong>共轭先验</strong>。
+例如表格第一行，Beta 分布与
+Beta分布互为共轭分布，Beta分布是二项分布/伯努利分布的共轭先验。</p>
+<p>下面通过例子解释这个表格的用法。</p>
+<h3 id="例子-1">5.4.2 例子</h3>
+<h4 id="beta分布二项分布beta分布">1. Beta分布+二项分布=Beta分布</h4>
+<p>Beta 分布 <span
+class="math inline"><em>p</em> ∼ <em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em>, <em>β</em>)</span>
+定义在 <span class="math inline">[0, 1]</span>
+区间上，描述的是我们对某个事件发生概率 <span
+class="math inline"><em>p</em></span> 的信心。 <span
+class="math inline"><em>α</em></span> 可以看作虚拟的成功次数，<span
+class="math inline"><em>β</em></span> 看作虚拟的失败次数。</p>
+<p>现在要估计硬币正面朝上的概率 <span
+class="math inline"><em>p</em></span>。 *
+先验：根据尝试，硬币正面朝上和反面朝上的概率是相等的。设先验为 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(10, 10)</span>，这意味着我假装之前已经抛过
+20 次，10 正 10 反。 * 数据：新做了 <span
+class="math inline"><em>n</em> = 10</span> 次实验，7 正 3 反。 *
+后验：根据更新公式，<span
+class="math inline"><em>α</em><sup>′</sup> = 10 + 7 = 17, <em>β</em><sup>′</sup> = 10 + 3 = 13</span>。后验为
+<span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(17, 13)</span>。
+* 估计：后验均值 <span
+class="math inline">$\text{E}(p)=\frac{17}{17+13}=\frac{17}{30}$</span>。即硬币正面朝上的概率为
+<span class="math inline">$\frac{17}{30}$</span>。</p>
+<h4 id="gamma分布泊松分布gamma分布">2. Gamma分布+泊松分布=Gamma分布</h4>
+<p>Gamma 分布 <span
+class="math inline"><em>λ</em> ∼ <em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em>, <em>β</em>)</span>
+定义在 <span
+class="math inline">(0, +∞)</span>，通常用于描述单位时间内事件发生的次数
+<span class="math inline"><em>λ</em></span>，或事件发生的速率。其中
+<span class="math inline"><em>α</em></span> 代表总次数，<span
+class="math inline"><em>β</em></span> 代表总时间。</p>
+<p>现在要估计单位时间（这里取 1 小时）内进站的公交车数量 <span
+class="math inline"><em>λ</em></span>。</p>
+<ul>
+<li>先验：根据经验，每小时大概来 3 辆。设 Gamma(3, 1)（意思是 1
+小时观察到了 3 辆）。</li>
+<li>数据：观察了 <span class="math inline"><em>n</em> = 2</span>
+小时，分别来了 4 辆和 6 辆。总数 <span
+class="math inline">∑<em>x</em> = 10</span>。</li>
+<li>后验：根据更新公式，<span
+class="math inline"><em>α</em><sup>′</sup> = 3 + 10 = 13</span>
+(总共来了 13 辆), <span
+class="math inline"><em>β</em><sup>′</sup> = 1 + 2 = 3</span>
+(总共观察了 3 小时)。后验为 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(13, 3)</span>。</li>
+<li>估计：后验均值 <span
+class="math inline">E(<em>λ</em>) = 13/3</span>。即一小时内来了 <span
+class="math inline">13/3</span> 辆公交车。</li>
+</ul>
+<h4 id="gamma分布指数分布gamma分布">3. Gamma分布+指数分布=Gamma分布</h4>
+<p>设灯泡寿命 <span
+class="math inline"><em>X</em> ∼ <em>E</em><em>x</em><em>p</em>(<em>λ</em>)</span>。现在要估计灯泡的寿命。
+* 先验：<span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(10, 1800)</span>，即根据经验，10个灯泡的总寿命是1800小时。
+* 数据：测试了 <span class="math inline"><em>n</em> = 5</span>
+个灯泡，寿命总和 <span class="math inline">∑<em>x</em> = 1000</span>
+小时。 * 后验：注意这里 <span class="math inline"><em>α</em></span>
+更新的是<strong>样本个数</strong>，<span
+class="math inline"><em>β</em></span>
+更新的是<strong>观测值总和</strong>。 根据更新公式，<span
+class="math inline"><em>α</em><sup>′</sup> = <em>α</em> + 5 = 15,  <em>β</em><sup>′</sup> = <em>β</em> + 1000 = 2800</span>。
+* 估计：后验均值 <span class="math inline">$\text{E}(X) =
+\frac{2800}{15}=186.66$</span>，即灯泡的平均寿命是186.66小时。</p>
+<p>需要注意的是，gamma+泊松与gamma+指数的更新公式正好相反。本质原因是，泊松分布中，时间是固定的（人为选取的，比如上面观察了<strong>2</strong>小时内进站的公交车数量），次数是随机变量（1小时内进站的公交车数量，是观测得到的）；而泊松分布中，时间是随机变量（观测到的灯泡寿命），次数是固定的（人为选取的，比如上面测试了5个灯泡）。两者的定义相反，导致更新公式正好相反。</p>
+<h4 id="dirichlet分布多项分布dirichlet分布">4.
+Dirichlet分布+多项分布=Dirichlet分布</h4>
+<p>Dirichlet分布是 Beta 分布在高维上的推广。Beta 是两面的硬币，Dirichlet
+是 <span class="math inline"><em>K</em></span>
+面的骰子。它描述的是多分类概率向量 <span
+class="math inline"><em>p⃗</em> = (<em>p</em><sub>1</sub>, ..., <em>p</em><sub><em>K</em></sub>)</span>
+的分布。<span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub>, <em>α</em><sub>2</sub>, ..., <em>α</em><sub><em>k</em></sub>)</span>
+的参数 <span
+class="math inline"><em>α</em><sub>1</sub>, <em>α</em><sub>2</sub>, ..., <em>α</em><sub><em>k</em></sub></span>
+分别代表事件 1,2,…,k 出现次数的伪计数。</p>
+<p>现在有一个三面的骰子。 * 先验：<span
+class="math inline"><em>D</em><em>i</em><em>r</em>(1, 1, 1)</span>。这代表均匀分布认为每一面出现的概率相等。
+*
+数据：现在投了若干次骰子，投掷结果为：1点出现2次，2点出现0次，3点出现1次。向量
+<span class="math inline"><em>m⃗</em> = (2, 0, 1)</span>。 *
+后验：根据更新公式，<span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub><sup>′</sup>, <em>α</em><sub>2</sub><sup>′</sup>, <em>α</em><sub>3</sub><sup>′</sup>) = <em>D</em><em>i</em><em>r</em>(1 + 2, 1 + 0, 1 + 1) = <em>D</em><em>i</em><em>r</em>(3, 1, 2)</span>。
+* 估计：第1面朝上的概率为 <span
+class="math inline">$\frac{3}{3+1+2}=\frac{1}{2}$</span>，第2面朝上的概率为
+<span
+class="math inline">$\frac{1}{3+1+2}=\frac{1}{6}$</span>，第3面朝上的概率为
+<span class="math inline">$\frac{2}{3+1+2}=\frac{1}{3}$</span>。</p>
+<h4 id="正态分布正态分布正态分布">5. 正态分布+正态分布=正态分布</h4>
+<p>测量温度，假设已知温度计的测量误差方差为 <span
+class="math inline"><em>σ</em><sup>2</sup> = 1</span>（即精度为 <span
+class="math inline">1/<em>σ</em><sup>2</sup> = 1</span>）。现在要估计真实气温
+<span class="math inline"><em>μ</em></span>。</p>
+<ul>
+<li>先验：根据天气预报或体感，我相信气温在 25 度左右，不确定度（方差）为
+<span
+class="math inline"><em>σ</em><sub>0</sub><sup>2</sup> = 2</span>。这意味着先验分布为
+<span class="math inline"><em>N</em>(25, 2)</span>，先验精度为 <span
+class="math inline">1/2 = 0.5</span>。</li>
+<li>数据：做了一次测量 (<span
+class="math inline"><em>n</em> = 1</span>)，温度计读数 <span
+class="math inline"><em>x</em> = 30</span>。数据的观测精度为 <span
+class="math inline">1/1 = 1</span>。</li>
+<li>后验：正态分布的后验均值是先验均值和观测数据的<strong>加权平均</strong>，权重是各自的<strong>精度</strong>（方差的倒数）；后验精度是先验精度与观测精度之和。
+<ul>
+<li>后验精度：<span class="math inline">$\frac{1}{\sigma'^2} =
+\frac{1}{\sigma_0^2} + \frac{n}{\sigma^2} = 0.5 + 1 =
+1.5$</span>。因此后验方差 <span class="math inline">$\sigma'^2 =
+\frac{1}{1.5} \approx 0.67$</span>。</li>
+<li>后验均值：<span class="math inline">$\mu' = \frac{\text{先验精度}
+\cdot \mu_0 + \text{数据精度} \cdot x}{\text{总精度}} = \frac{0.5 \times
+25 + 1 \times 30}{0.5 + 1} = \frac{12.5 + 30}{1.5} = \frac{42.5}{1.5}
+\approx 28.33$</span>。</li>
+<li>后验分布为 <span
+class="math inline"><em>N</em>(28.33, 0.67)</span>。</li>
+</ul></li>
+<li>估计：后验均值 <span
+class="math inline">E(<em>μ</em>) = 28.33</span>。</li>
+</ul>
+<h3 id="数学原理与推导">5.4.3 数学原理与推导</h3>
+<p>上面五个例子直观地展示了共轭分布与更新公式的用法。事实上，这五个例子非常符合人们的直觉，即在经验的基础上，根据新观测到的数据，更新信念。</p>
+<p>下面通过数学推导更新公式。 这里的核心逻辑是，写出 <span
+class="math inline"><em>先</em><em>验</em><em>分</em><em>布</em> × <em>似</em><em>然</em><em>函</em><em>数</em></span>，然后忽略常数，看剩下的部分像什么分布。</p>
+<h4 id="beta分布-二项分布-beta分布">1. Beta分布 + 二项分布 =
+Beta分布</h4>
+<p><em>Th</em>. 设 <span class="math inline"><em>θ</em></span>
+为事件成功的概率，且服从先验分布 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em>, <em>β</em>)</span>。现又做了
+<span class="math inline"><em>n</em></span> 次试验（即数据服从二项分布
+<span
+class="math inline"><em>X</em> ∼ <em>B</em>(<em>n</em>, <em>θ</em>)</span>），成功次数为
+<span class="math inline"><em>k</em></span>。则现在 <span
+class="math inline"><em>θ</em>|<em>X</em></span> 服从后验分布 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em> + <em>k</em>, <em>β</em> + <em>n</em> − <em>k</em>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span
+class="math inline"><em>p</em>(<em>θ</em>) = Beta(<em>α</em>, <em>β</em>) ∝ <em>θ</em><sup><em>α</em> − 1</sup>(1 − <em>θ</em>)<sup><em>β</em> − 1</sup></span>（根据
+Beta 分布的概率密度函数）</p>
+<p><span
+class="math inline"><em>p</em>(<em>X</em>|<em>θ</em>) = <em>C</em><sub><em>n</em></sub><sup><em>k</em></sup><em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup> ∝ <em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup></span></p>
+<p><span
+class="math inline"><em>P</em>(<em>θ</em>|<em>X</em>) ∝ <em>P</em>(<em>θ</em>) ⋅ <em>P</em>(<em>X</em>|<em>θ</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\theta|X)} \propto
+\theta^{\alpha-1}(1-\theta)^{\beta-1} \cdot \theta^k
+(1-\theta)^{n-k}$</span></p>
+<p><span class="math inline">$\phantom{P(\theta|X)} =
+\theta^{(\alpha+k)-1} (1-\theta)^{(\beta+n-k)-1}$</span></p>
+<p>即 <span class="math inline"><em>θ</em>|<em>X</em></span> 服从 Beta
+分布 <span
+class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em> + <em>k</em>, <em>β</em> + <em>n</em> − <em>k</em>)</span>。</p>
+<h4 id="gamma分布-泊松分布-gamma分布">2. Gamma分布 + 泊松分布 =
+Gamma分布</h4>
+<p><em>Th</em>. 设 <span class="math inline"><em>λ</em></span>
+为单位时间内某事件发生的次数，且满足先验分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em>, <em>β</em>)</span>。现观测了
+<span class="math inline"><em>n</em></span> 单位时间（即数据服从泊松分布
+<span
+class="math inline"><em>X</em> ∼ <em>P</em><em>o</em><em>i</em>(<em>λ</em>)</span>），得到观测数据
+<span
+class="math inline"><em>X</em> = {<em>X</em><sub>1</sub>, <em>X</em><sub>2</sub>, ..., <em>X</em><sub><em>n</em></sub>}</span>，其中
+<span class="math inline"><em>X</em><sub><em>i</em></sub></span> 为第
+<span class="math inline"><em>i</em></span>
+个小时观测到的事件发生次数。则 <span
+class="math inline"><em>λ</em>|<em>X</em></span> 服从分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em> + ∑<em>X</em><sub><em>i</em></sub>, <em>β</em> + <em>n</em>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span
+class="math inline"><em>p</em>(<em>λ</em>) = Gamma(<em>α</em>, <em>β</em>) ∝ <em>λ</em><sup><em>α</em> − 1</sup><em>e</em><sup>−<em>β</em><em>λ</em></sup></span>（根据
+Gamma 分布的概率密度函数）</p>
+<p><span class="math inline">$p(X|\lambda) = p(X_1|\lambda)
+p(X_2|\lambda)... p(X_n|\lambda)=\prod
+\frac{\lambda^{x_i}e^{-\lambda}}{x_i!} \propto \lambda^{\sum x_i}
+e^{-n\lambda}$</span></p>
+<p><span
+class="math inline"><em>P</em>(<em>λ</em>|<em>X</em>) ∝ <em>P</em>(<em>λ</em>) ⋅ <em>P</em>(<em>X</em>|<em>λ</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\lambda|X)} \propto
+\lambda^{\alpha-1} e^{-\beta\lambda} \cdot \lambda^{\sum x_i}
+e^{-n\lambda}$</span></p>
+<p><span class="math inline">$\phantom{P(\lambda|X)} =
+\lambda^{(\alpha+\sum x_i)-1} e^{-(\beta+n)\lambda}$</span></p>
+<p>即 <span class="math inline"><em>λ</em>|<em>X</em></span> 服从 Gamma
+分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em> + ∑<em>x</em><sub><em>i</em></sub>, <em>β</em> + <em>n</em>)</span>。</p>
+<h4 id="gamma分布-指数分布-gamma分布">3. Gamma分布 + 指数分布 =
+Gamma分布</h4>
+<p><em>Th</em>. 设 <span class="math inline"><em>λ</em></span>
+为灯泡坏掉的速率，且 <span class="math inline"><em>λ</em></span>
+服从先验分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em>, <em>β</em>)</span>。现在又观测了
+<span class="math inline"><em>n</em></span> 个灯泡（即数据服从指数分布
+<span
+class="math inline"><em>X</em> ∼ <em>E</em><em>x</em><em>p</em>(<em>λ</em>)</span>），得到观测数据
+<span
+class="math inline"><em>X</em> = {<em>X</em><sub>1</sub>, <em>X</em><sub>2</sub>, ..., <em>X</em><sub><em>n</em></sub>}</span>，其中
+<span class="math inline"><em>X</em><sub><em>i</em></sub></span> 为第
+<span class="math inline"><em>i</em></span> 个灯泡的寿命。则 <span
+class="math inline"><em>λ</em>|<em>X</em></span> 服从 Gamma 分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em> + <em>n</em>, <em>β</em> + ∑<em>X</em><sub><em>i</em></sub>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span
+class="math inline"><em>p</em>(<em>λ</em>) = Gamma(<em>α</em>, <em>β</em>) ∝ <em>λ</em><sup><em>α</em> − 1</sup><em>e</em><sup>−<em>β</em><em>λ</em></sup></span>（根据
+Gamma 分布的概率密度函数）</p>
+<p><span
+class="math inline"><em>p</em>(<em>X</em>|<em>λ</em>) = <em>p</em>(<em>X</em><sub>1</sub>|<em>λ</em>)<em>p</em>(<em>X</em><sub>2</sub>|<em>λ</em>)...<em>p</em>(<em>X</em><sub><em>n</em></sub>|<em>λ</em>) = ∏<em>λ</em><em>e</em><sup>−<em>λ</em><em>x</em><sub><em>i</em></sub></sup> = <em>λ</em><sup><em>n</em></sup><em>e</em><sup>−<em>λ</em>∑<em>x</em><sub><em>i</em></sub></sup></span></p>
+<p><span
+class="math inline"><em>P</em>(<em>λ</em>|<em>X</em>) ∝ <em>P</em>(<em>λ</em>) ⋅ <em>P</em>(<em>X</em>|<em>λ</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\lambda|X)} \propto
+\lambda^{\alpha-1} e^{-\beta\lambda} \cdot \lambda^n e^{-\lambda \sum
+x_i}$</span></p>
+<p><span class="math inline">$\phantom{P(\lambda|X)} =
+\lambda^{(\alpha+n)-1} e^{-(\beta+\sum x_i)\lambda}$</span></p>
+<p>即 <span class="math inline"><em>λ</em>|<em>X</em></span> 服从 Gamma
+分布 <span
+class="math inline"><em>G</em><em>a</em><em>m</em><em>m</em><em>a</em>(<em>α</em> + <em>n</em>, <em>β</em> + ∑<em>x</em><sub><em>i</em></sub>)</span>。<strong>注意与泊松分布的区别。</strong></p>
+<h4 id="dirichlet分布-多项分布-dirichlet分布">4. Dirichlet分布 +
+多项分布 = Dirichlet分布</h4>
+<p><em>Th</em>. 设 <span
+class="math inline"><em>θ⃗</em> = (<em>θ</em><sub>1</sub>, …, <em>θ</em><sub><em>K</em></sub>)</span>
+为多分类概率向量，且服从先验分布 <span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub>, …, <em>α</em><sub><em>K</em></sub>)</span>。现进行
+<span class="math inline"><em>n</em></span>
+次试验（即数据服从多项分布），观测结果中第 <span
+class="math inline"><em>k</em></span> 类出现的次数为 <span
+class="math inline"><em>m</em><sub><em>k</em></sub></span>。则 <span
+class="math inline"><em>θ⃗</em>|<em>X</em></span> 服从后验分布 <span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub> + <em>m</em><sub>1</sub>, …, <em>α</em><sub><em>K</em></sub> + <em>m</em><sub><em>K</em></sub>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span class="math inline">$P(\vec{\theta}) = \text{Dir}(\vec{\alpha})
+\propto \prod_{k=1}^K \theta_k^{\alpha_k - 1}$</span>（根据 Dirichlet
+分布的概率密度函数）</p>
+<p><span class="math inline">$P(X|\vec{\theta}) =p(X_1|\vec{\theta})
+p(X_2|\vec{\theta})... p(X_n|\vec{\theta})\propto \prod_{k=1}^K
+\theta_k^{m_k}$</span></p>
+<p><span
+class="math inline"><em>P</em>(<em>θ⃗</em>|<em>X</em>) ∝ <em>P</em>(<em>θ⃗</em>) ⋅ <em>P</em>(<em>X</em>|<em>θ⃗</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\vec{\theta}|X)} \propto
+\prod_{k=1}^K \theta_k^{\alpha_k - 1} \cdot \prod_{k=1}^K
+\theta_k^{m_k}$</span></p>
+<p><span class="math inline">$\phantom{P(\vec{\theta}|X)} =
+\prod_{k=1}^K \theta_k^{(\alpha_k + m_k) - 1}$</span></p>
+<p>即 <span class="math inline"><em>θ⃗</em>|<em>X</em></span> 服从
+Dirichlet 分布 <span
+class="math inline"><em>D</em><em>i</em><em>r</em>(<em>α</em><sub>1</sub> + <em>m</em><sub>1</sub>, …, <em>α</em><sub><em>K</em></sub> + <em>m</em><sub><em>K</em></sub>)</span>。</p>
+<h4 id="正态分布-正态分布-正态分布-方差已知">5. 正态分布 + 正态分布 =
+正态分布 (方差已知)</h4>
+<p><em>Th</em>. 设 <span class="math inline"><em>μ</em></span>
+为正态分布的均值（观测方差 <span
+class="math inline"><em>σ</em><sup>2</sup></span> 已知），且 <span
+class="math inline"><em>μ</em></span> 服从先验分布 <span
+class="math inline"><em>N</em>(<em>μ</em><sub>0</sub>, <em>σ</em><sub>0</sub><sup>2</sup>)</span>。现观测到
+<span class="math inline"><em>n</em></span> 个样本数据 <span
+class="math inline"><em>X</em> = {<em>x</em><sub>1</sub>, …, <em>x</em><sub><em>n</em></sub>}</span>（均值为
+<span class="math inline"><em>x̄</em></span>）。则 <span
+class="math inline"><em>μ</em>|<em>X</em></span> 服从后验分布 <span
+class="math inline"><em>N</em>(<em>μ</em><sub><em>n</em></sub>, <em>σ</em><sub><em>n</em></sub><sup>2</sup>)</span>。</p>
+<p><em>proof</em>.</p>
+<p><span class="math inline">$P(\mu) = N(\mu_0, \sigma_0^2) \propto
+\exp\left( -\frac{(\mu-\mu_0)^2}{2\sigma_0^2} \right)$</span></p>
+<p><span class="math inline">$P(X|\mu) = \prod_{i=1}^n N(x_i|\mu,
+\sigma^2) \propto \exp\left( -\frac{\sum_{i=1}^n(x_i-\mu)^2}{2\sigma^2}
+\right)$</span></p>
+<p><span
+class="math inline"><em>P</em>(<em>μ</em>|<em>X</em>) ∝ <em>P</em>(<em>μ</em>) ⋅ <em>P</em>(<em>X</em>|<em>μ</em>)</span></p>
+<p><span class="math inline">$\phantom{P(\mu|X)} \propto \exp\left(
+-\frac{(\mu-\mu_0)^2}{2\sigma_0^2} \right) \cdot \exp\left(
+-\frac{\sum(x_i-\mu)^2}{2\sigma^2} \right)$</span></p>
+<p><span class="math inline">$\phantom{P(\mu|X)} = \exp\left(
+-\frac{1}{2} \left[ \frac{(\mu-\mu_0)^2}{\sigma_0^2} +
+\frac{\sum(x_i-\mu)^2}{\sigma^2} \right] \right)$</span></p>
+<p>通过整理 <span class="math inline"><em>μ</em></span>
+的二次项系数和一次项系数，可得 <span
+class="math inline"><em>μ</em>|<em>X</em></span> 仍服从正态分布，且： *
+后验精度：<span class="math inline">$\frac{1}{\sigma_n^2} =
+\frac{1}{\sigma_0^2} + \frac{n}{\sigma^2}$</span></p>
+<ul>
+<li>后验均值：<span class="math inline">$\mu_n =
+\frac{\frac{1}{\sigma_0^2}\mu_0 +
+\frac{n}{\sigma^2}\bar{x}}{\frac{1}{\sigma_0^2} +
+\frac{n}{\sigma^2}}$</span></li>
+</ul>
+<h2 id="总结">5.5 总结</h2>
+<p>本章系统地介绍了贝叶斯估计，旨在解决极大似然估计（MLE）在数据稀缺时容易过拟合及产生偏差的问题。</p>
+<p>我们从贝叶斯公式出发，确立了后验分布 <span
+class="math inline">∝</span> 似然函数 <span class="math inline">×</span>
+先验分布的核心推断框架。为了解决贝叶斯推断中分母（边缘似然）难以积分计算的痛点，本章重点讲解了两条捷径：
+1.
+最大后验概率（MAP）：通过寻找后验概率最大的点来代替完整分布，并揭示了它在机器学习中等价于带正则项（L1/L2）的
+MLE 这一重要本质。 2. 共轭先验：通过选择与似然函数匹配的特定先验分布（如
+Beta-二项、Gamma-泊松、正态-正态），使得后验分布保持相同的函数形式，从而将复杂的概率积分转化为简单的参数更新。</p>
+<p>归根结底，贝叶斯估计体现了数据与信念的动态折中。当数据不足时，先验知识能防止模型走偏；当数据充足时，观测事实则会主导结果。这是现代统计学习中处理不确定性和防止过拟合的数学基石。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
