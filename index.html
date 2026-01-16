@@ -1214,7 +1214,7 @@ K-Means 初始化）是打破僵局、提升效果的标准范式。</p>
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-01-16 15:17:32 / Modified: 15:52:18" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
+      <time title="Created: 2026-01-16 15:17:32 / Modified: 15:56:02" itemprop="dateCreated datePublished" datetime="2026-01-16T15:17:32+08:00">2026-01-16</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1489,9 +1489,9 @@ class="math inline"><em>p</em>(<em>θ</em>|<em>X</em>)</span> 与先验分布
 属于同一种分布。这样做的好处是，我们完全不需要做积分，只需要做简单的加法来更新参数即可。</p>
 <p>我们先给出结论，并通过例子解释结论怎么用，最后推导结论。</p>
 <h3 id="共轭分布大全">5.4.1 共轭分布大全</h3>
-<p>符号说明： * <span
-class="math inline"><em>n</em></span>：样本数量</p>
+<p>符号说明：</p>
 <ul>
+<li><p><span class="math inline"><em>n</em></span>：样本数量</p></li>
 <li><p><span
 class="math inline">∑<em>x</em><sub><em>i</em></sub></span>：样本观测值的总和</p></li>
 <li><p><span
@@ -1722,8 +1722,15 @@ class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em> + <
 class="math display"><em>p</em>(<em>θ</em>) = Beta(<em>α</em>, <em>β</em>) ∝ <em>θ</em><sup><em>α</em> − 1</sup>(1 − <em>θ</em>)<sup><em>β</em> − 1</sup>（<em>根</em><em>据</em><em>B</em><em>e</em><em>t</em><em>a</em><em>分</em><em>布</em><em>的</em><em>概</em><em>率</em><em>密</em><em>度</em><em>函</em><em>数</em>）</span></p>
 <p><span
 class="math display"><em>p</em>(<em>X</em>|<em>θ</em>) = <em>C</em><sub><em>n</em></sub><sup><em>k</em></sup><em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup> ∝ <em>θ</em><sup><em>k</em></sup>(1 − <em>θ</em>)<sup><em>n</em> − <em>k</em></sup></span></p>
-$$
-<p>$$</p>
+<p><span
+class="math display"><em>P</em>(<em>θ</em>|<em>X</em>) ∝ <em>P</em>(<em>θ</em>) ⋅ <em>P</em>(<em>X</em>|<em>θ</em>)</span></p>
+<p><span class="math display">$$
+\phantom{P(\theta|X)} \propto \theta^{\alpha-1}(1-\theta)^{\beta-1}
+\cdot \theta^k (1-\theta)^{n-k}
+$$</span></p>
+<p><span class="math display">$$
+\phantom{P(\theta|X)} = \theta^{(\alpha+k)-1} (1-\theta)^{(\beta+n-k)-1}
+$$</span></p>
 <p>即 <span class="math inline"><em>θ</em>|<em>X</em></span> 服从 Beta
 分布 <span
 class="math inline"><em>B</em><em>e</em><em>t</em><em>a</em>(<em>α</em> + <em>k</em>, <em>β</em> + <em>n</em> − <em>k</em>)</span>。</p>
