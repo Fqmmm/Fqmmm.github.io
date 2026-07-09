@@ -1,0 +1,2404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  逻辑在知识表示中的位置 命题逻辑：用真假命题描述世界 一阶谓词逻辑：表示对象、关系与量词 语义、模型与逻辑蕴含 推理规则与合一 逻辑推理案例：金融投资顾问 归结反证：把证明问题变成矛盾检测 子句形转换：归结推理的标准输入格式 归结推理的典型例题与答案抽取 归结策略、Herbrand 结构与语义树 其他逻辑系统：默认推理、模态逻辑与真值维护 Horn 子句与 Pro">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Logics and Prolog">
+<meta property="og:url" content="http://example.com/2026/07/09/AI/Logics%20and%20Prolog/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  逻辑在知识表示中的位置 命题逻辑：用真假命题描述世界 一阶谓词逻辑：表示对象、关系与量词 语义、模型与逻辑蕴含 推理规则与合一 逻辑推理案例：金融投资顾问 归结反证：把证明问题变成矛盾检测 子句形转换：归结推理的标准输入格式 归结推理的典型例题与答案抽取 归结策略、Herbrand 结构与语义树 其他逻辑系统：默认推理、模态逻辑与真值维护 Horn 子句与 Pro">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530173942531.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606100442535.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606094120879.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606094515412.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606094537621.png">
+<meta property="article:published_time" content="2026-07-09T07:12:29.447Z">
+<meta property="article:modified_time" content="2026-07-09T07:12:29.448Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="Prolog">
+<meta property="article:tag" content="归结推理">
+<meta property="article:tag" content="谓词逻辑">
+<meta property="article:tag" content="逻辑">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530173942531.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/AI/Logics%20and%20Prolog/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/AI/Logics%20and%20Prolog/","path":"2026/07/09/AI/Logics and Prolog/","title":"Logics and Prolog"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Logics and Prolog | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E5%9C%A8%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA%E4%B8%AD%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">1 逻辑在知识表示中的位置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA%E9%9C%80%E8%A6%81%E9%80%BB%E8%BE%91"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 为什么知识表示需要逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E5%AD%A6%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%BA%94%E8%A6%81%E7%B4%A0"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 逻辑学系统的五要素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E4%B8%BB%E7%BA%BF"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 本章主线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E9%A2%98%E9%80%BB%E8%BE%91%E7%94%A8%E7%9C%9F%E5%81%87%E5%91%BD%E9%A2%98%E6%8F%8F%E8%BF%B0%E4%B8%96%E7%95%8C"><span class="nav-number">3.</span> <span class="nav-text">2 命题逻辑：用真假命题描述世界</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E9%A2%98%E9%80%BB%E8%BE%91%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%AC%A6%E5%8F%B7"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 命题逻辑的基本符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E9%A2%98%E9%80%BB%E8%BE%91%E7%9A%84%E8%AF%AD%E4%B9%89"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 命题逻辑的语义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E9%80%BB%E8%BE%91%E7%AD%89%E4%BB%B7%E5%BC%8F"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 常用逻辑等价式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E9%98%B6%E8%B0%93%E8%AF%8D%E9%80%BB%E8%BE%91%E8%A1%A8%E7%A4%BA%E5%AF%B9%E8%B1%A1%E5%85%B3%E7%B3%BB%E4%B8%8E%E9%87%8F%E8%AF%8D"><span class="nav-number">4.</span> <span class="nav-text">3
+一阶谓词逻辑：表示对象、关系与量词</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%91%BD%E9%A2%98%E9%80%BB%E8%BE%91%E4%B8%8D%E5%A4%9F%E7%94%A8"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 为什么命题逻辑不够用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E9%98%B6%E9%80%BB%E8%BE%91%E7%9A%84%E7%AC%A6%E5%8F%B7%E4%B8%8E%E9%A1%B9"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 一阶逻辑的符号与项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E5%8F%A5%E5%AD%90%E4%B8%8E%E5%A4%8D%E5%90%88%E5%8F%A5%E5%AD%90"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 原子句子与复合句子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%87%8F%E8%AF%8D%E5%85%A8%E7%A7%B0%E4%B8%8E%E5%AD%98%E5%9C%A8"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 量词：全称与存在</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E9%98%B6%E9%80%BB%E8%BE%91%E8%A1%A8%E8%BE%BE%E5%AE%9E%E4%BE%8B"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 一阶逻辑表达实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E9%98%B6%E4%B8%8E%E9%AB%98%E9%98%B6%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 一阶与高阶的区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E6%A8%A1%E5%9E%8B%E4%B8%8E%E9%80%BB%E8%BE%91%E8%95%B4%E5%90%AB"><span class="nav-number">5.</span> <span class="nav-text">4 语义、模型与逻辑蕴含</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E9%87%8A%E7%AC%A6%E5%8F%B7%E5%A6%82%E4%BD%95%E8%8E%B7%E5%BE%97%E6%84%8F%E4%B9%89"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 解释：符号如何获得意义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%A1%E8%B6%B3%E6%A8%A1%E5%9E%8B%E5%8F%AF%E6%BB%A1%E8%B6%B3%E6%9C%89%E6%95%88%E4%B8%8E%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="nav-number">5.2.</span> <span class="nav-text">4.2
+满足、模型、可满足、有效与不一致</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">5.2.1.</span> <span class="nav-text">4.2.1 例子</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#the-oedipus"><span class="nav-number">5.2.2.</span> <span class="nav-text">4.2.2 The Oedipus</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E8%95%B4%E5%90%AB"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 逻辑蕴含</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E8%A7%84%E5%88%99%E4%B8%8E%E5%90%88%E4%B8%80"><span class="nav-number">6.</span> <span class="nav-text">5 推理规则与合一</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%81%E6%98%8E%E8%BF%87%E7%A8%8B%E5%8F%AF%E9%9D%A0%E6%80%A7%E4%B8%8E%E5%AE%8C%E5%A4%87%E6%80%A7"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 证明过程、可靠性与完备性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%8E%A8%E7%90%86%E8%A7%84%E5%88%99"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 常用推理规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%88%E4%B8%80%E8%AE%A9%E4%B8%A4%E4%B8%AA%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%8C%B9%E9%85%8D"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 合一：让两个表达式匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%88%E4%B8%80%E4%BE%8B%E5%AD%90"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 合一例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E6%8E%A8%E7%90%86%E6%A1%88%E4%BE%8B%E9%87%91%E8%9E%8D%E6%8A%95%E8%B5%84%E9%A1%BE%E9%97%AE"><span class="nav-number">7.</span> <span class="nav-text">6 逻辑推理案例：金融投资顾问</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%AE%BE%E5%AE%9A"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 问题设定</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%84%E5%88%99%E5%BD%A2%E5%BC%8F%E5%8C%96"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 规则形式化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 推理过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E7%BB%93%E5%8F%8D%E8%AF%81%E6%8A%8A%E8%AF%81%E6%98%8E%E9%97%AE%E9%A2%98%E5%8F%98%E6%88%90%E7%9F%9B%E7%9B%BE%E6%A3%80%E6%B5%8B"><span class="nav-number">8.</span> <span class="nav-text">7
+归结反证：把证明问题变成矛盾检测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%92%E7%BB%93%E5%8F%8D%E8%AF%81%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 归结反证的基本思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%92%E7%BB%93%E5%8F%8D%E8%AF%81%E6%AD%A5%E9%AA%A4"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 归结反证步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8B%97%E4%B8%8E%E6%AD%BB%E4%BA%A1%E4%BE%8B%E5%AD%90"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 狗与死亡例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%90%E5%8F%A5%E5%BD%A2%E8%BD%AC%E6%8D%A2%E5%BD%92%E7%BB%93%E6%8E%A8%E7%90%86%E7%9A%84%E6%A0%87%E5%87%86%E8%BE%93%E5%85%A5%E6%A0%BC%E5%BC%8F"><span class="nav-number">9.</span> <span class="nav-text">8
+子句形转换：归结推理的标准输入格式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%AD%90%E5%8F%A5%E5%BD%A2"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 什么是子句形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%90%E5%8F%A5%E5%BD%A2%E8%BD%AC%E6%8D%A2%E6%AD%A5%E9%AA%A4"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 子句形转换步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5%E6%B6%88%E5%8E%BB%E8%95%B4%E5%90%AB"><span class="nav-number">9.2.1.</span> <span class="nav-text">第一步：消去蕴含</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5%E5%B0%86%E5%90%A6%E5%AE%9A%E5%90%91%E5%86%85%E6%8E%A8%E8%BF%9B"><span class="nav-number">9.2.2.</span> <span class="nav-text">第二步：将否定向内推进</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E6%AD%A5%E5%8F%98%E9%87%8F%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">9.2.3.</span> <span class="nav-text">第三步：变量标准化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E5%9B%9B%E6%AD%A5%E5%89%8D%E6%9D%9F%E5%8C%96"><span class="nav-number">9.2.4.</span> <span class="nav-text">第四步：前束化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%94%E6%AD%A5skolem-%E5%8C%96%E6%B6%88%E5%8E%BB%E5%AD%98%E5%9C%A8%E9%87%8F%E8%AF%8D"><span class="nav-number">9.2.5.</span> <span class="nav-text">第五步：Skolem
+化，消去存在量词</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E5%85%AD%E6%AD%A5%E5%88%A0%E9%99%A4%E5%85%A8%E7%A7%B0%E9%87%8F%E8%AF%8D"><span class="nav-number">9.2.6.</span> <span class="nav-text">第六步：删除全称量词</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%83%E6%AD%A5%E8%BD%AC%E6%88%90%E5%90%88%E5%8F%96%E8%8C%83%E5%BC%8F"><span class="nav-number">9.2.7.</span> <span class="nav-text">第七步：转成合取范式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E5%85%AB%E6%AD%A5%E6%8B%86%E6%88%90%E5%8D%95%E7%8B%AC%E5%AD%90%E5%8F%A5"><span class="nav-number">9.2.8.</span> <span class="nav-text">第八步：拆成单独子句</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B9%9D%E6%AD%A5%E5%86%8D%E6%AC%A1%E6%A0%87%E5%87%86%E5%8C%96%E5%8F%98%E9%87%8F"><span class="nav-number">9.2.9.</span> <span class="nav-text">第九步：再次标准化变量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#skolem-%E5%8C%96%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 Skolem 化的理解</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E7%BB%93%E6%8E%A8%E7%90%86%E7%9A%84%E5%85%B8%E5%9E%8B%E4%BE%8B%E9%A2%98%E4%B8%8E%E7%AD%94%E6%A1%88%E6%8A%BD%E5%8F%96"><span class="nav-number">10.</span> <span class="nav-text">9
+归结推理的典型例题与答案抽取</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%AB%E4%B9%90%E5%AD%A6%E7%94%9F%E4%BE%8B%E5%AD%90"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 快乐学生例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B2%BE%E5%BD%A9%E4%BA%BA%E7%94%9F%E4%BE%8B%E5%AD%90"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 精彩人生例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%96%E7%88%B6%E6%AF%8D%E4%BE%8B%E5%AD%90"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 祖父母例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BD%92%E7%BB%93%E7%AD%96%E7%95%A5herbrand-%E7%BB%93%E6%9E%84%E4%B8%8E%E8%AF%AD%E4%B9%89%E6%A0%91"><span class="nav-number">11.</span> <span class="nav-text">10 归结策略、Herbrand
+结构与语义树</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%92%E7%BB%93%E7%AD%96%E7%95%A5"><span class="nav-number">11.1.</span> <span class="nav-text">10.1 归结策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#herbrand-%E8%AE%BA%E5%9F%9F"><span class="nav-number">11.2.</span> <span class="nav-text">10.2 Herbrand 论域</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%88%E6%8A%8A%E5%AE%83%E7%90%86%E8%A7%A3%E6%88%90%E7%AC%A6%E5%8F%B7%E4%B8%96%E7%95%8C"><span class="nav-number">11.2.1.</span> <span class="nav-text">10.2.1 先把它理解成“符号世界”</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B2%A1%E6%9C%89%E5%87%BD%E6%95%B0%E6%97%B6%E8%AE%BA%E5%9F%9F%E5%B0%B1%E6%98%AF%E5%B7%B2%E6%9C%89%E5%B8%B8%E9%87%8F"><span class="nav-number">11.2.2.</span> <span class="nav-text">10.2.2
+没有函数时：论域就是已有常量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%89%E5%87%BD%E6%95%B0%E6%97%B6%E4%B8%8D%E6%96%AD%E6%9E%84%E9%80%A0%E6%96%B0%E5%AF%B9%E8%B1%A1"><span class="nav-number">11.2.3.</span> <span class="nav-text">10.2.3 有函数时：不断构造新对象</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A3%E5%BC%8F%E5%AE%9A%E4%B9%89%E4%BB%8E-h_0-%E4%B8%80%E5%B1%82%E5%B1%82%E7%94%9F%E6%88%90"><span class="nav-number">11.2.4.</span> <span class="nav-text">10.2.4 正式定义：从 H0 一层层生成</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%83%E4%B8%BA%E4%BB%80%E4%B9%88%E5%AF%B9%E5%BD%92%E7%BB%93%E6%8E%A8%E7%90%86%E6%9C%89%E7%94%A8"><span class="nav-number">11.2.5.</span> <span class="nav-text">10.2.5 它为什么对归结推理有用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E6%A0%91"><span class="nav-number">11.3.</span> <span class="nav-text">10.3 语义树</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E9%80%BB%E8%BE%91%E7%B3%BB%E7%BB%9F%E9%BB%98%E8%AE%A4%E6%8E%A8%E7%90%86%E6%A8%A1%E6%80%81%E9%80%BB%E8%BE%91%E4%B8%8E%E7%9C%9F%E5%80%BC%E7%BB%B4%E6%8A%A4"><span class="nav-number">12.</span> <span class="nav-text">11
+其他逻辑系统：默认推理、模态逻辑与真值维护</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">12.1.</span> <span class="nav-text">11.1 逻辑系统的分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%BB%98%E8%AE%A4%E6%8E%A8%E7%90%86"><span class="nav-number">12.2.</span> <span class="nav-text">11.2 默认推理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E6%80%81%E9%80%BB%E8%BE%91"><span class="nav-number">12.3.</span> <span class="nav-text">11.3 模态逻辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9C%9F%E5%80%BC%E7%BB%B4%E6%8A%A4%E7%B3%BB%E7%BB%9F"><span class="nav-number">12.4.</span> <span class="nav-text">11.4 真值维护系统</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#horn-%E5%AD%90%E5%8F%A5%E4%B8%8E-prolog-%E7%9A%84%E9%80%BB%E8%BE%91%E5%9F%BA%E7%A1%80"><span class="nav-number">13.</span> <span class="nav-text">12 Horn 子句与 Prolog
+的逻辑基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#horn-%E5%AD%90%E5%8F%A5"><span class="nav-number">13.1.</span> <span class="nav-text">12.1 Horn 子句</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#horn-%E5%AD%90%E5%8F%A5%E7%9A%84%E4%B8%89%E7%A7%8D%E5%BD%A2%E5%BC%8F"><span class="nav-number">13.2.</span> <span class="nav-text">12.2 Horn 子句的三种形式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#prolog-%E7%A8%8B%E5%BA%8F%E6%89%A7%E8%A1%8C%E5%90%88%E4%B8%80%E5%9B%9E%E6%BA%AF%E4%B8%8E%E6%90%9C%E7%B4%A2%E9%A1%BA%E5%BA%8F"><span class="nav-number">14.</span> <span class="nav-text">13 Prolog
+程序执行：合一、回溯与搜索顺序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#prolog-%E5%A6%82%E4%BD%95%E8%AF%81%E6%98%8E%E4%B8%80%E4%B8%AA%E7%9B%AE%E6%A0%87"><span class="nav-number">14.1.</span> <span class="nav-text">13.1 Prolog 如何证明一个目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#prolog-%E8%AF%AD%E6%B3%95%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB"><span class="nav-number">14.2.</span> <span class="nav-text">13.2 Prolog 语法对应关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E4%B8%8E%E5%9B%9E%E6%BA%AF"><span class="nav-number">14.3.</span> <span class="nav-text">13.3 查询与回溯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%90%E5%8F%A5%E9%A1%BA%E5%BA%8F%E5%92%8C%E7%9B%AE%E6%A0%87%E9%A1%BA%E5%BA%8F%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">14.4.</span> <span class="nav-text">13.4 子句顺序和目标顺序的影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#prolog-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E5%85%B8%E5%9E%8B%E7%A8%8B%E5%BA%8F"><span class="nav-number">15.</span> <span class="nav-text">14 Prolog 数据结构与典型程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%97%E8%A1%A8%E4%B8%8E%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D"><span class="nav-number">15.1.</span> <span class="nav-text">14.1 列表与模式匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#member-%E8%B0%93%E8%AF%8D"><span class="nav-number">15.2.</span> <span class="nav-text">14.2 member 谓词</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%90%E5%8F%A5%E4%B8%8E%E7%9B%AE%E6%A0%87%E9%87%8D%E6%8E%92predecessor-%E4%BE%8B%E5%AD%90"><span class="nav-number">15.3.</span> <span class="nav-text">14.3 子句与目标重排：predecessor
+例子</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E5%A7%8B%E5%86%99%E6%B3%95"><span class="nav-number">15.3.1.</span> <span class="nav-text">14.3.1 原始写法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#variation1"><span class="nav-number">15.3.2.</span> <span class="nav-text">14.3.2 Variation1</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#variation2"><span class="nav-number">15.3.3.</span> <span class="nav-text">14.3.3 Variation2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#variation3"><span class="nav-number">15.3.4.</span> <span class="nav-text">14.3.4 Variation3</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AA%91%E5%A3%AB%E5%B7%A1%E6%B8%B8%E9%97%AE%E9%A2%98%E6%90%9C%E7%B4%A2%E9%81%BF%E5%85%8D%E9%87%8D%E5%A4%8D%E4%B8%8E%E5%9B%9E%E6%BA%AF"><span class="nav-number">15.4.</span> <span class="nav-text">14.4
+骑士巡游问题：搜索、避免重复与回溯</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cut%E6%8E%A7%E5%88%B6%E6%90%9C%E7%B4%A2"><span class="nav-number">15.5.</span> <span class="nav-text">14.5 cut：控制搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%9C%E5%A4%AB%E7%8B%BC%E7%BE%8A%E5%92%8C%E7%99%BD%E8%8F%9C%E9%97%AE%E9%A2%98"><span class="nav-number">15.6.</span> <span class="nav-text">14.6 农夫、狼、羊和白菜问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9B%E7%B1%BB%E7%A7%BB%E5%8A%A8%E8%A7%84%E5%88%99"><span class="nav-number">15.6.1.</span> <span class="nav-text">14.6.1 四类移动规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9B%9E%E6%BA%AF%E6%8F%90%E7%A4%BA%E8%B7%AF%E5%BE%84%E6%90%9C%E7%B4%A2%E5%92%8C%E4%B8%A4%E5%B2%B8%E5%85%B3%E7%B3%BB"><span class="nav-number">15.6.2.</span> <span class="nav-text">14.6.2
+回溯提示、路径搜索和两岸关系</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">15.6.3.</span> <span class="nav-text">14.6.3 启动程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E8%BF%87%E7%A8%8B"><span class="nav-number">15.6.4.</span> <span class="nav-text">14.6.4 运行过程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%A2%B3%E7%90%86"><span class="nav-number">16.</span> <span class="nav-text">15 重点梳理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E6%9C%80%E6%A0%B8%E5%BF%83%E7%9A%84%E6%A6%82%E5%BF%B5%E9%93%BE"><span class="nav-number">16.1.</span> <span class="nav-text">15.1 本章最核心的概念链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E9%A2%91%E6%98%93%E6%B7%B7%E7%82%B9"><span class="nav-number">16.2.</span> <span class="nav-text">15.2 高频易混点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%9A%E9%A2%98%E6%97%B6%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%A5%97%E8%B7%AF"><span class="nav-number">16.3.</span> <span class="nav-text">15.3 做题时的基本套路</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">16.4.</span> <span class="nav-text">15.4 参考资料</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/Logics%20and%20Prolog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Logics and Prolog | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Logics and Prolog
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:12:29" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="目录">目录</h2>
+<ul>
+<li>逻辑在知识表示中的位置</li>
+<li>命题逻辑：用真假命题描述世界</li>
+<li>一阶谓词逻辑：表示对象、关系与量词</li>
+<li>语义、模型与逻辑蕴含</li>
+<li>推理规则与合一</li>
+<li>逻辑推理案例：金融投资顾问</li>
+<li>归结反证：把证明问题变成矛盾检测</li>
+<li>子句形转换：归结推理的标准输入格式</li>
+<li>归结推理的典型例题与答案抽取</li>
+<li>归结策略、Herbrand 结构与语义树</li>
+<li>其他逻辑系统：默认推理、模态逻辑与真值维护</li>
+<li>Horn 子句与 Prolog 的逻辑基础</li>
+<li>Prolog 程序执行：合一、回溯与搜索顺序</li>
+<li>Prolog 数据结构与典型程序</li>
+<li>重点梳理</li>
+</ul>
+<h2 id="逻辑在知识表示中的位置">1 逻辑在知识表示中的位置</h2>
+<h3 id="为什么知识表示需要逻辑">1.1 为什么知识表示需要逻辑</h3>
+<p>本章属于“知识表示基础”（Foundation of Knowledge
+Representation）的一部分。材料一开始把知识表示的基础分成三类：<strong>逻辑（Logics）</strong>、<strong>本体（Ontology）</strong>和<strong>计算理论（Theory
+of
+Computation）</strong>。其中逻辑负责回答一个最根本的问题：如果系统已经知道一些事实和规则，它怎样才能严格地推出新的结论？</p>
+<p>例如，一个专家系统知道“所有人都会死”和“苏格拉底是人”，它应该能够推出“苏格拉底会死”。这个过程看似符合常识，但对于机器来说必须被形式化，否则系统就无法判断哪些结论是可靠的、哪些结论只是猜测。因此，逻辑在人工智能中的作用可以概括为两点：第一，它提供一种<strong>精确表示知识的语言</strong>；第二，它提供一套<strong>从已有知识推出新知识的推理规则</strong>。</p>
+<h3 id="逻辑学系统的五要素">1.2 逻辑学系统的五要素</h3>
+<p>老师提到的“逻辑学系统五要素”可以看成本章的总纲。一个逻辑系统要能工作，必须先规定<strong>能用哪些记号写东西</strong>，再规定<strong>哪些表达式能表示对象、哪些表达式能判断真假</strong>，然后规定<strong>这些真假句子在什么情况下成立</strong>，最后规定<strong>怎样从已有句子推出新句子</strong>。这五个要素分别是：<strong>符号、项、语句、语义、推理</strong>。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">要素</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">作用</th>
+<th style="text-align: left;">简单理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">符号</td>
+<td style="text-align: left;">Symbols</td>
+<td style="text-align: left;">提供逻辑语言的基本记号</td>
+<td style="text-align: left;">逻辑系统的“字母表”</td>
+</tr>
+<tr>
+<td style="text-align: left;">项</td>
+<td style="text-align: left;">Terms</td>
+<td style="text-align: left;">表示论域中的对象</td>
+<td style="text-align: left;">能指向某个东西的表达式</td>
+</tr>
+<tr>
+<td style="text-align: left;">语句</td>
+<td style="text-align: left;">Sentences</td>
+<td style="text-align: left;">表示可以判真假的命题</td>
+<td style="text-align: left;">能说“真/假”的完整表达式</td>
+</tr>
+<tr>
+<td style="text-align: left;">语义</td>
+<td style="text-align: left;">Semantics</td>
+<td style="text-align: left;">解释符号和语句的含义</td>
+<td style="text-align: left;">规定一个语句什么时候为真</td>
+</tr>
+<tr>
+<td style="text-align: left;">推理</td>
+<td style="text-align: left;">Inference</td>
+<td style="text-align: left;">从已有语句推出新语句</td>
+<td style="text-align: left;">规定怎样合法地证明结论</td>
+</tr>
+</tbody>
+</table>
+<p><strong>符号（Symbols）</strong>是逻辑系统允许使用的基本材料。在一阶逻辑中，符号包括常量符号
+<span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em>, <em>s</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>, 0</span>，变量符号
+<span
+class="math inline"><em>x</em>, <em>y</em>, <em>z</em></span>，函数符号
+<span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>, <em>s</em><em>u</em><em>m</em></span>，谓词符号
+<span
+class="math inline"><em>m</em><em>a</em><em>n</em>, <em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>, <em>g</em><em>r</em><em>e</em><em>a</em><em>t</em><em>e</em><em>r</em></span>，逻辑符号
+<span
+class="math inline">∧, ∨, ¬,→,∀,∃</span>，以及括号、逗号等辅助符号。符号本身还不一定构成完整意义，它们更像搭建逻辑表达式的零件。</p>
+<p><strong>项（Terms）</strong>是用来指称对象的表达式。常量是项，变量是项，函数作用在项上得到的结果也是项。例如
+<span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span>、<span
+class="math inline"><em>x</em></span>、<span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+都是项。项本身不能判断真假，因为它只是表示“某个东西”。比如 <span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+表示 John 的父亲这个对象，但它还不是一句命题。</p>
+<p><strong>语句（Sentences）</strong>是可以判断真假的完整表达式。比如
+<span
+class="math inline"><em>m</em><em>a</em><em>n</em>(<em>s</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span>
+表示“苏格拉底是人”，<span
+class="math inline"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>m</em><em>a</em><em>r</em><em>y</em>)</span>
+表示“John 是 Mary
+的父母”，它们都可以在某个解释下判定为真或假。语句还可以通过联结词和量词构成更复杂的表达式，例如：</p>
+<p><span
+class="math display">∀<em>x</em>(<em>m</em><em>a</em><em>n</em>(<em>x</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>x</em>))</span></p>
+<p>这句话表示“所有人都会死”。因此，项和语句的区别非常关键：<span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span> 和
+<span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+是对象表达式，不能直接说真假；<span
+class="math inline"><em>m</em><em>a</em><em>n</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+和 <span
+class="math inline"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>m</em><em>a</em><em>r</em><em>y</em>)</span>
+是语句，可以判断真假。</p>
+<p><strong>语义（Semantics）</strong>负责解释这些符号到底代表什么，以及语句什么时候为真。例如公式
+<span
+class="math inline"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>m</em><em>a</em><em>r</em><em>y</em>)</span>
+光看符号无法知道真假，必须给出解释：<span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span>
+指哪个对象，<span
+class="math inline"><em>m</em><em>a</em><em>r</em><em>y</em></span>
+指哪个对象，<span
+class="math inline"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>x</em>, <em>y</em>)</span>
+表示什么关系。如果在这个解释下 John 确实是 Mary
+的父母，那么该语句为真；否则为假。对于带量词的语句，语义还要规定变量在什么论域中取值。</p>
+<p><strong>推理（Inference）</strong>规定怎样从已有语句推出新语句。例如已知：</p>
+<p><span
+class="math display">∀<em>x</em>(<em>m</em><em>a</em><em>n</em>(<em>x</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>x</em>))</span></p>
+<p>以及：</p>
+<p><span
+class="math display"><em>m</em><em>a</em><em>n</em>(<em>s</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<p>可以先通过全称实例化得到：</p>
+<p><span
+class="math display"><em>m</em><em>a</em><em>n</em>(<em>s</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>s</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<p>再通过假言推理推出：</p>
+<p><span
+class="math display"><em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>s</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<p>这就是推理。后面的合一、归结反证和
+Prolog，本质上都是在研究怎样把这种推理过程机械化。</p>
+<p>一句话总结：<strong>符号规定能写什么，项表示对象，语句表示真假命题，语义规定命题什么时候为真，推理规定怎样从已有真命题推出新命题。</strong></p>
+<h3 id="本章主线">1.3 本章主线</h3>
+<p>本章的主线可以理解为从“表达能力较弱但简单”的逻辑，逐步走向“表达能力更强、并能用于程序执行”的逻辑系统。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">层次</th>
+<th style="text-align: left;">核心问题</th>
+<th style="text-align: left;">代表内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">命题逻辑（Propositional Logic）</td>
+<td style="text-align: left;">命题整体是真是假</td>
+<td style="text-align: left;">命题符号、联结词、真值表、等价式</td>
+</tr>
+<tr>
+<td style="text-align: left;">一阶谓词逻辑（First-Order Logic）</td>
+<td style="text-align: left;">对象之间有什么关系</td>
+<td style="text-align: left;">常量、变量、函数、谓词、量词、解释</td>
+</tr>
+<tr>
+<td style="text-align: left;">自动推理（Automated Reasoning）</td>
+<td style="text-align: left;">怎样机械地证明结论</td>
+<td style="text-align: left;">合一、子句形、归结反证</td>
+</tr>
+<tr>
+<td style="text-align: left;">逻辑程序设计（Logic Programming）</td>
+<td style="text-align: left;">让逻辑规则直接作为程序运行</td>
+<td style="text-align: left;">Horn 子句、Prolog、回溯、cut</td>
+</tr>
+</tbody>
+</table>
+<p>课程梳理时不要把这些内容看成孤立概念。<strong>命题逻辑提供基本真值语义，一阶谓词逻辑增加对象和量词，归结推理把一阶逻辑证明转化为可机械执行的步骤，而
+Prolog 则把 Horn 子句上的归结推理实现成一种编程语言。</strong></p>
+<h2 id="命题逻辑用真假命题描述世界">2 命题逻辑：用真假命题描述世界</h2>
+<h3 id="命题逻辑的基本符号">2.1 命题逻辑的基本符号</h3>
+<p><strong>命题逻辑（Propositional
+Logic）</strong>把世界描述为一组可以判定真假的命题。命题符号通常写作
+<span
+class="math inline"><em>P</em>, <em>Q</em>, <em>R</em>, <em>S</em>, …</span>，每个符号代表一个完整陈述，例如“今天下雨”“地面是湿的”“灯是亮的”。命题逻辑不关心命题内部结构，只关心整个命题的真假。</p>
+<p>命题逻辑中常用的符号如下。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">中文含义</th>
+<th style="text-align: left;">直观解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>t</em><em>r</em><em>u</em><em>e</em>, <em>f</em><em>a</em><em>l</em><em>s</em><em>e</em></span></td>
+<td style="text-align: left;">truth symbols</td>
+<td style="text-align: left;">真值符号</td>
+<td style="text-align: left;">表示真或假</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">∧</span></td>
+<td style="text-align: left;">conjunction</td>
+<td style="text-align: left;">合取/与</td>
+<td style="text-align: left;">两边都真才真</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">∨</span></td>
+<td style="text-align: left;">disjunction</td>
+<td style="text-align: left;">析取/或</td>
+<td style="text-align: left;">至少一边真就真</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">¬</span></td>
+<td style="text-align: left;">negation</td>
+<td style="text-align: left;">否定/非</td>
+<td style="text-align: left;">真变假，假变真</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">→</span></td>
+<td style="text-align: left;">implication</td>
+<td style="text-align: left;">蕴含/如果则</td>
+<td style="text-align: left;">前件真而后件假时才假</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">≡</span></td>
+<td style="text-align: left;">equivalence</td>
+<td style="text-align: left;">等价</td>
+<td style="text-align: left;">两边在所有解释下真值相同</td>
+</tr>
+</tbody>
+</table>
+<p>这里的“命题演算句子”（propositional calculus
+sentences）其实就是合法公式。合法公式也称为<strong>合式公式（well-formed
+formula, WFF）</strong>。例如 <span
+class="math inline"><em>P</em></span>、<span
+class="math inline">¬<em>P</em></span>、<span
+class="math inline"><em>P</em> ∧ <em>Q</em></span>、<span
+class="math inline"><em>P</em> ∨ ¬<em>Q</em></span>、<span
+class="math inline"><em>P</em> → <em>Q</em></span> 都是合式公式；而
+<span class="math inline"><em>P</em>∧</span> 或 <span
+class="math inline"> → <em>Q</em></span>
+不是合式公式，因为符号组合不完整。</p>
+<h3 id="命题逻辑的语义">2.2 命题逻辑的语义</h3>
+<p>命题逻辑的语义来自<strong>解释（interpretation）</strong>。一个解释就是给每个命题符号分配一个真值。例如，如果
+<span class="math inline"><em>P</em></span> 表示“下雨”，<span
+class="math inline"><em>Q</em></span> 表示“地面湿”，那么一个解释可以是
+<span
+class="math inline"><em>P</em> = <em>t</em><em>r</em><em>u</em><em>e</em>, <em>Q</em> = <em>f</em><em>a</em><em>l</em><em>s</em><em>e</em></span>，表示“下雨但地面不湿”。</p>
+<p>在给定解释之后，复合公式的真假由联结词决定。否定 <span
+class="math inline">¬<em>P</em></span> 的真值与 <span
+class="math inline"><em>P</em></span> 相反；合取 <span
+class="math inline"><em>P</em> ∧ <em>Q</em></span> 只有在 <span
+class="math inline"><em>P</em></span> 和 <span
+class="math inline"><em>Q</em></span> 都为真时才为真；析取 <span
+class="math inline"><em>P</em> ∨ <em>Q</em></span> 只有在 <span
+class="math inline"><em>P</em></span> 和 <span
+class="math inline"><em>Q</em></span> 都为假时才为假；蕴含 <span
+class="math inline"><em>P</em> → <em>Q</em></span> 只有在 <span
+class="math inline"><em>P</em></span> 为真且 <span
+class="math inline"><em>Q</em></span> 为假时才为假。</p>
+<p>蕴含最容易混淆。<span
+class="math inline"><em>P</em> → <em>Q</em></span> 读作“如果 <span
+class="math inline"><em>P</em></span>，那么 <span
+class="math inline"><em>Q</em></span>”。它不是说 <span
+class="math inline"><em>P</em></span> 一定发生，也不是说 <span
+class="math inline"><em>Q</em></span> 一定由 <span
+class="math inline"><em>P</em></span> 造成，而是说“不允许出现 <span
+class="math inline"><em>P</em></span> 真而 <span
+class="math inline"><em>Q</em></span> 假的情况”。例如：</p>
+<p><span class="math display">It has rained → Ground is wet</span></p>
+<p>这个公式在“下雨且地面不湿”时为假，在其他情况下都为真。特别是如果没有下雨，无论地面是否湿，整个蕴含式在经典逻辑中都为真。这种现象叫作<strong>空真（vacuous
+truth）</strong>，是理解蕴含真值表时的关键。</p>
+<h3 id="常用逻辑等价式">2.3 常用逻辑等价式</h3>
+<p>逻辑等价表示两个公式在所有可能解释下真值都相同。这里列出了一组常用等价式，这些等价式在后面“化为子句形”时会反复使用。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">等价式</th>
+<th style="text-align: left;">名称</th>
+<th style="text-align: left;">用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">¬(¬<em>P</em>) ≡ <em>P</em></span></td>
+<td style="text-align: left;">双重否定律</td>
+<td style="text-align: left;">消去连续否定</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> ∨ <em>Q</em> ≡ ¬<em>P</em> → <em>Q</em></span></td>
+<td style="text-align: left;">蕴含与析取转换</td>
+<td style="text-align: left;">把蕴含改写为析取</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> → <em>Q</em> ≡ ¬<em>Q</em> → ¬<em>P</em></span></td>
+<td style="text-align: left;">逆否律（Contrapositive Law）</td>
+<td style="text-align: left;">证明蕴含时常用</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">¬(<em>P</em> ∨ <em>Q</em>) ≡ ¬<em>P</em> ∧ ¬<em>Q</em></span></td>
+<td style="text-align: left;">德摩根律（De Morgan’s Law）</td>
+<td style="text-align: left;">将否定向内推进</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">¬(<em>P</em> ∧ <em>Q</em>) ≡ ¬<em>P</em> ∨ ¬<em>Q</em></span></td>
+<td style="text-align: left;">德摩根律</td>
+<td style="text-align: left;">将否定向内推进</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> ∨ <em>Q</em> ≡ <em>Q</em> ∨ <em>P</em></span></td>
+<td style="text-align: left;">交换律</td>
+<td style="text-align: left;">调整公式顺序</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> ∧ <em>Q</em> ≡ <em>Q</em> ∧ <em>P</em></span></td>
+<td style="text-align: left;">交换律</td>
+<td style="text-align: left;">调整公式顺序</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">(<em>P</em> ∨ <em>Q</em>) ∨ <em>R</em> ≡ <em>P</em> ∨ (<em>Q</em> ∨ <em>R</em>)</span></td>
+<td style="text-align: left;">结合律</td>
+<td style="text-align: left;">去掉括号、重组表达式</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">(<em>P</em> ∧ <em>Q</em>) ∧ <em>R</em> ≡ <em>P</em> ∧ (<em>Q</em> ∧ <em>R</em>)</span></td>
+<td style="text-align: left;">结合律</td>
+<td style="text-align: left;">去掉括号、重组表达式</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> ∨ (<em>Q</em> ∧ <em>R</em>) ≡ (<em>P</em> ∨ <em>Q</em>) ∧ (<em>P</em> ∨ <em>R</em>)</span></td>
+<td style="text-align: left;">分配律</td>
+<td style="text-align: left;">转换为合取范式</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> ∧ (<em>Q</em> ∨ <em>R</em>) ≡ (<em>P</em> ∧ <em>Q</em>) ∨ (<em>P</em> ∧ <em>R</em>)</span></td>
+<td style="text-align: left;">分配律</td>
+<td style="text-align: left;">转换为析取范式</td>
+</tr>
+</tbody>
+</table>
+<p>例如，材料证明了：</p>
+<p><span
+class="math display">(¬<em>P</em> ∨ <em>Q</em>) ≡ (<em>P</em> → <em>Q</em>)</span></p>
+<p>这说明“如果 <span class="math inline"><em>P</em></span> 则 <span
+class="math inline"><em>Q</em></span>”可以等价改写成“不是 <span
+class="math inline"><em>P</em></span>，或者 <span
+class="math inline"><em>Q</em></span>”。后面做归结时必须把蕴含 <span
+class="math inline">→</span> 消掉，所以这个等价式非常重要。</p>
+<h2 id="一阶谓词逻辑表示对象关系与量词">3
+一阶谓词逻辑：表示对象、关系与量词</h2>
+<h3 id="为什么命题逻辑不够用">3.1 为什么命题逻辑不够用</h3>
+<p>命题逻辑只能把整句话当成一个不可拆分的符号。比如“苏格拉底是人”和“苏格拉底会死”可以分别写成
+<span class="math inline"><em>P</em></span> 和 <span
+class="math inline"><em>Q</em></span>，但命题逻辑看不出“苏格拉底”是对象，看不出“人”是一个集合，看不出“苏格拉底”属于“人”这个集合；也看不出“是人”和“会死”是性质。这样一来，系统就很难表达“所有人都会死”这种带变量的通用规则。</p>
+<p>一阶谓词逻辑（First-Order Logic,
+FOL）正是为了解决这个问题。它允许我们表示对象、对象属性、对象之间的关系，以及“所有”“存在”这样的量词。例如：</p>
+<p><span
+class="math display">∀<em>x</em>(<em>m</em><em>a</em><em>n</em>(<em>x</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>x</em>))</span></p>
+<p>表示“对所有对象 <span class="math inline"><em>x</em></span>，如果
+<span class="math inline"><em>x</em></span> 是人，那么 <span
+class="math inline"><em>x</em></span> 会死”。再加上事实：</p>
+<p><span
+class="math display"><em>m</em><em>a</em><em>n</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<p>系统就可以推出：</p>
+<p><span
+class="math display"><em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<h3 id="一阶逻辑的符号与项">3.2 一阶逻辑的符号与项</h3>
+<p>一阶逻辑的基本元素包括常量、变量、函数、谓词和逻辑联结词。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">元素</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">示例</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">常量/常元（constant）</td>
+<td style="text-align: left;">constant symbol</td>
+<td style="text-align: left;"><span
+class="math inline"><em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>, <em>J</em><em>o</em><em>h</em><em>n</em>, 0, <em>π</em></span></td>
+<td style="text-align: left;">表示领域中的具体对象</td>
+</tr>
+<tr>
+<td style="text-align: left;">变量/变元（variable）</td>
+<td style="text-align: left;">variable symbol</td>
+<td style="text-align: left;"><span
+class="math inline"><em>x</em>, <em>y</em>, <em>z</em></span></td>
+<td style="text-align: left;">表示可被对象替换的位置</td>
+</tr>
+<tr>
+<td style="text-align: left;">函数/函元（function）</td>
+<td style="text-align: left;">function symbol</td>
+<td style="text-align: left;"><span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>x</em>), <em>s</em><em>u</em><em>m</em>(<em>x</em>, <em>y</em>)</span></td>
+<td style="text-align: left;">从对象映射到对象</td>
+</tr>
+<tr>
+<td style="text-align: left;">谓词（predicate）</td>
+<td style="text-align: left;">predicate symbol</td>
+<td style="text-align: left;"><span
+class="math inline"><em>m</em><em>a</em><em>n</em>(<em>x</em>), <em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>x</em>, <em>y</em>)</span></td>
+<td style="text-align: left;">表示性质或关系，真值为真或假</td>
+</tr>
+<tr>
+<td style="text-align: left;">项（term）</td>
+<td style="text-align: left;">term</td>
+<td style="text-align: left;"><span
+class="math inline"><em>J</em><em>o</em><em>h</em><em>n</em>, <em>x</em>, 0, <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>J</em><em>o</em><em>h</em><em>n</em>)</span></td>
+<td style="text-align: left;">能指称对象的表达式</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>zxq：更专业的叫法应该是“常元”“变元”“函元”</p>
+<p>常元、变元、函元都可以是项</p>
+</blockquote>
+<p>在这里，函数和谓词都带有<strong>元数（arity）</strong>。元数表示它需要几个参数。例如
+<span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>x</em>)</span>
+是一元函数，<span
+class="math inline"><em>s</em><em>u</em><em>m</em>(<em>x</em>, <em>y</em>)</span>
+是二元函数；<span
+class="math inline"><em>m</em><em>a</em><em>n</em>(<em>x</em>)</span>
+是一元谓词，<span
+class="math inline"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>x</em>, <em>y</em>)</span>
+是二元谓词。</p>
+<p>需要注意的是，函数和谓词虽然长得很像，但语义完全不同。<strong>函数返回一个对象</strong>，例如
+<span
+class="math inline"><em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>b</em><em>i</em><em>l</em><em>l</em>)</span>
+可以表示“Bill 的母亲”这个对象；<strong>谓词返回真假</strong>，例如 <span
+class="math inline"><em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>e</em><em>v</em><em>e</em>, <em>a</em><em>b</em><em>e</em><em>l</em>)</span>
+表示“Eve 是 Abel 的母亲”这个关系是否成立。</p>
+<h3 id="原子句子与复合句子">3.3 原子句子与复合句子</h3>
+<p><strong>原子句子（atomic
+sentence）</strong>是最小的可判真假的句子，通常由一个谓词加若干项构成。例如：</p>
+<p><span
+class="math display"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>a</em><em>d</em><em>a</em><em>m</em>, <em>a</em><em>b</em><em>e</em><em>l</em>)</span></p>
+<p>表示 “Adam 是 Abel 的父亲”。如果谓词元数为 <span
+class="math inline"><em>n</em></span>，那么它后面必须跟 <span
+class="math inline"><em>n</em></span> 个项，例如 <span
+class="math inline"><em>p</em>(<em>t</em><sub>1</sub>, <em>t</em><sub>2</sub>, …, <em>t</em><sub><em>n</em></sub>)</span>。真值符号
+<span
+class="math inline"><em>t</em><em>r</em><em>u</em><em>e</em></span> 和
+<span
+class="math inline"><em>f</em><em>a</em><em>l</em><em>s</em><em>e</em></span>
+也可以看成原子句子。</p>
+<p><strong>复合句子</strong>由原子句子通过联结词和量词组合而来。这里列出的构造规则可以总结为：原子句子是句子；如果
+<span class="math inline"><em>s</em></span> 是句子，则 <span
+class="math inline">¬<em>s</em></span> 是句子；如果 <span
+class="math inline"><em>s</em><sub>1</sub>, <em>s</em><sub>2</sub></span>
+是句子，则 <span
+class="math inline"><em>s</em><sub>1</sub> ∧ <em>s</em><sub>2</sub></span>、<span
+class="math inline"><em>s</em><sub>1</sub> ∨ <em>s</em><sub>2</sub></span>、<span
+class="math inline"><em>s</em><sub>1</sub> → <em>s</em><sub>2</sub></span>、<span
+class="math inline"><em>s</em><sub>1</sub> ≡ <em>s</em><sub>2</sub></span>
+都是句子；如果 <span class="math inline"><em>x</em></span> 是变量且
+<span class="math inline"><em>s</em></span> 是句子，则 <span
+class="math inline">∀<em>x</em> <em>s</em></span> 和 <span
+class="math inline">∃<em>x</em> <em>s</em></span> 也是句子。</p>
+<h3 id="量词全称与存在">3.4 量词：全称与存在</h3>
+<p>一阶逻辑最重要的扩展是量词。</p>
+<p><strong>全称量词（universal quantifier）</strong><span
+class="math inline">∀</span> 表示“对所有对象都成立”。例如： <span
+class="math display">∀<em>x</em>(<em>b</em><em>a</em><em>s</em><em>k</em><em>e</em><em>t</em><em>b</em><em>a</em><em>l</em><em>l</em>_<em>p</em><em>l</em><em>a</em><em>y</em><em>e</em><em>r</em>(<em>x</em>) → <em>t</em><em>a</em><em>l</em><em>l</em>(<em>x</em>))</span></p>
+<p>表示“所有篮球运动员都高”。这里使用蕴含而不是合取，是因为我们并不是说“所有对象都是篮球运动员且都高”，而是说“只要某个对象是篮球运动员，它就高”。</p>
+<p><strong>存在量词（existential quantifier）</strong><span
+class="math inline">∃</span> 表示“至少存在一个对象使句子成立”。例如：
+<span
+class="math display">∃<em>x</em>(<em>p</em><em>e</em><em>r</em><em>s</em><em>o</em><em>n</em>(<em>x</em>) ∧ <em>l</em><em>i</em><em>k</em><em>e</em><em>s</em>(<em>x</em>, <em>a</em><em>n</em><em>c</em><em>h</em><em>o</em><em>v</em><em>i</em><em>e</em><em>s</em>))</span></p>
+<p>表示“有些人喜欢凤尾鱼”。这里使用合取而不是蕴含，是因为我们要断言存在某个对象同时满足“是人”和“喜欢凤尾鱼”。如果写成
+<span
+class="math inline">∃<em>x</em>(<em>p</em><em>e</em><em>r</em><em>s</em><em>o</em><em>n</em>(<em>x</em>) → <em>l</em><em>i</em><em>k</em><em>e</em><em>s</em>(<em>x</em>, <em>a</em><em>n</em><em>c</em><em>h</em><em>o</em><em>v</em><em>i</em><em>e</em><em>s</em>))</span>，<strong>在许多解释下会因为
+<span
+class="math inline"><em>p</em><em>e</em><em>r</em><em>s</em><em>o</em><em>n</em>(<em>x</em>)</span>
+为假而空真</strong>，不能正确表达“有人喜欢凤尾鱼”。</p>
+<h3 id="一阶逻辑表达实例">3.5 一阶逻辑表达实例</h3>
+<p>这里给出了一组自然语言到谓词逻辑的翻译例子。学习时可以用这些例子检查自己是否真正理解量词和联结词的搭配。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">自然语言</th>
+<th style="text-align: left;">谓词逻辑表达</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">如果星期一不下雨，Tom 会去山里</td>
+<td style="text-align: left;"><span
+class="math inline">¬<em>w</em><em>e</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>r</em><em>a</em><em>i</em><em>n</em>, <em>m</em><em>o</em><em>n</em><em>d</em><em>a</em><em>y</em>) → <em>g</em><em>o</em>(<em>t</em><em>o</em><em>m</em>, <em>m</em><em>o</em><em>u</em><em>n</em><em>t</em><em>a</em><em>i</em><em>n</em><em>s</em>)</span></td>
+<td style="text-align: left;">条件规则用蕴含</td>
+</tr>
+<tr>
+<td style="text-align: left;">Emma 是杜宾犬并且是好狗</td>
+<td style="text-align: left;"><span
+class="math inline"><em>g</em><em>o</em><em>o</em><em>d</em><em>d</em><em>o</em><em>g</em>(<em>e</em><em>m</em><em>m</em><em>a</em>) ∧ <em>i</em><em>s</em><em>a</em>(<em>e</em><em>m</em><em>m</em><em>a</em>, <em>d</em><em>o</em><em>b</em><em>e</em><em>r</em><em>m</em><em>a</em><em>n</em>)</span></td>
+<td style="text-align: left;">同时满足两个性质用合取</td>
+</tr>
+<tr>
+<td style="text-align: left;">所有篮球运动员都高</td>
+<td style="text-align: left;"><span
+class="math inline">∀<em>x</em>(<em>b</em><em>a</em><em>s</em><em>k</em><em>e</em><em>t</em><em>b</em><em>a</em><em>l</em><em>l</em>_<em>p</em><em>l</em><em>a</em><em>y</em><em>e</em><em>r</em>(<em>x</em>) → <em>t</em><em>a</em><em>l</em><em>l</em>(<em>x</em>))</span></td>
+<td style="text-align: left;">全称规则常用蕴含</td>
+</tr>
+<tr>
+<td style="text-align: left;">有些人喜欢凤尾鱼</td>
+<td style="text-align: left;"><span
+class="math inline">∃<em>x</em>(<em>p</em><em>e</em><em>r</em><em>s</em><em>o</em><em>n</em>(<em>x</em>) ∧ <em>l</em><em>i</em><em>k</em><em>e</em><em>s</em>(<em>x</em>, <em>a</em><em>n</em><em>c</em><em>h</em><em>o</em><em>v</em><em>i</em><em>e</em><em>s</em>))</span></td>
+<td style="text-align: left;">存在对象常用合取</td>
+</tr>
+<tr>
+<td style="text-align: left;">没有人喜欢税</td>
+<td style="text-align: left;"><span
+class="math inline">¬∃<em>x</em>(<em>l</em><em>i</em><em>k</em><em>e</em><em>s</em>(<em>x</em>, <em>t</em><em>a</em><em>x</em><em>e</em><em>s</em>))</span></td>
+<td style="text-align: left;">“没有”可表示为“不存在”</td>
+</tr>
+</tbody>
+</table>
+<h3 id="一阶与高阶的区别">3.6 一阶与高阶的区别</h3>
+<p>这里强调，一阶谓词逻辑只允许量词作用于<strong>论域中的对象</strong>，而不能作用于谓词或函数。例如：</p>
+<p><span
+class="math display">∀<em>x</em>(<em>m</em><em>a</em><em>n</em>(<em>x</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>x</em>))</span></p>
+<p>这里 <span class="math inline"><em>x</em></span>
+表示对象，所以是一阶逻辑。相反，如果写成：</p>
+<p><span
+class="math display">∀<em>P</em> <em>P</em>(<em>g</em><em>e</em><em>o</em><em>r</em><em>g</em><em>e</em>, <em>k</em><em>a</em><em>t</em><em>e</em>)</span></p>
+<p>其中 <span class="math inline"><em>P</em></span>
+是谓词变量，这就进入了<strong>高阶谓词逻辑（Higher-Order Predicate
+Logic）</strong>。高阶逻辑表达能力更强，但自动推理通常更困难，很多性质不再像一阶逻辑那样可控。</p>
+<h2 id="语义模型与逻辑蕴含">4 语义、模型与逻辑蕴含</h2>
+<h3 id="解释符号如何获得意义">4.1 解释：符号如何获得意义</h3>
+<p>一阶逻辑公式本身只是符号串。要判断它是真是假，必须给这些符号指定含义，这就是<strong>解释（interpretation）</strong>。这里定义：给定一个非空论域
+<span
+class="math inline"><em>D</em></span>，解释会把常量、变量、函数和谓词都映射到
+<span class="math inline"><em>D</em></span> 或 <span
+class="math inline"><em>D</em></span> 上的结构。</p>
+<p>更具体地说，常量被指定为 <span class="math inline"><em>D</em></span>
+中的某个元素；变量的取值来自 <span
+class="math inline"><em>D</em></span>；<span
+class="math inline"><em>m</em></span> 元函数被解释为从 <span
+class="math inline"><em>D</em><sup><em>m</em></sup></span> 到 <span
+class="math inline"><em>D</em></span> 的映射；<span
+class="math inline"><em>n</em></span> 元谓词被解释为从 <span
+class="math inline"><em>D</em><sup><em>n</em></sup></span> 到 <span
+class="math inline">{<em>t</em><em>r</em><em>u</em><em>e</em>, <em>f</em><em>a</em><em>l</em><em>s</em><em>e</em>}</span>
+的映射。这个定义非常重要，因为它说明逻辑公式的真假不是由符号名字决定的，而是由解释决定的。</p>
+<p>例如，<span
+class="math inline"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>a</em><em>d</em><em>a</em><em>m</em>, <em>c</em><em>a</em><em>i</em><em>n</em>)</span>
+是否为真，取决于解释中 <span
+class="math inline"><em>a</em><em>d</em><em>a</em><em>m</em></span> 和
+<span
+class="math inline"><em>c</em><em>a</em><em>i</em><em>n</em></span>
+分别指向谁，以及 <span
+class="math inline"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em></span>
+这个二元谓词被解释成什么关系。如果解释把 <span
+class="math inline"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em></span>
+定义为“亲生父母关系”，且 Adam 确实是 Cain
+的父亲，那么该原子句子为真。</p>
+<h3 id="满足模型可满足有效与不一致">4.2
+满足、模型、可满足、有效与不一致</h3>
+<p>材料连续给出了几个很容易混淆的语义概念，课程经常会考定义或判断题。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">满足</td>
+<td style="text-align: left;">satisfy</td>
+<td style="text-align: left;">如果公式 <span
+class="math inline"><em>x</em></span> 在解释 <span
+class="math inline"><em>I</em></span> 和某个变量赋值下为真，则 <span
+class="math inline"><em>I</em></span> 满足 <span
+class="math inline"><em>x</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">模型</td>
+<td style="text-align: left;">model</td>
+<td style="text-align: left;">如果解释 <span
+class="math inline"><em>I</em></span>
+在所有相关变量赋值下都满足公式或公式集，则 <span
+class="math inline"><em>I</em></span> 是其模型</td>
+</tr>
+<tr>
+<td style="text-align: left;">可满足</td>
+<td style="text-align: left;">satisfiable</td>
+<td
+style="text-align: left;">存在至少一个解释和变量赋值使公式或公式集为真</td>
+</tr>
+<tr>
+<td style="text-align: left;">不可满足</td>
+<td style="text-align: left;">unsatisfiable</td>
+<td style="text-align: left;">不存在任何解释和变量赋值使其为真</td>
+</tr>
+<tr>
+<td style="text-align: left;">不一致</td>
+<td style="text-align: left;">inconsistent</td>
+<td style="text-align: left;">一个公式集不可满足，即无法同时为真</td>
+</tr>
+<tr>
+<td style="text-align: left;">有效</td>
+<td style="text-align: left;">valid</td>
+<td style="text-align: left;">对所有可能解释都为真</td>
+</tr>
+</tbody>
+</table>
+<p>下面用一组简单例子把这些概念区分开。假设论域：</p>
+<p><span
+class="math display"><em>D</em> = {<em>j</em><em>o</em><em>h</em><em>n</em>, <em>m</em><em>a</em><em>r</em><em>y</em>}</span></p>
+<p>并且解释 <span class="math inline"><em>I</em></span> 中，<span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span> 表示
+John，<span
+class="math inline"><em>m</em><em>a</em><em>r</em><em>y</em></span> 表示
+Mary，谓词 <span
+class="math inline"><em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>x</em>)</span>
+表示“<span class="math inline"><em>x</em></span>
+是学生”。在这个解释下，如果 John 是学生，那么：</p>
+<p><span
+class="math display"><em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span></p>
+<p>为真。此时可以说解释 <span class="math inline"><em>I</em></span>
+<strong>满足（satisfy）</strong>公式 <span
+class="math inline"><em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>。满足强调的是：在某个解释和变量赋值下，这个公式被判定为真。</p>
+<p>如果在同一个解释 <span class="math inline"><em>I</em></span>
+中，论域里的所有人都是学生，也就是 John 和 Mary 都是学生，那么：</p>
+<p><span
+class="math display">∀<em>x</em> <em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>x</em>)</span></p>
+<p>在 <span class="math inline"><em>I</em></span> 下为真。此时 <span
+class="math inline"><em>I</em></span> 就是公式 <span
+class="math inline">∀<em>x</em> <em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>x</em>)</span>
+的一个<strong>模型（model）</strong>。模型比满足更强一些，它通常强调某个解释能让一个公式或一个公式集整体成立。对于带自由变量的公式，还要考虑相关变量赋值；对于闭合语句，则直接看该解释下是否为真。</p>
+<p><strong>可满足（satisfiable）</strong>表示至少存在一个解释能让公式为真。例如：</p>
+<p><span
+class="math display">∃<em>x</em> <em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>x</em>)</span></p>
+<p>是可满足的，因为只要存在某个解释使论域中至少一个对象是学生，它就为真。比如上面的解释里
+John
+是学生，那么这个公式就成立。注意，可满足不要求公式在所有解释下都真，只要求“有一种世界能让它真”。</p>
+<p><strong>不可满足（unsatisfiable）</strong>表示无论怎么解释都不可能为真。例如：</p>
+<p><span
+class="math display">∃<em>x</em>(<em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>x</em>) ∧ ¬<em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>x</em>))</span></p>
+<p>不可满足，因为它要求某个对象同时是学生且不是学生，这在经典逻辑中不可能成立。</p>
+<p><strong>不一致（inconsistent）</strong>通常用于公式集。如果一个公式集无法在任何解释下同时为真，就说它不一致。例如公式集：</p>
+<p><span
+class="math display">{<em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>), ¬<em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)}</span></p>
+<p>是不一致的，因为它同时要求 <span
+class="math inline"><em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+为真和为假。也就是说，不一致可以理解为“整个知识库内部发生矛盾”。</p>
+<p><strong>有效（valid）</strong>表示公式在所有可能解释下都为真。例如：</p>
+<p><span
+class="math display"><em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>) ∨ ¬<em>S</em><em>t</em><em>u</em><em>d</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span></p>
+<p>是有效式，因为无论 John
+是不是学生，这个析取式都为真。有效比可满足强得多：可满足只要求至少有一个解释为真，而有效要求每一个解释都为真。</p>
+<p>这几个概念可以用一句话串起来：<strong>有效公式一定可满足，但可满足公式不一定有效；不可满足公式没有任何模型；如果一个公式集不可满足，就称为不一致。</strong></p>
+<h4 id="例子">4.2.1 例子</h4>
+<p>材料 第 29 页用下面两个公式说明“解释、模型和推理”之间的关系：</p>
+<p><span
+class="math display">¬<em>A</em>(<em>x</em>) ∨ <em>B</em>(<em>x</em>)</span></p>
+<p><span
+class="math display">¬<em>B</em>(<em>x</em>) ∨ <em>C</em>(<em>x</em>)</span></p>
+<p>它们分别等价于：</p>
+<p><span
+class="math display"><em>A</em>(<em>x</em>) → <em>B</em>(<em>x</em>)</span></p>
+<p><span
+class="math display"><em>B</em>(<em>x</em>) → <em>C</em>(<em>x</em>)</span></p>
+<p>也就是说，第一个公式表示“如果某个对象满足 <span
+class="math inline"><em>A</em></span>，那么它也满足 <span
+class="math inline"><em>B</em></span>”；第二个公式表示“如果某个对象满足
+<span class="math inline"><em>B</em></span>，那么它也满足 <span
+class="math inline"><em>C</em></span>”。把它们连起来，直觉上可以推出：</p>
+<p><span
+class="math display"><em>A</em>(<em>x</em>) → <em>C</em>(<em>x</em>)</span></p>
+<p>因为 <span class="math inline"><em>A</em></span> 会推出 <span
+class="math inline"><em>B</em></span>，而 <span
+class="math inline"><em>B</em></span> 又会推出 <span
+class="math inline"><em>C</em></span>。</p>
+<p>这里列出三个解释。为了做课堂练习，可以按这种列举式写法理解：列出的正文字表示为真，列出的负文字表示为假，未列出的相关基原子通常按“不成立/假”来检查<strong>（封闭世界假设）</strong>。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">解释</th>
+<th style="text-align: left;">给出的事实</th>
+<th style="text-align: left;">是否能作为两个公式的模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Interpretation 1</td>
+<td style="text-align: left;"><span
+class="math inline"><em>A</em>(<em>a</em>), <em>A</em>(<em>b</em>), <em>B</em>(<em>b</em>), ¬<em>C</em>(<em>a</em>)</span></td>
+<td style="text-align: left;">不能。因为若 <span
+class="math inline"><em>A</em>(<em>a</em>)</span> 为真，则按第一条应有
+<span class="math inline"><em>B</em>(<em>a</em>)</span>；若 <span
+class="math inline"><em>B</em>(<em>b</em>)</span> 为真，则按第二条应有
+<span
+class="math inline"><em>C</em>(<em>b</em>)</span>。在列举式解释下，<span
+class="math inline"><em>B</em>(<em>a</em>)</span> 和 <span
+class="math inline"><em>C</em>(<em>b</em>)</span>
+不成立，因此它违反规则。</td>
+</tr>
+<tr>
+<td style="text-align: left;">Interpretation 2</td>
+<td style="text-align: left;"><span
+class="math inline"><em>A</em>(<em>a</em>), <em>A</em>(<em>b</em>), <em>B</em>(<em>a</em>), ¬<em>B</em>(<em>b</em>), ¬<em>C</em>(<em>a</em>), ¬<em>C</em>(<em>b</em>)</span></td>
+<td style="text-align: left;">不能。因为 <span
+class="math inline"><em>A</em>(<em>b</em>)</span> 为真但 <span
+class="math inline"><em>B</em>(<em>b</em>)</span> 为假，直接违反 <span
+class="math inline"><em>A</em>(<em>x</em>) → <em>B</em>(<em>x</em>)</span>；同时
+<span class="math inline"><em>B</em>(<em>a</em>)</span> 为真但 <span
+class="math inline"><em>C</em>(<em>a</em>)</span> 为假，违反 <span
+class="math inline"><em>B</em>(<em>x</em>) → <em>C</em>(<em>x</em>)</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;">Interpretation 3</td>
+<td style="text-align: left;"><span
+class="math inline"><em>A</em>(<em>a</em>), <em>B</em>(<em>a</em>), <em>C</em>(<em>a</em>)</span></td>
+<td style="text-align: left;">可以看成一个满足规则链的解释。对于对象
+<span class="math inline"><em>a</em></span>，<span
+class="math inline"><em>A</em>(<em>a</em>)</span>、<span
+class="math inline"><em>B</em>(<em>a</em>)</span>、<span
+class="math inline"><em>C</em>(<em>a</em>)</span> 都成立，因此 <span
+class="math inline"><em>A</em>(<em>a</em>) → <em>B</em>(<em>a</em>)</span>
+和 <span
+class="math inline"><em>B</em>(<em>a</em>) → <em>C</em>(<em>a</em>)</span>
+都成立。</td>
+</tr>
+</tbody>
+</table>
+<p>这个例子的重点不是记住三个
+interpretation，而是理解判断模型的方法：<strong>把变量 <span
+class="math inline"><em>x</em></span>
+替换成论域中的对象，然后检查每条规则有没有被违反。</strong> 对于 <span
+class="math inline"><em>A</em>(<em>x</em>) → <em>B</em>(<em>x</em>)</span>，唯一会违反它的情况是
+<span class="math inline"><em>A</em>(<em>x</em>)</span> 为真但 <span
+class="math inline"><em>B</em>(<em>x</em>)</span> 为假；对于 <span
+class="math inline"><em>B</em>(<em>x</em>) → <em>C</em>(<em>x</em>)</span>，唯一会违反它的情况是
+<span class="math inline"><em>B</em>(<em>x</em>)</span> 为真但 <span
+class="math inline"><em>C</em>(<em>x</em>)</span> 为假。</p>
+<h4 id="the-oedipus">4.2.2 The Oedipus</h4>
+<p>材料 随后给出 The Oedipus
+的人物关系图，用来把“解释”和“推理”放到一个具体场景中理解。图中涉及的人物可以看成论域中的对象：</p>
+<p><span
+class="math display"><em>D</em> = {<em>I</em><em>o</em><em>k</em><em>a</em><em>s</em><em>t</em><em>e</em>, <em>O</em><em>e</em><em>d</em><em>i</em><em>p</em><em>u</em><em>s</em>, <em>P</em><em>o</em><em>l</em><em>y</em><em>n</em><em>e</em><em>i</em><em>k</em><em>e</em><em>s</em>, <em>T</em><em>h</em><em>e</em><em>r</em><em>s</em><em>a</em><em>n</em><em>d</em><em>r</em><em>o</em><em>s</em>}</span></p>
+<p>图中的关系和性质可以表示为：</p>
+<p><span
+class="math display"><em>h</em><em>a</em><em>s</em><em>C</em><em>h</em><em>i</em><em>l</em><em>d</em>(<em>I</em><em>o</em><em>k</em><em>a</em><em>s</em><em>t</em><em>e</em>, <em>O</em><em>e</em><em>d</em><em>i</em><em>p</em><em>u</em><em>s</em>)</span></p>
+<p><span
+class="math display"><em>h</em><em>a</em><em>s</em><em>C</em><em>h</em><em>i</em><em>l</em><em>d</em>(<em>O</em><em>e</em><em>d</em><em>i</em><em>p</em><em>u</em><em>s</em>, <em>P</em><em>o</em><em>l</em><em>y</em><em>n</em><em>e</em><em>i</em><em>k</em><em>e</em><em>s</em>)</span></p>
+<p><span
+class="math display"><em>h</em><em>a</em><em>s</em><em>C</em><em>h</em><em>i</em><em>l</em><em>d</em>(<em>P</em><em>o</em><em>l</em><em>y</em><em>n</em><em>e</em><em>i</em><em>k</em><em>e</em><em>s</em>, <em>T</em><em>h</em><em>e</em><em>r</em><em>s</em><em>a</em><em>n</em><em>d</em><em>r</em><em>o</em><em>s</em>)</span></p>
+<p><span
+class="math display"><em>P</em><em>a</em><em>t</em><em>r</em><em>i</em><em>c</em><em>i</em><em>d</em><em>e</em>(<em>O</em><em>e</em><em>d</em><em>i</em><em>p</em><em>u</em><em>s</em>)</span></p>
+<p><span
+class="math display">¬<em>P</em><em>a</em><em>t</em><em>r</em><em>i</em><em>c</em><em>i</em><em>d</em><em>e</em>(<em>T</em><em>h</em><em>e</em><em>r</em><em>s</em><em>a</em><em>n</em><em>d</em><em>r</em><em>o</em><em>s</em>)</span></p>
+<p>其中 <span
+class="math inline"><em>h</em><em>a</em><em>s</em><em>C</em><em>h</em><em>i</em><em>l</em><em>d</em>(<em>x</em>, <em>y</em>)</span>
+是二元谓词，表示“<span class="math inline"><em>x</em></span> 有孩子
+<span class="math inline"><em>y</em></span>”；<span
+class="math inline"><em>P</em><em>a</em><em>t</em><em>r</em><em>i</em><em>c</em><em>i</em><em>d</em><em>e</em>(<em>x</em>)</span>
+是一元谓词，表示“<span class="math inline"><em>x</em></span>
+是弑父者”。这个例子说明，解释 <span
+class="math inline"><em>I</em></span> 会把常元 <span
+class="math inline"><em>I</em><em>o</em><em>k</em><em>a</em><em>s</em><em>t</em><em>e</em>, <em>O</em><em>e</em><em>d</em><em>i</em><em>p</em><em>u</em><em>s</em>, <em>P</em><em>o</em><em>l</em><em>y</em><em>n</em><em>e</em><em>i</em><em>k</em><em>e</em><em>s</em>, <em>T</em><em>h</em><em>e</em><em>r</em><em>s</em><em>a</em><em>n</em><em>d</em><em>r</em><em>o</em><em>s</em></span>
+指向论域中的具体对象，把 <span
+class="math inline"><em>h</em><em>a</em><em>s</em><em>C</em><em>h</em><em>i</em><em>l</em><em>d</em></span>
+解释为论域上的二元关系，把 <span
+class="math inline"><em>P</em><em>a</em><em>t</em><em>r</em><em>i</em><em>c</em><em>i</em><em>d</em><em>e</em></span>
+解释为论域上的一元性质集合。</p>
+<p>【图片占位：这里的 The Oedipus 人物关系图，可替换为
+这里对应图片。】</p>
+<p>需要注意的是，仅有上面这些事实时，我们只能知道图中明确给出的关系，例如
+Oedipus 是弑父者、Thersandros
+不是弑父者。<strong>不能仅凭血缘关系自动推出 Polyneikes 或 Thersandros
+是否是弑父者</strong>，因为这需要额外规则。例如如果人为加入规则：</p>
+<p><span
+class="math display">∀<em>x</em>∀<em>y</em>(<em>h</em><em>a</em><em>s</em><em>C</em><em>h</em><em>i</em><em>l</em><em>d</em>(<em>x</em>, <em>y</em>) ∧ <em>P</em><em>a</em><em>t</em><em>r</em><em>i</em><em>c</em><em>i</em><em>d</em><em>e</em>(<em>x</em>) → <em>P</em><em>a</em><em>t</em><em>r</em><em>i</em><em>c</em><em>i</em><em>d</em><em>e</em>(<em>y</em>))</span></p>
+<p>才表示“弑父者的孩子也是弑父者”。但这条规则显然不符合常识，而且会和
+<span
+class="math inline">¬<em>P</em><em>a</em><em>t</em><em>r</em><em>i</em><em>c</em><em>i</em><em>d</em><em>e</em>(<em>T</em><em>h</em><em>e</em><em>r</em><em>s</em><em>a</em><em>n</em><em>d</em><em>r</em><em>o</em><em>s</em>)</span>
+这类事实产生潜在冲突。因此，The Oedipus
+图的重点是提醒我们：<strong>事实、解释和推理规则是不同层面的东西；图中有事实，不等于系统可以随意继承性质或推出新事实。</strong></p>
+<h3 id="逻辑蕴含">4.3 逻辑蕴含</h3>
+<p><strong>逻辑蕴含（logical consequence / logically
+follows）</strong>描述的是“结论是否必然由前提推出”。如果每一个满足公式集
+<span class="math inline"><em>S</em></span> 的解释也满足公式 <span
+class="math inline"><em>x</em></span>，那么就说 <span
+class="math inline"><em>x</em></span> 从 <span
+class="math inline"><em>S</em></span> 逻辑推出，记作：</p>
+<p><span class="math display"><em>S</em> ⊨ <em>x</em></span></p>
+<p>这里的重点是“每一个模型”。如果只是在某个解释下 <span
+class="math inline"><em>S</em></span> 和 <span
+class="math inline"><em>x</em></span> 都为真，这还不够。只有当所有使
+<span class="math inline"><em>S</em></span> 为真的世界都使 <span
+class="math inline"><em>x</em></span> 为真时，<span
+class="math inline"><em>x</em></span> 才是 <span
+class="math inline"><em>S</em></span> 的必然结论。</p>
+<p>例如，给定：</p>
+<p><span
+class="math display">∀<em>x</em>(<em>m</em><em>a</em><em>n</em>(<em>x</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>x</em>))</span></p>
+<p>以及：</p>
+<p><span
+class="math display"><em>m</em><em>a</em><em>n</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<p>在任何满足这两个前提的解释中，<span
+class="math inline"><em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span>
+都必须为真。因此：</p>
+<p><span
+class="math display">{∀<em>x</em>(<em>m</em><em>a</em><em>n</em>(<em>x</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>x</em>)), <em>m</em><em>a</em><em>n</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)} ⊨ <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<h2 id="推理规则与合一">5 推理规则与合一</h2>
+<h3 id="证明过程可靠性与完备性">5.1 证明过程、可靠性与完备性</h3>
+<p>材料把<strong>证明过程（proof procedure）</strong>定义为“推理规则 +
+应用该规则的算法”。推理规则告诉我们什么形式的句子可以推出什么形式的新句子；算法则决定在大量句子中按什么顺序应用这些规则。</p>
+<p>评价一个推理过程有两个核心标准：<strong>可靠性（soundness）</strong>和<strong>完备性（completeness）</strong>。可靠性表示推理规则不会推出不该推出的结论，也就是说，如果规则从
+<span class="math inline"><em>S</em></span> 推出 <span
+class="math inline"><em>x</em></span>，那么 <span
+class="math inline"><em>S</em> ⊨ <em>x</em></span>。完备性表示凡是逻辑上能推出的结论，规则最终都能推出，也就是说，如果
+<span
+class="math inline"><em>S</em> ⊨ <em>x</em></span>，那么推理过程有能力得到
+<span class="math inline"><em>x</em></span>。</p>
+<p>一句话记忆：<strong>可靠性防止“乱推出”，完备性防止“漏推出”。</strong></p>
+<h3 id="常用推理规则">5.2 常用推理规则</h3>
+<p>这里列出了一组基础推理规则，这些规则是理解自动推理的入口。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">推理规则</th>
+<th style="text-align: left;">形式</th>
+<th style="text-align: left;">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">假言推理（Modus Ponens）</td>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em>, <em>P</em> → <em>Q</em> ⊢ <em>Q</em></span></td>
+<td style="text-align: left;">如果 <span
+class="math inline"><em>P</em></span> 真且 <span
+class="math inline"><em>P</em></span> 蕴含 <span
+class="math inline"><em>Q</em></span>，则 <span
+class="math inline"><em>Q</em></span> 真</td>
+</tr>
+<tr>
+<td style="text-align: left;">拒取式（Modus Tollens）</td>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> → <em>Q</em>, ¬<em>Q</em> ⊢ ¬<em>P</em></span></td>
+<td style="text-align: left;">如果 <span
+class="math inline"><em>P</em></span> 会导致 <span
+class="math inline"><em>Q</em></span>，但 <span
+class="math inline"><em>Q</em></span> 不真，则 <span
+class="math inline"><em>P</em></span> 不真</td>
+</tr>
+<tr>
+<td style="text-align: left;">合取消去（Elimination）</td>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> ∧ <em>Q</em> ⊢ <em>P</em></span>，<span
+class="math inline"><em>P</em> ∧ <em>Q</em> ⊢ <em>Q</em></span></td>
+<td style="text-align: left;">从合取式中取出任一部分</td>
+</tr>
+<tr>
+<td style="text-align: left;">合取引入（Introduction）</td>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em>, <em>Q</em> ⊢ <em>P</em> ∧ <em>Q</em></span></td>
+<td style="text-align: left;">两个事实都真时，可合成合取式</td>
+</tr>
+<tr>
+<td style="text-align: left;">全称实例化（Universal Instantiation）</td>
+<td style="text-align: left;"><span
+class="math inline">∀<em>x</em><em>P</em>(<em>x</em>) ⊢ <em>P</em>(<em>a</em>)</span></td>
+<td style="text-align: left;">全称命题可替换为任意具体对象</td>
+</tr>
+</tbody>
+</table>
+<p>这里 <span class="math inline">⊢</span> 是推导出 /
+可证明的意思。例如，苏格拉底例子的推理过程是：先用全称实例化把 <span
+class="math inline">∀<em>x</em>(<em>m</em><em>a</em><em>n</em>(<em>x</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>x</em>))</span>
+中的 <span class="math inline"><em>x</em></span> 替换成 <span
+class="math inline"><em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em></span>，得到：</p>
+<p><span
+class="math display"><em>m</em><em>a</em><em>n</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>) → <em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<p>再结合事实 <span
+class="math inline"><em>m</em><em>a</em><em>n</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span>，用假言推理推出：</p>
+<p><span
+class="math display"><em>m</em><em>o</em><em>r</em><em>t</em><em>a</em><em>l</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<h3 id="合一让两个表达式匹配">5.3 合一：让两个表达式匹配</h3>
+<p>在一阶逻辑推理中，规则往往带变量，而事实往往带具体对象。为了让它们能够匹配，需要使用<strong>合一（Unification）</strong>。合一的目标是找到一组替换，使两个表达式变成相同形式。</p>
+<p>例如：</p>
+<p><span
+class="math display"><em>m</em><em>a</em><em>n</em>(<em>x</em>)</span></p>
+<p>与：</p>
+<p><span
+class="math display"><em>m</em><em>a</em><em>n</em>(<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>)</span></p>
+<p>可以通过替换 <span
+class="math inline">{<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>/<em>x</em>}</span>
+合一。这里 <span
+class="math inline">{<em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em>/<em>x</em>}</span>
+表示把变量 <span class="math inline"><em>x</em></span> 替换成常量 <span
+class="math inline"><em>S</em><em>o</em><em>c</em><em>r</em><em>a</em><em>t</em><em>e</em><em>s</em></span>。</p>
+<p>合一中最重要的是<strong>最一般合一（most general unifier,
+MGU）</strong>。MGU
+是“最不具体、保留最大自由度”的替换。这里的定义可以理解为：如果 <span
+class="math inline"><em>g</em></span> 是
+MGU，那么任何其他能让表达式合一的替换 <span
+class="math inline"><em>s</em></span>，都可以看成先应用 <span
+class="math inline"><em>g</em></span>，再额外应用某个更具体的替换 <span
+class="math inline"><em>s</em><sup>′</sup></span>。</p>
+<p>合一有几条关键约束。常量是基实例（ground
+instance），不能被替换；同一个变量在所有出现位置必须一致替换；一个变量不能与包含自身的项合一，例如
+<span class="math inline"><em>x</em></span> 不能与 <span
+class="math inline"><em>f</em>(<em>x</em>)</span>
+合一，否则会产生无限结构；两个不同常量不能合一，例如 <span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span> 和
+<span
+class="math inline"><em>m</em><em>a</em><em>r</em><em>y</em></span>
+不能合一。</p>
+<h3 id="合一例子">5.4 合一例子</h3>
+<p>这里给出的合一例子是：</p>
+<p><span
+class="math display"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em><em>s</em>(<em>x</em>, <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>x</em>), <em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>b</em><em>i</em><em>l</em><em>l</em>))</span></p>
+<p>和：</p>
+<p><span
+class="math display"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em><em>s</em>(<em>b</em><em>i</em><em>l</em><em>l</em>, <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>b</em><em>i</em><em>l</em><em>l</em>), <em>y</em>)</span></p>
+<p>要让两个表达式相同，首先第一个参数要求 <span
+class="math inline"><em>x</em> = <em>b</em><em>i</em><em>l</em><em>l</em></span>，因此得到替换
+<span
+class="math inline">{<em>b</em><em>i</em><em>l</em><em>l</em>/<em>x</em>}</span>。替换后左式变为：</p>
+<p><span
+class="math display"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em><em>s</em>(<em>b</em><em>i</em><em>l</em><em>l</em>, <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>b</em><em>i</em><em>l</em><em>l</em>), <em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>b</em><em>i</em><em>l</em><em>l</em>))</span></p>
+<p>此时第三个参数要求 <span
+class="math inline"><em>y</em> = <em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>b</em><em>i</em><em>l</em><em>l</em>)</span>，于是得到：</p>
+<p><span
+class="math display">{<em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>b</em><em>i</em><em>l</em><em>l</em>)/<em>y</em>}</span></p>
+<p>最终的 MGU 为：</p>
+<p><span
+class="math display">{<em>b</em><em>i</em><em>l</em><em>l</em>/<em>x</em>, <em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>b</em><em>i</em><em>l</em><em>l</em>)/<em>y</em>}</span></p>
+<p>这个例子说明，合一不是简单地逐字符比较，而是在保持变量一致性的前提下寻找最一般替换。</p>
+<h2 id="逻辑推理案例金融投资顾问">6 逻辑推理案例：金融投资顾问</h2>
+<h3 id="问题设定">6.1 问题设定</h3>
+<p>材料用一个逻辑金融顾问（logic-based financial
+advisor）说明一阶逻辑如何支持专家系统推理。系统要根据用户储蓄、收入和家庭负担，判断用户应该把资金投入储蓄账户、股票市场，还是二者组合。</p>
+<p>规则的直觉如下：如果一个人的储蓄不足，应优先增加储蓄；如果储蓄充足且收入充足，可以考虑股票；如果储蓄充足但收入不足，可以考虑把剩余收入分配到储蓄和股票之间。</p>
+<h3 id="规则形式化">6.2 规则形式化</h3>
+<p>这里的高层投资建议规则可以写成：</p>
+<p><span
+class="math display"><em>s</em><em>a</em><em>v</em><em>i</em><em>n</em><em>g</em><em>s</em>_<em>a</em><em>c</em><em>c</em><em>o</em><em>u</em><em>n</em><em>t</em>(<em>i</em><em>n</em><em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>) → <em>i</em><em>n</em><em>v</em><em>e</em><em>s</em><em>t</em><em>m</em><em>e</em><em>n</em><em>t</em>(<em>s</em><em>a</em><em>v</em><em>i</em><em>n</em><em>g</em><em>s</em>)</span></p>
+<p><span
+class="math display"><em>s</em><em>a</em><em>v</em><em>i</em><em>n</em><em>g</em><em>s</em>_<em>a</em><em>c</em><em>c</em><em>o</em><em>u</em><em>n</em><em>t</em>(<em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>) ∧ <em>i</em><em>n</em><em>c</em><em>o</em><em>m</em><em>e</em>(<em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>) → <em>i</em><em>n</em><em>v</em><em>e</em><em>s</em><em>t</em><em>m</em><em>e</em><em>n</em><em>t</em>(<em>s</em><em>t</em><em>o</em><em>c</em><em>k</em><em>s</em>)</span></p>
+<p><span
+class="math display"><em>s</em><em>a</em><em>v</em><em>i</em><em>n</em><em>g</em><em>s</em>_<em>a</em><em>c</em><em>c</em><em>o</em><em>u</em><em>n</em><em>t</em>(<em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>) ∧ <em>i</em><em>n</em><em>c</em><em>o</em><em>m</em><em>e</em>(<em>i</em><em>n</em><em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>) → <em>i</em><em>n</em><em>v</em><em>e</em><em>s</em><em>t</em><em>m</em><em>e</em><em>n</em><em>t</em>(<em>c</em><em>o</em><em>m</em><em>b</em><em>i</em><em>n</em><em>a</em><em>t</em><em>i</em><em>o</em><em>n</em>)</span></p>
+<p>判断储蓄是否充足和收入是否充足，还需要更底层规则。设 <span
+class="math inline"><em>m</em><em>i</em><em>n</em><em>s</em><em>a</em><em>v</em><em>i</em><em>n</em><em>g</em><em>s</em>(<em>y</em>) = 5000 × <em>y</em></span>，<span
+class="math inline"><em>m</em><em>i</em><em>n</em><em>i</em><em>n</em><em>c</em><em>o</em><em>m</em><em>e</em>(<em>y</em>) = 15000 + 4000 × <em>y</em></span>，其中
+<span class="math inline"><em>y</em></span> 是赡养人数。若已存金额 <span
+class="math inline"><em>x</em></span>
+大于最低储蓄需求，则储蓄充足；若稳定收入 <span
+class="math inline"><em>x</em></span>
+大于最低收入需求，则收入充足；否则收入或储蓄不足。</p>
+<h3 id="推理过程">6.3 推理过程</h3>
+<p>这里给出的事实是：</p>
+<p><span
+class="math display"><em>a</em><em>m</em><em>o</em><em>u</em><em>n</em><em>t</em>_<em>s</em><em>a</em><em>v</em><em>e</em><em>d</em>(22000)</span></p>
+<p><span
+class="math display"><em>e</em><em>a</em><em>r</em><em>n</em><em>i</em><em>n</em><em>g</em><em>s</em>(25000, <em>s</em><em>t</em><em>e</em><em>a</em><em>d</em><em>y</em>)</span></p>
+<p><span
+class="math display"><em>d</em><em>e</em><em>p</em><em>e</em><em>n</em><em>d</em><em>e</em><em>n</em><em>t</em><em>s</em>(3)</span></p>
+<p>先判断收入。对于 <span class="math inline">3</span> 个赡养者：</p>
+<p><span
+class="math display"><em>m</em><em>i</em><em>n</em><em>i</em><em>n</em><em>c</em><em>o</em><em>m</em><em>e</em>(3) = 15000 + 4000 × 3 = 27000</span></p>
+<p>由于 <span
+class="math inline">25000 &lt; 27000</span>，所以收入不足，可推出：</p>
+<p><span
+class="math display"><em>i</em><em>n</em><em>c</em><em>o</em><em>m</em><em>e</em>(<em>i</em><em>n</em><em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>)</span></p>
+<p>再判断储蓄：</p>
+<p><span
+class="math display"><em>m</em><em>i</em><em>n</em><em>s</em><em>a</em><em>v</em><em>i</em><em>n</em><em>g</em><em>s</em>(3) = 5000 × 3 = 15000</span></p>
+<p>由于 <span
+class="math inline">22000 &gt; 15000</span>，所以储蓄充足，可推出：</p>
+<p><span
+class="math display"><em>s</em><em>a</em><em>v</em><em>i</em><em>n</em><em>g</em><em>s</em>_<em>a</em><em>c</em><em>c</em><em>o</em><em>u</em><em>n</em><em>t</em>(<em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>)</span></p>
+<p>最后使用投资建议规则：</p>
+<p><span
+class="math display"><em>s</em><em>a</em><em>v</em><em>i</em><em>n</em><em>g</em><em>s</em>_<em>a</em><em>c</em><em>c</em><em>o</em><em>u</em><em>n</em><em>t</em>(<em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>) ∧ <em>i</em><em>n</em><em>c</em><em>o</em><em>m</em><em>e</em>(<em>i</em><em>n</em><em>a</em><em>d</em><em>e</em><em>q</em><em>u</em><em>a</em><em>t</em><em>e</em>) → <em>i</em><em>n</em><em>v</em><em>e</em><em>s</em><em>t</em><em>m</em><em>e</em><em>n</em><em>t</em>(<em>c</em><em>o</em><em>m</em><em>b</em><em>i</em><em>n</em><em>a</em><em>t</em><em>i</em><em>o</em><em>n</em>)</span></p>
+<p>得到：</p>
+<p><span
+class="math display"><em>i</em><em>n</em><em>v</em><em>e</em><em>s</em><em>t</em><em>m</em><em>e</em><em>n</em><em>t</em>(<em>c</em><em>o</em><em>m</em><em>b</em><em>i</em><em>n</em><em>a</em><em>t</em><em>i</em><em>o</em><em>n</em>)</span></p>
+<p>这个例子体现了专家系统推理的典型结构：底层事实先触发中间判断，中间判断再触发最终建议。逻辑表示的好处是每一步推理都有明确依据，系统可以解释“为什么建议组合投资”。</p>
+<h2 id="归结反证把证明问题变成矛盾检测">7
+归结反证：把证明问题变成矛盾检测</h2>
+<h3 id="归结反证的基本思想">7.1 归结反证的基本思想</h3>
+<p><strong>归结反证（resolution
+refutation）</strong>是一种非常重要的自动推理方法。它不直接证明目标
+<span class="math inline"><em>G</em></span>，而是把目标的否定 <span
+class="math inline">¬<em>G</em></span>
+加入知识库，然后尝试推出矛盾。如果知识库 <span
+class="math inline"><em>S</em></span> 加上 <span
+class="math inline">¬<em>G</em></span> 不可满足，就说明 <span
+class="math inline"><em>S</em></span> 必然推出 <span
+class="math inline"><em>G</em></span>。</p>
+<p>其逻辑依据是：</p>
+<p><span
+class="math display"><em>S</em> ⊨ <em>G</em>  当且仅当  <em>S</em> ∪ {¬<em>G</em>}
+不可满足</span></p>
+<p>因此，归结证明的目标是推出<strong>空子句（empty
+clause）</strong>，通常写作 <span
+class="math inline">▫</span>。空子句表示矛盾，因为它不包含任何可满足的文字。</p>
+<h3 id="归结反证步骤">7.2 归结反证步骤</h3>
+<p>这里给出的归结反证流程可以整理为：</p>
+<ol type="1">
+<li>将前提或公理转化为子句形（clause form）。</li>
+<li>将待证明目标取反，也转化为子句形，并加入子句集合。</li>
+<li>在子句之间进行归结，产生新的逻辑后承子句。</li>
+<li>如果最终产生空子句 <span
+class="math inline">▫</span>，说明出现矛盾，目标得证。</li>
+<li>若目标含变量，归结过程中使用的替换可以用于抽取答案。</li>
+</ol>
+<p>归结规则的核心是消去一对互补文字。例如两个子句：</p>
+<p><span class="math display"><em>P</em> ∨ <em>A</em></span></p>
+<p>和：</p>
+<p><span class="math display">¬<em>P</em> ∨ <em>B</em></span></p>
+<p>可以归结得到：</p>
+<p><span class="math display"><em>A</em> ∨ <em>B</em></span></p>
+<p>在一阶逻辑中，<span class="math inline"><em>P</em></span> 和 <span
+class="math inline">¬<em>P</em></span>
+不必字面完全相同，只要它们能通过合一变成互补形式即可。</p>
+<h3 id="狗与死亡例子">7.3 狗与死亡例子</h3>
+<p>这里的例子是：</p>
+<p>所有狗都是动物：</p>
+<p><span
+class="math display">∀<em>x</em>(<em>d</em><em>o</em><em>g</em>(<em>x</em>) → <em>a</em><em>n</em><em>i</em><em>m</em><em>a</em><em>l</em>(<em>x</em>))</span></p>
+<p>所有动物都会死：</p>
+<p><span
+class="math display">∀<em>y</em>(<em>a</em><em>n</em><em>i</em><em>m</em><em>a</em><em>l</em>(<em>y</em>) → <em>d</em><em>i</em><em>e</em>(<em>y</em>))</span></p>
+<p>Fido 是狗：</p>
+<p><span
+class="math display"><em>d</em><em>o</em><em>g</em>(<em>f</em><em>i</em><em>d</em><em>o</em>)</span></p>
+<p>问题是 Fido 是否会死，即证明：</p>
+<p><span
+class="math display"><em>d</em><em>i</em><em>e</em>(<em>f</em><em>i</em><em>d</em><em>o</em>)</span></p>
+<p>先转为子句形：</p>
+<p><span
+class="math display">¬<em>d</em><em>o</em><em>g</em>(<em>x</em>) ∨ <em>a</em><em>n</em><em>i</em><em>m</em><em>a</em><em>l</em>(<em>x</em>)</span></p>
+<p><span
+class="math display">¬<em>a</em><em>n</em><em>i</em><em>m</em><em>a</em><em>l</em>(<em>y</em>) ∨ <em>d</em><em>i</em><em>e</em>(<em>y</em>)</span></p>
+<p><span
+class="math display"><em>d</em><em>o</em><em>g</em>(<em>f</em><em>i</em><em>d</em><em>o</em>)</span></p>
+<p>再加入目标否定：</p>
+<p><span
+class="math display">¬<em>d</em><em>i</em><em>e</em>(<em>f</em><em>i</em><em>d</em><em>o</em>)</span></p>
+<p>归结过程可以理解为：第一条和第二条归结（正文字和负文字可以消掉），得到
+<span
+class="math inline">¬<em>d</em><em>o</em><em>g</em>(<em>y</em>) ∨ <em>d</em><em>i</em><em>e</em>(<em>y</em>)</span>；再与
+<span
+class="math inline"><em>d</em><em>o</em><em>g</em>(<em>f</em><em>i</em><em>d</em><em>o</em>)</span>
+归结，得到 <span
+class="math inline"><em>d</em><em>i</em><em>e</em>(<em>f</em><em>i</em><em>d</em><em>o</em>)</span>；最后与
+<span
+class="math inline">¬<em>d</em><em>i</em><em>e</em>(<em>f</em><em>i</em><em>d</em><em>o</em>)</span>
+归结，得到空子句 <span class="math inline">▫</span>。因此，Fido
+会死。</p>
+<p>这个例子展示了归结反证的本质：<strong>证明目标等价于证明“目标不成立”会导致矛盾。</strong></p>
+<h2 id="子句形转换归结推理的标准输入格式">8
+子句形转换：归结推理的标准输入格式</h2>
+<h3 id="什么是子句形">8.1 什么是子句形</h3>
+<p>归结推理要求输入是<strong>子句（clause）</strong>，也就是若干文字的析取。文字（literal）是原子公式或其否定。例如：</p>
+<p><span
+class="math display">¬<em>d</em><em>o</em><em>g</em>(<em>x</em>) ∨ <em>a</em><em>n</em><em>i</em><em>m</em><em>a</em><em>l</em>(<em>x</em>)</span></p>
+<p>就是一个子句。多个子句的集合整体可以看成合取范式（conjunctive normal
+form, CNF），即“多个析取子句的合取”。</p>
+<p>材料用一个复杂公式演示如何把任意一阶逻辑公式转成子句形。重点不是死记该公式，而是掌握转换步骤。</p>
+<h3 id="子句形转换步骤">8.2 子句形转换步骤</h3>
+<p>子句形转换一般分九步。材料 第 61-69
+页用下面这个公式贯穿演示整个过程：</p>
+<p><span
+class="math display">∀<em>x</em>(([<em>a</em>(<em>x</em>) ∧ <em>b</em>(<em>x</em>)] → [<em>c</em>(<em>x</em>, <em>i</em>) ∧ ∃<em>y</em>∃<em>z</em>(<em>c</em>(<em>y</em>, <em>z</em>) → <em>d</em>(<em>x</em>, <em>y</em>))])) ∨ ∀<em>x</em> <em>e</em>(<em>x</em>)</span></p>
+<p>这个公式看起来很复杂，但转换目标很明确：把它变成“若干个子句的集合”。也就是说，最后每个子句都只是一串文字的析取，方便后续做归结推理。</p>
+<h4 id="第一步消去蕴含">第一步：消去蕴含</h4>
+<p>归结推理不直接处理 <span
+class="math inline">→</span>，所以第一步要把所有蕴含消掉。使用的等价式是：</p>
+<p><span
+class="math display"><em>a</em> → <em>b</em> ≡ ¬<em>a</em> ∨ <em>b</em></span></p>
+<p>本例中有两个蕴含：外层的 <span
+class="math inline">[<em>a</em>(<em>x</em>) ∧ <em>b</em>(<em>x</em>)] → [⋯]</span>，以及内层的
+<span
+class="math inline"><em>c</em>(<em>y</em>, <em>z</em>) → <em>d</em>(<em>x</em>, <em>y</em>)</span>。消去后得到：</p>
+<p><span
+class="math display">∀<em>x</em>(¬[<em>a</em>(<em>x</em>) ∧ <em>b</em>(<em>x</em>)] ∨ [<em>c</em>(<em>x</em>, <em>i</em>) ∧ ∃<em>y</em>∃<em>z</em>(¬<em>c</em>(<em>y</em>, <em>z</em>) ∨ <em>d</em>(<em>x</em>, <em>y</em>))]) ∨ ∀<em>x</em> <em>e</em>(<em>x</em>)</span></p>
+<h4 id="第二步将否定向内推进">第二步：将否定向内推进</h4>
+<p>第二步要把否定号推到最里面，使 <span class="math inline">¬</span>
+只作用于原子公式。常用规则包括：</p>
+<p><span class="math display">¬¬<em>a</em> ≡ <em>a</em></span></p>
+<p><span
+class="math display">¬∃<em>x</em> <em>a</em>(<em>x</em>) ≡ ∀<em>x</em> ¬<em>a</em>(<em>x</em>)</span></p>
+<p><span
+class="math display">¬∀<em>x</em> <em>a</em>(<em>x</em>) ≡ ∃<em>x</em> ¬<em>a</em>(<em>x</em>)</span></p>
+<p><span
+class="math display">¬(<em>a</em> ∧ <em>b</em>) ≡ ¬<em>a</em> ∨ ¬<em>b</em></span></p>
+<p><span
+class="math display">¬(<em>a</em> ∨ <em>b</em>) ≡ ¬<em>a</em> ∧ ¬<em>b</em></span></p>
+<p>本例中主要用到的是德摩根律：</p>
+<p><span
+class="math display">¬[<em>a</em>(<em>x</em>) ∧ <em>b</em>(<em>x</em>)] ≡ ¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>)</span></p>
+<p>因此公式变为：</p>
+<p><span
+class="math display">∀<em>x</em>((¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>)) ∨ [<em>c</em>(<em>x</em>, <em>i</em>) ∧ ∃<em>y</em>∃<em>z</em>(¬<em>c</em>(<em>y</em>, <em>z</em>) ∨ <em>d</em>(<em>x</em>, <em>y</em>))]) ∨ ∀<em>x</em> <em>e</em>(<em>x</em>)</span></p>
+<h4 id="第三步变量标准化">第三步：变量标准化</h4>
+<p>不同量词绑定的变量即使名字相同，也应改成不同名字。例如：</p>
+<p><span
+class="math display">∀<em>x</em> <em>a</em>(<em>x</em>) ∨ ∀<em>x</em> <em>b</em>(<em>x</em>)</span></p>
+<p>应改写为：</p>
+<p><span
+class="math display">∀<em>x</em> <em>a</em>(<em>x</em>) ∨ ∀<em>y</em> <em>b</em>(<em>y</em>)</span></p>
+<p>这样可以避免后续移动量词时发生变量名冲突。</p>
+<p>本例中，左边公式已经有一个 <span
+class="math inline">∀<em>x</em></span>，右边又有一个 <span
+class="math inline">∀<em>x</em> <em>e</em>(<em>x</em>)</span>。这两个
+<span class="math inline"><em>x</em></span>
+不是同一个变量，只是名字撞了，所以要把右边的 <span
+class="math inline"><em>x</em></span> 改名为 <span
+class="math inline"><em>w</em></span>：</p>
+<p><span
+class="math display">∀<em>x</em>((¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>)) ∨ [<em>c</em>(<em>x</em>, <em>i</em>) ∧ ∃<em>y</em>∃<em>z</em>(¬<em>c</em>(<em>y</em>, <em>z</em>) ∨ <em>d</em>(<em>x</em>, <em>y</em>))]) ∨ ∀<em>w</em> <em>e</em>(<em>w</em>)</span></p>
+<h4 id="第四步前束化">第四步：前束化</h4>
+<p>前束化（prenex
+form）就是把所有量词移动到公式最左侧，同时保持它们相对顺序不变。移动后，公式主体里不再夹杂量词：</p>
+<p><span
+class="math display">∀<em>x</em>∃<em>y</em>∃<em>z</em>∀<em>w</em>((¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>)) ∨ [<em>c</em>(<em>x</em>, <em>i</em>) ∧ (¬<em>c</em>(<em>y</em>, <em>z</em>) ∨ <em>d</em>(<em>x</em>, <em>y</em>))] ∨ <em>e</em>(<em>w</em>))</span></p>
+<h4 id="第五步skolem-化消去存在量词">第五步：Skolem
+化，消去存在量词</h4>
+<p>Skolem
+化（Skolemization）用于消去存在量词。如果存在变量不依赖任何全称变量，就用新的
+Skolem 常量替代；如果它出现在某些全称变量作用域内，就用这些全称变量的
+Skolem 函数替代。例如：</p>
+<p><span
+class="math display">∀<em>x</em>∃<em>y</em> <em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>x</em>, <em>y</em>)</span></p>
+<p>可以变成：</p>
+<p><span
+class="math display">∀<em>x</em> <em>m</em><em>o</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>x</em>, <em>m</em>(<em>x</em>))</span></p>
+<p>这里 <span class="math inline"><em>m</em>(<em>x</em>)</span> 表示“与
+<span class="math inline"><em>x</em></span>
+有关的某个母亲对象”。再如：</p>
+<p><span
+class="math display">∀<em>x</em>∀<em>y</em>∃<em>z</em>∀<em>w</em> <em>f</em><em>o</em><em>o</em>(<em>x</em>, <em>y</em>, <em>z</em>, <em>w</em>)</span></p>
+<p>可以变成：</p>
+<p><span
+class="math display">∀<em>x</em>∀<em>y</em>∀<em>w</em> <em>f</em><em>o</em><em>o</em>(<em>x</em>, <em>y</em>, <em>f</em>(<em>x</em>, <em>y</em>), <em>w</em>)</span></p>
+<p>在本例中，<span class="math inline">∃<em>y</em></span> 和 <span
+class="math inline">∃<em>z</em></span> 都出现在 <span
+class="math inline">∀<em>x</em></span> 之后、<span
+class="math inline">∀<em>w</em></span> 之前，因此 <span
+class="math inline"><em>y</em>, <em>z</em></span> 只依赖于 <span
+class="math inline"><em>x</em></span>，不依赖于 <span
+class="math inline"><em>w</em></span>。所以可以用两个 Skolem 函数 <span
+class="math inline"><em>f</em>(<em>x</em>)</span> 和 <span
+class="math inline"><em>g</em>(<em>x</em>)</span> 替换它们：</p>
+<p><span
+class="math display">∀<em>x</em>∀<em>w</em>((¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>)) ∨ [<em>c</em>(<em>x</em>, <em>i</em>) ∧ (¬<em>c</em>(<em>f</em>(<em>x</em>), <em>g</em>(<em>x</em>)) ∨ <em>d</em>(<em>x</em>, <em>f</em>(<em>x</em>)))] ∨ <em>e</em>(<em>w</em>))</span></p>
+<p>这里 <span class="math inline"><em>f</em>(<em>x</em>)</span>
+表示“对每个 <span class="math inline"><em>x</em></span> 存在的某个 <span
+class="math inline"><em>y</em></span>”，<span
+class="math inline"><em>g</em>(<em>x</em>)</span> 表示“对每个 <span
+class="math inline"><em>x</em></span> 存在的某个 <span
+class="math inline"><em>z</em></span>”。它们不是原本就存在的函数，而是
+Skolem 化时引入的新符号。</p>
+<h4 id="第六步删除全称量词">第六步：删除全称量词</h4>
+<p>经过 Skolem
+化后只剩全称变量。在子句形中，所有变量默认都是全称量化的，所以可以直接删除
+<span class="math inline">∀<em>x</em>∀<em>w</em></span>：</p>
+<p><span
+class="math display">(¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>)) ∨ [<em>c</em>(<em>x</em>, <em>i</em>) ∧ (¬<em>c</em>(<em>f</em>(<em>x</em>), <em>g</em>(<em>x</em>)) ∨ <em>d</em>(<em>x</em>, <em>f</em>(<em>x</em>)))] ∨ <em>e</em>(<em>w</em>)</span></p>
+<h4 id="第七步转成合取范式">第七步：转成合取范式</h4>
+<p>第七步利用结合律和分配律，把公式转成合取范式（CNF），也就是“若干析取式之间用
+<span class="math inline">∧</span> 连接”。核心规则是：</p>
+<p><span
+class="math display"><em>a</em> ∨ (<em>b</em> ∧ <em>c</em>) ≡ (<em>a</em> ∨ <em>b</em>) ∧ (<em>a</em> ∨ <em>c</em>)</span></p>
+<p>本例中，令：</p>
+<p><span
+class="math display"><em>A</em> = ¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>)</span></p>
+<p>则公式可以看成：</p>
+<p><span
+class="math display"><em>A</em> ∨ [<em>c</em>(<em>x</em>, <em>i</em>) ∧ (¬<em>c</em>(<em>f</em>(<em>x</em>), <em>g</em>(<em>x</em>)) ∨ <em>d</em>(<em>x</em>, <em>f</em>(<em>x</em>)))] ∨ <em>e</em>(<em>w</em>)</span></p>
+<p>把 <span class="math inline">∨</span> 分配到 <span
+class="math inline">∧</span> 里面，得到：</p>
+<p><span
+class="math display">[¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>) ∨ <em>c</em>(<em>x</em>, <em>i</em>) ∨ <em>e</em>(<em>w</em>)] ∧ [¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>) ∨ ¬<em>c</em>(<em>f</em>(<em>x</em>), <em>g</em>(<em>x</em>)) ∨ <em>d</em>(<em>x</em>, <em>f</em>(<em>x</em>)) ∨ <em>e</em>(<em>w</em>)]</span></p>
+<h4 id="第八步拆成单独子句">第八步：拆成单独子句</h4>
+<p>合取范式中的每个合取项都可以单独看成一个子句。因此本例得到两个子句：</p>
+<p><span
+class="math display">¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>) ∨ <em>c</em>(<em>x</em>, <em>i</em>) ∨ <em>e</em>(<em>w</em>)</span></p>
+<p><span
+class="math display">¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>) ∨ ¬<em>c</em>(<em>f</em>(<em>x</em>), <em>g</em>(<em>x</em>)) ∨ <em>d</em>(<em>x</em>, <em>f</em>(<em>x</em>)) ∨ <em>e</em>(<em>w</em>)</span></p>
+<h4 id="第九步再次标准化变量">第九步：再次标准化变量</h4>
+<p>不同子句中的变量默认是相互独立的，因此应把不同子句中的变量改成不同名字，以免归结时错误地把它们当成同一个变量。本例中可以保留第一个子句的
+<span class="math inline"><em>x</em>, <em>w</em></span>，把第二个子句的
+<span class="math inline"><em>x</em>, <em>w</em></span> 改成 <span
+class="math inline"><em>u</em>, <em>v</em></span>：</p>
+<p><span
+class="math display">¬<em>a</em>(<em>x</em>) ∨ ¬<em>b</em>(<em>x</em>) ∨ <em>c</em>(<em>x</em>, <em>i</em>) ∨ <em>e</em>(<em>w</em>)</span></p>
+<p><span
+class="math display">¬<em>a</em>(<em>u</em>) ∨ ¬<em>b</em>(<em>u</em>) ∨ ¬<em>c</em>(<em>f</em>(<em>u</em>), <em>g</em>(<em>u</em>)) ∨ <em>d</em>(<em>u</em>, <em>f</em>(<em>u</em>)) ∨ <em>e</em>(<em>v</em>)</span></p>
+<p>这两个子句就是原公式转换后的子句形。后续归结推理就可以在这些子句之间寻找互补文字，并通过合一消去它们。</p>
+<h3 id="skolem-化的理解">8.3 Skolem 化的理解</h3>
+<p>Skolem
+化容易被误解为“随便造一个函数”。更准确地说，它是在保持可满足性意义下，用一个新符号代表“存在的某个对象”。如果公式是
+<span
+class="math inline">∃<em>x</em> <em>P</em>(<em>x</em>)</span>，可以用一个新常量
+<span class="math inline"><em>c</em></span> 表示那个存在对象，得到 <span
+class="math inline"><em>P</em>(<em>c</em>)</span>。如果公式是 <span
+class="math inline">∀<em>x</em>∃<em>y</em> <em>P</em>(<em>x</em>, <em>y</em>)</span>，<span
+class="math inline"><em>y</em></span> 可能随 <span
+class="math inline"><em>x</em></span>
+不同而不同，所以不能用固定常量，而要用函数 <span
+class="math inline"><em>f</em>(<em>x</em>)</span> 表示“由 <span
+class="math inline"><em>x</em></span> 决定的某个 <span
+class="math inline"><em>y</em></span>”，得到 <span
+class="math inline">∀<em>x</em> <em>P</em>(<em>x</em>, <em>f</em>(<em>x</em>))</span>。</p>
+<p>因此，Skolem
+化通常不保持原公式的逻辑等价，但保持可满足性。这对归结反证足够，因为归结关心的是公式集是否不可满足。</p>
+<h2 id="归结推理的典型例题与答案抽取">9
+归结推理的典型例题与答案抽取</h2>
+<h3 id="快乐学生例子">9.1 快乐学生例子</h3>
+<p>这里的故事是：任何通过历史练习并中彩票的人是快乐的；任何学习或幸运的人都能通过所有练习；John
+没有学习但很幸运；任何幸运的人都会中彩票。问题是 John 是否快乐。</p>
+<p>形式化后，关键子句包括：</p>
+<p><span
+class="math display">¬<em>p</em><em>a</em><em>s</em><em>s</em>(<em>x</em>, <em>h</em><em>i</em><em>s</em><em>t</em><em>o</em><em>r</em><em>y</em>) ∨ ¬<em>w</em><em>i</em><em>n</em>(<em>x</em>, <em>l</em><em>o</em><em>t</em><em>t</em><em>e</em><em>r</em><em>y</em>) ∨ <em>h</em><em>a</em><em>p</em><em>p</em><em>y</em>(<em>x</em>)</span></p>
+<p><span
+class="math display">¬<em>s</em><em>t</em><em>u</em><em>d</em><em>y</em>(<em>y</em>) ∨ <em>p</em><em>a</em><em>s</em><em>s</em>(<em>y</em>, <em>z</em>)</span></p>
+<p><span
+class="math display">¬<em>l</em><em>u</em><em>c</em><em>k</em><em>y</em>(<em>w</em>) ∨ <em>p</em><em>a</em><em>s</em><em>s</em>(<em>w</em>, <em>v</em>)</span></p>
+<p><span
+class="math display">¬<em>s</em><em>t</em><em>u</em><em>d</em><em>y</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span></p>
+<p><span
+class="math display"><em>l</em><em>u</em><em>c</em><em>k</em><em>y</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span></p>
+<p><span
+class="math display">¬<em>l</em><em>u</em><em>c</em><em>k</em><em>y</em>(<em>u</em>) ∨ <em>w</em><em>i</em><em>n</em>(<em>u</em>, <em>l</em><em>o</em><em>t</em><em>t</em><em>e</em><em>r</em><em>y</em>)</span></p>
+<p>目标是证明 <span
+class="math inline"><em>h</em><em>a</em><em>p</em><em>p</em><em>y</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>，所以加入：</p>
+<p><span
+class="math display">¬<em>h</em><em>a</em><em>p</em><em>p</em><em>y</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span></p>
+<p>归结过程：由 <span
+class="math inline"><em>l</em><em>u</em><em>c</em><em>k</em><em>y</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+和 <span
+class="math inline">¬<em>l</em><em>u</em><em>c</em><em>k</em><em>y</em>(<em>u</em>) ∨ <em>w</em><em>i</em><em>n</em>(<em>u</em>, <em>l</em><em>o</em><em>t</em><em>t</em><em>e</em><em>r</em><em>y</em>)</span>
+得到 <span
+class="math inline"><em>w</em><em>i</em><em>n</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>l</em><em>o</em><em>t</em><em>t</em><em>e</em><em>r</em><em>y</em>)</span>；由
+<span
+class="math inline"><em>l</em><em>u</em><em>c</em><em>k</em><em>y</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+和 <span
+class="math inline">¬<em>l</em><em>u</em><em>c</em><em>k</em><em>y</em>(<em>w</em>) ∨ <em>p</em><em>a</em><em>s</em><em>s</em>(<em>w</em>, <em>v</em>)</span>
+得到 <span
+class="math inline"><em>p</em><em>a</em><em>s</em><em>s</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>h</em><em>i</em><em>s</em><em>t</em><em>o</em><em>r</em><em>y</em>)</span>；再结合“通过历史练习且中彩票则快乐”，推出
+<span
+class="math inline"><em>h</em><em>a</em><em>p</em><em>p</em><em>y</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>；最后与
+<span
+class="math inline">¬<em>h</em><em>a</em><em>p</em><em>p</em><em>y</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+矛盾。因此 John 快乐。</p>
+<h3 id="精彩人生例子">9.2 精彩人生例子</h3>
+<p>另一个故事是：不穷且聪明的人是快乐的；会阅读的人不笨，也就是聪明；John
+会阅读且富有，即不穷；快乐的人有精彩人生。问题是能否找到某个人有精彩人生。</p>
+<p>目标含变量：</p>
+<p><span
+class="math display">∃<em>w</em> <em>e</em><em>x</em><em>c</em><em>i</em><em>t</em><em>i</em><em>n</em><em>g</em>(<em>w</em>)</span></p>
+<p>归结反证时加入其否定：</p>
+<p><span
+class="math display">¬∃<em>w</em> <em>e</em><em>x</em><em>c</em><em>i</em><em>t</em><em>i</em><em>n</em><em>g</em>(<em>w</em>)</span></p>
+<p>等价于：</p>
+<p><span
+class="math display">∀<em>w</em> ¬<em>e</em><em>x</em><em>c</em><em>i</em><em>t</em><em>i</em><em>n</em><em>g</em>(<em>w</em>)</span></p>
+<p>子句形式可写为：</p>
+<p><span
+class="math display">¬<em>e</em><em>x</em><em>c</em><em>i</em><em>t</em><em>i</em><em>n</em><em>g</em>(<em>w</em>)</span></p>
+<p>通过归结可以推出 <span
+class="math inline"><em>e</em><em>x</em><em>c</em><em>i</em><em>t</em><em>i</em><em>n</em><em>g</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>，并与
+<span
+class="math inline">¬<em>e</em><em>x</em><em>c</em><em>i</em><em>t</em><em>i</em><em>n</em><em>g</em>(<em>w</em>)</span>
+在替换 <span
+class="math inline">{<em>j</em><em>o</em><em>h</em><em>n</em>/<em>w</em>}</span>
+下产生空子句。因此答案不仅是“存在”，还可以抽取为：</p>
+<p><span
+class="math display"><em>e</em><em>x</em><em>c</em><em>i</em><em>t</em><em>i</em><em>n</em><em>g</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span></p>
+<p>这个例子说明，当问题是“是否存在某个对象满足性质”时，归结过程中的合一替换可以告诉我们这个对象是谁。</p>
+<h3 id="祖父母例子">9.3 祖父母例子</h3>
+<p>材料最后用“每个人都有父母，父母的父母是祖父母”说明 Skolem
+函数和答案抽取。</p>
+<p>规则为：</p>
+<p><span
+class="math display">∀<em>x</em>∃<em>y</em> <em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>x</em>, <em>y</em>)</span></p>
+<p><span
+class="math display">∀<em>x</em>∀<em>y</em>∀<em>z</em>(<em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>x</em>, <em>y</em>) ∧ <em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>y</em>, <em>z</em>) → <em>g</em><em>r</em><em>a</em><em>n</em><em>d</em><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>x</em>, <em>z</em>))</span></p>
+<p>问题是 John 是否有祖父母：</p>
+<p><span
+class="math display">∃<em>w</em> <em>g</em><em>r</em><em>a</em><em>n</em><em>d</em><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>w</em>)</span></p>
+<p>第一条经过 Skolem 化变成：</p>
+<p><span
+class="math display"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>x</em>, <em>p</em><em>a</em>(<em>x</em>))</span></p>
+<p>表示“每个人 <span class="math inline"><em>x</em></span> 都有一个父母
+<span class="math inline"><em>p</em><em>a</em>(<em>x</em>)</span>”。由于
+<span
+class="math inline"><em>p</em><em>a</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>
+也有父母，所以还能得到：</p>
+<p><span
+class="math display"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>p</em><em>a</em>(<em>j</em><em>o</em><em>h</em><em>n</em>), <em>p</em><em>a</em>(<em>p</em><em>a</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)))</span></p>
+<p>结合祖父母规则，可以推出：</p>
+<p><span
+class="math display"><em>g</em><em>r</em><em>a</em><em>n</em><em>d</em><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>p</em><em>a</em>(<em>p</em><em>a</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)))</span></p>
+<p>因此答案是：</p>
+<p><span
+class="math display"><em>g</em><em>r</em><em>a</em><em>n</em><em>d</em><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>p</em><em>a</em>(<em>p</em><em>a</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)))</span></p>
+<p>这里的 <span
+class="math inline"><em>p</em><em>a</em>(<em>p</em><em>a</em>(<em>j</em><em>o</em><em>h</em><em>n</em>))</span>
+不是一个已知姓名，而是由 Skolem 函数构造出来的对象，表示“John
+的某个父母的某个父母”。</p>
+<h2 id="归结策略herbrand-结构与语义树">10 归结策略、Herbrand
+结构与语义树</h2>
+<h3 id="归结策略">10.1 归结策略</h3>
+<p>归结规则本身很简单，但在实际自动推理中，子句数量可能迅速爆炸。因此需要策略控制“先归结哪些子句”。这里列出四类策略：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">策略</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">广度优先策略（breadth-first
+strategy）</td>
+<td style="text-align: left;">按层次生成所有可能归结结果</td>
+<td style="text-align: left;">完整性较好，但空间开销大</td>
+</tr>
+<tr>
+<td style="text-align: left;">支持集策略（set of support strategy）</td>
+<td style="text-align: left;">优先使用与目标否定有关的子句</td>
+<td style="text-align: left;">常用于反证，减少无关推理</td>
+</tr>
+<tr>
+<td style="text-align: left;">单元优先策略（unit preference
+strategy）</td>
+<td style="text-align: left;">优先选择只有一个文字的单元子句</td>
+<td style="text-align: left;">可快速简化子句</td>
+</tr>
+<tr>
+<td style="text-align: left;">线性输入策略（linear input form
+strategy）</td>
+<td style="text-align: left;">每次归结至少使用一个原始输入子句</td>
+<td style="text-align: left;">简单高效，但一般不完备</td>
+</tr>
+</tbody>
+</table>
+<p>材料特别指出，线性输入策略不是完备的。也就是说，它可能在某些子句集确实不可满足时，仍然无法找到空子句。学习时要把“策略效率”和“策略完备性”区分开：高效策略可能剪掉太多路径，从而失去完备性。</p>
+<p>材料 第 88 页给出的反例是下面四个子句：</p>
+<p><span class="math display">¬<em>a</em> ∨ ¬<em>b</em></span></p>
+<p><span class="math display"><em>a</em> ∨ ¬<em>b</em></span></p>
+<p><span class="math display">¬<em>a</em> ∨ <em>b</em></span></p>
+<p><span class="math display"><em>a</em> ∨ <em>b</em></span></p>
+<p>这个子句集本身是不可满足的。可以直观地按 <span
+class="math inline"><em>a</em>, <em>b</em></span> 的真假来看：如果 <span
+class="math inline"><em>a</em> = <em>t</em><em>r</em><em>u</em><em>e</em>, <em>b</em> = <em>t</em><em>r</em><em>u</em><em>e</em></span>，第一个子句
+<span class="math inline">¬<em>a</em> ∨ ¬<em>b</em></span> 为假；如果
+<span
+class="math inline"><em>a</em> = <em>t</em><em>r</em><em>u</em><em>e</em>, <em>b</em> = <em>f</em><em>a</em><em>l</em><em>s</em><em>e</em></span>，第三个子句
+<span class="math inline">¬<em>a</em> ∨ <em>b</em></span> 为假；如果
+<span
+class="math inline"><em>a</em> = <em>f</em><em>a</em><em>l</em><em>s</em><em>e</em>, <em>b</em> = <em>t</em><em>r</em><em>u</em><em>e</em></span>，第二个子句
+<span class="math inline"><em>a</em> ∨ ¬<em>b</em></span> 为假；如果
+<span
+class="math inline"><em>a</em> = <em>f</em><em>a</em><em>l</em><em>s</em><em>e</em>, <em>b</em> = <em>f</em><em>a</em><em>l</em><em>s</em><em>e</em></span>，第四个子句
+<span class="math inline"><em>a</em> ∨ <em>b</em></span>
+为假。四种赋值全部失败，所以整个子句集没有模型。</p>
+<p>用普通归结可以推出矛盾。例如：</p>
+<p><span
+class="math display">(¬<em>a</em> ∨ ¬<em>b</em>)  和  (<em>a</em> ∨ ¬<em>b</em>)</span></p>
+<p>对 <span class="math inline"><em>a</em></span> 归结，得到：</p>
+<p><span class="math display">¬<em>b</em></span></p>
+<p>再由：</p>
+<p><span
+class="math display">(¬<em>a</em> ∨ <em>b</em>)  和  (<em>a</em> ∨ <em>b</em>)</span></p>
+<p>对 <span class="math inline"><em>a</em></span> 归结，得到：</p>
+<p><span class="math display"><em>b</em></span></p>
+<p>最后 <span class="math inline"><em>b</em></span> 和 <span
+class="math inline">¬<em>b</em></span> 归结，得到空子句：</p>
+<p><span class="math display">▫</span></p>
+<p>问题在于，线性输入策略要求每一步归结都至少使用一个<strong>原始输入子句</strong>。但上面的最后一步需要把两个中间推出的子句
+<span class="math inline"><em>b</em></span> 和 <span
+class="math inline">¬<em>b</em></span>
+拿来归结，而它们都不是原始输入子句。线性输入策略不允许这一步，因此即使原子句集确实不可满足，它也可能无法推出空子句。这就是“线性输入策略不完备”的含义。</p>
+<h3 id="herbrand-论域">10.2 Herbrand 论域</h3>
+<h4 id="先把它理解成符号世界">10.2.1 先把它理解成“符号世界”</h4>
+<p><strong>Herbrand 论域（Herbrand
+Domain）</strong>可以先理解成一句话：它是只用公式里出现过的常量和函数，能够“造”出来的所有对象名字。它不是在描述真实世界中到底有哪些对象，而是在给自动推理构造一个只由符号组成的世界。这个符号世界的作用是告诉机器：公式里的变量可以尝试替换成哪些对象名字。</p>
+<h4 id="没有函数时论域就是已有常量">10.2.2
+没有函数时：论域就是已有常量</h4>
+<p>例如，知识库里只有：</p>
+<p><span
+class="math display"><em>p</em><em>a</em><em>r</em><em>e</em><em>n</em><em>t</em>(<em>j</em><em>o</em><em>h</em><em>n</em>, <em>m</em><em>a</em><em>r</em><em>y</em>)</span></p>
+<p>这里出现的常量是 <span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span> 和
+<span
+class="math inline"><em>m</em><em>a</em><em>r</em><em>y</em></span>，没有函数符号。因此
+Herbrand 论域就是：</p>
+<p><span
+class="math display"><em>H</em> = {<em>j</em><em>o</em><em>h</em><em>n</em>, <em>m</em><em>a</em><em>r</em><em>y</em>}</span></p>
+<p>这表示在当前符号世界里，变量暂时只需要考虑替换成 <span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span> 或
+<span
+class="math inline"><em>m</em><em>a</em><em>r</em><em>y</em></span>。</p>
+<h4 id="有函数时不断构造新对象">10.2.3 有函数时：不断构造新对象</h4>
+<p>如果知识库中出现函数，Herbrand
+论域就会从常量出发，不断用函数构造新对象。例如有常量 <span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span>，还有一元函数
+<span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>x</em>)</span>，那么第一层是：</p>
+<p><span
+class="math display"><em>H</em><sub>0</sub> = {<em>j</em><em>o</em><em>h</em><em>n</em>}</span></p>
+<p>下一层把 <span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span>
+放进函数里，得到：</p>
+<p><span
+class="math display"><em>H</em><sub>1</sub> = {<em>j</em><em>o</em><em>h</em><em>n</em>, <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)}</span></p>
+<p>再下一层继续把已有对象放进函数里：</p>
+<p><span
+class="math display"><em>H</em><sub>2</sub> = {<em>j</em><em>o</em><em>h</em><em>n</em>, <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>), <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>))}</span></p>
+<p>所以最终 Herbrand 论域是：</p>
+<p><span
+class="math display"><em>H</em> = {<em>j</em><em>o</em><em>h</em><em>n</em>, <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>), <em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)), …}</span></p>
+<p>直观地说，它包含 John、John 的父亲、John
+的父亲的父亲，依此类推。只要函数可以继续嵌套，Herbrand
+论域就可能无限大。</p>
+<h4 id="正式定义从-h_0-一层层生成">10.2.4 正式定义：从 <span
+class="math inline"><em>H</em><sub>0</sub></span> 一层层生成</h4>
+<p>更一般地，<strong>Herbrand
+论域是由子句集中出现的常量和函数符号构造出的所有基项集合</strong>。这里的基项（ground
+term）指不含变量的项，例如 <span
+class="math inline"><em>j</em><em>o</em><em>h</em><em>n</em></span>、<span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>j</em><em>o</em><em>h</em><em>n</em>)</span>、<span
+class="math inline"><em>f</em>(<em>a</em>)</span> 都是基项，而 <span
+class="math inline"><em>f</em><em>a</em><em>t</em><em>h</em><em>e</em><em>r</em>(<em>x</em>)</span>
+不是基项。</p>
+<p>这里给出的构造方式可以整理为：</p>
+<p><span class="math display">$$
+H=\bigcup_{i=0}^{\infty}H_i
+$$</span></p>
+<p>如果子句集 <span class="math inline"><em>S</em></span>
+中没有常量，则令：</p>
+<p><span
+class="math display"><em>H</em><sub>0</sub> = {<em>a</em>}</span></p>
+<p>其中 <span class="math inline"><em>a</em></span>
+是人为加入的常量；如果 <span class="math inline"><em>S</em></span>
+中有常量，则：</p>
+<p><span
+class="math display"><em>H</em><sub>0</sub> = {<em>c</em> ∣ <em>c</em>
+出现在 <em>S</em> 中}</span></p>
+<p>接着用 <span class="math inline"><em>S</em></span>
+中出现的函数符号不断生成新项：</p>
+<p><span
+class="math display"><em>H</em><sub><em>i</em> + 1</sub> = <em>H</em><sub><em>i</em></sub> ∪ {<em>f</em>(<em>t</em><sub>1</sub>, …, <em>t</em><sub><em>n</em></sub>) ∣ <em>t</em><sub>1</sub>, …, <em>t</em><sub><em>n</em></sub> ∈ <em>H</em><sub><em>i</em></sub>, <em>f</em>
+是 <em>S</em> 中出现的 <em>n</em> 元函数}</span></p>
+<p>这条递推公式翻译成人话就是：下一层 <span
+class="math inline"><em>H</em><sub><em>i</em> + 1</sub></span>
+等于旧集合 <span
+class="math inline"><em>H</em><sub><em>i</em></sub></span>，再加上“把旧集合里的对象塞进函数后造出来的新对象”。</p>
+<p>例如，如果常量有 <span
+class="math inline"><em>a</em></span>，函数有一元函数 <span
+class="math inline"><em>f</em></span>，那么 Herbrand 论域包含： <span
+class="math display"><em>a</em>, <em>f</em>(<em>a</em>), <em>f</em>(<em>f</em>(<em>a</em>)), <em>f</em>(<em>f</em>(<em>f</em>(<em>a</em>))), …</span></p>
+<p>如果函数是二元函数，也要把旧集合中的对象两两组合进去。例如常量为
+<span class="math inline"><em>a</em>, <em>b</em></span>，函数为 <span
+class="math inline"><em>p</em><em>a</em><em>i</em><em>r</em>(<em>x</em>, <em>y</em>)</span>，那么：</p>
+<p><span
+class="math display"><em>H</em><sub>0</sub> = {<em>a</em>, <em>b</em>}</span></p>
+<p>第一轮可以生成：</p>
+<p><span
+class="math display"><em>p</em><em>a</em><em>i</em><em>r</em>(<em>a</em>, <em>a</em>), <em>p</em><em>a</em><em>i</em><em>r</em>(<em>a</em>, <em>b</em>), <em>p</em><em>a</em><em>i</em><em>r</em>(<em>b</em>, <em>a</em>), <em>p</em><em>a</em><em>i</em><em>r</em>(<em>b</em>, <em>b</em>)</span></p>
+<p>第二轮又可以继续生成 <span
+class="math inline"><em>p</em><em>a</em><em>i</em><em>r</em>(<em>a</em>, <em>p</em><em>a</em><em>i</em><em>r</em>(<em>a</em>, <em>b</em>))</span>、<span
+class="math inline"><em>p</em><em>a</em><em>i</em><em>r</em>(<em>p</em><em>a</em><em>i</em><em>r</em>(<em>a</em>, <em>a</em>), <em>b</em>)</span>、<span
+class="math inline"><em>p</em><em>a</em><em>i</em><em>r</em>(<em>p</em><em>a</em><em>i</em><em>r</em>(<em>a</em>, <em>b</em>), <em>p</em><em>a</em><em>i</em><em>r</em>(<em>b</em>, <em>a</em>))</span>
+这样的更复杂项。</p>
+<h4 id="它为什么对归结推理有用">10.2.5 它为什么对归结推理有用</h4>
+<p>Herbrand
+论域和归结推理的关系在于，它把“变量可能取什么值”限制在公式自身能够构造出的基项上。比如有子句：</p>
+<p><span class="math display"><em>P</em>(<em>x</em>)</span></p>
+<p>和：</p>
+<p><span
+class="math display">¬<em>P</em>(<em>f</em>(<em>a</em>))</span></p>
+<p>由于 <span class="math inline"><em>f</em>(<em>a</em>)</span> 属于
+Herbrand 论域，<span class="math inline"><em>P</em>(<em>x</em>)</span>
+可以用替换 <span
+class="math inline">{<em>f</em>(<em>a</em>)/<em>x</em>}</span>
+实例化为：</p>
+<p><span
+class="math display"><em>P</em>(<em>f</em>(<em>a</em>))</span></p>
+<p>于是它就能和 <span
+class="math inline">¬<em>P</em>(<em>f</em>(<em>a</em>))</span>
+产生矛盾。Herbrand
+理论背后的关键思想是：如果一阶子句集不可满足，那么在由 Herbrand
+论域生成的某些基实例中，也能发现命题逻辑层面的矛盾。换句话说，Herbrand
+论域为自动推理提供了一个可机械枚举的符号搜索空间。</p>
+<h3 id="语义树">10.3 语义树</h3>
+<p>语义树（semantic tree）可以看成对 Herbrand
+基原子真值赋值的系统枚举。这里的例子涉及子句集：</p>
+<p><span
+class="math display">{<em>p</em>(<em>x</em>), ¬<em>p</em>(<em>x</em>) ∨ <em>q</em>(<em>x</em>), ¬<em>q</em>(<em>f</em>(<em>a</em>))}</span></p>
+<p>语义树会依次考虑 <span
+class="math inline"><em>p</em>(<em>a</em>)</span>、<span
+class="math inline"><em>q</em>(<em>a</em>)</span>、<span
+class="math inline"><em>p</em>(<em>f</em>(<em>a</em>))</span>、<span
+class="math inline"><em>q</em>(<em>f</em>(<em>a</em>))</span>
+等基原子的真假分支。如果某个分支已经违反某个子句，就可以关闭该分支。若所有分支都关闭，则子句集不可满足。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530173942531.png" alt="image-20260530173942114" style="zoom: 30%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606100442535.png" style="zoom: 30%;" /></p>
+<p>语义树与归结的关系在于：语义树从“模型搜索”角度检查可满足性，而归结从“证明矛盾”角度检查不可满足性。二者视角不同，但都服务于自动推理。</p>
+<h2 id="其他逻辑系统默认推理模态逻辑与真值维护">11
+其他逻辑系统：默认推理、模态逻辑与真值维护</h2>
+<h3 id="逻辑系统的分类">11.1 逻辑系统的分类</h3>
+<p>材料把逻辑系统粗略分为三类。第一类是表达能力很强但通常不可判定的逻辑，例如一阶逻辑的某些变体和高阶逻辑。第二类是不含量词、计算复杂度较低的形式系统，例如命题逻辑及其非单调变体。第三类介于命题逻辑和一阶逻辑之间，通过限制量词获得可判定性，例如模态逻辑（Modal
+Logic）、描述逻辑（Description Logic）和命题时序逻辑（Propositional
+Temporal Logic）。</p>
+<p>这部分的核心思想是：<strong>表达能力、推理效率和可判定性之间存在权衡。</strong>逻辑越强，能表达的知识越复杂，但自动推理往往越难。</p>
+<h3 id="默认推理">11.2 默认推理</h3>
+<p>默认推理（Default
+Reasoning）处理的是“通常情况下成立，但可能有例外”的知识。例如“鸟通常会飞，但企鹅不会飞”。经典逻辑是单调的：一旦推出某结论，加入新知识不会使旧结论失效。但默认推理是非单调的，因为加入“这是企鹅”后，可能撤回“它会飞”。</p>
+<p>这里给出默认逻辑（Default Logic）形式：</p>
+<p><span class="math display">$$
+\frac{p:\neg r_1\land\cdots\land\neg r_n}{q}
+$$</span></p>
+<p>可以直观理解为：如果 <span class="math inline"><em>p</em></span>
+成立，并且没有证据表明例外 <span
+class="math inline"><em>r</em><sub>1</sub>, …, <em>r</em><sub><em>n</em></sub></span>
+成立，那么默认推出 <span class="math inline"><em>q</em></span>。</p>
+<p>材料还提到
+circumscription，可理解为一种最小化异常情况的思想：除非能证明某对象属于异常类，否则默认它不是异常。</p>
+<h3 id="模态逻辑">11.3 模态逻辑</h3>
+<p>模态逻辑（Modal
+Logic）在普通真假之外加入“必然”和“可能”这类模态概念。这里给出两个基本符号：</p>
+<p><span class="math display">□<em>p</em></span></p>
+<p>表示“必然 <span class="math inline"><em>p</em></span>”；</p>
+<p><span class="math display">◇<em>p</em></span></p>
+<p>表示“可能 <span class="math inline"><em>p</em></span>”。</p>
+<p>二者之间有重要关系：</p>
+<p><span class="math display">□<em>p</em> ↔︎ ¬◇¬<em>p</em></span></p>
+<p>意思是“<span class="math inline"><em>p</em></span>
+必然为真”等价于“不可能 <span class="math inline"><em>p</em></span>
+为假”。另一个常见公理是：</p>
+<p><span
+class="math display">□(<em>p</em> → <em>q</em>) → (□<em>p</em> → □<em>q</em>)</span></p>
+<p>表示如果“<span class="math inline"><em>p</em></span> 蕴含 <span
+class="math inline"><em>q</em></span>”是必然的，并且 <span
+class="math inline"><em>p</em></span> 必然为真，那么 <span
+class="math inline"><em>q</em></span> 也必然为真。</p>
+<h3 id="真值维护系统">11.4 真值维护系统</h3>
+<p>真值维护系统（Truth Maintenance System,
+TMS）用于在知识变化时维护结论的一致性。这里强调，TMS
+会为每个结论记录其<strong>理由（justification）</strong>，也就是推出该结论所用的事实、规则和假设。</p>
+<p>当系统发现矛盾时，它可以沿着理由追踪哪些假设导致了矛盾，然后撤回错误假设，并进一步撤回所有依赖这些假设的结论。这个机制特别适合默认推理和动态知识库，因为在这些场景中，后续信息可能推翻先前结论。</p>
+<h2 id="horn-子句与-prolog-的逻辑基础">12 Horn 子句与 Prolog
+的逻辑基础</h2>
+<h3 id="horn-子句">12.1 Horn 子句</h3>
+<p><strong>Horn 子句（Horn
+Clause）</strong>是至多包含一个【正文字】的子句。一般形式为： <span
+class="math display"><em>a</em> ∨ ¬<em>b</em><sub>1</sub> ∨ ¬<em>b</em><sub>2</sub> ∨ ⋯ ∨ ¬<em>b</em><sub><em>n</em></sub></span></p>
+<p>把它改写成蕴含形式，就是：</p>
+<p><span
+class="math display"><em>a</em> ← <em>b</em><sub>1</sub> ∧ <em>b</em><sub>2</sub> ∧ ⋯ ∧ <em>b</em><sub><em>n</em></sub></span></p>
+<p>也可以写成更常见的逻辑形式：</p>
+<p><span
+class="math display"><em>b</em><sub>1</sub> ∧ <em>b</em><sub>2</sub> ∧ ⋯ ∧ <em>b</em><sub><em>n</em></sub> → <em>a</em></span></p>
+<p>Prolog 正是建立在 Horn 子句之上的逻辑程序设计语言。Horn
+子句限制了表达能力，但换来了更可控、更高效的推理过程。根据 SWI-Prolog
+文档和经典逻辑程序设计教材，Prolog 的执行可以理解为对 Horn
+子句进行一种受控的 SLD 归结（SLD Resolution）。</p>
+<h3 id="horn-子句的三种形式">12.2 Horn 子句的三种形式</h3>
+<p>这里列出 Horn 子句的三种形式。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">形式</th>
+<th style="text-align: left;">逻辑写法</th>
+<th style="text-align: left;">Prolog 直观含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">目标/无头子句（goal/headless clause）</td>
+<td style="text-align: left;"><span
+class="math inline"> ← <em>a</em><sub>1</sub> ∧ ⋯ ∧ <em>a</em><sub><em>n</em></sub></span></td>
+<td style="text-align: left;">要证明的查询</td>
+</tr>
+<tr>
+<td style="text-align: left;">事实（fact）</td>
+<td style="text-align: left;"><span
+class="math inline"><em>a</em>←</span></td>
+<td style="text-align: left;">无条件成立的事实</td>
+</tr>
+<tr>
+<td style="text-align: left;">规则（rule）</td>
+<td style="text-align: left;"><span
+class="math inline"><em>a</em> ← <em>b</em><sub>1</sub> ∧ ⋯ ∧ <em>b</em><sub><em>n</em></sub></span></td>
+<td style="text-align: left;">如果条件都成立，则结论成立</td>
+</tr>
+</tbody>
+</table>
+<p>在 Prolog 中，事实通常写成：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">likes(george, kate).</span><br></pre></td></tr></table></figure>
+<p>规则通常写成：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">friends(<span class="symbol">X</span>, <span class="symbol">Y</span>) :- likes(<span class="symbol">X</span>, <span class="symbol">Z</span>), likes(<span class="symbol">Y</span>, <span class="symbol">Z</span>).</span><br></pre></td></tr></table></figure>
+<p>查询通常写成：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- friends(george, susie).</span><br></pre></td></tr></table></figure>
+<p>其中 <code>:-</code> 可以读作“if”，逗号 <code>,</code>
+表示合取“and”。</p>
+<h2 id="prolog-程序执行合一回溯与搜索顺序">13 Prolog
+程序执行：合一、回溯与搜索顺序</h2>
+<h3 id="prolog-如何证明一个目标">13.1 Prolog 如何证明一个目标</h3>
+<p>给定目标：</p>
+<p><span
+class="math display"> ← <em>a</em><sub>1</sub> ∧ <em>a</em><sub>2</sub> ∧ ⋯ ∧ <em>a</em><sub><em>n</em></sub></span></p>
+<p>Prolog 解释器会从左到右选择当前最左目标 <span
+class="math inline"><em>a</em><sub>1</sub></span>，然后按照程序中子句出现的顺序，寻找第一个能与
+<span class="math inline"><em>a</em><sub>1</sub></span>
+的头部合一的子句。如果找到规则：</p>
+<p><span
+class="math display"><em>a</em><sub>1</sub> ← <em>b</em><sub>1</sub> ∧ <em>b</em><sub>2</sub> ∧ ⋯ ∧ <em>b</em><sub><em>m</em></sub></span></p>
+<p>并使用替换 <span class="math inline"><em>ξ</em></span>
+合一，那么原目标会被改写成：</p>
+<p><span
+class="math display"> ← (<em>b</em><sub>1</sub> ∧ <em>b</em><sub>2</sub> ∧ ⋯ ∧ <em>b</em><sub><em>m</em></sub> ∧ <em>a</em><sub>2</sub> ∧ ⋯ ∧ <em>a</em><sub><em>n</em></sub>)<em>ξ</em></span></p>
+<p>也就是说，Prolog
+用规则体替换已经证明的目标，然后继续证明新的最左目标。如果所有目标都被消去，得到空目标，查询成功；若某条路径失败，Prolog
+会回溯到上一个选择点，尝试其他可能子句或其他合一结果。</p>
+<h3 id="prolog-语法对应关系">13.2 Prolog 语法对应关系</h3>
+<p>这里给出了英语、谓词逻辑和 Prolog 的对应关系。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">英语</th>
+<th style="text-align: left;">谓词逻辑</th>
+<th style="text-align: left;">Prolog</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">and</td>
+<td style="text-align: left;"><span class="math inline">∧</span></td>
+<td style="text-align: left;"><code>,</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">or</td>
+<td style="text-align: left;"><span class="math inline">∨</span></td>
+<td style="text-align: left;"><code>;</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">only if / if</td>
+<td style="text-align: left;"><span class="math inline">→</span></td>
+<td style="text-align: left;"><code>:-</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">not</td>
+<td style="text-align: left;"><span class="math inline">¬</span></td>
+<td style="text-align: left;"><code>not</code> 或 <code>\+</code></td>
+</tr>
+</tbody>
+</table>
+<p>需要注意，Prolog 中的 <code>not</code> 或 <code>\+</code>
+通常不是经典逻辑中的严格否定，而是<strong>失败即否定（negation as
+failure）</strong>：如果 Prolog
+无法证明某个目标，就把它当作失败，从而认为其否定成立。这个机制依赖<strong>封闭世界假设（closed
+world assumption）</strong>，即程序中不能推出的事实默认视为不成立。</p>
+<p>例如，若程序中只有：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">likes(george, kate).</span><br><span class="line">likes(george, susie).</span><br><span class="line">likes(george, wine).</span><br></pre></td></tr></table></figure>
+<p>查询：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- likes(george, gin).</span><br></pre></td></tr></table></figure>
+<p>会得到 <code>no</code>。这不代表现实世界中 George 一定不喜欢
+gin，而是表示在当前知识库中无法证明他喜欢 gin。</p>
+<h3 id="查询与回溯">13.3 查询与回溯</h3>
+<p>这里的例子：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">likes(george, kate).</span><br><span class="line">likes(george, susie).</span><br><span class="line">likes(george, wine).</span><br><span class="line">likes(susie, wine).</span><br><span class="line">likes(kate, gin).</span><br></pre></td></tr></table></figure>
+<p>查询：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- likes(george, <span class="symbol">X</span>).</span><br></pre></td></tr></table></figure>
+<p>Prolog 会依次给出：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">X</span> = kate ;</span><br><span class="line"><span class="symbol">X</span> = susie ;</span><br><span class="line"><span class="symbol">X</span> = wine ;</span><br><span class="line">no</span><br></pre></td></tr></table></figure>
+<p>这里的分号表示用户要求 Prolog 回溯，继续寻找下一个解。Prolog
+的解不是一次性全部“算出来”，而是沿着程序顺序和目标顺序逐个搜索出来。</p>
+<h3 id="子句顺序和目标顺序的影响">13.4 子句顺序和目标顺序的影响</h3>
+<p>逻辑上，合取 <span class="math inline"><em>A</em> ∧ <em>B</em></span>
+与 <span class="math inline"><em>B</em> ∧ <em>A</em></span> 等价；但在
+Prolog 中，目标顺序会影响搜索过程、效率，甚至是否终止。材料用
+<code>predecessor</code> 祖先关系展示了这一点。</p>
+<p>自然的写法是先给出基本情况，再给出递归情况：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">predecessor(<span class="symbol">Parent</span>, <span class="symbol">Child</span>) :-</span><br><span class="line">    parent(<span class="symbol">Parent</span>, <span class="symbol">Child</span>).</span><br><span class="line"></span><br><span class="line">predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Successor</span>) :-</span><br><span class="line">    parent(<span class="symbol">Predecessor</span>, <span class="symbol">Child</span>),</span><br><span class="line">    predecessor(<span class="symbol">Child</span>, <span class="symbol">Successor</span>).</span><br></pre></td></tr></table></figure>
+<p>这个写法的递归是“先走一步
+parent，再递归”，搜索会沿着家族关系向下推进。若把递归规则放在前面，或把递归目标放在规则体最前面，例如：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Successor</span>) :-</span><br><span class="line">    predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Child</span>),</span><br><span class="line">    parent(<span class="symbol">Child</span>, <span class="symbol">Successor</span>).</span><br></pre></td></tr></table></figure>
+<p>Prolog
+可能在还没有缩小问题规模时就递归调用自己，导致深度优先搜索陷入无限递归。因此，Prolog
+程序不仅要逻辑上正确，还要控制搜索过程。</p>
+<h2 id="prolog-数据结构与典型程序">14 Prolog 数据结构与典型程序</h2>
+<h3 id="列表与模式匹配">14.1 列表与模式匹配</h3>
+<p>Prolog 中列表写作：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]</span><br><span class="line">[]</span><br><span class="line">[[george, kate], [allen, amy], [don, pat]]</span><br></pre></td></tr></table></figure>
+<p>列表最重要的模式是 <code>[Head | Tail]</code>，其中 <code>Head</code>
+是第一个元素，<code>Tail</code> 是剩余列表。例如：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[tom, dick, harry] = [<span class="symbol">X</span> | <span class="symbol">Y</span>]</span><br></pre></td></tr></table></figure>
+<p>得到：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">X</span> = tom</span><br><span class="line"><span class="symbol">Y</span> = [dick, harry]</span><br></pre></td></tr></table></figure>
+<p>再如：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[tom, dick, harry] = [<span class="symbol">X</span>, <span class="symbol">Y</span> | <span class="symbol">Z</span>]</span><br></pre></td></tr></table></figure>
+<p>得到：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">X</span> = tom</span><br><span class="line"><span class="symbol">Y</span> = dick</span><br><span class="line"><span class="symbol">Z</span> = [harry]</span><br></pre></td></tr></table></figure>
+<p>而 <code>[tom, dick, harry]</code> 不能匹配
+<code>[X,Y,Z,W|U]</code>，因为后者至少需要四个元素。</p>
+<h3 id="member-谓词">14.2 member 谓词</h3>
+<p>这里给出的 <code>member</code> 定义是 Prolog 递归程序的经典例子：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">member(<span class="symbol">X</span>, [<span class="symbol">X</span> | <span class="symbol">T</span>]).</span><br><span class="line">member(<span class="symbol">X</span>, [<span class="symbol">Y</span> | <span class="symbol">T</span>]) :- member(<span class="symbol">X</span>, <span class="symbol">T</span>).</span><br></pre></td></tr></table></figure>
+<p>第一条规则表示：如果 <span class="math inline"><em>X</em></span>
+是列表头部，那么 <span class="math inline"><em>X</em></span>
+是该列表成员。第二条规则表示：如果 <span
+class="math inline"><em>X</em></span>
+不是当前头部，也可以去尾部列表中继续找。</p>
+<p>查询：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- member(c, [a, b, c]).</span><br></pre></td></tr></table></figure>
+<p>执行过程是：先尝试把 <code>c</code> 与头部 <code>a</code>
+合一，失败；再递归检查 <code>[b,c]</code>；继续尝试 <code>c</code> 与
+<code>b</code> 合一，失败；递归检查 <code>[c]</code>；最后
+<code>c</code> 与头部 <code>c</code> 合一成功。因此整个查询成功。</p>
+<p>如果查询：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- member(<span class="symbol">X</span>, [a, b, c]).</span><br></pre></td></tr></table></figure>
+<p>Prolog 会通过回溯依次生成：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">X</span> = a ;</span><br><span class="line"><span class="symbol">X</span> = b ;</span><br><span class="line"><span class="symbol">X</span> = c ;</span><br><span class="line">no</span><br></pre></td></tr></table></figure>
+<p>这里最后的 <code>no</code> 表示“没有更多解”，不是说 <code>X</code>
+不是成员。前面的 <span
+class="math inline"><em>a</em>, <em>b</em>, <em>c</em></span> 已经是
+Prolog 通过回溯找到的所有可能答案。</p>
+<h3 id="子句与目标重排predecessor-例子">14.3 子句与目标重排：predecessor
+例子</h3>
+<p>材料 第 107-110 页用 <code>predecessor</code> 例子说明：在 Prolog
+中，<strong>规则顺序</strong>和<strong>规则体中目标的顺序</strong>会显著影响搜索过程。逻辑上等价的递归定义，换个顺序后可能效率不同，甚至可能陷入无限递归。</p>
+<p>这里的事实是：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">parent(tom, liz).</span><br><span class="line">parent(pam, bob).</span><br><span class="line">parent(bob, ann).</span><br><span class="line">parent(tom, bob).</span><br><span class="line">parent(bob, pat).</span><br><span class="line">parent(pat, jim).</span><br></pre></td></tr></table></figure>
+<p>查询是：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- predecessor(tom, pat).</span><br></pre></td></tr></table></figure>
+<p>其中 <code>predecessor(X, Y)</code> 可以理解为“<span
+class="math inline"><em>X</em></span> 是 <span
+class="math inline"><em>Y</em></span>
+的祖先”。父母是最直接的一代祖先，所以基本规则是：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">predecessor(<span class="symbol">Parent</span>, <span class="symbol">Child</span>) :-</span><br><span class="line">    parent(<span class="symbol">Parent</span>, <span class="symbol">Child</span>).</span><br></pre></td></tr></table></figure>
+<p>递归规则是：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Successor</span>) :-</span><br><span class="line">    parent(<span class="symbol">Predecessor</span>, <span class="symbol">Child</span>),</span><br><span class="line">    predecessor(<span class="symbol">Child</span>, <span class="symbol">Successor</span>).</span><br></pre></td></tr></table></figure>
+<p>这条规则的意思是：如果 <code>Predecessor</code> 是 <code>Child</code>
+的父母，而 <code>Child</code> 又是 <code>Successor</code> 的祖先，那么
+<code>Predecessor</code> 也是 <code>Successor</code> 的祖先。比如
+<code>tom</code> 是 <code>bob</code> 的父母，<code>bob</code> 是
+<code>pat</code> 的父母，所以可以推出
+<code>predecessor(tom, pat)</code>。</p>
+<h4 id="原始写法">14.3.1 原始写法</h4>
+<p>材料 的原始写法是先写基本规则，再写递归规则：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">predecessor(<span class="symbol">Parent</span>, <span class="symbol">Child</span>) :-</span><br><span class="line">    parent(<span class="symbol">Parent</span>, <span class="symbol">Child</span>).</span><br><span class="line"></span><br><span class="line">predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Successor</span>) :-</span><br><span class="line">    parent(<span class="symbol">Predecessor</span>, <span class="symbol">Child</span>),</span><br><span class="line">    predecessor(<span class="symbol">Child</span>, <span class="symbol">Successor</span>).</span><br></pre></td></tr></table></figure>
+<p>这个顺序比较自然。Prolog 查询 <code>predecessor(tom, pat)</code>
+时，会先检查 Tom 是否直接是 Pat 的父母；若不是，再进入递归规则，沿着
+<code>parent(tom, Child)</code> 找到 <code>Child = liz</code> 或
+<code>Child = bob</code>，然后继续检查
+<code>predecessor(Child, pat)</code>。当走到 <code>Child = bob</code>
+时，基本规则可以直接证明
+<code>predecessor(bob, pat)</code>，于是整个查询成功。</p>
+<h4 id="variation1">14.3.2 Variation1</h4>
+<p>Variation 1 把递归规则放在基本规则前面：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Successor</span>) :-</span><br><span class="line">    parent(<span class="symbol">Predecessor</span>, <span class="symbol">Child</span>),</span><br><span class="line">    predecessor(<span class="symbol">Child</span>, <span class="symbol">Successor</span>).</span><br><span class="line"></span><br><span class="line">predecessor(<span class="symbol">Parent</span>, <span class="symbol">Child</span>) :-</span><br><span class="line">    parent(<span class="symbol">Parent</span>, <span class="symbol">Child</span>).</span><br></pre></td></tr></table></figure>
+<p>这种写法通常仍然能找到答案，因为递归规则体的第一个目标是
+<code>parent(Predecessor, Child)</code>，它会先通过一个具体的父子事实缩小搜索范围，再递归调用
+<code>predecessor(Child, Successor)</code>。不过它会优先尝试更深的递归路径，可能比原始写法多走一些搜索分支。</p>
+<h4 id="variation2">14.3.3 Variation2</h4>
+<p>Variation 2 保持基本规则在前，但把递归规则体中的目标顺序改了：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">predecessor(<span class="symbol">Parent</span>, <span class="symbol">Child</span>) :-</span><br><span class="line">    parent(<span class="symbol">Parent</span>, <span class="symbol">Child</span>).</span><br><span class="line"></span><br><span class="line">predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Successor</span>) :-</span><br><span class="line">    predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Child</span>),</span><br><span class="line">    parent(<span class="symbol">Child</span>, <span class="symbol">Successor</span>).</span><br></pre></td></tr></table></figure>
+<p>这条递归规则的逻辑意思仍然可以读通：如果 <code>Predecessor</code> 是
+<code>Child</code> 的祖先，且 <code>Child</code> 是
+<code>Successor</code> 的父母，那么 <code>Predecessor</code> 是
+<code>Successor</code> 的祖先。但执行上更危险，因为递归调用
+<code>predecessor(Predecessor, Child)</code> 放在了
+<code>parent(Child, Successor)</code> 前面。也就是说，Prolog
+还没有先用一个具体的 <code>parent</code> 事实限制
+<code>Child</code>，就先递归寻找祖先关系，搜索空间会变大。</p>
+<h4 id="variation3">14.3.4 Variation3</h4>
+<p>Variation 3
+同时把递归规则放在前面，并且递归目标也放在规则体最前面：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Successor</span>) :-</span><br><span class="line">    predecessor(<span class="symbol">Predecessor</span>, <span class="symbol">Child</span>),</span><br><span class="line">    parent(<span class="symbol">Child</span>, <span class="symbol">Successor</span>).</span><br><span class="line"></span><br><span class="line">predecessor(<span class="symbol">Parent</span>, <span class="symbol">Child</span>) :-</span><br><span class="line">    parent(<span class="symbol">Parent</span>, <span class="symbol">Child</span>).</span><br></pre></td></tr></table></figure>
+<p>这是最容易出问题的写法。查询 <code>predecessor(tom, pat)</code>
+时，Prolog 首先匹配递归规则，于是又要证明
+<code>predecessor(tom, Child)</code>；为了证明这个新目标，它又优先匹配同一条递归规则，继续变成
+<code>predecessor(tom, Child2)</code>，如此反复。由于 Prolog
+默认采用从上到下、从左到右、深度优先的搜索策略，它可能在还没来得及尝试基本规则前，就陷入无限递归。</p>
+<p>这个例子要记住的结论是：<strong>在 Prolog
+中，声明式逻辑含义和过程式执行顺序必须同时考虑。</strong>
+写递归规则时，通常应先放能缩小搜索范围的目标，例如
+<code>parent(Predecessor, Child)</code>，再放递归调用；同时通常把基本情况放在递归情况之前，让程序有机会尽早停止。</p>
+<h3 id="骑士巡游问题搜索避免重复与回溯">14.4
+骑士巡游问题：搜索、避免重复与回溯</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606094120879.png" style="zoom:50%;" /></p>
+<p>材料用一个 <span class="math inline">3 × 3</span>
+棋盘上的骑士移动问题说明 Prolog 如何进行路径搜索。棋盘格编号为 <span
+class="math inline">1</span> 到 <span
+class="math inline">9</span>。以下是所有的合法移动：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">move(<span class="number">1</span>, <span class="number">6</span>). move(<span class="number">3</span>, <span class="number">4</span>). move(<span class="number">6</span>, <span class="number">7</span>). move(<span class="number">8</span>, <span class="number">3</span>).</span><br><span class="line">move(<span class="number">1</span>, <span class="number">8</span>). move(<span class="number">3</span>, <span class="number">8</span>). move(<span class="number">6</span>, <span class="number">1</span>). move(<span class="number">8</span>, <span class="number">1</span>).</span><br><span class="line">move(<span class="number">2</span>, <span class="number">7</span>). move(<span class="number">4</span>, <span class="number">3</span>). move(<span class="number">7</span>, <span class="number">6</span>). move(<span class="number">9</span>, <span class="number">4</span>).</span><br><span class="line">move(<span class="number">2</span>, <span class="number">9</span>). move(<span class="number">4</span>, <span class="number">9</span>). move(<span class="number">7</span>, <span class="number">2</span>). move(<span class="number">9</span>, <span class="number">2</span>).</span><br></pre></td></tr></table></figure>
+<p>路径规则为：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">path(<span class="symbol">Z</span>, <span class="symbol">Z</span>, <span class="symbol">L</span>).</span><br><span class="line">path(<span class="symbol">X</span>, <span class="symbol">Y</span>, <span class="symbol">L</span>) :- move(<span class="symbol">X</span>, <span class="symbol">Z</span>), not(member(<span class="symbol">Z</span>, <span class="symbol">L</span>)), path(<span class="symbol">Z</span>, <span class="symbol">Y</span>, [<span class="symbol">Z</span> | <span class="symbol">L</span>]).</span><br></pre></td></tr></table></figure>
+<p>第一条是基本情况：从 <span class="math inline"><em>Z</em></span> 到
+<span class="math inline"><em>Z</em></span> 的路径已经找到，已访问列表是
+<span
+class="math inline"><em>L</em></span>。第二条是递归情况：如果可以从
+<span class="math inline"><em>X</em></span> 走到 <span
+class="math inline"><em>Z</em></span>，并且 <span
+class="math inline"><em>Z</em></span> 没有出现在已访问列表 <span
+class="math inline"><em>L</em></span> 中，那么继续从 <span
+class="math inline"><em>Z</em></span> 搜索到目标 <span
+class="math inline"><em>Y</em></span>，同时把 <span
+class="math inline"><em>Z</em></span> 加入访问列表。</p>
+<p>查询：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- path(<span class="number">1</span>, <span class="number">3</span>, [<span class="number">1</span>]).</span><br></pre></td></tr></table></figure>
+<p>推理过程：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606094515412.png" style="zoom:50%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606094537621.png" style="zoom:50%;" /></p>
+<h3 id="cut控制搜索">14.5 cut：控制搜索</h3>
+<p>Prolog 的 cut 写作
+<code>!</code>，用于剪掉当前谓词调用中已经产生的选择点。根据 SWI-Prolog
+文档，<code>!</code>
+会丢弃进入当前谓词后创建的选择点。直观地说，<strong>一旦执行到
+cut，Prolog
+就承诺使用当前已经做出的选择，不再回头尝试该选择之前的其他可能。</strong></p>
+<p>材料的例子中，若定义：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">path2(<span class="symbol">X</span>, <span class="symbol">Y</span>) :-</span><br><span class="line">    move(<span class="symbol">X</span>, <span class="symbol">Z</span>),</span><br><span class="line">    move(<span class="symbol">Z</span>, <span class="symbol">Y</span>).</span><br></pre></td></tr></table></figure>
+<p>查询：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- path2(<span class="number">1</span>, <span class="symbol">W</span>).</span><br></pre></td></tr></table></figure>
+<p>会通过回溯找到多个两步可达结果：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">W</span> = <span class="number">7</span> ;</span><br><span class="line"><span class="symbol">W</span> = <span class="number">1</span> ;</span><br><span class="line"><span class="symbol">W</span> = <span class="number">3</span> ;</span><br><span class="line"><span class="symbol">W</span> = <span class="number">1</span> ;</span><br><span class="line">no</span><br></pre></td></tr></table></figure>
+<p>如果加入 cut：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">path3(<span class="symbol">X</span>, <span class="symbol">Y</span>) :-</span><br><span class="line">    move(<span class="symbol">X</span>, <span class="symbol">Z</span>),</span><br><span class="line">    !,</span><br><span class="line">    move(<span class="symbol">Z</span>, <span class="symbol">Y</span>).</span><br></pre></td></tr></table></figure>
+<p>查询：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- path3(<span class="number">1</span>, <span class="symbol">W</span>).</span><br></pre></td></tr></table></figure>
+<p>当 <code>move(1, Z)</code> 第一次选中 <span
+class="math inline"><em>Z</em> = 6</span> 后，cut 会阻止 Prolog 回头尝试
+<span class="math inline"><em>Z</em> = 8</span>。因此结果只来自路径
+<span class="math inline">1 → 6 → <em>W</em></span>：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">W</span> = <span class="number">7</span> ;</span><br><span class="line"><span class="symbol">W</span> = <span class="number">1</span> ;</span><br><span class="line">no</span><br></pre></td></tr></table></figure>
+<p>cut
+可以提高效率、避免不必要搜索，但也可能改变程序的逻辑含义。学习时可以把
+cut 理解为“搜索控制工具”，而不是普通逻辑联结词。</p>
+<h3 id="农夫狼羊和白菜问题">14.6 农夫、狼、羊和白菜问题</h3>
+<p>材料最后用经典的农夫过河问题展示 Prolog
+如何解决状态空间搜索。状态写作：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">state(<span class="symbol">Farmer</span>, <span class="symbol">Wolf</span>, <span class="symbol">Goat</span>, <span class="symbol">Cabbage</span>)</span><br></pre></td></tr></table></figure>
+<p>其中每个位置取 <code>w</code> 或
+<code>e</code>，分别表示河西岸和河东岸。初始状态为：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">state(w, w, w, w)</span><br></pre></td></tr></table></figure>
+<p>目标状态为：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">state(e, e, e, e)</span><br></pre></td></tr></table></figure>
+<p>移动规则描述农夫带狼、带羊、带白菜或独自过河。每次移动后都要检查状态是否安全：不能让狼和羊在没有农夫时单独相处，也不能让羊和白菜在没有农夫时单独相处。</p>
+<p>这里的程序结构大致是：<code>move</code>
+生成合法下一状态；<code>path</code>
+递归寻找从当前状态到目标状态的路径；<code>been_stack</code>
+记录已经访问过的状态，避免循环；<code>not(member_stack(...))</code>
+用失败即否定检查是否重复；最后用 cut 在找到一条解后停止继续搜索。</p>
+<p>材料 第 120-123
+页给出了这段程序的主体。需要先说明一个细节：材料为了突出状态变化，把变量写成了小写的
+<code>x,y,w,g,c</code>；但在标准 Prolog
+中，<strong>变量必须以大写字母或下划线开头</strong>，小写开头会被当作原子。因此下面代码按
+材料 原样保留，理解时应把这些小写符号看成变量。</p>
+<h4 id="四类移动规则">14.6.1 四类移动规则</h4>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">move(state(x, x, g, c), state(y, y, g, c)) :-				# 农夫带狼过河</span><br><span class="line">    opposite(x, y), not(unsafe(state(y, y, g, c))),</span><br><span class="line">    writelist([<span class="string">&#x27; Try farmer takes wolf &#x27;</span>, y, y, g, c])</span><br><span class="line"></span><br><span class="line">move(state(x, w, x, c), state(y, w, y, c)) :-				# 农夫带羊过河</span><br><span class="line">    opposite(x, y), not(unsafe(state(y, w, y, c))),</span><br><span class="line">    writelist([<span class="string">&#x27; Try farmer takes goat &#x27;</span>, y, w, y, c])</span><br><span class="line"></span><br><span class="line">move(state(x, w, g, x), state(y, w, g, y)) :-				# 农夫带白菜过河</span><br><span class="line">    opposite(x, y), not(unsafe(state(y, w, g, y))),</span><br><span class="line">    writelist([<span class="string">&#x27; Try farmer takes cabbage &#x27;</span>, y, w, g, c])</span><br><span class="line"></span><br><span class="line">move(state(x, w, g, c), state(y, w, g, c)) :-				# 农夫独自过河</span><br><span class="line">    opposite(x, y), not(unsafe(state(y, w, g, c))),</span><br><span class="line">    writelist([<span class="string">&#x27; Try farmer takes self &#x27;</span>, y, w, g, c])</span><br></pre></td></tr></table></figure>
+<h4 id="回溯提示路径搜索和两岸关系">14.6.2
+回溯提示、路径搜索和两岸关系</h4>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">move(state(f, w, g, c), state(f, w, g, c)) :-</span><br><span class="line">    writelist([<span class="string">&#x27; BACKTRACK from &#x27;</span>, f, w, g, c]), fail.</span><br><span class="line"></span><br><span class="line">path(goal, goal, been_stack) :-</span><br><span class="line">    write(<span class="string">&#x27; Solution path is &#x27;</span>), nl,</span><br><span class="line">    reverse_print_stack(been_stack).</span><br><span class="line"></span><br><span class="line">path(state, goal, been_stack) :-</span><br><span class="line">    move(state, next_state),</span><br><span class="line">    not(member_stack(next_state, been_stack)),</span><br><span class="line">    stack(next_state, been_stack, new_been_stack),</span><br><span class="line">    path(next_state, goal, new_been_stack), !.</span><br><span class="line"></span><br><span class="line">opposite(e, w).</span><br><span class="line">opposite(w, e).</span><br></pre></td></tr></table></figure>
+<p>第一条特殊的 <code>move</code> 规则并不是真的移动，它的作用是打印
+<code>BACKTRACK from ...</code>，然后用 <code>fail</code>
+强制失败，从而让 Prolog
+回溯。它更像调试输出，用来展示某条搜索路径走不通。</p>
+<p>第一条 <code>path</code>
+是基本情况：如果当前状态已经等于目标状态，就说明找到了解，程序打印
+<code>Solution path is</code>，并把访问过的状态栈反向输出。第二条
+<code>path</code> 是递归搜索：先用 <code>move(state, next_state)</code>
+生成下一状态，再用
+<code>not(member_stack(next_state, been_stack))</code>
+检查这个状态没有访问过，然后把 <code>next_state</code>
+压入栈，继续递归搜索从 <code>next_state</code> 到 <code>goal</code>
+的路径。最后的 <code>!</code> 是
+cut，表示一旦找到一条解，就不要再回溯寻找其他解。</p>
+<p><code>opposite(e, w)</code> 和 <code>opposite(w, e)</code>
+定义东西两岸互为对岸。如果当前位置是 <code>w</code>，下一次过河后就是
+<code>e</code>；如果当前位置是 <code>e</code>，下一次过河后就是
+<code>w</code>。</p>
+<h4 id="启动程序">14.6.3 启动程序</h4>
+<p>启动程序的入口是：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">go(start, goal) :-</span><br><span class="line">    empty_stack(empty_been_stack),</span><br><span class="line">    stack(start, empty_been_stack, been_stack),</span><br><span class="line">    path(state, goal, been_stack)</span><br></pre></td></tr></table></figure>
+<p>对应查询为：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?- go(state(w, w, w, w), state(e, e, e, e)).</span><br></pre></td></tr></table></figure>
+<h4 id="运行过程">14.6.4 运行过程</h4>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Process:                           Solution path is:</span><br><span class="line">Try farmer takes goat e w e w      state(w, w, w, w)</span><br><span class="line">Try farmer takes self w w e w      state(e, w, e, w)</span><br><span class="line">Try farmer takes wolf e e e w      state(w, w, e, w)</span><br><span class="line">Try farmer takes goat w e w w      state(e, e, e, w)</span><br><span class="line">Try farmer takes cabbage e e w e   state(w, e, w, w)</span><br><span class="line">Try farmer takes wolf w w w e      state(e, e, w, e)</span><br><span class="line">Try farmer takes goat e w e e      state(w, e, w, e)</span><br><span class="line"> BACKTRACK from e, w, e, e         state(e, e, e, e)</span><br><span class="line"> BACKTRACK from e, w, e, e</span><br><span class="line">Try farmer takes self w e w e</span><br><span class="line">Try farmer takes goat e e e e</span><br></pre></td></tr></table></figure>
+<p>左边 <code>Process</code> 是 Prolog
+搜索时尝试的移动，包括失败后的回溯信息；右边
+<code>Solution path is</code>
+是最终找到的解路径。成功路径对应的状态序列是：</p>
+<figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">state(w, w, w, w)</span><br><span class="line">state(e, w, e, w)</span><br><span class="line">state(w, w, e, w)</span><br><span class="line">state(e, e, e, w)</span><br><span class="line">state(w, e, w, w)</span><br><span class="line">state(e, e, w, e)</span><br><span class="line">state(w, e, w, e)</span><br><span class="line">state(e, e, e, e)</span><br></pre></td></tr></table></figure>
+<p>把这些状态翻译成人话，就是：农夫先带羊过河，自己回来；带狼过河，再把羊带回来；带白菜过河，自己回来；最后再带羊过河。这个顺序保证任何时候狼都不会和羊单独留在一起，羊也不会和白菜单独留在一起。</p>
+<p>这里给出的成功路径可整理为：</p>
+<ol type="1">
+<li>农夫带羊过河。</li>
+<li>农夫独自返回。</li>
+<li>农夫带狼过河。</li>
+<li>农夫带羊返回。</li>
+<li>农夫带白菜过河。</li>
+<li>农夫独自返回。</li>
+<li>农夫带羊过河。</li>
+</ol>
+<p>这个例子与骑士路径问题本质相同：都可以看成图搜索。区别在于，农夫问题的“节点”是完整状态，<code>move</code>
+规则负责生成相邻状态，安全约束负责剪枝。</p>
+<h2 id="重点梳理">15 重点梳理</h2>
+<h3 id="本章最核心的概念链">15.1 本章最核心的概念链</h3>
+<p>本章内容很多，但可以用一条概念链串起来：</p>
+<p><span
+class="math display">逻辑表示 → 语义解释 → 逻辑蕴含 → 推理规则 → 归结反证 → Horn
+子句 → Prolog 执行</span></p>
+<p>命题逻辑解决基本真假组合，一阶谓词逻辑解决对象和关系表示，模型语义定义“什么叫真”，逻辑蕴含定义“什么叫必然推出”，归结反证提供可机械执行的证明方法，而
+Prolog 把 Horn 子句上的归结搜索变成程序执行。</p>
+<h3 id="高频易混点">15.2 高频易混点</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">易混点</th>
+<th style="text-align: left;">正确理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em> → <em>Q</em></span></td>
+<td style="text-align: left;">只有 <span
+class="math inline"><em>P</em> = <em>t</em><em>r</em><em>u</em><em>e</em>, <em>Q</em> = <em>f</em><em>a</em><em>l</em><em>s</em><em>e</em></span>
+时为假；不是因果关系本身</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">∀<em>x</em>(<em>P</em>(<em>x</em>) → <em>Q</em>(<em>x</em>))</span></td>
+<td style="text-align: left;">表示所有 <span
+class="math inline"><em>P</em></span> 都是 <span
+class="math inline"><em>Q</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">∃<em>x</em>(<em>P</em>(<em>x</em>) ∧ <em>Q</em>(<em>x</em>))</span></td>
+<td style="text-align: left;">表示存在对象同时满足 <span
+class="math inline"><em>P</em></span> 和 <span
+class="math inline"><em>Q</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">可满足与有效</td>
+<td
+style="text-align: left;">可满足是“至少一个解释为真”，有效是“所有解释为真”</td>
+</tr>
+<tr>
+<td style="text-align: left;">可靠与完备</td>
+<td
+style="text-align: left;">可靠是不推出假结论，完备是不遗漏真后承</td>
+</tr>
+<tr>
+<td style="text-align: left;">合一与匹配</td>
+<td style="text-align: left;">合一要找一致替换，MGU 要尽量一般</td>
+</tr>
+<tr>
+<td style="text-align: left;">Skolem 化</td>
+<td
+style="text-align: left;">消去存在量词，保持可满足性而不一定保持等价</td>
+</tr>
+<tr>
+<td style="text-align: left;">空子句</td>
+<td style="text-align: left;">表示矛盾，是归结反证成功的标志</td>
+</tr>
+<tr>
+<td style="text-align: left;">Prolog 的 not</td>
+<td style="text-align: left;">通常是失败即否定，不是经典否定</td>
+</tr>
+<tr>
+<td style="text-align: left;">cut</td>
+<td style="text-align: left;">控制回溯搜索，会影响程序行为</td>
+</tr>
+</tbody>
+</table>
+<h3 id="做题时的基本套路">15.3 做题时的基本套路</h3>
+<p>遇到自然语言翻译题，先找对象、关系和量词。凡是“所有……”通常用 <span
+class="math inline">∀</span> 加蕴含，凡是“有些……”通常用 <span
+class="math inline">∃</span> 加合取。遇到“没有……”可以写成 <span
+class="math inline">¬∃</span>。</p>
+<p>遇到归结证明题，先把前提转为子句形，再把目标取反加入子句集。然后寻找互补文字，必要时先做合一。证明结束的标志是推出空子句
+<span
+class="math inline">▫</span>。如果目标中有变量，不要忘记沿着归结过程收集合一替换，最终可用于答案抽取。</p>
+<p>遇到 Prolog
+程序题，先看事实和规则的顺序，再看每条规则体中目标的顺序。Prolog
+使用从左到右、从上到下、深度优先、失败回溯的搜索策略，所以逻辑等价的写法在执行上可能完全不同。判断
+<code>member</code>、路径搜索、祖先递归和 cut
+行为时，尤其要按这个执行顺序逐步模拟。</p>
+<h3 id="参考资料">15.4 参考资料</h3>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://logic.stanford.edu/intrologic/extras/fol.html">Stanford
+Introduction to Logic: First-Order
+Logic</a>，补充一阶逻辑语法、语义与解释的背景说明。</li>
+<li><a
+target="_blank" rel="noopener" href="https://plato.stanford.edu/entries/logic-classical/">Stanford
+Encyclopedia of Philosophy: Classical
+Logic</a>，补充经典逻辑、模型语义和证明系统的整体背景。</li>
+<li><a
+target="_blank" rel="noopener" href="https://www.swi-prolog.org/pldoc/man?predicate=%21%2F0">SWI-Prolog
+Documentation: <code>!/0</code></a>，补充 Prolog cut
+对选择点和回溯的影响。</li>
+<li><a
+target="_blank" rel="noopener" href="https://www.swi-prolog.org/pldoc/man?section=lists">SWI-Prolog
+Documentation: <code>library(lists)</code></a>，补充 Prolog
+列表与常用列表谓词的实现背景。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%80%BB%E8%BE%91/" rel="tag"># 逻辑</a>
+              <a href="/tags/Prolog/" rel="tag"># Prolog</a>
+              <a href="/tags/%E5%BD%92%E7%BB%93%E6%8E%A8%E7%90%86/" rel="tag"># 归结推理</a>
+              <a href="/tags/%E8%B0%93%E8%AF%8D%E9%80%BB%E8%BE%91/" rel="tag"># 谓词逻辑</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/Genetic%20Algorithm/" rel="prev" title="Genetic Algorithm">
+                  <i class="fa fa-angle-left"></i> Genetic Algorithm
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/CLIPS/" rel="next" title="CLIPS">
+                  CLIPS <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

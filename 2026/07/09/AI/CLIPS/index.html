@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  CLIPS 与基于规则的专家系统 CLIPS 语法基础与数据类型 事实、模板与工作记忆 事实操作与初始事实集合 规则定义、执行与构件管理 变量、通配符与事实地址 字段约束与谓词函数 条件元素：or、and、not、exists、forall、logical 决策树专家系统案例 规则执行控制：显著性、阶段与模块 过程式函数与交互控制 监控系统案例：传感器、趋势与告警">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CLIPS">
+<meta property="og:url" content="http://example.com/2026/07/09/AI/CLIPS/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  CLIPS 与基于规则的专家系统 CLIPS 语法基础与数据类型 事实、模板与工作记忆 事实操作与初始事实集合 规则定义、执行与构件管理 变量、通配符与事实地址 字段约束与谓词函数 条件元素：or、and、not、exists、forall、logical 决策树专家系统案例 规则执行控制：显著性、阶段与模块 过程式函数与交互控制 监控系统案例：传感器、趋势与告警">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260610203852670.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615130349339.png">
+<meta property="article:published_time" content="2026-07-09T07:12:29.449Z">
+<meta property="article:modified_time" content="2026-07-09T07:12:29.450Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="CLIPS">
+<meta property="article:tag" content="Rete">
+<meta property="article:tag" content="专家系统">
+<meta property="article:tag" content="规则系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260610203852670.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/AI/CLIPS/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/AI/CLIPS/","path":"2026/07/09/AI/CLIPS/","title":"CLIPS"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>CLIPS | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#clips-%E4%B8%8E%E5%9F%BA%E4%BA%8E%E8%A7%84%E5%88%99%E7%9A%84%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F"><span class="nav-number">2.</span> <span class="nav-text">1 CLIPS 与基于规则的专家系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#clips-%E7%9A%84%E5%AE%9A%E4%BD%8D"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 CLIPS 的定位</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E8%A7%84%E5%88%99%E7%9A%84%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F%E7%BB%93%E6%9E%84"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 基于规则的专家系统结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#clips-%E8%AF%AD%E6%B3%95%E5%9F%BA%E7%A1%80%E4%B8%8E%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.</span> <span class="nav-text">2 CLIPS 语法基础与数据类型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%99%E9%87%8C%E7%9A%84%E8%AE%B0%E5%8F%B7%E7%BA%A6%E5%AE%9A"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 这里的记号约定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 原子数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BC%80%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%B8%8E%E6%95%B0%E5%AD%A6%E5%87%BD%E6%95%B0"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 前缀表达式与数学函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8B%E5%AE%9E%E6%A8%A1%E6%9D%BF%E4%B8%8E%E5%B7%A5%E4%BD%9C%E8%AE%B0%E5%BF%86"><span class="nav-number">4.</span> <span class="nav-text">3 事实、模板与工作记忆</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%AE%9E%E6%98%AF-clips-%E7%9A%84%E5%BD%93%E5%89%8D%E4%B8%96%E7%95%8C%E7%8A%B6%E6%80%81"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 事实是 CLIPS
+的“当前世界状态”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#deftemplate%E5%AE%9A%E4%B9%89%E4%BA%8B%E5%AE%9E%E7%BB%93%E6%9E%84"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 deftemplate：定义事实结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E5%B1%9E%E6%80%A7%E7%B1%BB%E5%9E%8B%E5%8F%96%E5%80%BC%E8%8C%83%E5%9B%B4%E5%9F%BA%E6%95%B0%E5%92%8C%E9%BB%98%E8%AE%A4%E5%80%BC"><span class="nav-number">4.3.</span> <span class="nav-text">3.3
+模板属性：类型、取值、范围、基数和默认值</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">4.3.1.</span> <span class="nav-text">3.3.1 例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E4%BA%8B%E5%AE%9E%E4%B8%8E%E6%A8%A1%E6%9D%BF%E4%BA%8B%E5%AE%9E"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 有序事实与模板事实</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E6%A6%82%E5%BF%B5%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 各概念的关系</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8B%E5%AE%9E%E6%93%8D%E4%BD%9C%E4%B8%8E%E5%88%9D%E5%A7%8B%E4%BA%8B%E5%AE%9E%E9%9B%86%E5%90%88"><span class="nav-number">5.</span> <span class="nav-text">4 事实操作与初始事实集合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#assertfactsretract-%E4%B8%8E-modify"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 assert、facts、retract 与
+modify</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#assert%E5%A2%9E"><span class="nav-number">5.1.1.</span> <span class="nav-text">4.1.1 Assert：增</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#facts%E6%9F%A5"><span class="nav-number">5.1.2.</span> <span class="nav-text">4.1.2 Facts：查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#retract%E5%88%A0"><span class="nav-number">5.1.3.</span> <span class="nav-text">4.1.3 Retract：删</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#modify%E6%94%B9"><span class="nav-number">5.1.4.</span> <span class="nav-text">4.1.4 Modify：改</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#deffacts%E9%A2%84%E7%BD%AE%E4%B8%80%E7%BB%84%E5%88%9D%E5%A7%8B%E4%BA%8B%E5%AE%9E"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 deffacts：预置一组初始事实</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%84%E5%88%99%E5%AE%9A%E4%B9%89%E6%89%A7%E8%A1%8C%E4%B8%8E%E6%9E%84%E4%BB%B6%E7%AE%A1%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">5 规则定义、执行与构件管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#defrule%E6%8A%8A%E7%9F%A5%E8%AF%86%E5%86%99%E6%88%90%E6%9D%A1%E4%BB%B6%E5%88%B0%E5%8A%A8%E4%BD%9C"><span class="nav-number">6.1.</span> <span class="nav-text">5.1
+defrule：把知识写成“条件到动作”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#runprintout-%E4%B8%8E-clear"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 run、printout 与 clear</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%84%E4%BB%B6%E7%9A%84%E6%9F%A5%E7%9C%8B%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%BE%93%E5%87%BA%E4%B8%8E%E5%88%A0%E9%99%A4"><span class="nav-number">6.3.</span> <span class="nav-text">5.3
+构件的查看、格式化输出与删除</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E9%80%9A%E9%85%8D%E7%AC%A6%E4%B8%8E%E4%BA%8B%E5%AE%9E%E5%9C%B0%E5%9D%80"><span class="nav-number">7.</span> <span class="nav-text">6 变量、通配符与事实地址</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E5%AD%97%E6%AE%B5%E5%8F%98%E9%87%8F"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 单字段变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%AE%9E%E5%9C%B0%E5%9D%80%E5%9C%A8-rhs-%E4%B8%AD%E4%BF%AE%E6%94%B9%E6%88%96%E5%88%A0%E9%99%A4%E5%8C%B9%E9%85%8D%E5%88%B0%E7%9A%84%E4%BA%8B%E5%AE%9E"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 事实地址：在 RHS
+中修改或删除匹配到的事实</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E5%AD%97%E6%AE%B5%E9%80%9A%E9%85%8D%E7%AC%A6%E4%B8%8E%E6%9C%AA%E6%8C%87%E5%AE%9A%E6%A7%BD"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 单字段通配符与未指定槽</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%AD%97%E6%AE%B5%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 多字段通配符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%97%E6%AE%B5%E7%BA%A6%E6%9D%9F%E4%B8%8E%E8%B0%93%E8%AF%8D%E5%87%BD%E6%95%B0"><span class="nav-number">8.</span> <span class="nav-text">7 字段约束与谓词函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9E%E6%8E%A5%E7%BA%A6%E6%9D%9F%E9%9D%9E%E6%88%96%E4%B8%94"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 连接约束：非、或、且</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E5%AD%97%E6%AE%B5%E7%BA%A6%E6%9D%9F"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 组合字段约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%93%E8%AF%8D%E5%87%BD%E6%95%B0%E4%B8%8E-test"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 谓词函数与 test</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E5%85%83%E7%B4%A0orandnotexistsforalllogical"><span class="nav-number">9.</span> <span class="nav-text">8
+条件元素：or、and、not、exists、forall、logical</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#or-%E4%B8%8E-and%E7%BB%84%E5%90%88%E5%A4%9A%E7%A7%8D%E8%A7%A6%E5%8F%91%E6%9D%A1%E4%BB%B6"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 or 与 and：组合多种触发条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#not%E7%94%A8%E4%B8%8D%E5%AD%98%E5%9C%A8%E8%A7%A6%E5%8F%91%E8%A7%84%E5%88%99"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 not：用“不存在”触发规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exists%E5%8F%AA%E5%85%B3%E5%BF%83%E6%98%AF%E5%90%A6%E8%87%B3%E5%B0%91%E5%AD%98%E5%9C%A8%E4%B8%80%E4%B8%AA%E4%BA%8B%E5%AE%9E"><span class="nav-number">9.3.</span> <span class="nav-text">8.3
+exists：只关心是否至少存在一个事实</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#forall%E6%89%80%E6%9C%89%E5%AF%B9%E8%B1%A1%E9%83%BD%E6%BB%A1%E8%B6%B3%E5%90%8E%E7%BB%AD%E6%9D%A1%E4%BB%B6"><span class="nav-number">9.4.</span> <span class="nav-text">8.4
+forall：所有对象都满足后续条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#logical%E4%BA%8B%E5%AE%9E%E7%9A%84%E9%80%BB%E8%BE%91%E4%BE%9D%E8%B5%96%E4%B8%8E%E7%9C%9F%E5%80%BC%E7%BB%B4%E6%8A%A4"><span class="nav-number">9.5.</span> <span class="nav-text">8.5
+logical：事实的逻辑依赖与真值维护</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%86%B3%E7%AD%96%E6%A0%91%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F%E6%A1%88%E4%BE%8B"><span class="nav-number">10.</span> <span class="nav-text">9 决策树专家系统案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%A8%E8%A7%84%E5%88%99%E8%A1%A8%E7%A4%BA%E5%86%B3%E7%AD%96%E6%A0%91"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 用规则表示决策树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%8E%E8%AF%A2%E9%97%AE%E9%97%AE%E9%A2%98"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 初始化与询问问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B2%BF-yesno-%E5%88%86%E6%94%AF%E5%89%8D%E8%BF%9B"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 沿 yes&#x2F;no 分支前进</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8C%9C%E6%B5%8B%E7%AD%94%E6%A1%88%E4%B8%8E%E5%AD%A6%E4%B9%A0%E6%96%B0%E8%8A%82%E7%82%B9"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 猜测答案与学习新节点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%84%E5%88%99%E6%89%A7%E8%A1%8C%E6%8E%A7%E5%88%B6%E6%98%BE%E8%91%97%E6%80%A7%E9%98%B6%E6%AE%B5%E4%B8%8E%E6%A8%A1%E5%9D%97"><span class="nav-number">11.</span> <span class="nav-text">10
+规则执行控制：显著性、阶段与模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%8E%A7%E5%88%B6%E8%A7%84%E5%88%99%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="nav-number">11.1.</span> <span class="nav-text">10.1 为什么需要控制规则执行顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#salience%E7%BB%99%E8%A7%84%E5%88%99%E8%AE%BE%E7%BD%AE%E4%BC%98%E5%85%88%E7%BA%A7"><span class="nav-number">11.2.</span> <span class="nav-text">10.2 salience：给规则设置优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#phase-%E6%8E%A7%E5%88%B6%E6%A8%A1%E5%BC%8F"><span class="nav-number">11.3.</span> <span class="nav-text">10.3 phase 控制模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#defmodule%E7%94%A8%E6%A8%A1%E5%9D%97%E7%BB%84%E7%BB%87%E8%A7%84%E5%88%99%E5%BA%93"><span class="nav-number">11.4.</span> <span class="nav-text">10.4 defmodule：用模块组织规则库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9D%97%E9%97%B4%E5%AF%BC%E5%85%A5%E5%92%8C%E5%AF%BC%E5%87%BA%E4%BA%8B%E5%AE%9E%E6%A8%A1%E6%9D%BF"><span class="nav-number">11.5.</span> <span class="nav-text">10.5 模块间导入和导出事实模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#initial-fact-%E4%B8%8E%E7%89%B9%E6%AE%8A%E8%A7%84%E5%88%99"><span class="nav-number">11.6.</span> <span class="nav-text">10.6 initial-fact 与特殊规则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%87%E7%A8%8B%E5%BC%8F%E5%87%BD%E6%95%B0%E4%B8%8E%E4%BA%A4%E4%BA%92%E6%8E%A7%E5%88%B6"><span class="nav-number">12.</span> <span class="nav-text">11 过程式函数与交互控制</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%91%E6%8E%A7%E7%B3%BB%E7%BB%9F%E6%A1%88%E4%BE%8B%E4%BC%A0%E6%84%9F%E5%99%A8%E8%B6%8B%E5%8A%BF%E4%B8%8E%E5%91%8A%E8%AD%A6"><span class="nav-number">13.</span> <span class="nav-text">12
+监控系统案例：传感器、趋势与告警</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E8%83%8C%E6%99%AF"><span class="nav-number">13.1.</span> <span class="nav-text">12.1 问题背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E4%B8%8E%E4%BC%A0%E6%84%9F%E5%99%A8%E6%A8%A1%E6%9D%BF"><span class="nav-number">13.2.</span> <span class="nav-text">12.2 设备与传感器模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%A8%E6%9C%9F%E8%BF%90%E8%A1%8C%E4%B8%8E%E6%A8%A1%E5%9D%97%E7%84%A6%E7%82%B9"><span class="nav-number">13.3.</span> <span class="nav-text">12.3 周期运行与模块焦点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#input-%E6%A8%A1%E5%9D%97%E8%AF%BB%E5%8F%96%E4%BC%A0%E6%84%9F%E5%99%A8%E5%80%BC"><span class="nav-number">13.4.</span> <span class="nav-text">12.4 INPUT 模块：读取传感器值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#trends-%E6%A8%A1%E5%9D%97%E6%8A%8A%E5%8E%9F%E5%A7%8B%E5%80%BC%E8%BD%AC%E5%8C%96%E4%B8%BA%E7%8A%B6%E6%80%81"><span class="nav-number">13.5.</span> <span class="nav-text">12.5 TRENDS
+模块：把原始值转化为状态</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B6%8B%E5%8A%BF%E4%BA%8B%E5%AE%9E%E8%AE%B0%E5%BD%95%E7%8A%B6%E6%80%81%E6%8C%81%E7%BB%AD%E6%97%B6%E9%97%B4"><span class="nav-number">13.6.</span> <span class="nav-text">12.6 趋势事实：记录状态持续时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#warnings-%E6%A8%A1%E5%9D%97%E5%91%8A%E8%AD%A6%E4%B8%8E%E5%85%B3%E5%81%9C%E8%AE%BE%E5%A4%87"><span class="nav-number">13.7.</span> <span class="nav-text">12.7 WARNINGS
+模块：告警与关停设备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%A8%E7%90%86%E5%BC%95%E6%93%8E%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%95%88%E7%8E%87%E4%BC%98%E5%8C%96"><span class="nav-number">14.</span> <span class="nav-text">13
+推理引擎、模式匹配网络与效率优化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%86%E5%88%AB-%E8%A1%8C%E5%8A%A8%E5%BE%AA%E7%8E%AF"><span class="nav-number">14.1.</span> <span class="nav-text">13.1 识别-行动循环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E7%BD%91%E7%BB%9C%E4%B8%8E%E8%BF%9E%E6%8E%A5%E7%BD%91%E7%BB%9C"><span class="nav-number">14.2.</span> <span class="nav-text">13.2 模式网络与连接网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E9%A1%BA%E5%BA%8F%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BD%B1%E5%93%8D%E6%95%88%E7%8E%87"><span class="nav-number">14.3.</span> <span class="nav-text">13.3 模式顺序为什么影响效率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%AD%97%E6%AE%B5%E9%80%9A%E9%85%8D%E7%AC%A6%E7%9A%84%E7%BB%84%E5%90%88%E7%88%86%E7%82%B8"><span class="nav-number">14.4.</span> <span class="nav-text">13.4 多字段通配符的组合爆炸</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#test-%E6%9D%A1%E4%BB%B6%E5%BA%94%E5%B0%BD%E6%97%A9%E6%94%BE%E7%BD%AE"><span class="nav-number">14.5.</span> <span class="nav-text">13.5 test 条件应尽早放置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%85%88%E4%BD%BF%E7%94%A8%E5%86%85%E5%BB%BA%E6%A8%A1%E5%BC%8F%E7%BA%A6%E6%9D%9F"><span class="nav-number">14.6.</span> <span class="nav-text">13.6 优先使用内建模式约束</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%88%E7%8E%87%E4%BC%98%E5%8C%96%E8%A7%84%E5%88%99%E6%B1%87%E6%80%BB"><span class="nav-number">14.7.</span> <span class="nav-text">13.7 效率优化规则汇总</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8B%E5%AE%9E%E6%96%87%E4%BB%B6%E7%9A%84%E5%8A%A0%E8%BD%BD%E4%B8%8E%E4%BF%9D%E5%AD%98"><span class="nav-number">15.</span> <span class="nav-text">14 事实文件的加载与保存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%A2%B3%E7%90%86"><span class="nav-number">16.</span> <span class="nav-text">15 重点梳理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E9%A1%BB%E6%8E%8C%E6%8F%A1%E7%9A%84%E4%B8%BB%E7%BA%BF"><span class="nav-number">16.1.</span> <span class="nav-text">15.1 必须掌握的主线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E9%A2%91%E6%A6%82%E5%BF%B5%E5%AF%B9%E7%85%A7"><span class="nav-number">16.2.</span> <span class="nav-text">15.2 高频概念对照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%93%E9%94%99%E7%82%B9%E6%80%BB%E7%BB%93"><span class="nav-number">16.3.</span> <span class="nav-text">15.3 易错点总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E9%A2%98%E5%9E%8B%E5%87%86%E5%A4%87"><span class="nav-number">16.4.</span> <span class="nav-text">15.4 典型题型准备</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">17.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/CLIPS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="CLIPS | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CLIPS
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:12:29" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ul>
+<li>CLIPS 与基于规则的专家系统</li>
+<li>CLIPS 语法基础与数据类型</li>
+<li>事实、模板与工作记忆</li>
+<li>事实操作与初始事实集合</li>
+<li>规则定义、执行与构件管理</li>
+<li>变量、通配符与事实地址</li>
+<li>字段约束与谓词函数</li>
+<li>条件元素：or、and、not、exists、forall、logical</li>
+<li>决策树专家系统案例</li>
+<li>规则执行控制：显著性、阶段与模块</li>
+<li>过程式函数与交互控制</li>
+<li>监控系统案例：传感器、趋势与告警</li>
+<li>推理引擎、模式匹配网络与效率优化</li>
+<li>事实文件的加载与保存</li>
+<li>重点梳理</li>
+<li>参考资料</li>
+</ul>
+<h1 id="clips-与基于规则的专家系统">1 CLIPS 与基于规则的专家系统</h1>
+<h2 id="clips-的定位">1.1 CLIPS 的定位</h2>
+<p>CLIPS 是 C Language Integrated Production System
+的缩写，中文可以理解为 <strong>C 语言集成产生式系统</strong>。它最初由
+NASA Johnson Space Center 开发，用来构建专家系统（Expert System）。根据
+CLIPS 官方介绍，CLIPS
+适合那些“用启发式规则比用固定算法更容易描述和维护”的问题；这也解释了为什么本章把
+CLIPS
+放在人工智能课程中讲：它不是普通的过程式语言，而是一种面向知识、规则和推理的工具。</p>
+<p>在专家系统中，知识通常不是写成一条从头到尾执行的程序，而是写成许多“如果条件满足，就执行某些动作”的规则。系统运行时会不断查看当前事实，找出可以触发的规则，并把规则的动作作用到工作记忆（Working
+Memory）上。这个过程叫<strong>前向推理（Forward
+Chaining）</strong>，因为推理从已知事实出发，一步步推出新事实或执行新动作。</p>
+<h2 id="基于规则的专家系统结构">1.2 基于规则的专家系统结构</h2>
+<p>这里给出的专家系统结构包括用户界面、知识获取设施、解释设施、知识库、工作记忆、议程和推理机。它们之间的关系可以理解为：知识库保存长期规则，工作记忆保存当前事实，推理机负责把规则和事实匹配起来，议程保存已经匹配成功但尚未执行的规则实例。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">组成部分</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">用户界面</td>
+<td style="text-align: left;">User Interface</td>
+<td style="text-align: left;">让用户输入问题、查看系统输出</td>
+</tr>
+<tr>
+<td style="text-align: left;">知识获取设施</td>
+<td style="text-align: left;">Knowledge Acquisition Facility</td>
+<td
+style="text-align: left;">帮助把专家经验转化为系统中的事实和规则</td>
+</tr>
+<tr>
+<td style="text-align: left;">解释设施</td>
+<td style="text-align: left;">Explanation Facility</td>
+<td
+style="text-align: left;">解释系统为什么得到某个结论，体现专家系统的可解释性</td>
+</tr>
+<tr>
+<td style="text-align: left;">知识库</td>
+<td style="text-align: left;">Knowledge Base</td>
+<td style="text-align: left;">保存规则（Rules），表示领域知识</td>
+</tr>
+<tr>
+<td style="text-align: left;">工作记忆</td>
+<td style="text-align: left;">Working Memory</td>
+<td style="text-align: left;">保存事实（Facts），表示当前问题状态</td>
+</tr>
+<tr>
+<td style="text-align: left;">议程</td>
+<td style="text-align: left;">Agenda</td>
+<td style="text-align: left;">保存已激活、等待执行的规则实例</td>
+</tr>
+<tr>
+<td style="text-align: left;">推理机</td>
+<td style="text-align: left;">Inference Engine</td>
+<td style="text-align: left;">进行匹配、冲突消解和动作执行</td>
+</tr>
+</tbody>
+</table>
+<p>这一结构的优点是<strong>模块化强、可解释性好、接近人类用规则处理问题的方式</strong>。例如在火灾应急系统中，规则可以写成“如果发生火灾，则启动喷水系统”。当工作记忆中出现火灾事实时，系统就会触发对应规则，并生成响应动作。</p>
+<h1 id="clips-语法基础与数据类型">2 CLIPS 语法基础与数据类型</h1>
+<h2 id="这里的记号约定">2.1 这里的记号约定</h2>
+<p>CLIPS 的语法大量使用括号，因此读代码时首先要习惯 Lisp
+风格的前缀表达式。这里的记号约定是为了描述语法模板，而不是 CLIPS
+程序本身。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">记号</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>( )</code></td>
+<td style="text-align: left;">CLIPS 的基本定界符</td>
+<td style="text-align: left;"><code>(assert (data 3))</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>&lt;integer&gt;</code></td>
+<td style="text-align: left;">需要替换成一个整数</td>
+<td style="text-align: left;"><code>&lt;limit&gt;</code> 可以写成
+<code>10</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>[ ]</code></td>
+<td style="text-align: left;">可选部分</td>
+<td style="text-align: left;"><code>[&lt;optional-comment&gt;]</code>
+表示注释可写可不写</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>+</code></td>
+<td style="text-align: left;">一个或多个</td>
+<td style="text-align: left;"><code>&lt;fact&gt;+</code>
+表示至少一个事实</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>*</code></td>
+<td style="text-align: left;">零个或多个</td>
+<td style="text-align: left;"><code>&lt;slot-definition&gt;*</code>
+表示可以没有，也可以有多个槽定义</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>|</code></td>
+<td style="text-align: left;">多选一</td>
+<td style="text-align: left;"><code>all | none | some</code>
+表示三者选一</td>
+</tr>
+</tbody>
+</table>
+<h2 id="原子数据类型">2.2 原子数据类型</h2>
+<p>CLIPS 的基本数据类型包括整数、浮点数、符号和字符串。符号（Symbol）是
+CLIPS 中非常常见的值，它不加引号，例如
+<code>fire</code>、<code>activate-sprinkler-system</code>。字符串（String）必须加双引号，例如
+<code>"John Smith"</code>。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">类型</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">示例</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">整数</td>
+<td style="text-align: left;">integer</td>
+<td
+style="text-align: left;"><code>1</code>、<code>+3</code>、<code>-1</code>、<code>65</code></td>
+<td style="text-align: left;">不带小数点</td>
+</tr>
+<tr>
+<td style="text-align: left;">浮点数</td>
+<td style="text-align: left;">float</td>
+<td
+style="text-align: left;"><code>1.5</code>、<code>0.7</code>、<code>9e+1</code></td>
+<td style="text-align: left;">可用科学计数法</td>
+</tr>
+<tr>
+<td style="text-align: left;">符号</td>
+<td style="text-align: left;">symbol</td>
+<td style="text-align: left;"><code>fire</code>、<code>345B</code></td>
+<td style="text-align: left;">常用于枚举值、名字、状态</td>
+</tr>
+<tr>
+<td style="text-align: left;">字符串</td>
+<td style="text-align: left;">string</td>
+<td style="text-align: left;"><code>"John Smith"</code></td>
+<td style="text-align: left;">可包含空格，必须加双引号</td>
+</tr>
+</tbody>
+</table>
+<p>CLIPS
+用空格、制表符、换行、双引号、括号、分号以及若干特殊字符作为分隔符。变量名以
+<code>?</code> 或 <code>$?</code>
+开头，因此普通符号不能以这两个前缀开头。这个细节在阅读模式匹配代码时很重要：<code>?name</code>
+不是符号，而是一个单字段变量；<code>$?name</code> 是多字段变量。</p>
+<h2 id="前缀表达式与数学函数">2.3 前缀表达式与数学函数</h2>
+<p>CLIPS 中函数调用采用前缀形式，即函数名写在最前面。例如普通数学表达式
+<span class="math inline">3 + 4 × 5</span> 在 CLIPS 中写作：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(+ 3 (* 4 5))</span><br></pre></td></tr></table></figure>
+<p>同理，表达式 <span
+class="math inline">$\frac{y_2-y_1}{x_2-x_1}&gt;0$</span> 可以写成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(&gt; (/ (- ?y2 ?y1) (- ?x2 ?x1)) 0)</span><br></pre></td></tr></table></figure>
+<p>这种写法的好处是所有函数调用都具有统一结构：<code>(函数名 参数1 参数2 ...)</code>。它看起来不如中缀表达式直观，但对于解释器来说更容易解析。</p>
+<h1 id="事实模板与工作记忆">3 事实、模板与工作记忆</h1>
+<h2 id="事实是-clips-的当前世界状态">3.1 事实是 CLIPS
+的“当前世界状态”</h2>
+<p>事实（Fact）表示系统当前知道的信息。工作记忆可以看成事实列表，里面既可以保存原始输入，也可以保存规则推理出的中间结果和最终结论。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(person (name &quot;John Smith&quot;)</span><br><span class="line">        (age 21)</span><br><span class="line">        (eye-color black)</span><br><span class="line">        (hair-color black))</span><br></pre></td></tr></table></figure>
+<p>这个事实表示一个人的姓名、年龄、眼睛颜色和头发颜色。与普通数据库记录类似，它由关系名
+<code>person</code> 和若干字段组成。不同之处在于，CLIPS
+的事实会被规则实时匹配；当事实被增加、删除或修改时，议程中的规则激活也会随之更新。</p>
+<h2 id="deftemplate定义事实结构">3.2 deftemplate：定义事实结构</h2>
+<p><code>deftemplate</code>
+用来定义模板（Template），也就是某类事实应该有哪些槽（Slot）。模板相当于数据库中的表结构或
+C 语言中的结构体定义。其基本语法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate &lt;relation-name&gt;</span><br><span class="line">  [&lt;optional-comment&gt;]</span><br><span class="line">  &lt;slot-definition&gt;*)</span><br></pre></td></tr></table></figure>
+<p>槽有两种：<code>slot</code>
+表示单字段槽，只能放一个值；<code>multislot</code>
+表示多字段槽，可以放零个或多个值。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate person</span><br><span class="line">  &quot;A person template&quot;	--这是注释</span><br><span class="line">  (multislot name)</span><br><span class="line">  (slot age)</span><br><span class="line">  (slot eye-color)</span><br><span class="line">  (slot hair-color))</span><br></pre></td></tr></table></figure>
+<p>这里 <code>name</code> 用 <code>multislot</code>
+是因为姓名可能由多个部分构成，例如 <code>John Q. Smith</code>；而
+<code>age</code>、<code>eye-color</code>、<code>hair-color</code>
+一般只需要一个值。</p>
+<h2 id="模板属性类型取值范围基数和默认值">3.3
+模板属性：类型、取值、范围、基数和默认值</h2>
+<p>模板不仅能规定槽名，还能规定槽值的合法范围。这样做的目的不是为了“写得更复杂”，而是为了让知识库更可靠：错误事实在进入工作记忆时就能被发现。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">属性</th>
+<th style="text-align: left;">语法</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">类型属性</td>
+<td
+style="text-align: left;"><code>(type &lt;type-specification&gt;)</code></td>
+<td style="text-align: left;">限定槽值类型，如
+<code>SYMBOL</code>、<code>INTEGER</code>、<code>FLOAT</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">允许值属性</td>
+<td
+style="text-align: left;"><code>(&lt;allowed-value&gt; &lt;value&gt;+)</code></td>
+<td style="text-align: left;">限定槽值必须属于某个集合</td>
+</tr>
+<tr>
+<td style="text-align: left;">范围属性</td>
+<td
+style="text-align: left;"><code>(range &lt;lower-limit&gt; &lt;upper-limit&gt;)</code></td>
+<td style="text-align: left;">限定数值上下界</td>
+</tr>
+<tr>
+<td style="text-align: left;">基数属性</td>
+<td
+style="text-align: left;"><code>(cardinality &lt;lower-limit&gt; &lt;upper-limit&gt;)</code></td>
+<td style="text-align: left;">限定多字段槽中字段个数</td>
+</tr>
+<tr>
+<td style="text-align: left;">默认值属性</td>
+<td
+style="text-align: left;"><code>(default &lt;default-specification&gt;)</code></td>
+<td style="text-align: left;">给没有显式填写的槽提供默认值</td>
+</tr>
+</tbody>
+</table>
+<p>材料对每一种属性都列出了可选值。首先，类型属性中的
+<code>&lt;type-specification&gt;</code>
+用来说明槽里可以放什么类型的数据：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th
+style="text-align: left;"><code>&lt;type-specification&gt;</code></th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>?VARIABLE</code></td>
+<td style="text-align: left;">默认值，表示类型不受限制，可以匹配任意合法
+CLIPS 值</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>SYMBOL</code></td>
+<td style="text-align: left;">符号类型，例如
+<code>fire</code>、<code>male</code>、<code>activate-sprinkler-system</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>STRING</code></td>
+<td style="text-align: left;">字符串类型，例如
+<code>"John Smith"</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>LEXEME</code></td>
+<td style="text-align: left;">词素类型，等价于 <code>SYMBOL</code> 或
+<code>STRING</code>，即可以是符号也可以是字符串</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>INTEGER</code></td>
+<td style="text-align: left;">整数类型，例如
+<code>21</code>、<code>-1</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>FLOAT</code></td>
+<td style="text-align: left;">浮点数类型，例如
+<code>1.5</code>、<code>9e+1</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>NUMBER</code></td>
+<td style="text-align: left;">数值类型，等价于 <code>INTEGER</code> 或
+<code>FLOAT</code></td>
+</tr>
+</tbody>
+</table>
+<p>允许值属性中的 <code>&lt;allowed-value&gt;</code>
+用来进一步限制槽值必须来自某个集合。它不是具体值本身，而是说明“后面这些值按什么类别解释”：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><code>&lt;allowed-value&gt;</code></th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>allowed-values</code></td>
+<td
+style="text-align: left;">允许任意类型的指定值，是最通用的取值集合限制</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>?VARIABLE</code></td>
+<td style="text-align: left;">默认值，表示不限制允许值集合</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allowed-symbols</code></td>
+<td style="text-align: left;">后面列出的允许值必须按符号处理</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allowed-strings</code></td>
+<td style="text-align: left;">后面列出的允许值必须按字符串处理</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allowed-lexemes</code></td>
+<td style="text-align: left;">后面列出的允许值可以是符号或字符串</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allowed-integers</code></td>
+<td style="text-align: left;">后面列出的允许值必须是整数</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allowed-floats</code></td>
+<td style="text-align: left;">后面列出的允许值必须是浮点数</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>allowed-numbers</code></td>
+<td style="text-align: left;">后面列出的允许值可以是整数或浮点数</td>
+</tr>
+</tbody>
+</table>
+<p>范围属性中的 <code>&lt;lower-limit&gt;</code> 和
+<code>&lt;upper-limit&gt;</code> 可以是具体数字，也可以是
+<code>?VARIABLE</code>。如果写具体数字，就表示对应的下界或上界；如果写
+<code>?VARIABLE</code>，就表示这一侧没有固定边界。例如
+<code>(range 0 ?VARIABLE)</code> 表示数值不能小于
+<code>0</code>，但没有规定最大值。</p>
+<p>基数属性中的 <code>&lt;lower-limit&gt;</code> 和
+<code>&lt;upper-limit&gt;</code> 用来限制 <code>multislot</code>
+中字段个数，取值可以是正整数或 <code>?VARIABLE</code>。例如
+<code>(cardinality 1 6)</code> 表示这个多字段槽至少有 1 个字段、最多有 6
+个字段；如果上界写成
+<code>?VARIABLE</code>，就表示没有固定最大个数。</p>
+<p>默认值属性中的 <code>&lt;default-specification&gt;</code>
+有三种常见情况：<code>?DERIVE</code> 是默认设置，表示让 CLIPS
+根据类型、允许值、范围和基数等信息推导默认值；<code>?NONE</code>
+表示没有默认值，断言事实时必须显式提供该槽值；如果写一个或多个表达式，则这些表达式就是用户指定的默认值。单字段槽只能给一个默认表达式，多字段槽可以给零个或多个默认表达式。</p>
+<h3 id="例子">3.3.1 例子</h3>
+<p>例如，一个人的年龄应为整数且不能小于 0，性别只能取 <code>male</code>
+或 <code>female</code>，可以写成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate person</span><br><span class="line">  (multislot name (type SYMBOL) (cardinality 1 6))</span><br><span class="line">  (slot age (type INTEGER) (range 0 ?VARIABLE))</span><br><span class="line">  (slot gender (allowed-values male female) (default female)))</span><br></pre></td></tr></table></figure>
+<p>其中 <code>?VARIABLE</code> 在属性中表示“这一端不固定”。</p>
+<p>这里的 <code>default-derive-example</code> 进一步说明了
+<code>?DERIVE</code> 的含义：如果不显式指定默认值，CLIPS
+会根据类型、允许值、范围等属性推导一个默认值。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate default-derive-example</span><br><span class="line">  (slot a)</span><br><span class="line">  (slot b (type INTEGER))</span><br><span class="line">  (slot c (allowed-values red green blue))</span><br><span class="line">  (multislot d)</span><br><span class="line">  (multislot e</span><br><span class="line">    (cardinality 2 2)</span><br><span class="line">    (type FLOAT)</span><br><span class="line">    (range 3.5 10.0)))</span><br><span class="line"></span><br><span class="line">(assert (default-derive-example))</span><br></pre></td></tr></table></figure>
+<p>断言 <code>(default-derive-example)</code> 时没有显式填写任何槽，所以
+CLIPS 会为每个槽推导默认值，结果可理解为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(default-derive-example</span><br><span class="line">  (a nil)</span><br><span class="line">  (b 0)</span><br><span class="line">  (c red)</span><br><span class="line">  (d)</span><br><span class="line">  (e 3.5 3.5))</span><br></pre></td></tr></table></figure>
+<p>这里 <code>a</code> 没有类型、范围或允许值限制，因此默认推导为
+<code>nil</code>；<code>b</code> 被声明为整数，所以默认得到整数
+<code>0</code>；<code>c</code> 的允许值是
+<code>red green blue</code>，CLIPS 取第一个允许值
+<code>red</code>；<code>d</code>
+是没有基数要求的多字段槽，因此默认为空字段序列；<code>e</code>
+是多字段槽，并且要求字段个数恰好为 2、类型为浮点数、范围为 <span
+class="math inline">[3.5, 10.0]</span>，所以 CLIPS 用下界
+<code>3.5</code> 填满两个字段，得到
+<code>(e 3.5 3.5)</code>。这个例子说明，<code>?DERIVE</code>
+不是固定产生同一个值，而是会结合槽的约束条件推导一个合法默认值。</p>
+<h2 id="有序事实与模板事实">3.4 有序事实与模板事实</h2>
+<p>CLIPS 中的事实可以分为有序事实（Ordered Fact）和模板事实（Template
+Fact）。有序事实只有关系名和一串字段，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(number-list 7 9 3 4 20)</span><br></pre></td></tr></table></figure>
+<p>模板事实则显式写出槽名，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(person (name Sean Zheng)</span><br><span class="line">        (age 21)</span><br><span class="line">        (eye-color black)</span><br><span class="line">        (hair-color black))</span><br></pre></td></tr></table></figure>
+<p>有序事实适合结构简单、字段含义由位置决定的场景；模板事实适合字段较多、需要类型约束和可读性的场景。实际开发中，如果事实有明确属性，优先使用
+<code>deftemplate</code>
+定义模板，因为它能让规则更清楚，也能减少因字段顺序写错带来的错误。</p>
+<h2 id="各概念的关系">3.5 各概念的关系</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260610203852670.png" style="zoom:50%;" /></p>
+<h1 id="事实操作与初始事实集合">4 事实操作与初始事实集合</h1>
+<h2 id="assertfactsretract-与-modify">4.1 assert、facts、retract 与
+modify</h2>
+<p>事实操作是 CLIPS 程序运行时改变工作记忆的主要方式。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">语法</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">增加事实</td>
+<td style="text-align: left;"><code>(assert &lt;fact&gt;+)</code></td>
+<td style="text-align: left;">向工作记忆加入一个或多个事实</td>
+</tr>
+<tr>
+<td style="text-align: left;">显示事实</td>
+<td
+style="text-align: left;"><code>(facts [&lt;start&gt; [&lt;end&gt; [&lt;maximum&gt;]]])</code></td>
+<td style="text-align: left;">查看当前事实列表</td>
+</tr>
+<tr>
+<td style="text-align: left;">删除事实</td>
+<td
+style="text-align: left;"><code>(retract &lt;fact-index&gt;+)</code></td>
+<td style="text-align: left;">根据事实编号或事实地址删除事实</td>
+</tr>
+<tr>
+<td style="text-align: left;">修改事实</td>
+<td
+style="text-align: left;"><code>(modify &lt;fact-index&gt; &lt;slot-modifier&gt;+)</code></td>
+<td style="text-align: left;">修改模板事实的槽值</td>
+</tr>
+</tbody>
+</table>
+<h3 id="assert增">4.1.1 Assert：增</h3>
+<p><code>assert</code> 的作用是把新事实加入工作记忆。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(assert (person (name &quot;John Smith&quot;)</span><br><span class="line">                (age 21)</span><br><span class="line">                (eye-color black)</span><br><span class="line">                (hair-color black)))</span><br></pre></td></tr></table></figure>
+<p>执行后，工作记忆中会多出一个 <code>person</code> 事实。CLIPS
+会给每条事实分配事实编号，例如可能显示为
+<code>f-1</code>、<code>f-2</code>。这个编号后面可以被
+<code>retract</code> 或 <code>modify</code> 使用。</p>
+<h3 id="facts查">4.1.2 Facts：查</h3>
+<p><code>facts</code> 用来查看当前事实列表。最简单的写法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(facts)</span><br></pre></td></tr></table></figure>
+<p>如果当前工作记忆中有两个事实，输出可能类似于：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">f-1     (initial-fact)</span><br><span class="line">f-2     (person (name &quot;John Smith&quot;) (age 21) (eye-color black) (hair-color black))</span><br></pre></td></tr></table></figure>
+<p>也可以指定显示范围。例如 <code>(facts 2 5)</code> 表示显示编号从
+<code>2</code> 到 <code>5</code>
+的事实；如果再加最大显示数量，则可以限制最多输出多少条事实。</p>
+<h3 id="retract删">4.1.3 Retract：删</h3>
+<p><code>retract</code> 用来删除事实。例如，如果上面 <code>person</code>
+事实的编号是 <code>f-2</code>，可以写：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(retract 2)</span><br></pre></td></tr></table></figure>
+<p>或者在规则中使用事实地址删除匹配到的事实：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(defrule remove-moved-record</span><br><span class="line">  ?f &lt;- (moved (name ?name))</span><br><span class="line">  =&gt;</span><br><span class="line">  (retract ?f))</span><br></pre></td></tr></table></figure>
+<p>第一种写法适合在交互环境中根据事实编号手动删除，第二种写法适合在规则执行时删除当前匹配到的事实。</p>
+<h3 id="modify改">4.1.4 Modify：改</h3>
+<p><code>modify</code> 用来修改模板事实中的槽值。例如，如果
+<code>f-2</code> 是一个 <code>person</code> 事实，现在要把年龄改成
+<code>22</code>，可以写：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(modify 2 (age 22))</span><br></pre></td></tr></table></figure>
+<p>如果在规则中修改事实，通常先用事实地址绑定它：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(defrule birthday</span><br><span class="line">  ?p &lt;- (person (name ?name) (age ?age))</span><br><span class="line">  =&gt;</span><br><span class="line">  (modify ?p (age (+ ?age 1))))</span><br></pre></td></tr></table></figure>
+<p>这条规则的意思是：匹配到某个人后，把他的年龄加
+1。需要注意的是，<code>modify</code>
+只能修改模板事实的槽值；对于有序事实，通常需要先 <code>retract</code>
+旧事实，再 <code>assert</code> 新事实。</p>
+<p><code>modify</code>
+本质上可以理解为“删除旧事实，再加入修改后的新事实”。因此它也会触发规则重新匹配。比如某人搬家后，可以把
+<code>person</code> 事实中的地址更新为新的地址。</p>
+<h2 id="deffacts预置一组初始事实">4.2 deffacts：预置一组初始事实</h2>
+<p><code>deffacts</code>
+用来定义一组可以在重置系统时自动加入工作记忆的事实：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(deffacts people</span><br><span class="line">  &quot;Some people we know&quot;</span><br><span class="line">  (person (name &quot;Sean Smith&quot;) (age 21) (eye-color black) (hair-color black))</span><br><span class="line">  (person (name &quot;John Riley&quot;) (age 24) (eye-color blue) (hair-color black))</span><br><span class="line">  (person (name &quot;Bruce Lenny&quot;) (age 35) (eye-color blue) (hair-color blond)))</span><br></pre></td></tr></table></figure>
+<p>这类似于给系统准备测试数据或初始数据库。课程梳理时要把
+<code>deffacts</code> 和 <code>assert</code>
+区分开：<code>deffacts</code>
+是构件定义，描述“有哪些初始事实”；<code>assert</code>
+是运行时动作，直接把事实放入工作记忆。</p>
+<h1 id="规则定义执行与构件管理">5 规则定义、执行与构件管理</h1>
+<h2 id="defrule把知识写成条件到动作">5.1
+defrule：把知识写成“条件到动作”</h2>
+<p>规则（Rule）是 CLIPS 的核心构件。基本语法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(defrule &lt;rule-name&gt;</span><br><span class="line">  [&lt;optional-comment&gt;]</span><br><span class="line">  &lt;patterns&gt;*        ; Left-Hand Side, LHS</span><br><span class="line">  =&gt;</span><br><span class="line">  &lt;actions&gt;*)        ; Right-Hand Side, RHS</span><br></pre></td></tr></table></figure>
+<p><code>=&gt;</code>
+左边是条件部分（LHS），通常由一个或多个模式组成；右边是动作部分（RHS），可以增加事实、修改事实、打印信息或调用函数。这里的火灾规则可以解释为：如果工作记忆中存在一个
+<code>emergency</code> 事实，并且它的 <code>type</code> 槽为
+<code>fire</code>，那么系统就断言一个响应事实，表示应该启动喷水系统。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(defrule fire-emergency</span><br><span class="line">  (emergency (type fire))</span><br><span class="line">  =&gt;</span><br><span class="line">  (assert (response (action activate-sprinkler-system))))</span><br></pre></td></tr></table></figure>
+<p>这条规则并不是在定义一个函数供用户手动调用，而是在定义一个<strong>可被事实触发的知识片段</strong>。当事实满足
+LHS 时，规则实例进入议程；当推理机选择它执行时，RHS 动作才真正发生。</p>
+<h2 id="runprintout-与-clear">5.2 run、printout 与 clear</h2>
+<p><code>run</code> 用来启动推理过程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(run [&lt;limit&gt;])</span><br></pre></td></tr></table></figure>
+<p>如果指定
+<code>&lt;limit&gt;</code>，系统最多触发指定次数的规则；如果不指定，则运行到没有可执行规则、遇到
+<code>halt</code> 或用户中断为止。<code>printout</code> 用于输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(printout t &quot;Activate the sprinkler system&quot; crlf)</span><br></pre></td></tr></table></figure>
+<p>其中 <code>t</code> 表示标准输出，<code>crlf</code>
+表示换行。<code>clear</code>
+则会清空当前环境中的构件和事实，通常用于重新开始一次实验。</p>
+<h2 id="构件的查看格式化输出与删除">5.3
+构件的查看、格式化输出与删除</h2>
+<p>CLIPS
+把规则、模板、初始事实集合等称为构件（Construct）。这里列出了常用管理命令：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">功能</th>
+<th style="text-align: left;">命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">列出规则</td>
+<td style="text-align: left;"><code>(list-defrules)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">列出模板</td>
+<td style="text-align: left;"><code>(list-deftemplates)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">列出初始事实集合</td>
+<td style="text-align: left;"><code>(list-deffacts)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">美化输出规则</td>
+<td
+style="text-align: left;"><code>(ppdefrule &lt;defrule-name&gt;)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">美化输出模板</td>
+<td
+style="text-align: left;"><code>(ppdeftemplate &lt;deftemplate-name&gt;)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">美化输出初始事实集合</td>
+<td
+style="text-align: left;"><code>(ppdeffacts &lt;deffacts-name&gt;)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">删除规则</td>
+<td
+style="text-align: left;"><code>(undefrule &lt;defrule-name&gt;)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">删除模板</td>
+<td
+style="text-align: left;"><code>(undeftemplate &lt;deftemplate-name&gt;)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">删除初始事实集合</td>
+<td
+style="text-align: left;"><code>(undeffacts &lt;deffacts-name&gt;)</code></td>
+</tr>
+</tbody>
+</table>
+<p>这些命令的学习意义在于帮助理解 CLIPS 环境的交互式特征。CLIPS
+不只是一个语言规范，它也是一个可以不断加载、查看、运行和调试规则库的开发环境。</p>
+<h1 id="变量通配符与事实地址">6 变量、通配符与事实地址</h1>
+<h2 id="单字段变量">6.1 单字段变量</h2>
+<p>变量以 <code>?</code>
+开头，用来在模式匹配时绑定事实中的字段。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(defrule find-blue-eyes</span><br><span class="line">  (person (name ?name) (eyes blue))</span><br><span class="line">  =&gt;</span><br><span class="line">  (printout t ?name &quot; has blue eyes.&quot; crlf))</span><br></pre></td></tr></table></figure>
+<p>当工作记忆中有 <code>(person (name Jane) (eyes blue))</code>
+时，<code>?name</code> 会绑定为
+<code>Jane</code>。如果有多个符合条件的人，这条规则会产生多个激活，每个激活对应一组不同的变量绑定。</p>
+<p>变量还可以在多个模式之间传递约束。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(defrule find-eyes</span><br><span class="line">  (find (eyes ?eyes))</span><br><span class="line">  (person (name ?name) (eyes ?eyes))</span><br><span class="line">  =&gt;</span><br><span class="line">  (printout t ?name &quot; has &quot; ?eyes &quot; eyes.&quot; crlf))</span><br></pre></td></tr></table></figure>
+<p>如果先断言
+<code>(find (eyes green))</code>，那么第二个模式只会匹配眼睛为
+<code>green</code> 的人。这里的 <code>?eyes</code>
+把“查询条件”和“人员事实”连接起来。</p>
+<h2 id="事实地址在-rhs-中修改或删除匹配到的事实">6.2 事实地址：在 RHS
+中修改或删除匹配到的事实</h2>
+<p>如果规则右部需要修改或删除左部匹配到的事实，就必须保存事实地址。语法形式是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">?f &lt;- (pattern ...)</span><br></pre></td></tr></table></figure>
+<p>例如这里的搬家信息处理规则可以理解为：先匹配一个 <code>moved</code>
+事实，再匹配同名的 <code>person</code> 事实，然后把 <code>person</code>
+的地址改成新地址。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(defrule process-moved-information</span><br><span class="line">  ?f1 &lt;- (moved (name ?name) (address ?address))</span><br><span class="line">  ?f2 &lt;- (person (name ?name))</span><br><span class="line">  =&gt;</span><br><span class="line">  (modify ?f2 (address ?address))</span><br><span class="line">  (retract ?f1))</span><br></pre></td></tr></table></figure>
+<p><code>?f1</code> 和 <code>?f2</code>
+不是普通字段值，而是事实在工作记忆中的引用。没有事实地址，RHS
+就不知道应该修改或删除哪一条具体事实。</p>
+<h2 id="单字段通配符与未指定槽">6.3 单字段通配符与未指定槽</h2>
+<p>单字段通配符 <code>?</code>
+表示“这里有一个字段，但我不关心它的值”。例如要匹配姓名为“三段式结构，最后一段是某个姓”的人，可以写：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(person (name ? ? ?last-name)</span><br><span class="line">        (identity-card-number ?id-number))</span><br></pre></td></tr></table></figure>
+<p>这里前两个 <code>?</code> 只占位，不绑定变量；<code>?last-name</code>
+和 <code>?id-number</code> 会被保存供 RHS
+使用。未在模式中写出的槽并不是不存在，而是默认等价于用 <code>?</code>
+匹配。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(person (name John Q. Smith))</span><br></pre></td></tr></table></figure>
+<p>等价于：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(person (name John Q. Smith)</span><br><span class="line">        (identity-card-number ?))</span><br></pre></td></tr></table></figure>
+<p>这说明 CLIPS 的模板模式可以只写关心的槽，从而让规则更简洁。</p>
+<h2 id="多字段通配符">6.4 多字段通配符</h2>
+<p>多字段通配符 <code>$?</code> 可以匹配零个或多个字段。它在处理
+<code>multislot</code> 时非常重要。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(person (name $?name)</span><br><span class="line">        (children $?before ?child $?after))</span><br></pre></td></tr></table></figure>
+<p>如果某人的孩子列表是 <code>(Jane Joe Paul)</code>，并且要寻找孩子
+<code>Joe</code>，那么 <code>$?before</code> 绑定为
+<code>(Jane)</code>，<code>?child</code> 绑定为
+<code>Joe</code>，<code>$?after</code> 绑定为
+<code>(Paul)</code>。如果列表中有多个 <code>Joe</code>，CLIPS
+会给出多种匹配方式。这里的 <code>Jack R. Lenny</code> 有三个
+<code>Joe</code>，因此会产生三种不同的“前面若干字段 + 当前 Joe +
+后面若干字段”的绑定。</p>
+<p>多字段通配符虽然灵活，但会显著增加匹配组合数。后面效率优化部分会强调：<strong>不要滥用多字段通配符和多字段变量</strong>。</p>
+<h1 id="字段约束与谓词函数">7 字段约束与谓词函数</h1>
+<h2 id="连接约束非或且">7.1 连接约束：非、或、且</h2>
+<p>CLIPS 的字段约束可以在模式内部直接表达条件。常见连接符有
+<code>~</code>、<code>|</code> 和 <code>&amp;</code>。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">约束</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>~</code></td>
+<td style="text-align: left;">不能等于某值</td>
+<td style="text-align: left;"><code>(hair ~black)</code>
+表示头发不是黑色</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>|</code></td>
+<td style="text-align: left;">多个候选值之一</td>
+<td style="text-align: left;"><code>(hair brown|black)</code>
+表示棕色或黑色</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>&amp;</code></td>
+<td style="text-align: left;">同时满足多个约束</td>
+<td style="text-align: left;"><code>?color&amp;brown|black</code>
+表示绑定颜色且颜色为棕色或黑色</td>
+</tr>
+</tbody>
+</table>
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(defrule person-without-black-hair</span><br><span class="line">  (person (name ?name) (hair ~black))</span><br><span class="line">  =&gt;</span><br><span class="line">  (printout t ?name &quot; does not have black hair&quot; crlf))</span><br></pre></td></tr></table></figure>
+<p>如果需要在 RHS 中输出颜色，就不能只写
+<code>(hair brown|black)</code>，而应该写成
+<code>(hair ?color&amp;brown|black)</code>。这样既限制了颜色范围，又把实际颜色绑定到
+<code>?color</code>。</p>
+<h2 id="组合字段约束">7.2 组合字段约束</h2>
+<p>复杂约束可以把多个变量、取值范围和否定条件结合起来。这里的例子可以解释为：第一个人眼睛为蓝色或绿色，头发不是黑色；第二个人不能与第一个人同名，眼睛颜色也不能相同，头发要么是黑色，要么与第一个人的头发颜色相同。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(person (name ?name1)</span><br><span class="line">        (eyes ?eyes1&amp;blue|green)</span><br><span class="line">        (hair ?hair1&amp;~black))</span><br><span class="line">(person (name ?name2&amp;~?name1)</span><br><span class="line">        (eyes ?eyes2&amp;~?eyes1)</span><br><span class="line">        (hair ?hair2&amp;black|?hair1))</span><br></pre></td></tr></table></figure>
+<p>这类写法体现了 CLIPS
+模式匹配的表达能力：它不仅能判断单个事实是否满足条件，还能在多个事实之间建立相等、不等和取值集合关系。</p>
+<h2 id="谓词函数与-test">7.3 谓词函数与 test</h2>
+<p>谓词函数（Predicate
+Function）返回真或假，常用于更复杂的条件判断。例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(and (&gt; 4 3) (&gt; 4 5))   ; FALSE</span><br><span class="line">(or  (&gt; 4 3) (&gt; 4 5))   ; TRUE</span><br><span class="line">(not (integerp 3))      ; FALSE</span><br></pre></td></tr></table></figure>
+<p><code>test</code> 条件元素可以把任意谓词表达式放入 LHS：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(age ?age)</span><br><span class="line">(test (&gt; ?age 18))</span><br></pre></td></tr></table></figure>
+<p>这个模式也可以写成更紧凑的形式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(age ?age&amp;:(&gt; ?age 18))</span><br></pre></td></tr></table></figure>
+<p>两者含义相同：先把年龄绑定到 <code>?age</code>，再检查它是否大于
+18。学习时要注意，<code>test</code>
+不是匹配一个事实，而是在当前变量绑定已经形成后，额外判断一个布尔条件是否成立。</p>
+<h1 id="条件元素orandnotexistsforalllogical">8
+条件元素：or、and、not、exists、forall、logical</h1>
+<h2 id="or-与-and组合多种触发条件">8.1 or 与 and：组合多种触发条件</h2>
+<p><code>or</code>
+条件元素用于表达“多个条件分支满足一个即可”。材料先用两条规则表示关电条件：发生洪水时关电，或者喷水灭火系统开启时关电。随后把它们合并为一条规则：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(defrule shut-off-electricity</span><br><span class="line">  ?power &lt;- (electrical-power (status on))</span><br><span class="line">  (or (emergency (type flood))</span><br><span class="line">      (extinguisher-system (type water-sprinkler) (status on)))</span><br><span class="line">  =&gt;</span><br><span class="line">  (modify ?power (status off))</span><br><span class="line">  (printout t &quot;Shut off the electricity&quot; crlf))</span><br></pre></td></tr></table></figure>
+<p><code>and</code> 通常用于显式组合多个条件。虽然规则 LHS
+中连续写多个模式本身就近似于“与”，但在嵌套结构中 <code>and</code>
+能表达更清楚的逻辑。例如使用二氧化碳灭火器的条件可以是：发生 B
+类火灾，或者发生 C 类火灾且电源已关闭。</p>
+<h2 id="not用不存在触发规则">8.2 not：用“不存在”触发规则</h2>
+<p><code>not</code>
+条件元素表示不存在某个匹配事实。这里的最大数规则很典型：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(defrule largest-number</span><br><span class="line">  (number ?x)</span><br><span class="line">  (not (number ?y&amp;:(&gt; ?y ?x)))</span><br><span class="line">  =&gt;</span><br><span class="line">  (printout t &quot;Largest number is &quot; ?x crlf))</span><br></pre></td></tr></table></figure>
+<p>这条规则不是直接排序，而是说：如果存在一个数
+<code>?x</code>，并且不存在任何比它更大的数 <code>?y</code>，那么
+<code>?x</code> 就是最大数。这个例子体现了 <code>not</code>
+的推理味道：它常用于表达“没有反例”。</p>
+<p>使用 <code>not</code>
+时要特别注意变量绑定顺序。这里给出的生日例子说明，不能在
+<code>not</code>
+内部首次绑定一个后面还要使用的变量。正确写法应当先由普通模式绑定日期，再在
+<code>not</code> 中检查当天是否无人生日：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(check-for-no-birthdays (date ?date))</span><br><span class="line">(not (person (birthday ?date)))</span><br></pre></td></tr></table></figure>
+<p>如果把 <code>(not (person (birthday ?date)))</code>
+放在前面，<code>?date</code> 没有来源，规则含义就会出问题。</p>
+<h2 id="exists只关心是否至少存在一个事实">8.3
+exists：只关心是否至少存在一个事实</h2>
+<p>如果规则只需要在“至少存在一个 emergency”时触发一次，应该使用
+<code>exists</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(defrule operator-alert-for-emergency</span><br><span class="line">  (exists (emergency))</span><br><span class="line">  =&gt;</span><br><span class="line">  (printout t &quot;Emergency: Operator Alert&quot; crlf)</span><br><span class="line">  (assert (operator-alert)))</span><br></pre></td></tr></table></figure>
+<p>如果不使用 <code>exists</code>，而只写
+<code>(emergency)</code>，那么每一个 <code>emergency</code>
+事实都会产生一个激活。这里的两个紧急事实会导致输出两次；使用
+<code>exists</code>
+后，只要至少有一个紧急事实，规则整体就满足，但不会因为事实个数而重复触发同一逻辑。</p>
+<h2 id="forall所有对象都满足后续条件">8.4
+forall：所有对象都满足后续条件</h2>
+<p><code>forall</code>
+用来表达“对所有满足第一个条件的对象，后续条件都成立”。这里的例子是：所有发生火灾的建筑都已经疏散，并且消防队已到达现场。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(forall</span><br><span class="line">  (emergency (type fire) (location ?where))</span><br><span class="line">  (fire-squad (location ?where))</span><br><span class="line">  (evacuated (building ?where)))</span><br></pre></td></tr></table></figure>
+<p>它的逻辑含义是：对于每一个火灾地点
+<code>?where</code>，都必须存在对应的消防队事实和疏散事实。<code>forall</code>
+可以看成对多个对象做一致性检查，特别适合“所有任务是否都已完成”“所有故障是否都已处理”这类问题。</p>
+<p>材料还给出等价形式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(not (and &lt;first-CE&gt;</span><br><span class="line">          (not (and &lt;remaining-CEs&gt;+))))</span><br></pre></td></tr></table></figure>
+<p>这说明 <code>forall</code>
+的本质是“不存在一个反例”：不存在某个对象满足第一个条件，却不满足后续条件。</p>
+<h2 id="logical事实的逻辑依赖与真值维护">8.5
+logical：事实的逻辑依赖与真值维护</h2>
+<p><code>logical</code>
+条件元素用于建立事实之间的逻辑依赖。普通规则断言出的事实一旦进入工作记忆，通常不会因为前提事实消失而自动消失；而使用
+<code>logical</code> 时，RHS 中断言的事实会依赖于 <code>logical</code>
+中的前提。</p>
+<p>例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(defrule use-oxygen-masks</span><br><span class="line">  (logical (noxious-fumes-present)</span><br><span class="line">           (gas-extinguishers-in-use))</span><br><span class="line">  (emergency (type fire))</span><br><span class="line">  =&gt;</span><br><span class="line">  (assert (use-oxygen-masks)))</span><br></pre></td></tr></table></figure>
+<p>这里 <code>use-oxygen-masks</code>
+的合理性依赖于“有毒烟雾存在”和“正在使用气体灭火器”。如果这些逻辑前提不再成立，CLIPS
+的真值维护机制可以撤销由它们支持的结论。<code>dependents</code> 和
+<code>dependencies</code>
+命令分别用于查看某事实支持了哪些事实，以及某事实依赖于哪些事实。</p>
+<h1 id="决策树专家系统案例">9 决策树专家系统案例</h1>
+<h2 id="用规则表示决策树">9.1 用规则表示决策树</h2>
+<p>这里的动物识别决策树从一个问题开始：动物是否为温血动物？如果不是，则猜测为蛇；如果是，再问是否会发出呼噜声，进而猜测为猫或狗。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615130349339.png" alt="image-20260615130342144" style="zoom:50%;" /></p>
+<p>在 CLIPS 中，决策树的每个节点都可以表示成一个 <code>node</code>
+事实：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate node</span><br><span class="line">  (slot name)</span><br><span class="line">  (slot type)</span><br><span class="line">  (slot question)</span><br><span class="line">  (slot yes-node)</span><br><span class="line">  (slot no-node)</span><br><span class="line">  (slot answer))</span><br></pre></td></tr></table></figure>
+<p>决策节点（Decision Node）保存问题和 yes/no 分支；答案节点（Answer
+Node）保存最终猜测。这样一来，程序规则不需要把树结构写死，而是通过读取
+<code>node</code> 事实来沿树移动。</p>
+<h2 id="初始化与询问问题">9.2 初始化与询问问题</h2>
+<p>初始化规则检查是否还没有根节点，如果没有，就从
+<code>animal.dat</code> 加载事实，并断言当前节点为
+<code>root</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(defrule initialize</span><br><span class="line">  (not (node (name root)))</span><br><span class="line">  =&gt;</span><br><span class="line">  (load-facts &quot;animal.dat&quot;)</span><br><span class="line">  (assert (current-node root)))</span><br></pre></td></tr></table></figure>
+<p>当当前节点是决策节点且尚无回答时，系统输出问题并读取用户输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(defrule ask-decision-node-question</span><br><span class="line">  ?node &lt;- (current-node ?name)</span><br><span class="line">  (node (name ?name) (type decision) (question ?question))</span><br><span class="line">  (not (answer ?))</span><br><span class="line">  =&gt;</span><br><span class="line">  (printout t ?question &quot; (yes or no)&quot;)</span><br><span class="line">  (assert (answer (read))))</span><br></pre></td></tr></table></figure>
+<p>如果用户输入既不是 <code>yes</code> 也不是
+<code>no</code>，<code>bad-answer</code>
+规则会撤销该回答，让系统重新提问。这个设计体现了专家系统中的交互控制：规则不仅可以推理，也可以管理对话状态。</p>
+<h2 id="沿-yesno-分支前进">9.3 沿 yes/no 分支前进</h2>
+<p>如果回答是
+<code>yes</code>，系统撤销当前节点和回答事实，并断言新的当前节点为 yes
+分支；如果回答是 <code>no</code>，则进入 no 分支。规则的核心动作是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(retract ?node ?answer)</span><br><span class="line">(assert (current-node ?yes-branch))</span><br></pre></td></tr></table></figure>
+<p>或：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(retract ?node ?answer)</span><br><span class="line">(assert (current-node ?no-branch))</span><br></pre></td></tr></table></figure>
+<p>这里的关键思想是：<strong>程序状态由事实表示，程序流程由规则改变事实来推进</strong>。这和传统程序中的循环变量、指针移动不同，但表达决策树非常自然。</p>
+<h2 id="猜测答案与学习新节点">9.4 猜测答案与学习新节点</h2>
+<p>当当前节点是答案节点时，系统会输出猜测，并询问用户是否正确。如果猜对，系统询问是否再来一次；如果猜错，系统进入学习流程，要求用户输入正确动物和一个能区分新旧动物的问题。</p>
+<p>这里的学习规则会执行三步：第一，生成两个新节点名；第二，把原来的答案节点改造成决策节点；第三，断言两个新的答案节点，一个保存新动物，一个保存旧动物。其效果是把原来的一片叶子扩展成一个新的二叉分支。</p>
+<p>这个案例的学习重点不在具体动物，而在于理解 CLIPS
+如何实现“可增长的知识库”。用户纠正系统后，系统不是修改程序代码，而是修改事实文件中的决策树节点。最后通过
+<code>save-facts "animal.dat" local node</code>
+保存节点事实，下次运行时系统就拥有了新知识。</p>
+<h1 id="规则执行控制显著性阶段与模块">10
+规则执行控制：显著性、阶段与模块</h1>
+<h2 id="为什么需要控制规则执行顺序">10.1 为什么需要控制规则执行顺序</h2>
+<p>在简单例子中，只要规则满足条件就执行，顺序似乎不重要。但在真实系统中，很多规则会同时被激活，例如故障检测、故障隔离、恢复处理和优先级判断可能都能匹配事实。如果不控制执行顺序，系统可能先执行恢复，再做检测，导致逻辑混乱。</p>
+<p>材料把问题拆成几个阶段：检测（Detection）、隔离（Isolation）、恢复（Recovery）和优先级（Priority）。执行控制的核心目标是让系统在正确阶段运行正确规则。</p>
+<h2 id="salience给规则设置优先级">10.2 salience：给规则设置优先级</h2>
+<p>显著性（Salience）是规则优先级。语法是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(declare (salience &lt;integer&gt;))</span><br></pre></td></tr></table></figure>
+<p>取值范围通常为 <span class="math inline">−10000</span> 到 <span
+class="math inline">10000</span>，默认值为 <span
+class="math inline">0</span>。当议程中有多个激活时，CLIPS
+会优先选择显著性更高的规则执行。</p>
+<p>但是材料特别提醒不要滥用
+salience。错误做法是用优先级表达业务排斥关系，例如 emergency 规则
+salience 为 10，important 为 5，normal 为 0。这样虽然能让 emergency
+先执行，但规则之间仍然存在隐含耦合。更好的写法是在规则条件中显式写出排斥关系：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(defrule situation-important</span><br><span class="line">  (situation important)</span><br><span class="line">  (not (situation emergency))</span><br><span class="line">  =&gt;</span><br><span class="line">  (assert (action important)))</span><br></pre></td></tr></table></figure>
+<p>这样规则本身就说明：只有没有 emergency 时，important
+才应触发。<strong>salience
+适合控制运行阶段，不适合替代业务逻辑条件。</strong></p>
+<h2 id="phase-控制模式">10.3 phase 控制模式</h2>
+<p>阶段控制模式把当前阶段表示成事实，例如
+<code>(phase detection)</code>。检测规则都要求存在
+<code>(phase detection)</code>，隔离规则要求
+<code>(phase isolation)</code>，恢复规则要求
+<code>(phase recovery)</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(defrule detection-rule</span><br><span class="line">  (phase detection)</span><br><span class="line">  &lt;patterns&gt;*</span><br><span class="line">  =&gt;</span><br><span class="line">  &lt;actions&gt;*)</span><br></pre></td></tr></table></figure>
+<p>阶段切换规则使用较低 salience，例如
+<code>-10</code>，确保当前阶段的普通规则先执行完，再切换到下一阶段：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(defrule detection-to-isolation</span><br><span class="line">  (declare (salience -10))</span><br><span class="line">  ?phase &lt;- (phase detection)</span><br><span class="line">  =&gt;</span><br><span class="line">  (retract ?phase)</span><br><span class="line">  (assert (phase isolation)))</span><br></pre></td></tr></table></figure>
+<p>这种设计的好处是清楚、可调试。系统为什么运行某类规则，可以从工作记忆中的
+<code>phase</code> 事实直接看出来。</p>
+<h2 id="defmodule用模块组织规则库">10.4 defmodule：用模块组织规则库</h2>
+<p>当规则库变大后，仅靠 <code>phase</code> 事实可能还不够。CLIPS
+提供模块（Module）机制：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(defmodule &lt;module-name&gt; [&lt;comment&gt;])</span><br></pre></td></tr></table></figure>
+<p>默认模块是 <code>MAIN</code>。常用命令包括：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">命令</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>(get-current-module)</code></td>
+<td style="text-align: left;">查看当前模块</td>
+</tr>
+<tr>
+<td
+style="text-align: left;"><code>(set-current-module &lt;module&gt;)</code></td>
+<td style="text-align: left;">设置当前模块</td>
+</tr>
+<tr>
+<td
+style="text-align: left;"><code>(focus &lt;module-name&gt;+)</code></td>
+<td style="text-align: left;">把模块压入焦点栈，使其规则优先执行</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>(list-focus-stack)</code></td>
+<td style="text-align: left;">查看焦点栈</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>(clear-focus-stack)</code></td>
+<td style="text-align: left;">清空焦点栈</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>(pop-focus)</code></td>
+<td style="text-align: left;">弹出当前焦点模块</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>(get-focus)</code></td>
+<td style="text-align: left;">查看当前焦点</td>
+</tr>
+</tbody>
+</table>
+<p>这里的模块化方案定义
+<code>DETECTION</code>、<code>ISOLATION</code>、<code>RECOVERY</code>
+三个模块，并在 <code>MAIN</code> 中用 <code>phase-sequence</code>
+控制焦点轮转。这样不同阶段的规则不仅在逻辑上分开，也在模块命名空间中分开。</p>
+<h2 id="模块间导入和导出事实模板">10.5 模块间导入和导出事实模板</h2>
+<p>模块可以控制模板的可见性。一个模块可以导出模板，另一个模块可以导入模板：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(defmodule DETECTION</span><br><span class="line">  (export deftemplate fault))</span><br><span class="line"></span><br><span class="line">(defmodule RECOVERY</span><br><span class="line">  (import DETECTION deftemplate fault))</span><br></pre></td></tr></table></figure>
+<p>如果恢复模块需要读取检测模块产生的 <code>fault</code>
+事实，就必须导入对应模板。这个机制类似编程语言中的模块接口：不是所有知识都默认全局可见，而是通过
+<code>export</code> 和 <code>import</code> 明确共享边界。</p>
+<h2 id="initial-fact-与特殊规则">10.6 initial-fact 与特殊规则</h2>
+<p>材料还提到一种特殊规则：没有 LHS 条件，只有 RHS 动作。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(defrule &lt;rule-name&gt;</span><br><span class="line">  =&gt;</span><br><span class="line">  &lt;actions&gt;*)</span><br></pre></td></tr></table></figure>
+<p>这类规则常用于初始化。在涉及模块时，如果规则依赖
+<code>initial-fact</code>，需要从 <code>MAIN</code>
+导出并在其他模块导入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(defmodule MAIN (export deftemplate initial-fact))</span><br><span class="line">(defmodule &lt;module-name&gt; (import MAIN deftemplate initial-fact))</span><br></pre></td></tr></table></figure>
+<p>学习时不必死记所有细节，但要理解它解决的是“模块中如何触发初始化规则”的问题。</p>
+<h1 id="过程式函数与交互控制">11 过程式函数与交互控制</h1>
+<p>CLIPS 虽然是规则语言，但也提供过程式函数（Procedural
+Functions），例如 <code>if</code> 和 <code>while</code>。它们通常写在
+RHS 中，用来处理用户交互和局部控制。</p>
+<p><code>if</code> 的基本形式是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(if &lt;predicate-expression&gt;</span><br><span class="line"> then &lt;expression&gt;+</span><br><span class="line"> [else &lt;expression&gt;+])</span><br></pre></td></tr></table></figure>
+<p><code>while</code> 的基本形式是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(while &lt;predicate-expression&gt;</span><br><span class="line">  [do]</span><br><span class="line">  &lt;expression&gt;+)</span><br></pre></td></tr></table></figure>
+<p>这里的继续检查规则可以理解为：系统进入 <code>check-continue</code>
+阶段后，询问用户是否继续；如果输入不是 <code>yes</code> 或
+<code>no</code>，就循环提问；如果回答 <code>yes</code>，断言
+<code>(phase continue)</code>；否则执行 <code>halt</code> 停止系统。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(while (and (neq ?answer yes) (neq ?answer no))</span><br><span class="line">  do</span><br><span class="line">  (printout t &quot;Continue? &quot;)</span><br><span class="line">  (bind ?answer (read)))</span><br></pre></td></tr></table></figure>
+<p>这里 <code>bind</code> 用于给变量赋值，<code>halt</code>
+用于停止推理机。它说明 CLIPS
+不是纯粹的逻辑规则系统，在需要时也能写出过程式控制，但从风格上看，仍应让主要推理逻辑留在规则和事实中。</p>
+<h1 id="监控系统案例传感器趋势与告警">12
+监控系统案例：传感器、趋势与告警</h1>
+<h2 id="问题背景">12.1 问题背景</h2>
+<p>这里给出一个设备监控系统：多个传感器监测多个设备，每个传感器有低红线、低警戒线、高警戒线和高红线。系统根据传感器读数判断状态，并决定是否告警或关闭设备。</p>
+<p>【图片占位：传感器与设备连接示意图】</p>
+<p>红线和警戒线的含义可以概括为：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">区间</th>
+<th style="text-align: left;">条件</th>
+<th style="text-align: left;">系统反应</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">低红线</td>
+<td style="text-align: left;">读数小于等于低红线</td>
+<td style="text-align: left;">立即关闭设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">低警戒区</td>
+<td style="text-align: left;">大于低红线且小于等于低警戒线</td>
+<td style="text-align: left;">发出警告；若持续一定周期则关闭</td>
+</tr>
+<tr>
+<td style="text-align: left;">正常区</td>
+<td style="text-align: left;">大于低警戒线且小于高警戒线</td>
+<td style="text-align: left;">状态正常</td>
+</tr>
+<tr>
+<td style="text-align: left;">高警戒区</td>
+<td style="text-align: left;">大于等于高警戒线且小于高红线</td>
+<td style="text-align: left;">发出警告；若持续一定周期则关闭</td>
+</tr>
+<tr>
+<td style="text-align: left;">高红线</td>
+<td style="text-align: left;">大于等于高红线</td>
+<td style="text-align: left;">立即关闭设备</td>
+</tr>
+</tbody>
+</table>
+<p>这个案例把前面所有知识串起来：模板定义数据结构，模块划分阶段，规则读取输入、判断趋势、产生告警，事实修改推动系统周期性运行。</p>
+<h2 id="设备与传感器模板">12.2 设备与传感器模板</h2>
+<p>设备模板保存设备名和开关状态：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate MAIN::device</span><br><span class="line">  (slot name (type SYMBOL))</span><br><span class="line">  (slot status (allowed-values on off)))</span><br></pre></td></tr></table></figure>
+<p>传感器模板保存传感器名、所属设备、当前原始值、状态和四条阈值线：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate MAIN::sensor</span><br><span class="line">  (slot name (type SYMBOL))</span><br><span class="line">  (slot device (type SYMBOL))</span><br><span class="line">  (slot raw-value</span><br><span class="line">        (type SYMBOL NUMBER)</span><br><span class="line">        (allowed-symbols none)</span><br><span class="line">        (default none))</span><br><span class="line">  (slot state</span><br><span class="line">        (allowed-values low-red-line low-guard-line normal high-red-line high-guard-line)</span><br><span class="line">        (default normal))</span><br><span class="line">  (slot low-red-line (type NUMBER))</span><br><span class="line">  (slot low-guard-line (type NUMBER))</span><br><span class="line">  (slot high-guard-line (type NUMBER))</span><br><span class="line">  (slot high-red-line (type NUMBER)))</span><br></pre></td></tr></table></figure>
+<p>这里 <code>raw-value</code> 可以是数字，也可以是符号
+<code>none</code>。这是一种常见的状态设计：当传感器值尚未读取或已经处理完时，用
+<code>none</code> 表示“当前没有待处理读数”。</p>
+<h2 id="周期运行与模块焦点">12.3 周期运行与模块焦点</h2>
+<p>系统用 <code>(cycle 0)</code>
+表示当前周期，从事实数据中读取每个周期的传感器值。<code>Begin-Next-Cycle</code>
+规则每次把周期数加 1，并把焦点设置为
+<code>INPUT</code>、<code>TRENDS</code>、<code>WARNINGS</code>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(defrule MAIN::Begin-Next-Cycle</span><br><span class="line">  ?f &lt;- (cycle ?current-cycle)</span><br><span class="line">  =&gt;</span><br><span class="line">  (retract ?f)</span><br><span class="line">  (assert (cycle (+ ?current-cycle 1)))</span><br><span class="line">  (focus INPUT TRENDS WARNINGS))</span><br></pre></td></tr></table></figure>
+<p>这意味着每个周期中，系统先读取输入，再判断趋势，最后产生告警。模块焦点在这里承担了“调度器”的角色。</p>
+<h2 id="input-模块读取传感器值">12.4 INPUT 模块：读取传感器值</h2>
+<p><code>INPUT</code> 模块导入 <code>MAIN</code> 中的所有内容，并定义
+<code>fact-data-for-sensor</code> 保存预置输入序列：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate INPUT::fact-data-for-sensor</span><br><span class="line">  (slot name)</span><br><span class="line">  (multislot data))</span><br></pre></td></tr></table></figure>
+<p>读取规则从每个传感器的数据列表中取出一个值，写入对应
+<code>sensor</code> 的
+<code>raw-value</code>，并从数据列表中删除该值：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(modify ?s (raw-value ?raw-value))</span><br><span class="line">(modify ?f (data ?rest))</span><br></pre></td></tr></table></figure>
+<p>如果某个传感器已经没有数据，而系统仍需要读取，<code>No-Fact-Data-Values-Left</code>
+规则会打印提示并
+<code>halt</code>。这体现了输入模块的职责：它不判断是否异常，只负责把原始数据放到工作记忆中。</p>
+<h2 id="trends-模块把原始值转化为状态">12.5 TRENDS
+模块：把原始值转化为状态</h2>
+<p><code>TRENDS</code>
+模块根据传感器阈值判断状态。正常状态规则可以概括为：若原始值大于低警戒线且小于高警戒线，则状态为
+<code>normal</code>，并清空 <code>raw-value</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(test (and (&gt; ?raw-value ?lgl)</span><br><span class="line">           (&lt; ?raw-value ?hgl)))</span><br></pre></td></tr></table></figure>
+<p>高警戒线状态规则则判断：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(test (and (&gt;= ?raw-value ?hgl)</span><br><span class="line">           (&lt; ?raw-value ?hrl)))</span><br></pre></td></tr></table></figure>
+<p>类似地，还应有高红线、低警戒线、低红线状态规则。判断完成后把
+<code>raw-value</code> 设回
+<code>none</code>，表示该周期读数已处理。</p>
+<h2 id="趋势事实记录状态持续时间">12.6 趋势事实：记录状态持续时间</h2>
+<p>单个周期的状态不足以决定是否关闭设备，因为警戒区通常允许短时间波动。系统使用
+<code>sensor-trend</code>
+记录某个传感器当前状态从哪个周期开始、到哪个周期结束，以及持续多少周期后应关闭设备：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(deftemplate MAIN::sensor-trend</span><br><span class="line">  (slot name)</span><br><span class="line">  (slot state (default normal))</span><br><span class="line">  (slot start (default 0))</span><br><span class="line">  (slot end (default 0))</span><br><span class="line">  (slot shutdown-duration (default 3)))</span><br></pre></td></tr></table></figure>
+<p>如果新状态和趋势事实中的旧状态相同，<code>State-Has-Not-Changed</code>
+规则只更新结束周期；如果状态变化，<code>State-Has-Changed</code>
+规则把开始周期、结束周期和状态都改成当前周期的新状态。持续时间可以用公式理解为：</p>
+<p><span class="math display">duration = end − start + 1</span></p>
+<p>这个公式解释了为什么这里的规则写作
+<code>(+ (- ?end ?start) 1)</code>。</p>
+<h2 id="warnings-模块告警与关停设备">12.7 WARNINGS
+模块：告警与关停设备</h2>
+<p><code>WARNINGS</code>
+模块根据趋势事实决定输出警告还是关闭设备。红线区规则最直接：只要状态为
+<code>high-red-line</code> 或
+<code>low-red-line</code>，并且对应设备仍为
+<code>on</code>，就立即打印告警并把设备状态改为 <code>off</code>。</p>
+<p>警戒区规则则需要检查持续时间。如果传感器处于
+<code>high-guard-line</code> 或
+<code>low-guard-line</code>，且持续时间大于等于
+<code>shutdown-duration</code>，系统关闭设备；否则只打印传感器处于警戒区的提示。</p>
+<p>这个案例的关键不是记住每条规则，而是理解分层结构：</p>
+<ol type="1">
+<li><code>INPUT</code> 把外部数据变成事实。</li>
+<li><code>TRENDS</code> 把事实读数变成状态和趋势。</li>
+<li><code>WARNINGS</code> 根据趋势产生可执行动作。</li>
+</ol>
+<p>这种结构让每个模块职责清楚，也让规则库更容易维护。</p>
+<h1 id="推理引擎模式匹配网络与效率优化">13
+推理引擎、模式匹配网络与效率优化</h1>
+<h2 id="识别-行动循环">13.1 识别-行动循环</h2>
+<p>CLIPS 推理机的核心过程是识别-行动循环（Recognize-Act
+Cycle）。每一轮大致包括四步：</p>
+<ol type="1">
+<li>匹配（Match）：检查哪些规则的 LHS 被当前事实满足，更新议程。</li>
+<li>冲突消解（Conflict
+Resolution）：如果议程中有多个激活，选择优先级最高或符合策略的一个。</li>
+<li>行动（Act）：执行所选规则 RHS，随后从议程中移除该激活。</li>
+<li>停止检查（Check for Halt）：如果执行了
+<code>halt</code>、用户中断或没有激活，则停止；否则进入下一轮。</li>
+</ol>
+<p>这解释了为什么 CLIPS
+程序看起来没有主函数。真正的“主循环”在推理机中，用户写的是事实、规则和控制策略。</p>
+<h2 id="模式网络与连接网络">13.2 模式网络与连接网络</h2>
+<p>材料后半部分讨论规则如何搜索事实。朴素做法是每次事实变化后重新检查所有规则和所有事实，但这会非常慢。CLIPS
+使用类似 Rete
+的模式匹配思想，把规则条件组织成网络，复用不同规则之间的共同匹配结果。</p>
+<p>可以粗略区分两类网络：</p>
+<ul>
+<li>模式网络（Pattern
+Network）负责判断单个事实是否满足某个模式，例如某槽是否等于常量、是否不等于某值。</li>
+<li>连接网络（Join
+Network）负责把多个模式的匹配结果连接起来，例如第一个模式中绑定的
+<code>?x</code> 是否等于第二个模式中的某个槽值。</li>
+</ul>
+<p>这里的 <code>sharing-1</code> 和 <code>sharing-2</code>
+规则展示了规则共享：两条规则有相似的前两个模式，因此匹配网络可以复用部分中间结果。理解到这一层即可，不需要手动画完整网络。</p>
+<h2 id="模式顺序为什么影响效率">13.3 模式顺序为什么影响效率</h2>
+<p>材料用 <code>good-match</code> 和 <code>bad-match</code>
+说明模式顺序的重要性。<code>good-match</code> 先匹配非常具体的事实：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(find-match ?x ?y ?z ?w)</span><br><span class="line">(item ?x)</span><br><span class="line">(item ?y)</span><br><span class="line">(item ?z)</span><br><span class="line">(item ?w)</span><br></pre></td></tr></table></figure>
+<p>因为 <code>(find-match a c e g)</code> 只有一个事实，它首先把
+<code>?x ?y ?z ?w</code> 绑定为 <code>a c e g</code>，后面的
+<code>item</code> 模式就只需要检查这些具体值是否存在。</p>
+<p><code>bad-match</code> 则先写四个宽泛的
+<code>(item ?x)</code>、<code>(item ?y)</code>、<code>(item ?z)</code>、<code>(item ?w)</code>，最后才写
+<code>(find-match ?x ?y ?z ?w)</code>。如果有 7 个 <code>item</code>
+事实，前四个模式会产生大量组合，理论上组合数可接近 <span
+class="math inline">7<sup>4</sup> = 2401</span>，再到最后才被
+<code>find-match</code> 过滤。这里指出这种坏规则甚至可能耗尽内存。</p>
+<p>因此，<strong>最具体、匹配事实最少、最能绑定变量的模式应尽量放在前面</strong>。</p>
+<h2 id="多字段通配符的组合爆炸">13.4 多字段通配符的组合爆炸</h2>
+<p>对于事实：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(list (items x 5 y 9))</span><br></pre></td></tr></table></figure>
+<p>模式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(list (items $?a $?b $?c))</span><br></pre></td></tr></table></figure>
+<p>会有很多种拆分方式，因为
+<code>$?a</code>、<code>$?b</code>、<code>$?c</code>
+每个都可以匹配不同长度的字段序列。这里列出了多种匹配尝试，目的就是说明多字段通配符会带来组合爆炸。字段越多，多字段变量越多，可能的拆分方式越多。</p>
+<p>因此在规则设计中，只有当字段长度确实不确定时才使用
+<code>$?</code>；如果能用固定字段或单字段变量表达，就不要把问题写成多字段匹配。</p>
+<h2 id="test-条件应尽早放置">13.5 test 条件应尽早放置</h2>
+<p><code>test</code>
+可以过滤变量组合，但它只有在相关变量已绑定后才能执行。材料用“三个不同点”的例子说明：如果先匹配三个
+<code>point</code> 事实，再用一个大 <code>test</code>
+判断三者是否不同，系统会先生成大量三元组，再过滤掉重复点。更好的写法是在第二个点匹配后立刻测试它和第一个点不同，再匹配第三个点并测试第三个点与前两个点都不同。</p>
+<p>这种优化原则可以概括为：<strong>一旦变量足够，能过滤多少就尽早过滤多少</strong>。这会减少后续连接网络需要保存和扩展的部分匹配数量。</p>
+<h2 id="优先使用内建模式约束">13.6 优先使用内建模式约束</h2>
+<p>如果一个条件可以写成内建连接约束，就不要写成复杂的谓词函数。例如判断颜色是否为三原色，可以写：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(color ?x&amp;red|green|blue)</span><br></pre></td></tr></table></figure>
+<p>而不是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(color ?x&amp;:(or (eq ?x red)</span><br><span class="line">               (eq ?x green)</span><br><span class="line">               (eq ?x blue)))</span><br></pre></td></tr></table></figure>
+<p>两者逻辑上等价，但内建模式匹配约束更容易被匹配网络优化。课程如果考规则优化，可以把这一点写成：<strong>让
+CLIPS
+的模式匹配机制直接做过滤，而不是把所有过滤都推迟到通用函数调用中。</strong></p>
+<h2 id="效率优化规则汇总">13.7 效率优化规则汇总</h2>
+<p>材料逐步给出了 CLIPS 规则效率优化建议，可以整理如下：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">优化建议</th>
+<th style="text-align: left;">原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">最具体的模式放前面</td>
+<td style="text-align: left;">越早绑定变量，后续组合越少</td>
+</tr>
+<tr>
+<td style="text-align: left;">匹配易变事实的模式放后面</td>
+<td
+style="text-align: left;">易变事实频繁更新，会导致议程和部分匹配频繁变化</td>
+</tr>
+<tr>
+<td style="text-align: left;">匹配事实最少的模式放前面</td>
+<td style="text-align: left;">减少部分匹配数量</td>
+</tr>
+<tr>
+<td style="text-align: left;">限制多字段通配符和多字段变量数量</td>
+<td style="text-align: left;">避免字段拆分组合爆炸</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>test</code> 条件尽量靠前</td>
+<td style="text-align: left;">尽早过滤不合法变量组合</td>
+</tr>
+<tr>
+<td style="text-align: left;">使用内建连接约束代替等价谓词表达式</td>
+<td style="text-align: left;">让模式网络直接优化匹配</td>
+</tr>
+<tr>
+<td style="text-align: left;">减少事实数量，只在需要时加载事实</td>
+<td style="text-align: left;">工作记忆越大，匹配成本越高</td>
+</tr>
+</tbody>
+</table>
+<h1 id="事实文件的加载与保存">14 事实文件的加载与保存</h1>
+<p>CLIPS 可以从外部文件加载事实，也可以把事实保存到文件中：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(load-facts &lt;file-name&gt;)</span><br><span class="line">(save-facts &lt;file-name&gt; [&lt;save-scope&gt; &lt;deftemplate-names&gt;*])</span><br></pre></td></tr></table></figure>
+<p>其中 <code>&lt;save-scope&gt;</code> 可以是 <code>visible</code> 或
+<code>local</code>。事实文件的内容通常就是一行行事实，例如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(data 34)</span><br><span class="line">(data 89)</span><br></pre></td></tr></table></figure>
+<p>在决策树案例中，<code>load-facts "animal.dat"</code>
+用来加载已有动物知识，<code>save-facts "animal.dat" local node</code>
+用来保存学习后的节点事实。在监控系统案例中，事实文件或预置事实可以作为传感器数据来源。学习时可以把它理解为
+CLIPS 与外部持久化数据之间的桥梁。</p>
+<h1 id="重点梳理">15 重点梳理</h1>
+<h2 id="必须掌握的主线">15.1 必须掌握的主线</h2>
+<p>本章的主线是：<strong>CLIPS
+用事实表示当前状态，用规则表示专家知识，用推理机把事实和规则匹配起来，并通过议程控制规则执行。</strong>
+如果工作记忆发生变化，规则激活也会变化；如果规则执行了
+<code>assert</code>、<code>retract</code> 或
+<code>modify</code>，系统状态又会进一步变化。整个程序就是在这种“事实变化-规则触发-事实再变化”的循环中运行。</p>
+<h2 id="高频概念对照">15.2 高频概念对照</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">事实</td>
+<td style="text-align: left;">Fact</td>
+<td style="text-align: left;">工作记忆中的当前信息</td>
+</tr>
+<tr>
+<td style="text-align: left;">工作记忆</td>
+<td style="text-align: left;">Working Memory</td>
+<td style="text-align: left;">保存事实的动态区域</td>
+</tr>
+<tr>
+<td style="text-align: left;">模板</td>
+<td style="text-align: left;">Template</td>
+<td style="text-align: left;">用 <code>deftemplate</code>
+定义事实结构</td>
+</tr>
+<tr>
+<td style="text-align: left;">槽</td>
+<td style="text-align: left;">Slot</td>
+<td style="text-align: left;">模板事实中的字段</td>
+</tr>
+<tr>
+<td style="text-align: left;">多字段槽</td>
+<td style="text-align: left;">Multislot</td>
+<td style="text-align: left;">可容纳多个字段的槽</td>
+</tr>
+<tr>
+<td style="text-align: left;">规则</td>
+<td style="text-align: left;">Rule</td>
+<td style="text-align: left;">用 <code>defrule</code>
+定义的条件-动作知识</td>
+</tr>
+<tr>
+<td style="text-align: left;">左部</td>
+<td style="text-align: left;">LHS</td>
+<td style="text-align: left;">规则条件部分</td>
+</tr>
+<tr>
+<td style="text-align: left;">右部</td>
+<td style="text-align: left;">RHS</td>
+<td style="text-align: left;">规则动作部分</td>
+</tr>
+<tr>
+<td style="text-align: left;">议程</td>
+<td style="text-align: left;">Agenda</td>
+<td style="text-align: left;">已匹配、等待执行的规则激活</td>
+</tr>
+<tr>
+<td style="text-align: left;">显著性</td>
+<td style="text-align: left;">Salience</td>
+<td style="text-align: left;">规则优先级</td>
+</tr>
+<tr>
+<td style="text-align: left;">条件元素</td>
+<td style="text-align: left;">Conditional Element</td>
+<td
+style="text-align: left;"><code>or</code>、<code>not</code>、<code>exists</code>、<code>forall</code>
+等 LHS 结构</td>
+</tr>
+<tr>
+<td style="text-align: left;">焦点</td>
+<td style="text-align: left;">Focus</td>
+<td style="text-align: left;">当前优先执行规则的模块</td>
+</tr>
+<tr>
+<td style="text-align: left;">识别-行动循环</td>
+<td style="text-align: left;">Recognize-Act Cycle</td>
+<td style="text-align: left;">推理机的匹配、选择、执行循环</td>
+</tr>
+</tbody>
+</table>
+<h2 id="易错点总结">15.3 易错点总结</h2>
+<ol type="1">
+<li><code>deftemplate</code> 是定义结构，<code>deffacts</code>
+是定义初始事实集合，<code>assert</code> 是运行时加入事实。</li>
+<li><code>?x</code> 匹配一个字段，<code>$?x</code>
+匹配零个或多个字段；多字段变量很强大，但容易造成匹配爆炸。</li>
+<li>在 <code>not</code>
+中不要首次绑定后续要用的变量，应先在普通模式中绑定，再用
+<code>not</code> 检查不存在性。</li>
+<li><code>exists</code>
+用来避免因为多个事实而重复触发同一类存在性规则。</li>
+<li><code>forall</code>
+的直观含义是“没有反例”，即不存在满足第一个条件但不满足后续条件的对象。</li>
+<li>salience 是执行控制工具，不应替代业务条件；业务上的互斥最好写进
+LHS。</li>
+<li>规则效率很依赖模式顺序，具体模式、少匹配模式和早期过滤条件应尽量靠前。</li>
+</ol>
+<h2 id="典型题型准备">15.4 典型题型准备</h2>
+<p>如果题目要求阅读 CLIPS 代码，建议按以下顺序分析：先找
+<code>deftemplate</code> 看事实结构，再找 <code>deffacts</code>
+或输入事实看初始工作记忆；然后逐条看 <code>defrule</code> 的 LHS
+会匹配哪些事实、变量如何绑定；最后看 RHS
+对事实做了什么修改。对于涉及多个规则的题目，还要检查 salience、phase 或
+module 是否影响执行顺序。</p>
+<p>如果题目要求写规则，先用自然语言写出“如果……那么……”；再把“如果”部分拆成事实模式和必要的
+<code>test</code>；最后把“那么”部分写成
+<code>assert</code>、<code>modify</code>、<code>retract</code> 或
+<code>printout</code>。复杂条件优先使用模式约束，例如
+<code>?color&amp;red|green|blue</code>，只有模式约束表达不了时再使用
+<code>test</code>。</p>
+<h1 id="参考资料">参考资料</h1>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.clipsrules.net/">CLIPS 官方网站：A Tool for
+Building Expert Systems</a></li>
+<li><a target="_blank" rel="noopener" href="https://clipsrules.net/AboutCLIPS.html">CLIPS 官方 About
+页面</a></li>
+<li><a
+target="_blank" rel="noopener" href="https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19960022632.pdf">NASA
+Technical Reports Server: CLIPS, The C Language Integrated Production
+System</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/CLIPS/" rel="tag"># CLIPS</a>
+              <a href="/tags/%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F/" rel="tag"># 专家系统</a>
+              <a href="/tags/%E8%A7%84%E5%88%99%E7%B3%BB%E7%BB%9F/" rel="tag"># 规则系统</a>
+              <a href="/tags/Rete/" rel="tag"># Rete</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/Logics%20and%20Prolog/" rel="prev" title="Logics and Prolog">
+                  <i class="fa fa-angle-left"></i> Logics and Prolog
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/Reinforcement%20Learning/" rel="next" title="Reinforcement Learning">
+                  Reinforcement Learning <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

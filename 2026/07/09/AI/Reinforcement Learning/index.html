@@ -1,0 +1,2630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  机器学习中的强化学习位置 强化学习问题建模 多臂老虎机问题与探索-利用 Bellman 方程与广义策略迭代 Monte Carlo 方法 Temporal-Difference Learning SARSA 与 Q-Learning Model-based Methods Policy Gradient Methods n-step Bootstrapping 与 E">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Reinforcement Learning">
+<meta property="og:url" content="http://example.com/2026/07/09/AI/Reinforcement%20Learning/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  机器学习中的强化学习位置 强化学习问题建模 多臂老虎机问题与探索-利用 Bellman 方程与广义策略迭代 Monte Carlo 方法 Temporal-Difference Learning SARSA 与 Q-Learning Model-based Methods Policy Gradient Methods n-step Bootstrapping 与 E">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260609195126133.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260613125520809.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260613134412367.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260613134957146.png">
+<meta property="article:published_time" content="2026-07-09T07:12:29.451Z">
+<meta property="article:modified_time" content="2026-07-09T07:12:29.451Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="Q-Learning">
+<meta property="article:tag" content="TD学习">
+<meta property="article:tag" content="动态规划">
+<meta property="article:tag" content="强化学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260609195126133.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/AI/Reinforcement%20Learning/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/AI/Reinforcement%20Learning/","path":"2026/07/09/AI/Reinforcement Learning/","title":"Reinforcement Learning"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Reinforcement Learning | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%AD%E7%9A%84%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E4%BD%8D%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">1 机器学习中的强化学习位置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%B1%BB%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%BB%BB%E5%8A%A1"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 三类机器学习任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E6%9B%B4%E5%83%8F%E5%AD%A6%E4%BC%9A%E5%81%9A%E4%BA%8B"><span class="nav-number">2.2.</span> <span class="nav-text">1.2
+为什么强化学习更像“学会做事”</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E9%97%AE%E9%A2%98%E5%BB%BA%E6%A8%A1"><span class="nav-number">3.</span> <span class="nav-text">2 强化学习问题建模</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98%E4%B8%AD%E7%9A%84%E4%BA%A4%E4%BA%92%E9%97%AD%E7%8E%AF"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 迷宫问题中的交互闭环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%AC%A6%E5%8F%B7"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 基本符号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E4%BB%B7%E5%80%BC%E4%B8%8E%E5%8A%A8%E4%BD%9C%E4%BB%B7%E5%80%BC%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 状态价值与动作价值的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E6%8A%A5%E4%B8%8E%E6%8A%98%E6%89%A3%E5%9B%A0%E5%AD%90"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 回报与折扣因子</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E8%87%82%E8%80%81%E8%99%8E%E6%9C%BA%E9%97%AE%E9%A2%98%E4%B8%8E%E6%8E%A2%E7%B4%A2-%E5%88%A9%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">3 多臂老虎机问题与探索-利用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#bandit-%E6%98%AF%E6%9C%80%E7%AE%80%E5%8D%95%E7%9A%84%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E9%97%AE%E9%A2%98"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 Bandit
+是最简单的强化学习问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E4%BD%9C%E4%BB%B7%E5%80%BC%E4%BC%B0%E8%AE%A1%E7%94%A8%E5%B9%B3%E5%9D%87%E5%A5%96%E5%8A%B1%E4%BC%B0%E8%AE%A1%E5%A5%BD%E5%9D%8F"><span class="nav-number">4.2.</span> <span class="nav-text">3.2
+动作价值估计：用平均奖励估计好坏</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E5%A2%9E%E9%87%8F%E6%9B%B4%E6%96%B0"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 为什么要用增量更新</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B3%E7%A8%B3%E4%B8%8E%E9%9D%9E%E5%B9%B3%E7%A8%B3%E7%8E%AF%E5%A2%83"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 平稳与非平稳环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#epsilon-greedy%E6%8E%A2%E7%B4%A2%E4%B8%8E%E5%88%A9%E7%94%A8%E7%9A%84%E5%B9%B3%E8%A1%A1"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 ϵ-greedy：探索与利用的平衡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bandit-%E7%AE%97%E6%B3%95%E5%AE%8C%E6%95%B4%E7%90%86%E8%A7%A3"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 Bandit 算法完整理解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bellman-%E6%96%B9%E7%A8%8B%E4%B8%8E%E5%B9%BF%E4%B9%89%E7%AD%96%E7%95%A5%E8%BF%AD%E4%BB%A3"><span class="nav-number">5.</span> <span class="nav-text">4 Bellman 方程与广义策略迭代</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E5%9B%9E%E6%8A%A5%E5%88%B0%E4%BB%B7%E5%80%BC%E5%87%BD%E6%95%B0"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 从回报到价值函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bellman-%E6%96%B9%E7%A8%8B%E7%9A%84%E7%9B%B4%E8%A7%82%E5%90%AB%E4%B9%89"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 Bellman 方程的直观含义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-bellman-%E6%96%B9%E7%A8%8B%E6%9C%89%E7%94%A8"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 为什么 Bellman 方程有用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%BF%E4%B9%89%E7%AD%96%E7%95%A5%E8%BF%AD%E4%BB%A3"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 广义策略迭代</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E8%BF%AD%E4%BB%A3%E7%AE%97%E6%B3%95"><span class="nav-number">5.5.</span> <span class="nav-text">4.5 策略迭代算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">5.5.1.</span> <span class="nav-text">4.5.1 初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E8%AF%84%E4%BC%B0"><span class="nav-number">5.5.2.</span> <span class="nav-text">4.5.2 策略评估</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%96%E7%95%A5%E6%94%B9%E8%BF%9B"><span class="nav-number">5.5.3.</span> <span class="nav-text">4.5.3 策略改进</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E5%B0%94%E5%A4%AB%E4%BE%8B%E5%AD%90"><span class="nav-number">5.6.</span> <span class="nav-text">4.6 高尔夫例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rl-for-optimized-execution"><span class="nav-number">5.7.</span> <span class="nav-text">4.7 RL for Optimized Execution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#challenges-of-rl"><span class="nav-number">5.8.</span> <span class="nav-text">4.8 Challenges of RL</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#monte-carlo-%E6%96%B9%E6%B3%95"><span class="nav-number">6.</span> <span class="nav-text">5 Monte Carlo 方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#monte-carlo-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 Monte Carlo 的基本思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monte-carlo-%E4%B8%8E%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 Monte Carlo
+与动态规划的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#first-visit-monte-carlo-%E7%9A%84%E7%9B%B4%E8%A7%82%E8%BF%87%E7%A8%8B"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 First-visit Monte Carlo
+的直观过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monte-carlo-es"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 Monte Carlo ES</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">6.4.1.</span> <span class="nav-text">5.4.1 例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monte-carlo-%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 Monte Carlo 的优缺点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#temporal-difference-learning"><span class="nav-number">7.</span> <span class="nav-text">6 Temporal-Difference
+Learning</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E4%B8%80%E4%B8%AA%E5%B0%8F%E4%BE%8B%E5%AD%90%E5%BC%80%E5%A7%8B"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 从一个小例子开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#td-%E5%92%8C-monte-carlo-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 TD 和 Monte Carlo 的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#td0-%E6%9B%B4%E6%96%B0%E5%85%AC%E5%BC%8F"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 TD(0) 更新公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#td-error-%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 TD error 是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tabular-td-for-v_pi"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 Tabular TD for vπ</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E8%A1%A8%E6%A0%BC%E5%BC%8F-td-%E6%9B%B4%E6%96%B0%E4%BE%8B%E5%AD%90"><span class="nav-number">7.5.1.</span> <span class="nav-text">6.5.1 一个表格式 TD 更新例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-td-%E5%AD%A6%E4%B9%A0%E9%87%8D%E8%A6%81"><span class="nav-number">7.6.</span> <span class="nav-text">6.6 为什么 TD 学习重要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#monte-carlotd%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E5%AF%B9%E6%AF%94"><span class="nav-number">7.7.</span> <span class="nav-text">6.7 Monte
+Carlo、TD、动态规划对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sarsa-%E4%B8%8E-q-learning"><span class="nav-number">8.</span> <span class="nav-text">7 SARSA 与 Q-Learning</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E4%BB%B7%E5%80%BC%E8%AF%84%E4%BC%B0%E5%88%B0%E6%8E%A7%E5%88%B6"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 从价值评估到控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sarsa%E5%AD%A6%E4%B9%A0%E8%87%AA%E5%B7%B1%E5%AE%9E%E9%99%85%E6%89%A7%E8%A1%8C%E7%9A%84%E7%AD%96%E7%95%A5"><span class="nav-number">8.2.</span> <span class="nav-text">7.2
+SARSA：学习自己实际执行的策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#q-learning%E5%AD%A6%E4%B9%A0%E8%B4%AA%E5%BF%83%E6%9C%80%E4%BC%98%E7%9B%AE%E6%A0%87"><span class="nav-number">8.3.</span> <span class="nav-text">7.3
+Q-Learning：学习贪心最优目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sarsa-%E4%B8%8E-q-learning-%E7%9A%84%E7%9B%B4%E8%A7%82%E5%B7%AE%E5%BC%82"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 SARSA 与 Q-Learning
+的直观差异</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#expected-sarsa"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 Expected SARSA</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#model-based-methods"><span class="nav-number">9.</span> <span class="nav-text">8 Model-based Methods</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#model-free-%E4%B8%8E-model-based"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 Model-free 与 Model-based</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%90%E6%96%99%E5%9B%BE%E4%B8%AD%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 材料图中的流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#model-based-%E7%9A%84%E9%A3%8E%E9%99%A9"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 Model-based 的风险</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#policy-gradient-methods"><span class="nav-number">10.</span> <span class="nav-text">9 Policy Gradient Methods</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%9B%B4%E6%8E%A5%E5%AD%A6%E4%B9%A0%E7%AD%96%E7%95%A5"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 为什么要直接学习策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#softmax-%E7%AD%96%E7%95%A5"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 Softmax 策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reinforce-with-baseline"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 REINFORCE with Baseline</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="nav-number">10.3.1.</span> <span class="nav-text">9.3.1 例子</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#n-step-bootstrapping-%E4%B8%8E-eligibility-traces"><span class="nav-number">11.</span> <span class="nav-text">10 n-step
+Bootstrapping 与 Eligibility Traces</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E-1-step-td-%E5%88%B0-monte-carlo"><span class="nav-number">11.1.</span> <span class="nav-text">10.1 从 1-step TD 到 Monte
+Carlo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#n-%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">11.2.</span> <span class="nav-text">10.2 n 的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lambda-return"><span class="nav-number">11.3.</span> <span class="nav-text">10.3 λ-return</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#forward-view"><span class="nav-number">11.4.</span> <span class="nav-text">10.4 Forward View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#backward-view-%E4%B8%8E%E8%B5%84%E6%A0%BC%E8%BF%B9"><span class="nav-number">11.5.</span> <span class="nav-text">10.5 Backward View 与资格迹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eligibility-traces-%E7%9A%84%E6%84%8F%E4%B9%89"><span class="nav-number">11.6.</span> <span class="nav-text">10.6 Eligibility Traces 的意义</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E4%B8%8E%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93%E8%87%AA%E8%AF%BE%E7%A8%8B"><span class="nav-number">12.</span> <span class="nav-text">11
+深度强化学习与多智能体自课程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%B7%B1%E5%BA%A6%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0"><span class="nav-number">12.1.</span> <span class="nav-text">11.1 为什么需要深度强化学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#alphago-%E4%BE%8B%E5%AD%90"><span class="nav-number">12.2.</span> <span class="nav-text">11.2 AlphaGo 例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multi-agent-autocurricula"><span class="nav-number">12.3.</span> <span class="nav-text">11.3 Multi-Agent Autocurricula</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%8C%91%E6%88%98%E4%B8%8E%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9"><span class="nav-number">13.</span> <span class="nav-text">12 强化学习的挑战与重点内容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%99%E9%87%8C%E5%88%97%E5%87%BA%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">13.1.</span> <span class="nav-text">12.1 这里列出的挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%91%E8%9E%8D%E6%9C%80%E4%BC%98%E6%89%A7%E8%A1%8C%E4%BE%8B%E5%AD%90"><span class="nav-number">13.2.</span> <span class="nav-text">12.2 金融最优执行例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%AD%A6%E8%80%85%E5%BA%94%E6%8E%8C%E6%8F%A1%E7%9A%84%E6%A0%B8%E5%BF%83%E5%85%B3%E7%B3%BB"><span class="nav-number">13.3.</span> <span class="nav-text">12.3 初学者应掌握的核心关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E8%83%8C%E5%85%AC%E5%BC%8F%E4%B8%8E%E7%90%86%E8%A7%A3"><span class="nav-number">13.4.</span> <span class="nav-text">12.4 必背公式与理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%82%B9"><span class="nav-number">13.5.</span> <span class="nav-text">12.5 容易混淆点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93"><span class="nav-number">13.6.</span> <span class="nav-text">12.6 一句话总结</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/Reinforcement%20Learning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Reinforcement Learning | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Reinforcement Learning
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:12:29" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ol type="1">
+<li>机器学习中的强化学习位置</li>
+<li>强化学习问题建模</li>
+<li>多臂老虎机问题与探索-利用</li>
+<li>Bellman 方程与广义策略迭代</li>
+<li>Monte Carlo 方法</li>
+<li>Temporal-Difference Learning</li>
+<li>SARSA 与 Q-Learning</li>
+<li>Model-based Methods</li>
+<li>Policy Gradient Methods</li>
+<li>n-step Bootstrapping 与 Eligibility Traces</li>
+<li>深度强化学习与多智能体自课程</li>
+<li>强化学习的挑战与重点内容</li>
+</ol>
+<h1 id="机器学习中的强化学习位置">1 机器学习中的强化学习位置</h1>
+<h2 id="三类机器学习任务">1.1 三类机器学习任务</h2>
+<p>材料先把强化学习放在机器学习的大背景中。常见机器学习任务可以粗略分为三类：<strong>监督学习（Supervised
+Learning）</strong>、<strong>无监督学习（Unsupervised
+Learning）</strong> 和 <strong>强化学习（Reinforcement Learning,
+RL）</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260609195126133.png" style="zoom:50%;" /></p>
+<p>监督学习的特点是训练数据中已经有“标准答案”。例如图像分类中，每张图片都带有“猫”“狗”“车”等标签，模型学习的是从输入图片到输出标签的映射。学习过程中，如果模型预测错了，我们马上知道错在哪里，因为标签就是答案。</p>
+<p>无监督学习没有人工给出的标签。模型面对的是一堆未标注数据，需要自己发现数据内部结构。例如把用户按购买习惯聚成几类，或者把高维数据压缩到低维空间中进行可视化。它的重点不是“预测正确标签”，而是“发现隐藏模式”。</p>
+<p>强化学习则不同。强化学习研究的是一个<strong>智能体（agent）</strong>
+如何在环境中不断行动，并根据环境返回的<strong>奖励（reward）</strong>
+来学习更好的决策方式。它没有每一步的标准答案，只有行动之后得到的反馈，而且这个反馈可能很晚才出现。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">学习方式</th>
+<th style="text-align: left;">输入数据特点</th>
+<th style="text-align: left;">学习目标</th>
+<th style="text-align: left;">典型例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">监督学习</td>
+<td style="text-align: left;">有标签样本</td>
+<td style="text-align: left;">学会输入到标签的映射</td>
+<td style="text-align: left;">图片分类、垃圾邮件识别</td>
+</tr>
+<tr>
+<td style="text-align: left;">无监督学习</td>
+<td style="text-align: left;">无标签样本</td>
+<td style="text-align: left;">发现数据结构</td>
+<td style="text-align: left;">聚类、降维</td>
+</tr>
+<tr>
+<td style="text-align: left;">强化学习</td>
+<td style="text-align: left;">智能体与环境交互得到经验</td>
+<td style="text-align: left;">学会最大化长期奖励的策略</td>
+<td style="text-align: left;">走迷宫、下棋、机器人控制</td>
+</tr>
+</tbody>
+</table>
+<h2 id="为什么强化学习更像学会做事">1.2
+为什么强化学习更像“学会做事”</h2>
+<p>强化学习不是一次性判断一个样本属于什么类别，而是要在连续时间中做一串决策。一个动作的好坏不一定能立刻看出来，因为它可能影响很多步之后的结果。</p>
+<p>例如玩迷宫游戏时，某一步向左走可能暂时没有奖励，但它可能让智能体绕开死路，最终更快到达终点；某一步向右走可能马上获得一个小奖励，但之后进入陷阱。强化学习关心的不是单步奖励最大，而是从当前开始到未来的<strong>累计收益</strong>最大。</p>
+<p>因此，强化学习天然包含几个难点：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">难点</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">延迟奖励</td>
+<td style="text-align: left;">当前动作的后果可能以后才体现</td>
+<td style="text-align: left;">现在做的选择，可能几步之后才知道好坏</td>
+</tr>
+<tr>
+<td style="text-align: left;">连续决策</td>
+<td style="text-align: left;">每一步动作会改变后续可选状态</td>
+<td style="text-align: left;">下棋时一步棋会影响之后整局棋</td>
+</tr>
+<tr>
+<td style="text-align: left;">探索与利用</td>
+<td
+style="text-align: left;">要在尝试新动作和使用已知好动作之间平衡</td>
+<td style="text-align: left;">既要试新餐厅，也不能总错过已知好餐厅</td>
+</tr>
+<tr>
+<td style="text-align: left;">不确定性</td>
+<td style="text-align: left;">同样动作不一定每次产生同样结果</td>
+<td style="text-align: left;">市场、游戏对手、物理环境都可能变化</td>
+</tr>
+</tbody>
+</table>
+<p><strong>本讲的主线</strong>可以概括为：强化学习要解决“怎样评价状态和动作的好坏”，以及“怎样根据这些评价改进策略”。</p>
+<h1 id="强化学习问题建模">2 强化学习问题建模</h1>
+<h2 id="迷宫问题中的交互闭环">2.1 迷宫问题中的交互闭环</h2>
+<p>材料用迷宫问题展示强化学习最基本的交互结构。迷宫中有一个智能体，例如老鼠或机器人。它能观察到当前处境，选择向上、向下、向左、向右等动作。环境根据动作改变状态，并返回一个奖励。例如到达奶酪位置给正奖励，撞墙给负奖励，普通移动给零奖励或小负奖励。</p>
+<p>这个闭环可以写成：</p>
+<ol type="1">
+<li>智能体观察当前状态 <span
+class="math inline"><em>S</em><sub><em>t</em></sub></span>。</li>
+<li>智能体根据策略选择动作 <span
+class="math inline"><em>A</em><sub><em>t</em></sub></span>。</li>
+<li>环境接收动作，转移到新状态 <span
+class="math inline"><em>S</em><sub><em>t</em> + 1</sub></span>。</li>
+<li>环境给出奖励 <span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span>。</li>
+<li>智能体根据新经验更新对环境和动作的认识。</li>
+</ol>
+<p>注意奖励下标常写成 <span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span>，意思是“在时刻
+<span class="math inline"><em>t</em></span>
+做动作之后，于下一时刻收到的奖励”。这看起来有点绕，但它强调奖励是动作的结果。</p>
+<p>一个 episode
+可以理解为一次完整尝试。例如老鼠从起点出发，到找到奶酪或失败结束，这条完整轨迹就是一个
+episode。强化学习算法会从很多 episode 中逐渐学习。</p>
+<h2 id="基本符号">2.2 基本符号</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">英文</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">迷宫例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>S</em></span></td>
+<td style="text-align: left;">state set</td>
+<td style="text-align: left;">所有可能状态的集合</td>
+<td
+style="text-align: left;">迷宫中所有格子位置，或者位置加方向、能量等信息</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>A</em></span></td>
+<td style="text-align: left;">action set</td>
+<td style="text-align: left;">所有可能动作的集合</td>
+<td style="text-align: left;">上、下、左、右、停留</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em></span></td>
+<td style="text-align: left;">reward set</td>
+<td style="text-align: left;">所有可能奖励的集合</td>
+<td style="text-align: left;">到达终点 <span
+class="math inline">+10</span>，撞墙 <span
+class="math inline">−1</span>，普通移动 <span
+class="math inline">0</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>π</em>(<em>a</em> ∣ <em>s</em>)</span></td>
+<td style="text-align: left;">policy</td>
+<td style="text-align: left;">在状态 <span
+class="math inline"><em>s</em></span> 选择动作 <span
+class="math inline"><em>a</em></span> 的概率</td>
+<td style="text-align: left;">在某格子向右走的概率是 <span
+class="math inline">0.7</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>v</em><sub><em>π</em></sub>(<em>s</em>)</span></td>
+<td style="text-align: left;">state value</td>
+<td style="text-align: left;">按策略 <span
+class="math inline"><em>π</em></span> 行动时，状态 <span
+class="math inline"><em>s</em></span> 的长期价值</td>
+<td
+style="text-align: left;">从这个格子出发，平均最终能得到多少奖励</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>q</em><sub><em>π</em></sub>(<em>s</em>, <em>a</em>)</span></td>
+<td style="text-align: left;">action value</td>
+<td style="text-align: left;">按策略 <span
+class="math inline"><em>π</em></span> 行动时，在 <span
+class="math inline"><em>s</em></span> 做 <span
+class="math inline"><em>a</em></span> 的长期价值</td>
+<td
+style="text-align: left;">在这个格子先向右走，后面继续按策略行动，平均能得到多少奖励</td>
+</tr>
+</tbody>
+</table>
+<p><strong>策略（policy）</strong>
+是强化学习中最核心的对象之一。它回答的问题是：在某个状态下应该选择哪个动作。如果策略是确定性的，那么每个状态只对应一个动作；如果策略是随机的，那么每个状态对应一个动作概率分布。</p>
+<p>例如在某个迷宫格子中：</p>
+<p><span
+class="math display"><em>π</em>(右 ∣ <em>s</em>) = 0.6,  <em>π</em>(上 ∣ <em>s</em>) = 0.2,  <em>π</em>(左 ∣ <em>s</em>) = 0.1,  <em>π</em>(下 ∣ <em>s</em>) = 0.1.</span></p>
+<p>这表示智能体大多数时候向右走，但偶尔也会尝试别的方向。</p>
+<h2 id="状态价值与动作价值的区别">2.3 状态价值与动作价值的区别</h2>
+<p>状态价值 <span
+class="math inline"><em>v</em><sub><em>π</em></sub>(<em>s</em>)</span>
+和动作价值 <span
+class="math inline"><em>q</em><sub><em>π</em></sub>(<em>s</em>, <em>a</em>)</span>
+很容易混淆。可以用一句话区分：</p>
+<p><strong><span
+class="math inline"><em>v</em><sub><em>π</em></sub>(<em>s</em>)</span>
+评价“我站在这里有多好”；<span
+class="math inline"><em>q</em><sub><em>π</em></sub>(<em>s</em>, <em>a</em>)</span>
+评价“我站在这里并且先做这个动作有多好”。</strong></p>
+<p>假设在迷宫某个交叉路口，向右是终点方向，向左是死路。如果只看状态价值
+<span
+class="math inline"><em>v</em><sub><em>π</em></sub>(<em>s</em>)</span>，它告诉我们这个路口整体上好不好；如果看动作价值
+<span
+class="math inline"><em>q</em><sub><em>π</em></sub>(<em>s</em>, 右)</span>
+和 <span
+class="math inline"><em>q</em><sub><em>π</em></sub>(<em>s</em>, 左)</span>，它会告诉我们在这个路口右转和左转分别有多好。</p>
+<p>为什么动作价值很重要？因为要改进策略时，智能体最终要选择动作。如果知道每个动作的
+<span
+class="math inline"><em>q</em><sub><em>π</em></sub>(<em>s</em>, <em>a</em>)</span>，就可以直接选价值最大的动作：</p>
+<p><span
+class="math display"><em>π</em><sup>′</sup>(<em>s</em>) = arg max<sub><em>a</em></sub><em>q</em><sub><em>π</em></sub>(<em>s</em>, <em>a</em>).</span></p>
+<h2 id="回报与折扣因子">2.4 回报与折扣因子</h2>
+<p>强化学习优化的是从当前时刻开始的累计奖励，称为<strong>回报（return）</strong>：</p>
+<p><span class="math display">$$
+G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \cdots
+      = \sum_{k=0}^{\infty}\gamma^k R_{t+k+1}.
+$$</span></p>
+<p>这个公式可以逐项理解：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">项</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span></td>
+<td style="text-align: left;">当前动作之后马上得到的奖励</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>γ</em><em>R</em><sub><em>t</em> + 2</sub></span></td>
+<td style="text-align: left;">下一步奖励，乘一次折扣</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>γ</em><sup>2</sup><em>R</em><sub><em>t</em> + 3</sub></span></td>
+<td style="text-align: left;">再下一步奖励，乘两次折扣</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>γ</em><sup><em>k</em></sup></span></td>
+<td style="text-align: left;">距离现在越远，折扣次数越多</td>
+</tr>
+</tbody>
+</table>
+<p><span class="math inline"><em>γ</em> ∈ [0, 1]</span>
+称为<strong>折扣因子（discount
+factor）</strong>。它控制智能体有多重视未来。</p>
+<p>如果 <span class="math inline"><em>γ</em> = 0</span>，则 <span
+class="math inline"><em>G</em><sub><em>t</em></sub> = <em>R</em><sub><em>t</em> + 1</sub></span>，智能体只关心眼前奖励。如果
+<span class="math inline"><em>γ</em></span> 接近 <span
+class="math inline">1</span>，未来奖励几乎和当前奖励同样重要。迷宫中如果只关心眼前奖励，智能体可能会原地拿小奖励；如果重视长期奖励，它更可能为了终点大奖励暂时绕路。</p>
+<p>一个简单数值例子：假设未来三步奖励是 <span
+class="math inline">1, 1, 10</span>。</p>
+<p>当 <span class="math inline"><em>γ</em> = 0.5</span> 时：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em></sub> = 1 + 0.5 × 1 + 0.5<sup>2</sup> × 10 = 4.</span></p>
+<p>当 <span class="math inline"><em>γ</em> = 0.9</span> 时：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em></sub> = 1 + 0.9 × 1 + 0.9<sup>2</sup> × 10 = 10.</span></p>
+<p>同样的奖励序列，在更大的 <span class="math inline"><em>γ</em></span>
+下价值更高，因为智能体更重视远期的大奖励。</p>
+<h1 id="多臂老虎机问题与探索-利用">3 多臂老虎机问题与探索-利用</h1>
+<h2 id="bandit-是最简单的强化学习问题">3.1 Bandit
+是最简单的强化学习问题</h2>
+<p>多臂老虎机问题（Multi-armed Bandit
+Problem）是强化学习的入门模型。它的名字来自赌场里的老虎机：一台机器上有一个拉杆，玩家拉一下拉杆，机器可能吐出奖励，也可能什么都没有。“多臂”指的是现在有很多个拉杆，或者很多台可选机器，每次只能选择其中一个去拉。</p>
+<p>如果你没玩过老虎机，可以把它想成下面这个普通选择问题：桌上有四个按钮，每次你只能按一个按钮。按下按钮后，系统可能给你
+<span class="math inline">1</span> 分，也可能给你 <span
+class="math inline">0</span>
+分。每个按钮背后都有一个固定但你不知道的“中奖概率”。例如：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">按钮</th>
+<th style="text-align: left;">真实中奖概率</th>
+<th style="text-align: left;">你一开始是否知道</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">A</td>
+<td style="text-align: left;"><span class="math inline">70%</span></td>
+<td style="text-align: left;">不知道</td>
+</tr>
+<tr>
+<td style="text-align: left;">B</td>
+<td style="text-align: left;"><span class="math inline">30%</span></td>
+<td style="text-align: left;">不知道</td>
+</tr>
+<tr>
+<td style="text-align: left;">C</td>
+<td style="text-align: left;"><span class="math inline">55%</span></td>
+<td style="text-align: left;">不知道</td>
+</tr>
+<tr>
+<td style="text-align: left;">D</td>
+<td style="text-align: left;"><span class="math inline">40%</span></td>
+<td style="text-align: left;">不知道</td>
+</tr>
+</tbody>
+</table>
+<p>如果你事先知道这些概率，问题就很简单：永远按 A，因为 A
+的期望收益最高。但在强化学习里，智能体一开始不知道这些概率，只能通过一次次尝试来估计哪个按钮更好。</p>
+<p>在这个问题里：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">强化学习概念</th>
+<th style="text-align: left;">多臂老虎机里的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">智能体</td>
+<td style="text-align: left;">做选择的人或程序</td>
+</tr>
+<tr>
+<td style="text-align: left;">动作</td>
+<td style="text-align: left;">选择哪个按钮或哪台机器</td>
+</tr>
+<tr>
+<td style="text-align: left;">奖励</td>
+<td style="text-align: left;">按下后得到的分数，例如成功为 <span
+class="math inline">1</span>、失败为 <span
+class="math inline">0</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">动作价值</td>
+<td style="text-align: left;">某个按钮平均能带来多少奖励</td>
+</tr>
+<tr>
+<td style="text-align: left;">策略</td>
+<td style="text-align: left;">当前决定怎么选按钮的方法</td>
+</tr>
+</tbody>
+</table>
+<p>多臂老虎机和完整强化学习问题相比，最大的简化是：它<strong>没有复杂的状态变化</strong>。在迷宫问题中，向上走会改变当前位置；但在
+Bandit
+问题中，每次选择后通常又回到同样的选择场景。因此可以把它看作“只有一个状态、多个动作”的强化学习问题。</p>
+<p>Bandit
+问题的目标不是每台机器都试一样多，而是尽快发现哪台机器收益高，并尽量多选择它。但是如果太早认定某台机器最好，就可能错过真正更好的机器。</p>
+<p>例如你前两次按 A 都失败，前两次按 C 都成功，并不代表 C 一定比 A
+好，因为这可能只是随机波动。智能体必须一边利用当前看起来好的动作，一边继续探索其他动作。这就是后面要讲的<strong>探索与利用的权衡</strong>。</p>
+<h2 id="动作价值估计用平均奖励估计好坏">3.2
+动作价值估计：用平均奖励估计好坏</h2>
+<p>设某个动作已经被选过 <span class="math inline"><em>n</em> − 1</span>
+次，得到的奖励分别是：</p>
+<p><span
+class="math display"><em>R</em><sub>1</sub>, <em>R</em><sub>2</sub>, …, <em>R</em><sub><em>n</em> − 1</sub>.</span></p>
+<p>那么第 <span class="math inline"><em>n</em></span>
+次选择前，我们对这个动作价值的估计是：</p>
+<p><span class="math display">$$
+Q_n = \frac{R_1 + R_2 + \cdots + R_{n-1}}{n-1}.
+$$</span></p>
+<p>这个公式就是样本平均。它背后的想法很朴素：如果一个动作过去平均奖励高，就认为它未来也可能奖励高。</p>
+<p>例如某台老虎机被拉了 <span class="math inline">4</span> 次，奖励是
+<span class="math inline">1, 0, 1, 1</span>，则估计价值为：</p>
+<p><span class="math display">$$
+Q_5=\frac{1+0+1+1}{4}=0.75.
+$$</span></p>
+<p>这表示在已有经验下，我们估计这台机器成功率约为 <span
+class="math inline">75%</span>。</p>
+<h2 id="为什么要用增量更新">3.3 为什么要用增量更新</h2>
+<p>如果每次都从头计算平均值，需要保存所有历史奖励。材料推导了更方便的增量形式：</p>
+<p><span class="math display">$$
+Q_{n+1} = Q_n + \frac{1}{n}[R_n - Q_n].
+$$</span></p>
+<p>如果新奖励 <span
+class="math inline"><em>R</em><sub><em>n</em></sub></span> 比旧估计
+<span class="math inline"><em>Q</em><sub><em>n</em></sub></span>
+大，那么 <span
+class="math inline"><em>R</em><sub><em>n</em></sub> − <em>Q</em><sub><em>n</em></sub> &gt; 0</span>，估计值上调；如果新奖励更小，估计值下调。</p>
+<p>例如，某动作当前估计 <span
+class="math inline"><em>Q</em><sub>4</sub> = 0.6</span>，这是前 <span
+class="math inline">3</span> 次的平均值。第 <span
+class="math inline">4</span> 次得到奖励 <span
+class="math inline"><em>R</em><sub>4</sub> = 1</span>，则：</p>
+<p><span class="math display">$$
+Q_5=0.6+\frac{1}{4}(1-0.6)=0.6+0.1=0.7.
+$$</span></p>
+<p>新奖励比旧估计高，所以价值估计上升。</p>
+<h2 id="平稳与非平稳环境">3.4 平稳与非平稳环境</h2>
+<p>如果每个动作的奖励分布不随时间变化，称为<strong>平稳环境（stationary
+environment）</strong>。在这种情况下，普通样本平均很好，因为越多历史样本通常越可靠。</p>
+<p>但如果环境会变化，称为<strong>非平稳环境（nonstationary
+environment）</strong>。例如一个广告推荐系统中，用户兴趣会随时间变化；股票交易环境中，市场状态也会变。此时很久以前的数据不一定有参考价值。</p>
+<p>这里给出常数步长更新：</p>
+<p><span
+class="math display"><em>Q</em><sub><em>n</em> + 1</sub> = <em>Q</em><sub><em>n</em></sub> + <em>α</em>[<em>R</em><sub><em>n</em></sub> − <em>Q</em><sub><em>n</em></sub>].</span></p>
+<p>与 <span class="math inline">$\frac{1}{n}$</span> 不同，<span
+class="math inline"><em>α</em></span>
+是固定学习率。这样新数据永远有固定影响力，旧数据会逐渐被遗忘。</p>
+<p>展开后：</p>
+<p><span class="math display">$$
+Q_{n+1}
+= (1-\alpha)^n Q_1 + \sum_{i=1}^{n}\alpha(1-\alpha)^{n-i}R_i.
+$$</span></p>
+<p>这个公式说明：越新的奖励 <span
+class="math inline"><em>R</em><sub><em>i</em></sub></span>，权重越大；越旧的奖励，乘上的
+<span class="math inline">(1 − <em>α</em>)</span>
+次数越多，影响越小。可以把它理解为“带遗忘机制的平均”。</p>
+<h2 id="epsilon-greedy探索与利用的平衡">3.5 <span
+class="math inline"><em>ϵ</em></span>-greedy：探索与利用的平衡</h2>
+<p>这里的简单 Bandit 算法使用 <span
+class="math inline"><em>ϵ</em></span>-greedy 策略。它的规则很直接：</p>
+<ol type="1">
+<li>以概率 <span class="math inline">1 − <em>ϵ</em></span>
+选择当前估计价值最高的动作。</li>
+<li>以概率 <span class="math inline"><em>ϵ</em></span>
+随机选择一个动作。</li>
+</ol>
+<p>例如 <span class="math inline"><em>ϵ</em> = 0.1</span>，表示 <span
+class="math inline">90%</span> 的时候选择当前看起来最好的动作，<span
+class="math inline">10%</span> 的时候随机探索。</p>
+<p>为什么不能永远选当前最好的动作？因为一开始的估计可能不准。假设有四台老虎机，真实成功率分别是
+<span class="math inline">70%</span>、<span
+class="math inline">30%</span>、<span
+class="math inline">55%</span>、<span
+class="math inline">40%</span>。如果你第一次试 <span
+class="math inline">55%</span> 的机器刚好成功，而 <span
+class="math inline">70%</span>
+的机器第一次刚好失败，短期数据会误导你。如果完全贪心，可能长期选择次优动作。</p>
+<p>为什么不能一直随机探索？因为那样会浪费大量机会在低收益动作上。强化学习需要的是在学习过程中逐渐把更多选择分配给高价值动作。</p>
+<h2 id="bandit-算法完整理解">3.6 Bandit 算法完整理解</h2>
+<p>Bandit 算法要做的核心事情，是通过反复尝试和观察奖励，估计每个动作
+<span class="math inline"><em>a</em></span> 的价值 <span
+class="math inline"><em>Q</em>(<em>a</em>)</span>，也就是“选择这个动作平均能得到多少奖励”。估计出
+<span class="math inline"><em>Q</em>(<em>a</em>)</span>
+后，智能体就可以更多选择价值高的动作，同时保留少量探索机会。</p>
+<p>这里给出的简单 Bandit 算法可以解释为：</p>
+<ol type="1">
+<li>对每个动作 <span
+class="math inline"><em>a</em> = 1, …, <em>k</em></span>，初始化：</li>
+</ol>
+<p><span
+class="math display"><em>Q</em>(<em>a</em>) = 0,  <em>N</em>(<em>a</em>) = 0.</span></p>
+<p><span class="math inline"><em>N</em>(<em>a</em>)</span> 表示动作
+<span class="math inline"><em>a</em></span> 被选过的次数。</p>
+<ol start="2" type="1">
+<li>不断重复：</li>
+</ol>
+<p>以概率 <span class="math inline">1 − <em>ϵ</em></span> 选择：</p>
+<p><span
+class="math display"><em>a</em><sup>*</sup> = arg max<sub><em>a</em></sub><em>Q</em>(<em>a</em>).</span></p>
+<p>以概率 <span class="math inline"><em>ϵ</em></span>
+随机选择一个动作，并把本轮实际选中的动作也记为 <span
+class="math inline"><em>a</em><sup>*</sup></span>。</p>
+<ol start="3" type="1">
+<li><p>执行动作 <span
+class="math inline"><em>a</em><sup>*</sup></span>，观察奖励 <span
+class="math inline"><em>R</em></span>。</p></li>
+<li><p>更新选择次数：</p></li>
+</ol>
+<p><span
+class="math display"><em>N</em>(<em>a</em><sup>*</sup>) ← <em>N</em>(<em>a</em><sup>*</sup>) + 1.</span></p>
+<ol start="5" type="1">
+<li>更新动作价值：</li>
+</ol>
+<p><span class="math display">$$
+Q(a^*)\leftarrow Q(a^*)+\frac{1}{N(a^*)}[R-Q(a^*)].
+$$</span></p>
+<p>这个算法体现了强化学习的一个基本范式：<strong>先根据当前估计做动作，再用反馈修正估计，之后再用新的估计做更好的动作。</strong></p>
+<h1 id="bellman-方程与广义策略迭代">4 Bellman 方程与广义策略迭代</h1>
+<h2 id="从回报到价值函数">4.1 从回报到价值函数</h2>
+<p>在这一节中，<span
+class="math inline"><em>G</em><sub><em>t</em></sub></span>
+表示<strong>从时刻 <span class="math inline"><em>t</em></span>
+开始往未来看的总回报（return）</strong>。它不是某一步的即时奖励，而是从当前状态出发，之后所有奖励按折扣因子
+<span class="math inline"><em>γ</em></span> 加权求和的结果：</p>
+<p><span class="math display">$$
+G_t = R_{t+1}+\gamma R_{t+2}+\gamma^2R_{t+3}+\cdots
+=\sum_{k=0}^{\infty}\gamma^kR_{t+k+1}.
+$$</span></p>
+<p>这里 <span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span>
+是当前动作之后马上得到的奖励，<span
+class="math inline"><em>R</em><sub><em>t</em> + 2</sub></span>
+是再下一步奖励，依此类推。<span class="math inline"><em>γ</em></span>
+用来降低远期奖励的权重。例如 <span
+class="math inline"><em>γ</em> = 0.9</span> 时，两步后的奖励会乘上 <span
+class="math inline">0.9<sup>2</sup></span>。所以 <span
+class="math inline"><em>G</em><sub><em>t</em></sub></span>
+可以理解为：“如果我现在在时刻 <span
+class="math inline"><em>t</em></span>，从现在开始一路走下去，最终累计能得到多少收益。”</p>
+<p>有了 <span
+class="math inline"><em>G</em><sub><em>t</em></sub></span>，价值函数才有定义基础。价值函数本质上就是在问：从某个状态或状态-动作对开始，未来的
+<span class="math inline"><em>G</em><sub><em>t</em></sub></span>
+平均会是多少？</p>
+<p>状态价值函数定义为：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = 𝔼<sub><em>π</em></sub>[<em>G</em><sub><em>t</em></sub> ∣ <em>S</em><sub><em>t</em></sub> = <em>s</em>].</span></p>
+<p>这句话的意思是：如果当前处在状态 <span
+class="math inline"><em>s</em></span>，之后一直按照策略 <span
+class="math inline"><em>π</em></span>
+行动，那么从现在开始能获得多少回报。因为环境可能随机、策略也可能随机，所以要取期望。</p>
+<p>动作价值函数定义为：</p>
+<p><span
+class="math display"><em>q</em><sub><em>π</em></sub>(<em>s</em>, <em>a</em>) = 𝔼<sub><em>π</em></sub>[<em>G</em><sub><em>t</em></sub> ∣ <em>S</em><sub><em>t</em></sub> = <em>s</em>, <em>A</em><sub><em>t</em></sub> = <em>a</em>].</span></p>
+<p>它比状态价值多指定了第一步动作 <span
+class="math inline"><em>a</em></span>。第一步做完以后，后续仍然按策略
+<span class="math inline"><em>π</em></span> 行动。</p>
+<h2 id="bellman-方程的直观含义">4.2 Bellman 方程的直观含义</h2>
+<p>Bellman 方程（Bellman
+Equation）是强化学习最重要的公式之一。它说的是：</p>
+<p><strong>一个状态的价值 = 当前一步能得到的奖励 +
+下一状态的折扣后价值。</strong></p>
+<p>从回报定义出发：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em></sub> = <em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>G</em><sub><em>t</em> + 1</sub>.</span></p>
+<p>这一步只是把“从 <span class="math inline"><em>t</em></span>
+开始的总回报”拆成两部分：第一部分是下一步马上拿到的奖励 <span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span>，第二部分是从
+<span class="math inline"><em>t</em> + 1</span> 开始继续往后的总回报
+<span
+class="math inline"><em>G</em><sub><em>t</em> + 1</sub></span>，但未来回报要乘折扣因子
+<span class="math inline"><em>γ</em></span>。</p>
+<p>接下来从状态价值函数定义开始推导。状态价值是：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = 𝔼<sub><em>π</em></sub>[<em>G</em><sub><em>t</em></sub> ∣ <em>S</em><sub><em>t</em></sub> = <em>s</em>].</span></p>
+<p>把 <span
+class="math inline"><em>G</em><sub><em>t</em></sub> = <em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>G</em><sub><em>t</em> + 1</sub></span>
+代入：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = 𝔼<sub><em>π</em></sub>[<em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>G</em><sub><em>t</em> + 1</sub> ∣ <em>S</em><sub><em>t</em></sub> = <em>s</em>].</span></p>
+<p>现在问题变成：当已知当前状态是 <span
+class="math inline"><em>s</em></span>
+时，下一步会发生什么？下一步的不确定性主要来自两层：</p>
+<ol type="1">
+<li>智能体会按照策略 <span class="math inline"><em>π</em></span>
+选择动作 <span class="math inline"><em>a</em></span>，概率是 <span
+class="math inline"><em>π</em>(<em>a</em> ∣ <em>s</em>)</span>。</li>
+<li>环境在收到动作 <span class="math inline"><em>a</em></span>
+后，会随机给出奖励 <span class="math inline"><em>r</em></span>
+并转移到下一状态 <span
+class="math inline"><em>s</em><sup>′</sup></span>，概率是 <span
+class="math inline"><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)</span>。</li>
+</ol>
+<p>因此，要对所有可能动作求加权平均：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = ∑<sub><em>a</em></sub><em>π</em>(<em>a</em> ∣ <em>s</em>)𝔼<sub><em>π</em></sub>[<em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>G</em><sub><em>t</em> + 1</sub> ∣ <em>S</em><sub><em>t</em></sub> = <em>s</em>, <em>A</em><sub><em>t</em></sub> = <em>a</em>].</span></p>
+<p>这一步的意思是：当前在状态 <span
+class="math inline"><em>s</em></span>
+时，可能选择不同动作；每个动作对最终价值的贡献，要按该动作被策略选中的概率加权。</p>
+<p>接着，对给定动作 <span class="math inline"><em>a</em></span>
+后可能出现的下一状态 <span
+class="math inline"><em>s</em><sup>′</sup></span> 和奖励 <span
+class="math inline"><em>r</em></span> 再展开：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = ∑<sub><em>a</em></sub><em>π</em>(<em>a</em> ∣ <em>s</em>)∑<sub><em>s</em><sup>′</sup>, <em>r</em></sub><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)𝔼<sub><em>π</em></sub>[<em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>G</em><sub><em>t</em> + 1</sub> ∣ <em>S</em><sub><em>t</em></sub> = <em>s</em>, <em>A</em><sub><em>t</em></sub> = <em>a</em>, <em>S</em><sub><em>t</em> + 1</sub> = <em>s</em><sup>′</sup>, <em>R</em><sub><em>t</em> + 1</sub> = <em>r</em>].</span></p>
+<p>在这个条件下，<span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span>
+已经确定等于 <span
+class="math inline"><em>r</em></span>，所以可以替换：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = ∑<sub><em>a</em></sub><em>π</em>(<em>a</em> ∣ <em>s</em>)∑<sub><em>s</em><sup>′</sup>, <em>r</em></sub><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)[<em>r</em> + <em>γ</em>𝔼<sub><em>π</em></sub>[<em>G</em><sub><em>t</em> + 1</sub> ∣ <em>S</em><sub><em>t</em> + 1</sub> = <em>s</em><sup>′</sup>]].</span></p>
+<p>而根据状态价值函数的定义，从下一状态 <span
+class="math inline"><em>s</em><sup>′</sup></span> 开始、继续按策略 <span
+class="math inline"><em>π</em></span> 行动的期望回报就是：</p>
+<p><span
+class="math display">𝔼<sub><em>π</em></sub>[<em>G</em><sub><em>t</em> + 1</sub> ∣ <em>S</em><sub><em>t</em> + 1</sub> = <em>s</em><sup>′</sup>] = <em>v</em><sub><em>π</em></sub>(<em>s</em><sup>′</sup>).</span></p>
+<p>于是得到：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = ∑<sub><em>a</em></sub><em>π</em>(<em>a</em> ∣ <em>s</em>)∑<sub><em>s</em><sup>′</sup>, <em>r</em></sub><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)[<em>r</em> + <em>γ</em><em>v</em><sub><em>π</em></sub>(<em>s</em><sup>′</sup>)].</span></p>
+<p>这就是状态价值函数的 Bellman 方程：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = ∑<sub><em>a</em></sub><em>π</em>(<em>a</em> ∣ <em>s</em>)∑<sub><em>s</em><sup>′</sup>, <em>r</em></sub><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)[<em>r</em> + <em>γ</em><em>v</em><sub><em>π</em></sub>(<em>s</em><sup>′</sup>)],  ∀<em>s</em> ∈ <em>S</em>.</span></p>
+<p>逐项解释如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">∑<sub><em>a</em></sub><em>π</em>(<em>a</em> ∣ <em>s</em>)</span></td>
+<td style="text-align: left;">按策略 <span
+class="math inline"><em>π</em></span> 对所有可能动作加权平均</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)</span></td>
+<td style="text-align: left;">执行动作 <span
+class="math inline"><em>a</em></span> 后到达 <span
+class="math inline"><em>s</em><sup>′</sup></span> 并得到奖励 <span
+class="math inline"><em>r</em></span> 的概率</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>r</em></span></td>
+<td style="text-align: left;">这一步的即时奖励</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>γ</em><em>v</em><sub><em>π</em></sub>(<em>s</em><sup>′</sup>)</span></td>
+<td style="text-align: left;">下一状态未来价值的折扣</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">[<em>r</em> + <em>γ</em><em>v</em><sub><em>π</em></sub>(<em>s</em><sup>′</sup>)]</span></td>
+<td
+style="text-align: left;">选择动作并转移后得到的一步奖励加未来价值</td>
+</tr>
+</tbody>
+</table>
+<p>初学者可以把 Bellman
+方程想成“拆账”：今天的总价值可以拆成今天马上拿到的钱，加上明天开始还能赚的钱。</p>
+<h2 id="为什么-bellman-方程有用">4.3 为什么 Bellman 方程有用</h2>
+<p>Bellman
+方程有用，是因为它把一个长远问题变成了局部递推问题。我们不必一次性看完整个未来，只要知道下一步奖励和下一状态价值，就能更新当前状态价值。</p>
+<p>这也是后面很多算法的基础：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">算法思想</th>
+<th style="text-align: left;">和 Bellman 方程的关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">动态规划</td>
+<td style="text-align: left;">已知环境模型时，直接用 Bellman
+方程迭代求价值</td>
+</tr>
+<tr>
+<td style="text-align: left;">TD 学习</td>
+<td style="text-align: left;">不知道模型时，用实际采样到的 <span
+class="math inline"><em>R</em>, <em>S</em><sup>′</sup></span> 近似
+Bellman 更新</td>
+</tr>
+<tr>
+<td style="text-align: left;">Q-Learning</td>
+<td style="text-align: left;">用最大下一动作价值构造最优 Bellman
+目标</td>
+</tr>
+<tr>
+<td style="text-align: left;">策略迭代</td>
+<td style="text-align: left;">先用 Bellman
+方程评估策略，再用价值改进策略</td>
+</tr>
+</tbody>
+</table>
+<h2 id="广义策略迭代">4.4 广义策略迭代</h2>
+<p>广义策略迭代（Generalized Policy Iteration,
+GPI）由两个交替过程组成：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">过程</th>
+<th style="text-align: left;">问的问题</th>
+<th style="text-align: left;">做的事</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">策略评估（policy evaluation）</td>
+<td style="text-align: left;">当前策略好不好？</td>
+<td style="text-align: left;">估计 <span
+class="math inline"><em>v</em><sub><em>π</em></sub></span> 或 <span
+class="math inline"><em>q</em><sub><em>π</em></sub></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">策略改进（policy improvement）</td>
+<td style="text-align: left;">能不能根据价值选更好的动作？</td>
+<td style="text-align: left;">用价值函数产生更优策略</td>
+</tr>
+</tbody>
+</table>
+<p>这两个过程会互相影响。策略评估让我们知道当前策略的价值；策略改进改变策略后，原来的价值估计又不完全准确，于是需要重新评估。不断交替后，希望策略和值函数一起接近最优。</p>
+<p>可以用学习走迷宫理解：</p>
+<ol type="1">
+<li>先按照当前走法走很多次，估计每个位置好不好。</li>
+<li>发现某些位置向右走比向左走更好，于是修改走法。</li>
+<li>走法改了以后，再重新估计每个位置好不好。</li>
+<li>重复直到走法稳定。</li>
+</ol>
+<h2 id="策略迭代算法">4.5 策略迭代算法</h2>
+<p>这里的策略迭代（Policy
+Iteration）是一种典型的动态规划方法，通常假设已知环境模型 <span
+class="math inline"><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)</span>。</p>
+<h3 id="初始化">4.5.1 初始化</h3>
+<p>对所有状态 <span class="math inline"><em>s</em></span>
+初始化价值和策略：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em>) ∈ ℝ,  <em>π</em>(<em>s</em>) ∈ <em>A</em>(<em>s</em>).</span></p>
+<p>一开始不要求准确，可以随机设定。后续迭代会不断修正。</p>
+<h3 id="策略评估">4.5.2 策略评估</h3>
+<p>固定当前策略 <span
+class="math inline"><em>π</em></span>，反复更新：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em>) ← ∑<sub><em>s</em><sup>′</sup>, <em>r</em></sub><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>π</em>(<em>s</em>))[<em>r</em> + <em>γ</em><em>V</em>(<em>s</em><sup>′</sup>)].</span></p>
+<p>这一步的意思是：假设在状态 <span
+class="math inline"><em>s</em></span> 一定按照当前策略选择动作 <span
+class="math inline"><em>π</em>(<em>s</em>)</span>，那么状态 <span
+class="math inline"><em>s</em></span>
+的价值就是该动作可能导致的所有下一状态和奖励的期望。</p>
+<p>算法中用 <span class="math inline"><em>Δ</em></span>
+记录本轮价值变化的最大值：</p>
+<p><span
+class="math display"><em>Δ</em> ← max (<em>Δ</em>, |<em>v</em> − <em>V</em>(<em>s</em>)|).</span></p>
+<p>当 <span class="math inline"><em>Δ</em> &lt; <em>θ</em></span>
+时，说明价值函数已经变化很小，可以认为当前策略评估得差不多了。</p>
+<h3 id="策略改进">4.5.3 策略改进</h3>
+<p>用当前价值函数选择更好的动作：</p>
+<p><span
+class="math display"><em>π</em>(<em>s</em>) ← arg max<sub><em>a</em></sub>∑<sub><em>s</em><sup>′</sup>, <em>r</em></sub><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)[<em>r</em> + <em>γ</em><em>V</em>(<em>s</em><sup>′</sup>)].</span></p>
+<p>这个公式的意思是：对每个可能动作 <span
+class="math inline"><em>a</em></span>，计算“执行它后的一步奖励加下一状态价值”的期望，然后选择最大的动作。</p>
+<p>如果所有状态的最优动作都没有改变，则策略稳定，算法停止。此时可以认为：</p>
+<p><span
+class="math display"><em>V</em> ≈ <em>v</em><sub>*</sub>,  <em>π</em> ≈ <em>π</em><sub>*</sub>.</span></p>
+<p>其中 <span class="math inline"><em>v</em><sub>*</sub></span>
+是最优价值函数，<span class="math inline"><em>π</em><sub>*</sub></span>
+是最优策略。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260612162303585.png" /></p>
+<h2 id="高尔夫例子">4.6 高尔夫例子</h2>
+<p>这里的高尔夫例子展示了状态价值和动作价值的区别。图中等高线表示从不同位置把球打进洞大约还需要多少杆。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260613125520809.png" style="zoom:50%;" /></p>
+<p>如果只看状态价值 <span
+class="math inline"><em>v</em>(<em>s</em>)</span>，我们知道“球在这里总体上有多好”。但真正做决策时，还要考虑动作，比如使用推杆（putt）还是开球杆（driver）。不同球杆的风险和效果不同，因此动作价值
+<span class="math inline"><em>q</em>(<em>s</em>, <em>a</em>)</span>
+会不一样。</p>
+<p>这个例子帮助理解：<strong>策略改进不是只看当前状态，而是比较当前状态下不同动作的后果。</strong></p>
+<h2 id="rl-for-optimized-execution">4.7 RL for Optimized Execution</h2>
+<p><strong>RL for Optimized Execution</strong>
+可以理解为“用强化学习解决金融交易中的最优执行问题”。这里的 execution
+指交易执行，例如一个机构想买入或卖出大量股票，但不能一次性全部成交，因为这样可能强烈影响市场价格。它需要把大订单拆成许多小订单，在一段时间内逐步执行，并尽量降低交易成本。</p>
+<p>材料把这个问题描述为 <strong>execution as state-based stochastic
+optimal
+control</strong>，意思是：交易执行可以看作一个基于状态的随机最优控制问题。</p>
+<p>这里几个词要分开理解：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">词</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">在交易执行中的例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">state-based</td>
+<td style="text-align: left;">决策依赖当前状态</td>
+<td
+style="text-align: left;">剩余时间、还剩多少股票没买/卖、当前市场价格、订单簿情况</td>
+</tr>
+<tr>
+<td style="text-align: left;">stochastic</td>
+<td style="text-align: left;">环境有随机性</td>
+<td
+style="text-align: left;">同样的下单方式，在不同市场波动下可能得到不同成交结果</td>
+</tr>
+<tr>
+<td style="text-align: left;">optimal control</td>
+<td style="text-align: left;">目标是选择最优动作序列</td>
+<td
+style="text-align: left;">每一步决定下多少单、挂什么价格、放在订单簿什么位置</td>
+</tr>
+</tbody>
+</table>
+<p>这里列出了这个强化学习建模：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">强化学习元素</th>
+<th style="text-align: left;">交易执行中的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">状态（state）</td>
+<td style="text-align: left;">时间和剩余股票数量，例如“还剩 10
+分钟、还有 5000 股没执行”；也可能包括价格、成交量、订单簿深度等信息</td>
+</tr>
+<tr>
+<td style="text-align: left;">动作（actions）</td>
+<td
+style="text-align: left;">订单在订单簿中的位置，例如挂买一、买二，或者选择市价单/限价单、下单数量</td>
+</tr>
+<tr>
+<td style="text-align: left;">奖励（rewards）</td>
+<td
+style="text-align: left;">实际成交价格或由成交价格计算出的收益/成本，例如买得越便宜奖励越高，卖得越贵奖励越高</td>
+</tr>
+<tr>
+<td style="text-align: left;">随机性（stochastic）</td>
+<td
+style="text-align: left;">相同状态和相同动作不一定得到相同结果，因为市场中其他交易者也在变化</td>
+</tr>
+</tbody>
+</table>
+<p>这个例子的重点不是让我们掌握金融细节，而是说明强化学习适合处理一种问题：<strong>当前每一步动作都会影响后续状态，而且目标不是单步最好，而是整个执行过程总体最好</strong>。</p>
+<p>例如你要在 30 分钟内买入 10000
+股。如果一开始买太快，可能把价格推高，导致后面更贵；如果买太慢，最后时间不够，只能用更差价格强行成交。强化学习可以尝试学习一种策略：在不同市场状态下，动态决定当前应该积极成交还是耐心挂单。</p>
+<p>材料最后说这是 RL
+在市场微观结构（microstructure）中的大规模应用。市场微观结构研究订单簿、成交机制、买卖价差、流动性等细节，而这些细节正好会影响交易执行策略。</p>
+<h2 id="challenges-of-rl">4.8 Challenges of RL</h2>
+<p>强化学习落地时会遇到很多挑战。RL
+的数学框架看起来很清楚，但真实问题往往比迷宫和老虎机复杂得多。</p>
+<ol type="1">
+<li><p><strong>状态表示与特征学习。</strong>
+真实任务中的状态空间可能非常高维、连续，动作空间也可能连续。比如自动驾驶看到的不是几个离散格子，而是摄像头图像、速度、路线、障碍物位置等大量信息。此时不能只用表格记录每个状态，需要用函数近似或神经网络学习有用特征。</p></li>
+<li><p><strong>奖励信号设计。</strong>
+奖励函数可能不明确，也可能同时包含多个目标，还可能涉及风险。例如机器人走路任务中，如果只奖励“速度快”，智能体可能学出不稳定甚至危险的动作；如果金融交易只奖励成交价格，也可能忽略风险和市场冲击。奖励设计错了，智能体就可能学到“钻空子”的行为。</p></li>
+<li><p><strong>带延迟的策略评估。</strong>
+在真实系统中，执行器、传感器或奖励反馈都可能有延迟。也就是说，智能体做了一个动作后，可能要过一段时间才知道这个动作到底好不好。比如下棋中的一步棋，真正影响胜负可能要很多步之后才体现出来。</p></li>
+<li><p><strong>利用与探索的权衡。</strong>
+智能体既要利用当前已经知道的好策略，也要探索还不确定的新动作。只利用会陷入局部最优，只探索又会浪费大量样本。多臂老虎机中的
+<span class="math inline"><em>ϵ</em></span>-greedy
+就是在解决这个问题的最简单版本。</p></li>
+<li><p><strong>有限样本下的快速学习。</strong>
+很多真实系统不能无限试错。机器人反复摔倒会损坏硬件，医疗决策不能随意尝试，金融交易中的错误决策会带来真实损失。因此
+RL 算法需要在有限样本下尽快学到可用策略。</p></li>
+<li><p><strong>基于学习模型的规划。</strong>
+智能体可以学习一个世界模型，再在模型中模拟未来并进行规划。但如果模型不准，规划结果也会被误导。也就是说，在错误模拟器里学出来的策略，放到真实环境中可能失败。</p></li>
+<li><p><strong>自动选择子问题。</strong>
+复杂任务往往不能一口气学会，智能体需要知道先学什么、后学什么。例如先学会走直线，再学会转弯，最后学会避障。这类似课程学习：从简单任务逐渐过渡到复杂任务。</p></li>
+<li><p><strong>多智能体强化学习。</strong>
+当多个智能体同时学习时，环境会因为其他智能体的策略变化而不断变化。比如游戏对手会变强，市场中的其他交易者也会调整策略。这会让学习问题更不稳定，因为智能体面对的环境不再固定。</p></li>
+</ol>
+<p>这部分和前面的最优执行例子是连在一起的：最优执行给出一个真实复杂应用，而这些挑战解释了为什么这类真实应用很难。以交易执行为例，状态表示很复杂，奖励不仅要考虑成交价格，还要考虑风险和市场冲击；市场反馈有延迟，样本又很宝贵，而且其他交易者也在不断改变行为。这些正好对应强化学习落地时的典型困难。</p>
+<h1 id="monte-carlo-方法">5 Monte Carlo 方法</h1>
+<h2 id="monte-carlo-的基本思想">5.1 Monte Carlo 的基本思想</h2>
+<p>Monte Carlo 方法的核心是随机采样。材料用估计圆周率 <span
+class="math inline"><em>π</em></span>
+的例子说明：在正方形中随机撒点，统计落入四分之一圆内的比例，就可以估计圆面积，从而估计
+<span class="math inline"><em>π</em></span>。点越多，估计越稳定。</p>
+<p>在强化学习中，Monte Carlo
+方法不用环境模型，而是通过一次次完整试验得到回报。一个完整 episode
+结束后，算法知道某个状态或状态-动作对后面实际获得了多少回报，于是用这些回报的平均值估计价值。</p>
+<h2 id="monte-carlo-与动态规划的区别">5.2 Monte Carlo
+与动态规划的区别</h2>
+<p>动态规划需要知道环境模型，例如从 <span
+class="math inline"><em>s</em></span> 做 <span
+class="math inline"><em>a</em></span> 到达每个 <span
+class="math inline"><em>s</em><sup>′</sup></span>
+的概率是多少、奖励是多少。Monte Carlo
+不需要这些概率，只需要实际经验。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">是否需要模型</th>
+<th style="text-align: left;">什么时候更新</th>
+<th style="text-align: left;">更新依据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">动态规划</td>
+<td style="text-align: left;">需要</td>
+<td style="text-align: left;">可以直接迭代</td>
+<td style="text-align: left;">所有可能转移的期望</td>
+</tr>
+<tr>
+<td style="text-align: left;">Monte Carlo</td>
+<td style="text-align: left;">不需要</td>
+<td style="text-align: left;">episode 结束后</td>
+<td style="text-align: left;">实际采样得到的完整回报</td>
+</tr>
+</tbody>
+</table>
+<p>比如你不知道迷宫地图和转移概率，但你可以让机器人实际走很多次。每次走完以后，记录从某个位置开始最终得了多少分，多次平均就能估计这个位置的价值。</p>
+<h2 id="first-visit-monte-carlo-的直观过程">5.3 First-visit Monte Carlo
+的直观过程</h2>
+<p>假设一个 episode 是：</p>
+<p><span
+class="math display"><em>S</em><sub>0</sub>, <em>A</em><sub>0</sub>, <em>R</em><sub>1</sub>, <em>S</em><sub>1</sub>, <em>A</em><sub>1</sub>, <em>R</em><sub>2</sub>, …, <em>S</em><sub><em>T</em></sub>.</span></p>
+<p>如果我们要估计某个状态 <span class="math inline"><em>s</em></span>
+的价值，就找到这个 episode 中第一次出现 <span
+class="math inline"><em>s</em></span> 的时刻 <span
+class="math inline"><em>t</em></span>，计算从那以后所有奖励的折扣和：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em></sub> = <em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>R</em><sub><em>t</em> + 2</sub> + ⋯.</span></p>
+<p>把这个 <span
+class="math inline"><em>G</em><sub><em>t</em></sub></span> 加入 <span
+class="math inline"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>)</span>，然后取平均：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em>) = <em>a</em><em>v</em><em>e</em><em>r</em><em>a</em><em>g</em><em>e</em>(<em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>)).</span></p>
+<p>这里的 <span
+class="math inline"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>)</span>
+是一个<strong>记录表</strong>，专门用来保存“每次从状态 <span
+class="math inline"><em>s</em></span>
+第一次出现后计算出来的回报”。例如状态 <span
+class="math inline"><em>s</em></span> 在三次 episode
+中第一次出现后，对应回报分别是 <span
+class="math inline">5, 7, 6</span>，那么： <span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>) = [5, 7, 6],</span></p>
+<p>于是：</p>
+<p><span class="math display">$$
+V(s)=average(Returns(s))=\frac{5+7+6}{3}=6.
+$$</span></p>
+<p>所以，Monte Carlo
+方法估计价值的方式很朴素：<strong>每次实际跑完一条轨迹，就把观察到的回报存起来；样本越多，平均值越接近真实价值。</strong></p>
+<p>这就是 first-visit Monte Carlo 的基本想法。它只使用每个 episode
+中第一次访问状态 <span class="math inline"><em>s</em></span>
+后的回报，避免同一个 episode 对同一状态重复计数。</p>
+<h2 id="monte-carlo-es">5.4 Monte Carlo ES</h2>
+<p>这里给出 Monte Carlo ES（Exploring Starts）用于估计最优策略。ES 指
+exploring starts，即探索性起点。</p>
+<p>算法流程是：</p>
+<ol type="1">
+<li>对所有状态-动作对初始化：</li>
+</ol>
+<p><span
+class="math display"><em>Q</em>(<em>s</em>, <em>a</em>) ← 任意值,  <em>π</em>(<em>s</em>) ← 任意动作.</span></p>
+<ol start="2" type="1">
+<li>对每个 <span class="math inline">(<em>s</em>, <em>a</em>)</span>
+准备一个回报列表 <span
+class="math inline"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>, <em>a</em>)</span>。这里的
+<span
+class="math inline"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>, <em>a</em>)</span>
+和前面的 <span
+class="math inline"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>)</span>
+类似，只不过它记录的是“从状态 <span
+class="math inline"><em>s</em></span> 采取动作 <span
+class="math inline"><em>a</em></span> 之后得到的回报样本”。</li>
+<li>每次 episode 随机选择一个初始状态 <span
+class="math inline"><em>S</em><sub>0</sub></span> 和初始动作 <span
+class="math inline"><em>A</em><sub>0</sub></span>，并要求所有状态-动作对都有大于
+<span class="math inline">0</span> 的概率被选为起点。</li>
+<li>从 <span
+class="math inline"><em>S</em><sub>0</sub>, <em>A</em><sub>0</sub></span>
+开始，之后按照当前策略 <span class="math inline"><em>π</em></span>
+生成完整 episode。</li>
+<li>对 episode 中每个首次出现的 <span
+class="math inline">(<em>s</em>, <em>a</em>)</span>，计算其后的回报
+<span class="math inline"><em>G</em></span>。</li>
+<li>更新：</li>
+</ol>
+<p><span
+class="math display"><em>Q</em>(<em>s</em>, <em>a</em>) ← <em>a</em><em>v</em><em>e</em><em>r</em><em>a</em><em>g</em><em>e</em>(<em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>, <em>a</em>)).</span></p>
+<ol start="7" type="1">
+<li>对出现过的状态改进策略：</li>
+</ol>
+<p><span
+class="math display"><em>π</em>(<em>s</em>) ← arg max<sub><em>a</em></sub><em>Q</em>(<em>s</em>, <em>a</em>).</span></p>
+<p>这个算法体现了 GPI，也就是<strong>广义策略迭代</strong>。在 Monte
+Carlo ES 中，“策略评估”对应用采样回报不断更新 <span
+class="math inline"><em>Q</em>(<em>s</em>, <em>a</em>)</span>，“策略改进”对应用
+<span
+class="math inline"><em>π</em>(<em>s</em>) ← arg max<sub><em>a</em></sub><em>Q</em>(<em>s</em>, <em>a</em>)</span>
+把策略改成当前看起来最好的动作。</p>
+<h3 id="例子">5.4.1 例子</h3>
+<p>假设有一个很小的任务，包含两个非终止状态 <span
+class="math inline"><em>s</em><sub>1</sub>, <em>s</em><sub>2</sub></span>，每个状态下都有两个动作
+<span
+class="math inline"><em>a</em><sub>1</sub>, <em>a</em><sub>2</sub></span>。我们想估计四个状态-动作对的价值：</p>
+<p><span
+class="math display"><em>Q</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>),  <em>Q</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>2</sub>),  <em>Q</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>1</sub>),  <em>Q</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>).</span></p>
+<p>一开始还不知道哪个状态下哪个动作更好，所以为每个状态-动作对准备一个回报列表：</p>
+<p><span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>) = [],  <em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>2</sub>) = [],</span></p>
+<p><span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>1</sub>) = [],  <em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>) = [].</span></p>
+<p>假设折扣因子为：</p>
+<p><span class="math display"><em>γ</em> = 0.9.</span></p>
+<p>现在通过 Monte Carlo 采样得到几条完整 episode。因为是 first-visit
+的思想，所以每条 episode 中某个 <span
+class="math inline">(<em>s</em>, <em>a</em>)</span>
+第一次出现时，才把从那里开始的回报加入对应的 <span
+class="math inline"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em>, <em>a</em>)</span>。</p>
+<p>第一条 episode 是：</p>
+<p><span
+class="math display"><em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>, <em>R</em><sub>1</sub> = 2, <em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>, <em>R</em><sub>2</sub> = 4, <em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em>.</span></p>
+<p>对第一次出现的 <span
+class="math inline">(<em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>)</span>，从它开始的回报是：</p>
+<p><span
+class="math display"><em>G</em> = <em>R</em><sub>1</sub> + <em>γ</em><em>R</em><sub>2</sub> = 2 + 0.9 × 4 = 5.6.</span></p>
+<p>所以：</p>
+<p><span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>) = [5.6],  <em>Q</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>) = 5.6.</span></p>
+<p>对第一次出现的 <span
+class="math inline">(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>)</span>，它后面只剩奖励
+<span class="math inline"><em>R</em><sub>2</sub> = 4</span>，所以：</p>
+<p><span class="math display"><em>G</em> = 4.</span></p>
+<p>因此：</p>
+<p><span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>) = [4],  <em>Q</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>) = 4.</span></p>
+<p>第二条 episode 是：</p>
+<p><span
+class="math display"><em>s</em><sub>1</sub>, <em>a</em><sub>2</sub>, <em>R</em><sub>1</sub> = 1, <em>s</em><sub>2</sub>, <em>a</em><sub>1</sub>, <em>R</em><sub>2</sub> = 6, <em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em>.</span></p>
+<p>对 <span
+class="math inline">(<em>s</em><sub>1</sub>, <em>a</em><sub>2</sub>)</span>：</p>
+<p><span
+class="math display"><em>G</em> = <em>R</em><sub>1</sub> + <em>γ</em><em>R</em><sub>2</sub> = 1 + 0.9 × 6 = 6.4.</span></p>
+<p>所以：</p>
+<p><span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>2</sub>) = [6.4],  <em>Q</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>2</sub>) = 6.4.</span></p>
+<p>对 <span
+class="math inline">(<em>s</em><sub>2</sub>, <em>a</em><sub>1</sub>)</span>：</p>
+<p><span class="math display"><em>G</em> = 6.</span></p>
+<p>所以：</p>
+<p><span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>1</sub>) = [6],  <em>Q</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>1</sub>) = 6.</span></p>
+<p>第三条 episode 是：</p>
+<p><span
+class="math display"><em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>, <em>R</em><sub>1</sub> = 3, <em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>, <em>R</em><sub>2</sub> = 2, <em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em>.</span></p>
+<p>对 <span
+class="math inline">(<em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>)</span>：</p>
+<p><span class="math display"><em>G</em> = 3 + 0.9 × 2 = 4.8.</span></p>
+<p>把它加入原来的列表：</p>
+<p><span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>) = [5.6, 4.8].</span></p>
+<p>于是：</p>
+<p><span class="math display">$$
+Q(s_1,a_1)=average([5.6,4.8])=\frac{5.6+4.8}{2}=5.2.
+$$</span></p>
+<p>对 <span
+class="math inline">(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>)</span>：</p>
+<p><span class="math display"><em>G</em> = 2.</span></p>
+<p>更新：</p>
+<p><span
+class="math display"><em>R</em><em>e</em><em>t</em><em>u</em><em>r</em><em>n</em><em>s</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>) = [4, 2],</span></p>
+<p><span
+class="math display"><em>Q</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>) = <em>a</em><em>v</em><em>e</em><em>r</em><em>a</em><em>g</em><em>e</em>([4, 2]) = 3.</span></p>
+<p>此时四个动作价值估计为：</p>
+<p><span
+class="math display"><em>Q</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>1</sub>) = 5.2,  <em>Q</em>(<em>s</em><sub>1</sub>, <em>a</em><sub>2</sub>) = 6.4,</span></p>
+<p><span
+class="math display"><em>Q</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>1</sub>) = 6,  <em>Q</em>(<em>s</em><sub>2</sub>, <em>a</em><sub>2</sub>) = 3.</span></p>
+<p>策略改进时，在每个状态分别选择 <span
+class="math inline"><em>Q</em></span> 值最大的动作：</p>
+<p><span
+class="math display"><em>π</em>(<em>s</em><sub>1</sub>) = arg max<sub><em>a</em></sub><em>Q</em>(<em>s</em><sub>1</sub>, <em>a</em>) = <em>a</em><sub>2</sub>,</span></p>
+<p><span
+class="math display"><em>π</em>(<em>s</em><sub>2</sub>) = arg max<sub><em>a</em></sub><em>Q</em>(<em>s</em><sub>2</sub>, <em>a</em>) = <em>a</em><sub>1</sub>.</span></p>
+<p>这个例子展示了 Monte Carlo ES 的两个核心动作：先用完整 episode
+的折扣回报样本更新每个 <span
+class="math inline"><em>Q</em>(<em>s</em>, <em>a</em>)</span>，再在每个状态中选择当前动作价值最高的动作来改进策略。</p>
+<h2 id="monte-carlo-的优缺点">5.5 Monte Carlo 的优缺点</h2>
+<p>Monte Carlo
+方法的优点是简单、直观、不需要环境模型，而且估计目标是真实完整回报。缺点是必须等
+episode 结束才能更新。如果任务很长，甚至没有自然终止状态，Monte Carlo
+学习会很慢或不方便。</p>
+<p>另一个问题是方差较大。因为完整回报受很多随机因素影响，同一个状态开始的回报可能波动很大，需要很多样本平均才稳定。</p>
+<h1 id="temporal-difference-learning">6 Temporal-Difference
+Learning</h1>
+<h2 id="从一个小例子开始">6.1 从一个小例子开始</h2>
+<p>假设智能体在一个很简单的走廊里移动，只有两个非终止状态 <span
+class="math inline"><em>s</em><sub>1</sub>, <em>s</em><sub>2</sub></span>，然后到达终点：</p>
+<p><span
+class="math display"><em>s</em><sub>1</sub> → <em>s</em><sub>2</sub> → <em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em>.</span></p>
+<p>智能体已经有一张当前的状态价值估计表：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">状态</th>
+<th style="text-align: left;">当前估计价值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>V</em>(<em>s</em><sub>1</sub>)</span></td>
+<td style="text-align: left;"><span class="math inline">2</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>V</em>(<em>s</em><sub>2</sub>)</span></td>
+<td style="text-align: left;"><span class="math inline">5</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>V</em>(<em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em>)</span></td>
+<td style="text-align: left;"><span class="math inline">0</span></td>
+</tr>
+</tbody>
+</table>
+<p>现在智能体实际走了一步：它从 <span
+class="math inline"><em>s</em><sub>1</sub></span> 到了 <span
+class="math inline"><em>s</em><sub>2</sub></span>，并且这一步拿到奖励：</p>
+<p><span
+class="math display"><em>R</em><sub><em>t</em> + 1</sub> = 1.</span></p>
+<p>假设折扣因子：</p>
+<p><span class="math display"><em>γ</em> = 0.9.</span></p>
+<p>问题是：看到这一步经验以后，我们要不要更新 <span
+class="math inline"><em>V</em>(<em>s</em><sub>1</sub>)</span>？</p>
+<p>TD 的答案是：要更新，而且不用等到整个 episode
+结束。因为虽然我们还不知道从 <span
+class="math inline"><em>s</em><sub>2</sub></span>
+后面最终到底会得到多少完整回报，但我们已经有一个旧估计：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em><sub>2</sub>) = 5.</span></p>
+<p>所以可以先用“这一步奖励 + 下一状态的估计价值”来形成一个临时目标：</p>
+<p><span
+class="math display"><em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>V</em>(<em>s</em><sub>2</sub>) = 1 + 0.9 × 5 = 5.5.</span></p>
+<p>这表示：从 <span class="math inline"><em>s</em><sub>1</sub></span>
+走一步到 <span
+class="math inline"><em>s</em><sub>2</sub></span>，马上拿到 <span
+class="math inline">1</span> 分；而 <span
+class="math inline"><em>s</em><sub>2</sub></span>
+之后的未来，暂时用旧估计 <span
+class="math inline"><em>V</em>(<em>s</em><sub>2</sub>) = 5</span>
+来代表。于是 TD 认为，<span
+class="math inline"><em>s</em><sub>1</sub></span> 的价值应该更接近 <span
+class="math inline">5.5</span>，而不是原来的 <span
+class="math inline">2</span>。</p>
+<p>如果学习率 <span
+class="math inline"><em>α</em> = 0.1</span>，更新就是：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em><sub>1</sub>) ← 2 + 0.1(5.5 − 2) = 2.35.</span></p>
+<p>这个例子就是 TD
+学习的核心：<strong>走一步，看到一个奖励和下一个状态，就立刻把当前状态的价值往更合理的方向推一点。</strong></p>
+<h2 id="td-和-monte-carlo-的区别">6.2 TD 和 Monte Carlo 的区别</h2>
+<p>还是上面的走廊例子。假设完整 episode 是：</p>
+<p><span
+class="math display"><em>s</em><sub>1</sub>, <em>R</em><sub>1</sub> = 1, <em>s</em><sub>2</sub>, <em>R</em><sub>2</sub> = 10, <em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em>.</span></p>
+<p>如果用 Monte Carlo 方法更新 <span
+class="math inline"><em>V</em>(<em>s</em><sub>1</sub>)</span>，必须等
+episode 结束，然后计算从 <span
+class="math inline"><em>s</em><sub>1</sub></span> 开始的完整回报：</p>
+<p><span
+class="math display"><em>G</em> = <em>R</em><sub>1</sub> + <em>γ</em><em>R</em><sub>2</sub> = 1 + 0.9 × 10 = 10.</span></p>
+<p>Monte Carlo 会用 <span class="math inline">10</span> 作为目标来更新
+<span
+class="math inline"><em>V</em>(<em>s</em><sub>1</sub>)</span>。</p>
+<p>而 TD 不等终点。它在刚看到 <span
+class="math inline"><em>s</em><sub>1</sub> → <em>s</em><sub>2</sub></span>
+这一步时，就用：</p>
+<p><span
+class="math display"><em>R</em><sub>1</sub> + <em>γ</em><em>V</em>(<em>s</em><sub>2</sub>)</span></p>
+<p>作为目标。如果当时 <span
+class="math inline"><em>V</em>(<em>s</em><sub>2</sub>) = 5</span>，TD
+目标就是：</p>
+<p><span class="math display">1 + 0.9 × 5 = 5.5.</span></p>
+<p>所以两者的区别是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">更新目标</th>
+<th style="text-align: left;">是否等 episode 结束</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Monte Carlo</td>
+<td style="text-align: left;">真实完整回报 <span
+class="math inline"><em>G</em></span></td>
+<td style="text-align: left;">需要</td>
+</tr>
+<tr>
+<td style="text-align: left;">TD</td>
+<td style="text-align: left;">一步奖励 <span
+class="math inline">+</span> 下一状态的估计价值</td>
+<td style="text-align: left;">不需要</td>
+</tr>
+</tbody>
+</table>
+<p>Monte Carlo 的目标更“真实”，因为它真的看到了后面发生什么；TD
+的目标更“及时”，因为它可以边走边学。TD 用了一个旧估计 <span
+class="math inline"><em>V</em>(<em>s</em><sub>2</sub>)</span>
+来更新另一个估计 <span
+class="math inline"><em>V</em>(<em>s</em><sub>1</sub>)</span>，这就叫
+<strong>bootstrap</strong>。</p>
+<h2 id="td0-更新公式">6.3 TD(0) 更新公式</h2>
+<p><strong>TD(0)</strong> 是最基础的一步时序差分方法。这里的 TD
+是“时序差分”，表示用相邻时间步之间的估计差异来学习；括号里的 <span
+class="math inline">0</span>
+可以理解为“不额外等待更多真实奖励”，也就是只用当前一步交互得到的信息。</p>
+<p>更具体地说，智能体在状态 <span
+class="math inline"><em>S</em><sub><em>t</em></sub></span> 执行动作
+<span class="math inline"><em>A</em><sub><em>t</em></sub></span>
+后，环境返回即时奖励 <span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span>，并转移到下一状态
+<span
+class="math inline"><em>S</em><sub><em>t</em> + 1</sub></span>。TD(0)
+只用这一步观察到的 <span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span> 和 <span
+class="math inline"><em>V</em>(<em>S</em><sub><em>t</em> + 1</sub>)</span>
+来更新 <span
+class="math inline"><em>V</em>(<em>S</em><sub><em>t</em></sub>)</span>。</p>
+<p>TD(0) 的目标是：</p>
+<p><span
+class="math display"><em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>V</em>(<em>S</em><sub><em>t</em> + 1</sub>).</span></p>
+<p>其中 <span
+class="math inline"><em>R</em><sub><em>t</em> + 1</sub></span>
+是刚刚收到的即时奖励，<span
+class="math inline"><em>V</em>(<em>S</em><sub><em>t</em> + 1</sub>)</span>
+是下一状态的当前估计价值。</p>
+<p>TD(0) 的更新公式是：</p>
+<p><span
+class="math display"><em>V</em>(<em>S</em><sub><em>t</em></sub>) ← <em>V</em>(<em>S</em><sub><em>t</em></sub>) + <em>α</em>[<em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>V</em>(<em>S</em><sub><em>t</em> + 1</sub>) − <em>V</em>(<em>S</em><sub><em>t</em></sub>)].</span></p>
+<p>这条公式可以读成：</p>
+<p><span
+class="math display">新价值 = 旧价值 + 学习率 × (TD目标 − 旧价值).</span></p>
+<h2 id="td-error-是什么">6.4 TD error 是什么</h2>
+<p>TD 更新中最重要的量是 TD error：</p>
+<p><span
+class="math display"><em>δ</em><sub><em>t</em></sub> = <em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>V</em>(<em>S</em><sub><em>t</em> + 1</sub>) − <em>V</em>(<em>S</em><sub><em>t</em></sub>).</span></p>
+<p>它就是“TD 目标”和“旧估计”之间的差距。用 TD error
+可以把更新公式简写成：</p>
+<p><span
+class="math display"><em>V</em>(<em>S</em><sub><em>t</em></sub>) ← <em>V</em>(<em>S</em><sub><em>t</em></sub>) + <em>α</em><em>δ</em><sub><em>t</em></sub>.</span></p>
+<p>从直觉上看，<span
+class="math inline"><em>δ</em><sub><em>t</em></sub></span>
+有点像梯度下降里的误差信号：它的正负号告诉我们 <span
+class="math inline"><em>V</em>(<em>S</em><sub><em>t</em></sub>)</span>
+应该往上调还是往下调，它的大小表示这次修正应该有多强。</p>
+<p>仍然用刚才的例子：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em><sub>1</sub>) = 2,  <em>R</em><sub><em>t</em> + 1</sub> = 1,  <em>γ</em> = 0.9,  <em>V</em>(<em>s</em><sub>2</sub>) = 5.</span></p>
+<p>TD 目标是：</p>
+<p><span class="math display">1 + 0.9 × 5 = 5.5.</span></p>
+<p>TD error 是：</p>
+<p><span
+class="math display"><em>δ</em><sub><em>t</em></sub> = 5.5 − 2 = 3.5.</span></p>
+<p>因为 <span
+class="math inline"><em>δ</em><sub><em>t</em></sub> &gt; 0</span>，说明原来把
+<span class="math inline"><em>s</em><sub>1</sub></span>
+估低了，所以要提高 <span
+class="math inline"><em>V</em>(<em>s</em><sub>1</sub>)</span>。如果
+<span
+class="math inline"><em>δ</em><sub><em>t</em></sub> &lt; 0</span>，就说明原来估高了，需要降低。</p>
+<p>如果 <span class="math inline"><em>α</em> = 0.1</span>，更新为：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em><sub>1</sub>) ← 2 + 0.1 × 3.5 = 2.35.</span></p>
+<p>注意，TD 不会一下子把 <span
+class="math inline"><em>V</em>(<em>s</em><sub>1</sub>)</span> 改成 <span
+class="math inline">5.5</span>，而是只朝 <span
+class="math inline">5.5</span>
+移动一小步。这样做可以避免单次经验噪声太大导致估计剧烈震荡。</p>
+<h2 id="tabular-td-for-v_pi">6.5 Tabular TD for <span
+class="math inline"><em>v</em><sub><em>π</em></sub></span></h2>
+<p>这里的表格式 TD 策略评估，就是用 TD(0) 来估计某个固定策略 <span
+class="math inline"><em>π</em></span> 下的状态价值 <span
+class="math inline"><em>v</em><sub><em>π</em></sub></span>。</p>
+<p>这里的 <strong>tabular</strong>
+指“表格式”。意思是：如果状态数量不大，我们可以真的建一张表，每一行对应一个状态，每一行里存一个当前价值估计
+<span
+class="math inline"><em>V</em>(<em>s</em>)</span>。算法每走一步，就找到当前状态对应的那一行，把这一行的数值更新一下。</p>
+<p>例如可以有这样一张价值表：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">状态</th>
+<th style="text-align: left;">当前价值估计</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>s</em><sub>1</sub></span></td>
+<td style="text-align: left;"><span class="math inline">2.0</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>s</em><sub>2</sub></span></td>
+<td style="text-align: left;"><span class="math inline">5.0</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em></span></td>
+<td style="text-align: left;"><span class="math inline">0</span></td>
+</tr>
+</tbody>
+</table>
+<p>表格式 TD 的过程可以理解为：</p>
+<ol type="1">
+<li>给定一个要评估的策略 <span
+class="math inline"><em>π</em></span>。</li>
+<li>初始化所有状态价值 <span
+class="math inline"><em>V</em>(<em>s</em>)</span>，终止状态价值设为
+<span class="math inline">0</span>。</li>
+<li>从某个初始状态 <span class="math inline"><em>S</em></span> 开始一个
+episode。</li>
+<li>按策略 <span class="math inline"><em>π</em></span> 在状态 <span
+class="math inline"><em>S</em></span> 选择动作 <span
+class="math inline"><em>A</em></span>。</li>
+<li>执行动作，观察奖励 <span class="math inline"><em>R</em></span>
+和新状态 <span class="math inline"><em>S</em><sup>′</sup></span>。</li>
+<li>立刻更新当前状态：</li>
+</ol>
+<p><span
+class="math display"><em>V</em>(<em>S</em>) ← <em>V</em>(<em>S</em>) + <em>α</em>[<em>R</em> + <em>γ</em><em>V</em>(<em>S</em><sup>′</sup>) − <em>V</em>(<em>S</em>)].</span></p>
+<ol start="7" type="1">
+<li>令 <span
+class="math inline"><em>S</em> ← <em>S</em><sup>′</sup></span>，继续往前走，直到到达终止状态。</li>
+</ol>
+<p>这个算法最重要的特点是：<strong>每走一步就能更新一步</strong>。它不需要知道环境模型，也不需要等整条轨迹结束。</p>
+<h3 id="一个表格式-td-更新例子">6.5.1 一个表格式 TD 更新例子</h3>
+<p>假设当前价值表是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">状态</th>
+<th style="text-align: left;">更新前的 <span
+class="math inline"><em>V</em>(<em>s</em>)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>s</em><sub>1</sub></span></td>
+<td style="text-align: left;"><span class="math inline">2.0</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>s</em><sub>2</sub></span></td>
+<td style="text-align: left;"><span class="math inline">5.0</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em></span></td>
+<td style="text-align: left;"><span class="math inline">0</span></td>
+</tr>
+</tbody>
+</table>
+<p>现在智能体在状态 <span
+class="math inline"><em>s</em><sub>1</sub></span>，按照策略 <span
+class="math inline"><em>π</em></span> 选择了某个动作，环境返回：</p>
+<p><span
+class="math display"><em>R</em> = 1,  <em>S</em><sup>′</sup> = <em>s</em><sub>2</sub>.</span></p>
+<p>设：</p>
+<p><span
+class="math display"><em>γ</em> = 0.9,  <em>α</em> = 0.1.</span></p>
+<p>TD 目标是：</p>
+<p><span
+class="math display"><em>R</em> + <em>γ</em><em>V</em>(<em>S</em><sup>′</sup>) = 1 + 0.9 × <em>V</em>(<em>s</em><sub>2</sub>) = 1 + 0.9 × 5 = 5.5.</span></p>
+<p>当前旧估计是：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em><sub>1</sub>) = 2.0.</span></p>
+<p>所以：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em><sub>1</sub>) ← 2.0 + 0.1(5.5 − 2.0) = 2.35.</span></p>
+<p>更新后，价值表变成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">状态</th>
+<th style="text-align: left;">更新后的 <span
+class="math inline"><em>V</em>(<em>s</em>)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>s</em><sub>1</sub></span></td>
+<td style="text-align: left;"><span class="math inline">2.35</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>s</em><sub>2</sub></span></td>
+<td style="text-align: left;"><span class="math inline">5.0</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em></span></td>
+<td style="text-align: left;"><span class="math inline">0</span></td>
+</tr>
+</tbody>
+</table>
+<p>注意这一步只改了 <span
+class="math inline"><em>s</em><sub>1</sub></span>
+这一行，因为当前被更新的是刚刚访问的状态 <span
+class="math inline"><em>S</em> = <em>s</em><sub>1</sub></span>。<span
+class="math inline"><em>s</em><sub>2</sub></span>
+的值这次没有直接改，它只是作为下一状态出现在 TD 目标里。</p>
+<h2 id="为什么-td-学习重要">6.6 为什么 TD 学习重要</h2>
+<p>TD 学习结合了 Monte Carlo 和动态规划的优点：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">来源</th>
+<th style="text-align: left;">TD 继承的优点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Monte Carlo</td>
+<td
+style="text-align: left;">不需要环境模型，可以直接从实际经验中学习</td>
+</tr>
+<tr>
+<td style="text-align: left;">动态规划</td>
+<td
+style="text-align: left;">可以用已有价值估计更新当前价值，不必等完整回报</td>
+</tr>
+</tbody>
+</table>
+<p>这就是为什么材料说 TD learning
+是强化学习中非常核心的思想。很多后续算法，例如
+SARSA、Q-Learning、Expected SARSA，都可以看作把 TD 的更新思想从状态价值
+<span class="math inline"><em>V</em>(<em>s</em>)</span> 推广到动作价值
+<span
+class="math inline"><em>Q</em>(<em>s</em>, <em>a</em>)</span>。</p>
+<h2 id="monte-carlotd动态规划对比">6.7 Monte
+Carlo、TD、动态规划对比</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">是否需要模型</th>
+<th style="text-align: left;">是否需要完整 episode</th>
+<th style="text-align: left;">是否 bootstrap</th>
+<th style="text-align: left;">典型特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">动态规划</td>
+<td style="text-align: left;">需要</td>
+<td style="text-align: left;">不需要</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">知道环境转移概率，可以直接算期望</td>
+</tr>
+<tr>
+<td style="text-align: left;">Monte Carlo</td>
+<td style="text-align: left;">不需要</td>
+<td style="text-align: left;">需要</td>
+<td style="text-align: left;">否</td>
+<td style="text-align: left;">用真实完整回报，直观但更新慢</td>
+</tr>
+<tr>
+<td style="text-align: left;">TD</td>
+<td style="text-align: left;">不需要</td>
+<td style="text-align: left;">不需要</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">走一步学一步，适合在线学习</td>
+</tr>
+</tbody>
+</table>
+<p>初学者可以这样记：动态规划“知道地图和概率，所以可以算”；Monte
+Carlo“不知道地图，但走完整局后总结”；TD“不知道地图，也不等完整局，走一步学一步”。</p>
+<h1 id="sarsa-与-q-learning">7 SARSA 与 Q-Learning</h1>
+<h2 id="从价值评估到控制">7.1 从价值评估到控制</h2>
+<p>前面的 TD(0) 主要是在评估一个给定策略的状态价值 <span
+class="math inline"><em>V</em>(<em>s</em>)</span>。但强化学习最终要解决控制问题：不仅要知道当前策略好不好，还要学出更好的策略。</p>
+<p>为了直接选择动作，控制算法通常学习动作价值 <span
+class="math inline"><em>Q</em>(<em>s</em>, <em>a</em>)</span>。一旦知道
+<span
+class="math inline"><em>Q</em>(<em>s</em>, <em>a</em>)</span>，就可以用
+<span class="math inline"><em>ϵ</em></span>-greedy 等方式从 <span
+class="math inline"><em>Q</em></span> 导出策略。</p>
+<p>SARSA 和 Q-Learning 都是 TD
+控制算法，区别在于它们使用不同的更新目标。</p>
+<h2 id="sarsa学习自己实际执行的策略">7.2
+SARSA：学习自己实际执行的策略</h2>
+<p>SARSA 是 on-policy TD control。On-policy
+的意思是：<strong>用来生成行为的策略和被学习评估的策略是同一个策略</strong>。</p>
+<p>SARSA 的更新公式是：</p>
+<p><span
+class="math display"><em>Q</em>(<em>S</em>, <em>A</em>) ← <em>Q</em>(<em>S</em>, <em>A</em>) + <em>α</em>[<em>R</em> + <em>γ</em><em>Q</em>(<em>S</em><sup>′</sup>, <em>A</em><sup>′</sup>) − <em>Q</em>(<em>S</em>, <em>A</em>)].</span></p>
+<p>这次更新使用了五个量：</p>
+<p><span
+class="math display"><em>S</em>, <em>A</em>, <em>R</em>, <em>S</em><sup>′</sup>, <em>A</em><sup>′</sup>.</span></p>
+<p>这也是 SARSA 名字的来源。</p>
+<p>算法步骤：</p>
+<ol type="1">
+<li>初始化 <span
+class="math inline"><em>Q</em>(<em>s</em>, <em>a</em>)</span>。</li>
+<li>在当前状态 <span class="math inline"><em>S</em></span>，按由 <span
+class="math inline"><em>Q</em></span> 导出的策略选择动作 <span
+class="math inline"><em>A</em></span>，例如 <span
+class="math inline"><em>ϵ</em></span>-greedy。</li>
+<li>执行动作 <span class="math inline"><em>A</em></span>，得到奖励 <span
+class="math inline"><em>R</em></span> 和下一状态 <span
+class="math inline"><em>S</em><sup>′</sup></span>。</li>
+<li>在 <span class="math inline"><em>S</em><sup>′</sup></span>
+再按同一个策略选择下一动作 <span
+class="math inline"><em>A</em><sup>′</sup></span>。</li>
+<li>用 <span
+class="math inline"><em>R</em> + <em>γ</em><em>Q</em>(<em>S</em><sup>′</sup>, <em>A</em><sup>′</sup>)</span>
+更新 <span
+class="math inline"><em>Q</em>(<em>S</em>, <em>A</em>)</span>。</li>
+<li>令 <span
+class="math inline"><em>S</em> ← <em>S</em><sup>′</sup></span>，<span
+class="math inline"><em>A</em> ← <em>A</em><sup>′</sup></span>，继续。</li>
+</ol>
+<p>关键点在于：SARSA 的目标中用的是实际选出来的 <span
+class="math inline"><em>A</em><sup>′</sup></span>。如果策略包含探索，那么
+SARSA 会把探索动作可能带来的后果也考虑进去。</p>
+<h2 id="q-learning学习贪心最优目标">7.3
+Q-Learning：学习贪心最优目标</h2>
+<p>Q-Learning 是 off-policy TD control。Off-policy
+的意思是：<strong>行为策略和学习目标策略可以不同</strong>。</p>
+<p>Q-Learning 的更新公式是：</p>
+<p><span
+class="math display"><em>Q</em>(<em>S</em>, <em>A</em>) ← <em>Q</em>(<em>S</em>, <em>A</em>) + <em>α</em>[<em>R</em> + <em>γ</em>max<sub><em>a</em></sub><em>Q</em>(<em>S</em><sup>′</sup>, <em>a</em>) − <em>Q</em>(<em>S</em>, <em>A</em>)].</span></p>
+<p>它与 SARSA 最大的区别在于下一状态部分。SARSA 用实际选择的 <span
+class="math inline"><em>Q</em>(<em>S</em><sup>′</sup>, <em>A</em><sup>′</sup>)</span>，Q-Learning
+用所有动作中最大的 <span
+class="math inline">max<sub><em>a</em></sub><em>Q</em>(<em>S</em><sup>′</sup>, <em>a</em>)</span>。</p>
+<p>这表示 Q-Learning 即使当前用 <span
+class="math inline"><em>ϵ</em></span>-greedy
+探索，更新目标也是假设未来会选择当前估计最优动作。因此它学习的是贪心目标策略的动作价值。</p>
+<h2 id="sarsa-与-q-learning-的直观差异">7.4 SARSA 与 Q-Learning
+的直观差异</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">SARSA</th>
+<th style="text-align: left;">Q-Learning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">策略类型</td>
+<td style="text-align: left;">On-policy</td>
+<td style="text-align: left;">Off-policy</td>
+</tr>
+<tr>
+<td style="text-align: left;">下一步目标</td>
+<td style="text-align: left;">实际选择的 <span
+class="math inline"><em>A</em><sup>′</sup></span></td>
+<td style="text-align: left;">价值最大的动作</td>
+</tr>
+<tr>
+<td style="text-align: left;">更新目标</td>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em> + <em>γ</em><em>Q</em>(<em>S</em><sup>′</sup>, <em>A</em><sup>′</sup>)</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em> + <em>γ</em>max<sub><em>a</em></sub><em>Q</em>(<em>S</em><sup>′</sup>, <em>a</em>)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">是否考虑探索风险</td>
+<td style="text-align: left;">考虑</td>
+<td style="text-align: left;">较少考虑</td>
+</tr>
+<tr>
+<td style="text-align: left;">行为风格</td>
+<td style="text-align: left;">更保守</td>
+<td style="text-align: left;">更接近贪心最优</td>
+</tr>
+</tbody>
+</table>
+<p>一个经典理解方式是悬崖行走问题。智能体从起点走到终点，中间有悬崖。靠近悬崖的路径最短，但如果探索时随机走错一步就会掉下去。SARSA
+因为考虑实际 <span class="math inline"><em>ϵ</em></span>-greedy
+探索的风险，可能学到远离悬崖的安全路径；Q-Learning
+因为目标中总是假设下一步选最优动作，可能更倾向于贴近悬崖的短路径。</p>
+<h2 id="expected-sarsa">7.5 Expected SARSA</h2>
+<p>材料图中还出现 Expected SARSA 的示意。Expected SARSA 不使用实际采样的
+<span class="math inline"><em>A</em><sup>′</sup></span>，也不像
+Q-Learning 只取最大值，而是对下一状态所有动作按当前策略概率求期望：</p>
+<p><span
+class="math display"><em>Q</em>(<em>S</em>, <em>A</em>) ← <em>Q</em>(<em>S</em>, <em>A</em>) + <em>α</em>[<em>R</em> + <em>γ</em>∑<sub><em>a</em></sub><em>π</em>(<em>a</em> ∣ <em>S</em><sup>′</sup>)<em>Q</em>(<em>S</em><sup>′</sup>, <em>a</em>) − <em>Q</em>(<em>S</em>, <em>A</em>)].</span></p>
+<p>它介于 SARSA 和 Q-Learning 之间：比 SARSA
+的单次采样方差小，因为它求期望；又比 Q-Learning
+更忠实于当前策略，因为它使用 <span
+class="math inline"><em>π</em>(<em>a</em> ∣ <em>S</em><sup>′</sup>)</span>。</p>
+<h1 id="model-based-methods">8 Model-based Methods</h1>
+<h2 id="model-free-与-model-based">8.1 Model-free 与 Model-based</h2>
+<p>强化学习方法可以粗略分为 model-free 和 model-based。</p>
+<p>Model-free 方法不显式学习环境模型，只直接学习价值函数或策略。前面的
+Monte Carlo、TD、SARSA、Q-Learning 都可以看作 model-free 的代表。</p>
+<p>Model-based 方法会学习或使用环境模型。环境模型通常回答两个问题：</p>
+<ol type="1">
+<li>在状态 <span class="math inline"><em>s</em></span> 执行动作 <span
+class="math inline"><em>a</em></span> 后，会到达什么状态 <span
+class="math inline"><em>s</em><sup>′</sup></span>？</li>
+<li>会得到什么奖励 <span class="math inline"><em>r</em></span>？</li>
+</ol>
+<p>如果模型能预测下一状态和奖励，智能体就可以在模型中“想象”未来，再利用模拟经验学习。</p>
+<h2 id="材料图中的流程">8.2 材料图中的流程</h2>
+<p>这里的 Model-based Methods 图包含几个部分：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">部分</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">real experience</td>
+<td style="text-align: left;">智能体和真实环境交互得到的经验</td>
+</tr>
+<tr>
+<td style="text-align: left;">model learning</td>
+<td style="text-align: left;">用真实经验学习环境模型</td>
+</tr>
+<tr>
+<td style="text-align: left;">Model</td>
+<td style="text-align: left;">学到的环境模型</td>
+</tr>
+<tr>
+<td style="text-align: left;">simulated experience</td>
+<td style="text-align: left;">通过模型生成的模拟经验</td>
+</tr>
+<tr>
+<td style="text-align: left;">policy/value functions</td>
+<td style="text-align: left;">策略或价值函数</td>
+</tr>
+<tr>
+<td style="text-align: left;">planning update</td>
+<td style="text-align: left;">用模拟经验更新策略或价值</td>
+</tr>
+</tbody>
+</table>
+<p>基本循环是：</p>
+<ol type="1">
+<li>智能体在真实环境中行动，获得真实经验。</li>
+<li>用真实经验更新价值函数或策略。</li>
+<li>同时用真实经验学习环境模型。</li>
+<li>用模型生成模拟经验。</li>
+<li>用模拟经验进一步更新价值函数或策略。</li>
+</ol>
+<p>这类方法的优势是样本效率高，因为真实环境交互往往昂贵。比如机器人真实摔倒一次成本很高，如果能在模型中模拟很多次，就可以减少真实试错。</p>
+<h2 id="model-based-的风险">8.3 Model-based 的风险</h2>
+<p>Model-based
+方法的核心风险是模型误差。如果模型预测不准确，智能体可能在错误模型里学到错误策略。</p>
+<p>例如自动驾驶模型如果低估雨天刹车距离，规划算法可能在模拟中认为某个动作安全，但真实世界中却很危险。因此
+model-based 方法需要关注模型质量、误差累积和不确定性估计。</p>
+<h1 id="policy-gradient-methods">9 Policy Gradient Methods</h1>
+<h2 id="为什么要直接学习策略">9.1 为什么要直接学习策略</h2>
+<p>前面的很多方法先学习价值函数，再通过价值函数选择动作。但在某些任务中，直接学习策略更自然。</p>
+<p>例如机器人控制中，动作可能是连续值，如关节角速度。此时不方便枚举所有动作并计算
+<span
+class="math inline">max<sub><em>a</em></sub><em>Q</em>(<em>s</em>, <em>a</em>)</span>。策略梯度方法直接用参数
+<span class="math inline"><em>θ</em></span> 表示策略：</p>
+<p><span
+class="math display"><em>π</em>(<em>a</em> ∣ <em>s</em>, <em>θ</em>).</span></p>
+<p>学习目标是调整 <span
+class="math inline"><em>θ</em></span>，让策略产生更高回报。</p>
+<h2 id="softmax-策略">9.2 Softmax 策略</h2>
+<p>这里先为每个状态-动作对定义数值偏好：</p>
+<p><span
+class="math display"><em>h</em>(<em>s</em>, <em>a</em>, <em>θ</em>).</span></p>
+<p>偏好不是概率，可以是任意实数。为了把偏好变成合法概率，使用
+softmax：</p>
+<p><span class="math display">$$
+\pi(a\mid s,\theta)
+=
+\frac{\exp(h(s,a,\theta))}
+{\sum_b \exp(h(s,b,\theta))}.
+$$</span></p>
+<p>这个公式的作用是：</p>
+<ol type="1">
+<li>指数函数保证每个动作权重为正。</li>
+<li>分母对所有动作归一化，保证概率和为 <span
+class="math inline">1</span>。</li>
+<li>偏好更大的动作会得到更大的概率。</li>
+</ol>
+<p>例如两个动作偏好分别为 <span
+class="math inline"><em>h</em><sub>1</sub> = 2</span>、<span
+class="math inline"><em>h</em><sub>2</sub> = 1</span>，第一个动作概率会更高，但第二个动作仍然有非零概率。这有助于保持探索。</p>
+<h2 id="reinforce-with-baseline">9.3 REINFORCE with Baseline</h2>
+<p>这一节的算法要解决的问题是：<strong>如果策略本身是带参数的概率分布，我们应该怎样直接调整这些参数，让好动作以后更容易被选中，坏动作以后更不容易被选中？</strong></p>
+<p>前面的 Q-Learning、SARSA 通常先学习 <span
+class="math inline"><em>Q</em>(<em>s</em>, <em>a</em>)</span>，再根据
+<span class="math inline"><em>Q</em></span>
+选择动作。策略梯度方法不一定先学完整的 <span
+class="math inline"><em>Q</em></span> 表，而是直接学习策略：</p>
+<p><span
+class="math display"><em>π</em>(<em>a</em> ∣ <em>s</em>, <em>θ</em>).</span></p>
+<p>这里 <span class="math inline"><em>θ</em></span>
+是策略参数。算法的目标是让 <span class="math inline"><em>θ</em></span>
+变得更好，使策略在状态 <span class="math inline"><em>s</em></span>
+下更倾向于选择能带来高回报的动作。</p>
+<p>REINFORCE 的基本想法很直观：</p>
+<ol type="1">
+<li>先按照当前策略跑一条完整 episode。</li>
+<li>看每一步选择的动作最后带来了多少回报 <span
+class="math inline"><em>G</em><sub><em>t</em></sub></span>。</li>
+<li>如果某个动作之后的回报比预期好，就提高这个动作以后被选中的概率。</li>
+<li>如果某个动作之后的回报比预期差，就降低这个动作以后被选中的概率。</li>
+</ol>
+<p>带 baseline 的 REINFORCE 多做了一件事：它不只看“回报 <span
+class="math inline"><em>G</em><sub><em>t</em></sub></span>
+大不大”，而是看“回报 <span
+class="math inline"><em>G</em><sub><em>t</em></sub></span>
+是否比这个状态本来预期的价值更好”。这个“本来预期”就是 baseline。</p>
+<p>这里的算法使用两类参数：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>θ</em></span></td>
+<td style="text-align: left;">策略参数，决定动作概率</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><strong>w</strong></span></td>
+<td style="text-align: left;">价值函数参数，用来估计 baseline</td>
+</tr>
+</tbody>
+</table>
+<p>在深度强化学习里，可以把 <span class="math inline"><em>θ</em></span>
+理解成<strong>策略网络的参数</strong>：输入状态 <span
+class="math inline"><em>s</em></span>，输出各个动作的概率 <span
+class="math inline"><em>π</em>(<em>a</em> ∣ <em>s</em>, <em>θ</em>)</span>。可以把
+<span class="math inline"><strong>w</strong></span>
+理解成<strong>价值网络的参数</strong>：输入状态 <span
+class="math inline"><em>s</em></span>，输出这个状态的价值估计 <span
+class="math inline"><em>v̂</em>(<em>s</em>, <strong>w</strong>)</span>。不过从理论上说，它们不一定必须是神经网络参数，也可以是线性模型或其他可微函数的参数。</p>
+<p>每轮先按当前策略生成完整 episode：</p>
+<p><span
+class="math display"><em>S</em><sub>0</sub>, <em>A</em><sub>0</sub>, <em>R</em><sub>1</sub>, …, <em>S</em><sub><em>T</em> − 1</sub>, <em>A</em><sub><em>T</em> − 1</sub>, <em>R</em><sub><em>T</em></sub>.</span></p>
+<p>对于每个时间步 <span
+class="math inline"><em>t</em></span>，计算从该步开始的回报 <span
+class="math inline"><em>G</em><sub><em>t</em></sub></span>。然后计算优势或误差信号：</p>
+<p><span
+class="math display"><em>δ</em> = <em>G</em><sub><em>t</em></sub> − <em>v̂</em>(<em>S</em><sub><em>t</em></sub>, <strong>w</strong>).</span></p>
+<p>这里 <span
+class="math inline"><em>v̂</em>(<em>S</em><sub><em>t</em></sub>, <strong>w</strong>)</span>
+是 baseline，表示在状态 <span
+class="math inline"><em>S</em><sub><em>t</em></sub></span>
+本来预计能得到多少回报。<span class="math inline"><em>δ</em></span>
+表示实际回报比预期高多少。</p>
+<p>这个 <span class="math inline"><em>δ</em></span>
+可以理解为“这次动作表现是否超出预期”：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">情况</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">策略应该怎么改</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>δ</em> &gt; 0</span></td>
+<td style="text-align: left;">实际回报高于预期</td>
+<td style="text-align: left;">增加动作 <span
+class="math inline"><em>A</em><sub><em>t</em></sub></span> 的概率</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>δ</em> &lt; 0</span></td>
+<td style="text-align: left;">实际回报低于预期</td>
+<td style="text-align: left;">降低动作 <span
+class="math inline"><em>A</em><sub><em>t</em></sub></span> 的概率</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>δ</em> = 0</span></td>
+<td style="text-align: left;">正好符合预期</td>
+<td style="text-align: left;">基本不改变</td>
+</tr>
+</tbody>
+</table>
+<p>如果 <span class="math inline"><em>δ</em> &gt; 0</span>，说明动作
+<span class="math inline"><em>A</em><sub><em>t</em></sub></span>
+带来的结果比预期好，应增加它在状态 <span
+class="math inline"><em>S</em><sub><em>t</em></sub></span>
+下的概率：</p>
+<p><span
+class="math display"><em>θ</em> ← <em>θ</em> + <em>α</em><sup><em>θ</em></sup><em>γ</em><sup><em>t</em></sup><em>δ</em>∇<sub><em>θ</em></sub>ln <em>π</em>(<em>A</em><sub><em>t</em></sub> ∣ <em>S</em><sub><em>t</em></sub>, <em>θ</em>).</span></p>
+<p>如果 <span
+class="math inline"><em>δ</em> &lt; 0</span>，则降低该动作概率。</p>
+<p>同时更新价值函数参数：</p>
+<p><span
+class="math display"><strong>w</strong> ← <strong>w</strong> + <em>α</em><sup><strong>w</strong></sup><em>γ</em><sup><em>t</em></sup><em>δ</em>∇<sub><strong>w</strong></sub><em>v̂</em>(<em>S</em><sub><em>t</em></sub>, <strong>w</strong>).</span></p>
+<p>Baseline
+不改变策略梯度的期望方向，但能降低方差。直观地说，我们不只看“回报是不是大”，而是看“回报是否比这个状态的正常水平更大”。</p>
+<h3 id="例子-1">9.3.1 例子</h3>
+<p>假设在某个状态 <span class="math inline"><em>s</em></span>
+下，智能体有两个动作：<span
+class="math inline"><em>a</em><sub>1</sub></span> 和 <span
+class="math inline"><em>a</em><sub>2</sub></span>。当前策略是：</p>
+<p><span
+class="math display"><em>π</em>(<em>a</em><sub>1</sub> ∣ <em>s</em>, <em>θ</em>) = 0.6,  <em>π</em>(<em>a</em><sub>2</sub> ∣ <em>s</em>, <em>θ</em>) = 0.4.</span></p>
+<p>也就是说，当前策略更倾向于选 <span
+class="math inline"><em>a</em><sub>1</sub></span>。</p>
+<p>现在智能体按照当前策略跑了一次 episode。在状态 <span
+class="math inline"><em>s</em></span> 时，它选择了动作 <span
+class="math inline"><em>a</em><sub>2</sub></span>，最后从这一步开始得到的回报是：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em></sub> = 8.</span></p>
+<p>同时，价值函数给出的 baseline 是：</p>
+<p><span
+class="math display"><em>v̂</em>(<em>s</em>, <strong>w</strong>) = 5.</span></p>
+<p>所以：</p>
+<p><span
+class="math display"><em>δ</em> = <em>G</em><sub><em>t</em></sub> − <em>v̂</em>(<em>s</em>, <strong>w</strong>) = 8 − 5 = 3.</span></p>
+<p>因为 <span class="math inline"><em>δ</em> &gt; 0</span>，说明这次选择
+<span class="math inline"><em>a</em><sub>2</sub></span>
+的结果比原来预期更好。于是策略更新应该让 <span
+class="math inline"><em>a</em><sub>2</sub></span> 以后在状态 <span
+class="math inline"><em>s</em></span>
+下更容易被选中。更新后的策略可能变成：</p>
+<p><span
+class="math display"><em>π</em>(<em>a</em><sub>1</sub> ∣ <em>s</em>, <em>θ</em>) = 0.55,  <em>π</em>(<em>a</em><sub>2</sub> ∣ <em>s</em>, <em>θ</em>) = 0.45.</span></p>
+<p>具体概率改多少由学习率和梯度决定，但方向很清楚：<strong>表现超过预期的动作，概率上调。</strong></p>
+<p>如果另一次 episode 中，智能体在状态 <span
+class="math inline"><em>s</em></span> 选择 <span
+class="math inline"><em>a</em><sub>1</sub></span>，但最后回报只有：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em></sub> = 2,</span></p>
+<p>而 baseline 仍然是：</p>
+<p><span
+class="math display"><em>v̂</em>(<em>s</em>, <strong>w</strong>) = 5,</span></p>
+<p>则：</p>
+<p><span class="math display"><em>δ</em> = 2 − 5 = −3.</span></p>
+<p>这说明动作 <span class="math inline"><em>a</em><sub>1</sub></span>
+的结果比预期差，策略更新就会降低 <span
+class="math inline"><em>a</em><sub>1</sub></span> 以后被选中的概率。</p>
+<p>这个例子说明了 REINFORCE with Baseline
+的核心：<strong>不是简单奖励高就鼓励、奖励低就惩罚，而是看它相对于当前状态的正常水平是更好还是更差。</strong></p>
+<h1 id="n-step-bootstrapping-与-eligibility-traces">10 n-step
+Bootstrapping 与 Eligibility Traces</h1>
+<h2 id="从-1-step-td-到-monte-carlo">10.1 从 1-step TD 到 Monte
+Carlo</h2>
+<p>1-step TD 用一步奖励加下一状态估计作为目标：</p>
+<p><span
+class="math display"><em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>V</em>(<em>S</em><sub><em>t</em> + 1</sub>).</span></p>
+<p>Monte Carlo 用从当前开始直到 episode 结束的完整真实回报。n-step
+Bootstrapping 位于两者之间：先看未来 <span
+class="math inline"><em>n</em></span> 步真实奖励，再用第 <span
+class="math inline"><em>n</em></span> 步之后的价值估计补上剩余未来。</p>
+<p>这里的 n-step return 为：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em> : <em>t</em> + <em>n</em></sub> = <em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>R</em><sub><em>t</em> + 2</sub> + ⋯ + <em>γ</em><sup><em>n</em> − 1</sup><em>R</em><sub><em>t</em> + <em>n</em></sub> + <em>γ</em><sup><em>n</em></sup><em>v̂</em>(<em>S</em><sub><em>t</em> + <em>n</em></sub>, <strong>w</strong><sub><em>t</em> + <em>n</em> − 1</sub>).</span></p>
+<p>其中前 <span class="math inline"><em>n</em></span>
+项是真实观察到的奖励，最后一项是 bootstrap。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260613134412367.png" style="zoom:50%;" /></p>
+<blockquote>
+<p>白色圆圈：状态</p>
+<p>黑色圆圈：动作</p>
+</blockquote>
+<h2 id="n-的影响">10.2 n 的影响</h2>
+<p>当 <span class="math inline"><em>n</em> = 1</span> 时：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em> : <em>t</em> + 1</sub> = <em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>v̂</em>(<em>S</em><sub><em>t</em> + 1</sub>).</span></p>
+<p>这就是 TD(0) 目标。</p>
+<p>当 <span class="math inline"><em>n</em></span> 很大并一直到 episode
+结束时，最后的 bootstrap 项消失，目标接近 Monte Carlo 回报。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">看真实奖励的步数</th>
+<th style="text-align: left;">是否 bootstrap</th>
+<th style="text-align: left;">倾向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1-step TD</td>
+<td style="text-align: left;">1 步</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">更新快，方差小，但偏差可能较大</td>
+</tr>
+<tr>
+<td style="text-align: left;">n-step TD</td>
+<td style="text-align: left;">n 步</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">在 TD 和 MC 之间折中</td>
+</tr>
+<tr>
+<td style="text-align: left;">Monte Carlo</td>
+<td style="text-align: left;">到 episode 结束</td>
+<td style="text-align: left;">否</td>
+<td style="text-align: left;">偏差小，但方差大、更新慢</td>
+</tr>
+</tbody>
+</table>
+<h2 id="lambda-return">10.3 <span
+class="math inline"><em>λ</em></span>-return</h2>
+<p>材料 第 20 页先定义了 n-step return：</p>
+<p><span
+class="math display"><em>G</em><sub><em>t</em> : <em>t</em> + <em>n</em></sub> ≐ <em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>R</em><sub><em>t</em> + 2</sub> + ⋯ + <em>γ</em><sup><em>n</em> − 1</sup><em>R</em><sub><em>t</em> + <em>n</em></sub> + <em>γ</em><sup><em>n</em></sup><em>v̂</em>(<em>S</em><sub><em>t</em> + <em>n</em></sub>, <strong>w</strong><sub><em>t</em> + <em>n</em> − 1</sub>),  0 ≤ <em>t</em> ≤ <em>T</em> − <em>n</em>.</span></p>
+<p>这个公式的意思是：先使用未来 <span
+class="math inline"><em>n</em></span> 步真实奖励，再用第 <span
+class="math inline"><em>n</em></span> 步后的状态价值估计 <span
+class="math inline"><em>v̂</em>(<em>S</em><sub><em>t</em> + <em>n</em></sub>, <strong>w</strong><sub><em>t</em> + <em>n</em> − 1</sub>)</span>
+来补上更远的未来。这就是 n-step bootstrapping。</p>
+<p>接着，这里给出 <span class="math inline"><em>λ</em></span>-return
+的求和形式：</p>
+<p><span class="math display">$$
+G_t^\lambda
+\doteq
+(1-\lambda)\sum_{n=1}^{\infty}\lambda^{n-1}G_{t:t+n}.
+$$</span></p>
+<p>这里的权重依次是：</p>
+<p><span
+class="math display">(1 − <em>λ</em>),  (1 − <em>λ</em>)<em>λ</em>,  (1 − <em>λ</em>)<em>λ</em><sup>2</sup>, …</span></p>
+<p>因此，<span class="math inline"><em>λ</em></span>-return 可以理解为把
+1-step、2-step、3-step 等不同长度的 return 按权重混合起来。<span
+class="math inline"><em>λ</em></span> 越小，短步数 return
+权重越大；<span class="math inline"><em>λ</em></span> 越接近 <span
+class="math inline">1</span>，更长步数的 return 权重越大。</p>
+<p>特殊情况：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><span
+class="math inline"><em>λ</em></span></th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>λ</em> = 0</span></td>
+<td style="text-align: left;">只使用 1-step TD</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>λ</em> ≈ 1</span></td>
+<td style="text-align: left;">更接近 Monte Carlo</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">0 &lt; <em>λ</em> &lt; 1</span></td>
+<td style="text-align: left;">混合不同长度的回报</td>
+</tr>
+</tbody>
+</table>
+<h2 id="forward-view">10.4 Forward View</h2>
+<p>前向视角（forward
+view）从当前状态往未来看。它问的是：当前状态应该用未来哪些长度的回报来更新？答案是用
+<span class="math inline"><em>λ</em></span>-return，即不同 n-step return
+的加权平均。</p>
+<p>前向视角适合解释算法原理，因为它直观地展示了 TD(<span
+class="math inline"><em>λ</em></span>) 如何在 TD 和 Monte Carlo
+之间插值。但它的问题是需要知道未来很多步，甚至要等 episode
+结束，因此不方便在线实时更新。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260613134957146.png" style="zoom:50%;" /></p>
+<h2 id="backward-view-与资格迹">10.5 Backward View 与资格迹</h2>
+<p>后向视角（backward view）从当前 TD error
+往过去分配信用。它引入资格迹（eligibility trace）<span
+class="math inline"><em>z</em></span>，记录过去访问过的状态或特征还有多少“资格”被当前误差信号更新。</p>
+<p>这里给出的算法是 <strong>Semi-gradient TD(<span
+class="math inline"><em>λ</em></span>)</strong>，用于估计：</p>
+<p><span
+class="math display"><em>v̂</em> ≈ <em>v</em><sub><em>π</em></sub>.</span></p>
+<p>也就是说，我们想用一个带参数的函数 <span
+class="math inline"><em>v̂</em>(<em>S</em>, <strong>w</strong>)</span>
+来近似策略 <span class="math inline"><em>π</em></span> 下的真实状态价值
+<span
+class="math inline"><em>v</em><sub><em>π</em></sub>(<em>S</em>)</span>。</p>
+<p>算法的输入是：</p>
+<ol type="1">
+<li>要被评估的策略 <span class="math inline"><em>π</em></span>。</li>
+<li>一个可微的价值函数近似器 <span
+class="math inline"><em>v̂</em> : <em>S</em><sup>+</sup> × ℝ<sup><em>d</em></sup> → ℝ</span>，并且满足
+<span
+class="math inline"><em>v̂</em>(<em>t</em><em>e</em><em>r</em><em>m</em><em>i</em><em>n</em><em>a</em><em>l</em>, ⋅) = 0</span>。</li>
+</ol>
+<p>初始化价值函数参数：</p>
+<p><span class="math display"><strong>w</strong> ← 任意值，例如
+<strong>w</strong> = <strong>0</strong>.</span></p>
+<p>然后对每个 episode 重复以下过程：</p>
+<ol type="1">
+<li>初始化状态 <span class="math inline"><em>S</em></span>。</li>
+<li>初始化资格迹：</li>
+</ol>
+<p><span
+class="math display"><strong>z</strong> ← <strong>0</strong>.</span></p>
+<p>这里 <span class="math inline"><strong>z</strong></span> 是一个 <span
+class="math inline"><em>d</em></span> 维向量，维度和参数 <span
+class="math inline"><strong>w</strong></span> 相同。</p>
+<ol start="3" type="1">
+<li>对 episode 中的每一步重复：</li>
+</ol>
+<p>按照策略选择动作：</p>
+<p><span
+class="math display"><em>A</em> ∼ <em>π</em>(⋅ ∣ <em>S</em>).</span></p>
+<p>执行动作 <span
+class="math inline"><em>A</em></span>，观察奖励和下一状态：</p>
+<p><span
+class="math display"><em>R</em>, <em>S</em><sup>′</sup>.</span></p>
+<p>更新资格迹：</p>
+<p><span
+class="math display"><strong>z</strong> ← <em>γ</em><em>λ</em><strong>z</strong> + ∇<em>v̂</em>(<em>S</em>, <strong>w</strong>).</span></p>
+<p>这表示旧资格迹会按 <span
+class="math inline"><em>γ</em><em>λ</em></span>
+衰减，当前状态的特征梯度会加入资格迹。</p>
+<p>计算 TD error：</p>
+<p><span
+class="math display"><em>δ</em> ← <em>R</em> + <em>γ</em><em>v̂</em>(<em>S</em><sup>′</sup>, <strong>w</strong>) − <em>v̂</em>(<em>S</em>, <strong>w</strong>).</span></p>
+<p>用 TD error 和资格迹更新参数：</p>
+<p><span
+class="math display"><strong>w</strong> ← <strong>w</strong> + <em>α</em><em>δ</em><strong>z</strong>.</span></p>
+<p>最后令：</p>
+<p><span
+class="math display"><em>S</em> ← <em>S</em><sup>′</sup>,</span></p>
+<p>直到 <span class="math inline"><em>S</em><sup>′</sup></span>
+是终止状态。</p>
+<p>直观理解：如果某个状态刚刚出现过，它的资格迹很大，当前 TD error
+会强烈更新它；如果它很久以前出现过，资格迹已经衰减，更新影响就小。</p>
+<h2 id="eligibility-traces-的意义">10.6 Eligibility Traces 的意义</h2>
+<p>材料总结了 Eligibility Traces 的关键作用：</p>
+<ol type="1">
+<li>它统一了 TD 和 Monte Carlo。</li>
+<li><span class="math inline"><em>λ</em> = 0</span> 是 one-step
+TD，<span class="math inline"><em>λ</em> = 1</span> 接近 Monte
+Carlo。</li>
+<li>中间值通常能取得更好的偏差-方差折中。</li>
+<li>它允许在线实现类似 Monte Carlo 的多步信用分配。</li>
+</ol>
+<p>这部分初学者最重要的是理解“信用分配”。如果最终得到奖励，不只最后一步有功，之前很多步也可能有贡献。Eligibility
+traces 就是一种把当前反馈分配给过去状态的方法。</p>
+<h1 id="深度强化学习与多智能体自课程">11
+深度强化学习与多智能体自课程</h1>
+<h2 id="为什么需要深度强化学习">11.1 为什么需要深度强化学习</h2>
+<p>前面很多公式默认状态和动作可以用表格枚举。例如迷宫格子数量有限，可以为每个状态存一个
+<span
+class="math inline"><em>V</em>(<em>s</em>)</span>，为每个状态-动作对存一个
+<span
+class="math inline"><em>Q</em>(<em>s</em>, <em>a</em>)</span>。</p>
+<p>但现实任务中状态可能非常高维。例如围棋棋盘有极多可能局面，自动驾驶输入可能是图像、速度、地图和传感器数据，机器人控制涉及连续状态和连续动作。表格方法无法直接处理这些情况。</p>
+<p>深度强化学习（Deep Reinforcement
+Learning）用神经网络近似价值函数或策略：</p>
+<p><span
+class="math display"><em>V</em>(<em>s</em>) ≈ <em>V</em>(<em>s</em>; <strong>w</strong>),  <em>Q</em>(<em>s</em>, <em>a</em>) ≈ <em>Q</em>(<em>s</em>, <em>a</em>; <strong>w</strong>),  <em>π</em>(<em>a</em> ∣ <em>s</em>) ≈ <em>π</em>(<em>a</em> ∣ <em>s</em>; <em>θ</em>).</span></p>
+<p>神经网络的作用是从高维输入中学习有用表示，并把经验推广到相似状态。</p>
+<h2 id="alphago-例子">11.2 AlphaGo 例子</h2>
+<p>材料用 AlphaGo 说明深度网络和强化学习的结合。围棋困难在于：</p>
+<ol type="1">
+<li>状态空间巨大，棋盘局面数量远超暴力搜索能力。</li>
+<li>动作选择复杂，每一步有许多可能落子点。</li>
+<li>局面价值难以手工评估，因为一次落子的影响可能很久之后才显现。</li>
+</ol>
+<p>AlphaGo 使用两类网络：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">网络</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">策略网络（policy network）</td>
+<td style="text-align: left;">给出下一步可能动作，缩小搜索范围</td>
+</tr>
+<tr>
+<td style="text-align: left;">价值网络（value network）</td>
+<td style="text-align: left;">评估当前棋盘局面的胜率或价值</td>
+</tr>
+</tbody>
+</table>
+<p>这些网络先从人类专家棋谱中学习，再通过自我对弈进行强化学习。这个例子体现了深度学习和强化学习的互补：深度学习负责表示和泛化，强化学习负责通过长期回报改进行为。</p>
+<h2 id="multi-agent-autocurricula">11.3 Multi-Agent Autocurricula</h2>
+<p>材料最后提到 “Emergent tool use from multi-agent
+autocurricula”。多智能体自课程（multi-agent
+autocurricula）指多个智能体在互动中自动产生越来越复杂的训练任务。</p>
+<p>在单智能体任务中，环境通常相对固定；在多智能体任务中，其他智能体也是会学习的，因此环境会随对手或队友策略变化而变化。这会产生一种自动课程：一方学会某种技巧后，另一方必须学会应对，从而推动任务难度升级。</p>
+<p>例如一组智能体玩追逐和躲避游戏。追逐者变强后，躲避者需要学会利用障碍；躲避者学会防御后，追逐者又可能学会使用工具。复杂行为不是人工逐条写出来的，而是在竞争或协作中涌现。</p>
+<h1 id="强化学习的挑战与重点内容">12 强化学习的挑战与重点内容</h1>
+<h2 id="这里列出的挑战">12.1 这里列出的挑战</h2>
+<p>材料总结了强化学习面临的多个挑战。下面按初学者更容易理解的方式展开。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">挑战</th>
+<th style="text-align: left;">解释</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">状态表示与特征学习</td>
+<td style="text-align: left;">状态可能高维、连续，不能简单列成表</td>
+<td style="text-align: left;">自动驾驶看到的是图像和传感器流</td>
+</tr>
+<tr>
+<td style="text-align: left;">奖励设计</td>
+<td style="text-align: left;">奖励如果设计不好，会诱导错误行为</td>
+<td style="text-align: left;">只奖励速度可能导致机器人不顾安全</td>
+</tr>
+<tr>
+<td style="text-align: left;">策略评估延迟</td>
+<td style="text-align: left;">动作后果可能很久以后才出现</td>
+<td style="text-align: left;">下棋一步棋可能几十步后才体现价值</td>
+</tr>
+<tr>
+<td style="text-align: left;">探索-利用权衡</td>
+<td style="text-align: left;">要尝试新动作，也要使用已知好动作</td>
+<td
+style="text-align: left;">推荐系统既要推荐热门内容，也要试探用户新兴趣</td>
+</tr>
+<tr>
+<td style="text-align: left;">样本效率</td>
+<td style="text-align: left;">真实试错代价高，不能无限采样</td>
+<td style="text-align: left;">机器人不能摔坏几万次来学习走路</td>
+</tr>
+<tr>
+<td style="text-align: left;">世界模型学习</td>
+<td
+style="text-align: left;">模型可以帮助规划，但模型误差会误导策略</td>
+<td style="text-align: left;">模拟器不准会导致真实部署失败</td>
+</tr>
+<tr>
+<td style="text-align: left;">子问题选择</td>
+<td style="text-align: left;">智能体需要知道该练什么</td>
+<td style="text-align: left;">从简单任务逐渐学到复杂任务</td>
+</tr>
+<tr>
+<td style="text-align: left;">多智能体学习</td>
+<td style="text-align: left;">多个学习者相互影响，环境变得非平稳</td>
+<td style="text-align: left;">游戏、市场、交通系统中都有其他决策者</td>
+</tr>
+</tbody>
+</table>
+<h2 id="金融最优执行例子">12.2 金融最优执行例子</h2>
+<p>这里的 “RL for Optimized Execution”
+把交易执行看作随机最优控制问题。假设要在一段时间内买入或卖出一定数量股票，智能体需要决定每一时刻如何下单。</p>
+<p>可以对应为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">强化学习元素</th>
+<th style="text-align: left;">金融执行中的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">状态</td>
+<td
+style="text-align: left;">剩余时间、剩余股票数量、当前订单簿、市场波动</td>
+</tr>
+<tr>
+<td style="text-align: left;">动作</td>
+<td
+style="text-align: left;">下单价格、下单数量、订单在订单簿中的位置</td>
+</tr>
+<tr>
+<td style="text-align: left;">奖励</td>
+<td
+style="text-align: left;">成交价格、交易成本、滑点、风险调整收益</td>
+</tr>
+<tr>
+<td style="text-align: left;">随机性</td>
+<td style="text-align: left;">市场价格和其他交易者行为不可完全预测</td>
+</tr>
+</tbody>
+</table>
+<p>这个例子说明强化学习不仅用于游戏，还可用于真实决策系统。但真实系统更强调风险、稳定性和可解释性。</p>
+<h2 id="初学者应掌握的核心关系">12.3 初学者应掌握的核心关系</h2>
+<p>本讲知识点很多，但可以用一条主线串起来：</p>
+<ol type="1">
+<li>强化学习目标是最大化长期回报 <span
+class="math inline"><em>G</em><sub><em>t</em></sub></span>。</li>
+<li>为了判断长期回报，需要定义价值函数 <span
+class="math inline"><em>v</em><sub><em>π</em></sub>(<em>s</em>)</span>
+和 <span
+class="math inline"><em>q</em><sub><em>π</em></sub>(<em>s</em>, <em>a</em>)</span>。</li>
+<li>Bellman 方程把长期价值拆成即时奖励和下一状态价值。</li>
+<li>策略评估估计价值，策略改进用价值优化策略。</li>
+<li>Monte Carlo 用完整回报学习价值。</li>
+<li>TD 用一步奖励加下一状态估计学习价值。</li>
+<li>SARSA 和 Q-Learning 把 TD 思想用于控制。</li>
+<li>Policy Gradient 直接优化策略参数。</li>
+<li>Eligibility Traces 用 <span class="math inline"><em>λ</em></span> 把
+TD 和 Monte Carlo 联系起来。</li>
+</ol>
+<h2 id="必背公式与理解">12.4 必背公式与理解</h2>
+<p>回报：</p>
+<p><span class="math display">$$
+G_t = \sum_{k=0}^{\infty}\gamma^kR_{t+k+1}.
+$$</span></p>
+<p>含义：从当前开始，未来奖励的折扣和。</p>
+<p>状态价值：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = 𝔼<sub><em>π</em></sub>[<em>G</em><sub><em>t</em></sub> ∣ <em>S</em><sub><em>t</em></sub> = <em>s</em>].</span></p>
+<p>含义：在状态 <span class="math inline"><em>s</em></span> 开始，按策略
+<span class="math inline"><em>π</em></span> 行动的期望回报。</p>
+<p>Bellman 方程：</p>
+<p><span
+class="math display"><em>v</em><sub><em>π</em></sub>(<em>s</em>) = ∑<sub><em>a</em></sub><em>π</em>(<em>a</em> ∣ <em>s</em>)∑<sub><em>s</em><sup>′</sup>, <em>r</em></sub><em>p</em>(<em>s</em><sup>′</sup>, <em>r</em> ∣ <em>s</em>, <em>a</em>)[<em>r</em> + <em>γ</em><em>v</em><sub><em>π</em></sub>(<em>s</em><sup>′</sup>)].</span></p>
+<p>含义：当前状态价值等于所有可能动作、转移和奖励下的“即时奖励 +
+折扣未来价值”的期望。</p>
+<p>Bandit 增量更新：</p>
+<p><span class="math display">$$
+Q_{n+1}=Q_n+\frac{1}{n}[R_n-Q_n].
+$$</span></p>
+<p>含义：用新奖励和旧估计的误差修正平均值。</p>
+<p>TD(0)：</p>
+<p><span
+class="math display"><em>V</em>(<em>S</em><sub><em>t</em></sub>) ← <em>V</em>(<em>S</em><sub><em>t</em></sub>) + <em>α</em>[<em>R</em><sub><em>t</em> + 1</sub> + <em>γ</em><em>V</em>(<em>S</em><sub><em>t</em> + 1</sub>) − <em>V</em>(<em>S</em><sub><em>t</em></sub>)].</span></p>
+<p>含义：走一步就更新，用下一状态价值估计未来。</p>
+<p>SARSA：</p>
+<p><span
+class="math display"><em>Q</em>(<em>S</em>, <em>A</em>) ← <em>Q</em>(<em>S</em>, <em>A</em>) + <em>α</em>[<em>R</em> + <em>γ</em><em>Q</em>(<em>S</em><sup>′</sup>, <em>A</em><sup>′</sup>) − <em>Q</em>(<em>S</em>, <em>A</em>)].</span></p>
+<p>含义：用实际选择的下一动作更新，属于 on-policy。</p>
+<p>Q-Learning：</p>
+<p><span
+class="math display"><em>Q</em>(<em>S</em>, <em>A</em>) ← <em>Q</em>(<em>S</em>, <em>A</em>) + <em>α</em>[<em>R</em> + <em>γ</em>max<sub><em>a</em></sub><em>Q</em>(<em>S</em><sup>′</sup>, <em>a</em>) − <em>Q</em>(<em>S</em>, <em>A</em>)].</span></p>
+<p>含义：用下一状态最优动作价值更新，属于 off-policy。</p>
+<p><span class="math inline"><em>λ</em></span>-return：</p>
+<p><span class="math display">$$
+G_t^\lambda
+= (1-\lambda)\sum_{n=1}^{\infty}\lambda^{n-1}G_{t:t+n}.
+$$</span></p>
+<p>含义：把不同步数的 n-step return 加权平均，在 TD 和 Monte Carlo
+之间折中。</p>
+<h2 id="容易混淆点">12.5 容易混淆点</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">容易混淆点</th>
+<th style="text-align: left;">正确理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">reward 和 return</td>
+<td style="text-align: left;">reward 是一步奖励，return
+是未来奖励的折扣总和</td>
+</tr>
+<tr>
+<td style="text-align: left;">state value 和 action value</td>
+<td style="text-align: left;"><span
+class="math inline"><em>v</em>(<em>s</em>)</span> 评价状态，<span
+class="math inline"><em>q</em>(<em>s</em>, <em>a</em>)</span>
+评价状态下某个动作</td>
+</tr>
+<tr>
+<td style="text-align: left;">policy evaluation 和 policy
+improvement</td>
+<td
+style="text-align: left;">前者估计当前策略价值，后者用价值改进策略</td>
+</tr>
+<tr>
+<td style="text-align: left;">Monte Carlo 和 TD</td>
+<td style="text-align: left;">MC 等完整 episode，TD 走一步就更新</td>
+</tr>
+<tr>
+<td style="text-align: left;">SARSA 和 Q-Learning</td>
+<td style="text-align: left;">SARSA 用实际下一动作，Q-Learning
+用最大下一动作</td>
+</tr>
+<tr>
+<td style="text-align: left;">on-policy 和 off-policy</td>
+<td style="text-align: left;">on-policy 学习正在执行的策略，off-policy
+可以用一种策略探索、学习另一种目标策略</td>
+</tr>
+<tr>
+<td style="text-align: left;">model-free 和 model-based</td>
+<td style="text-align: left;">model-free 不显式学环境模型，model-based
+学或使用环境模型</td>
+</tr>
+</tbody>
+</table>
+<h2 id="一句话总结">12.6 一句话总结</h2>
+<p><strong>强化学习研究的是智能体如何在与环境的连续交互中，通过奖励信号学习最大化长期回报的策略。</strong>
+本讲从 Bandit 的动作价值估计开始，逐步引出 Bellman 方程、策略迭代、Monte
+Carlo、TD、SARSA、Q-Learning、模型方法、策略梯度和资格迹。所有这些方法都围绕同一件事展开：如何更准确地估计未来价值，并用这些估计做出更好的动作选择。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag"># 强化学习</a>
+              <a href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/" rel="tag"># 动态规划</a>
+              <a href="/tags/TD%E5%AD%A6%E4%B9%A0/" rel="tag"># TD学习</a>
+              <a href="/tags/Q-Learning/" rel="tag"># Q-Learning</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/CLIPS/" rel="prev" title="CLIPS">
+                  <i class="fa fa-angle-left"></i> CLIPS
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

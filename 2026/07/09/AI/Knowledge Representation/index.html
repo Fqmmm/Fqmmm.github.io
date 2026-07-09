@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  知识表示为什么重要：从专家系统说起 语义网络：把知识组织成概念层级 框架表示法：用对象模板组织常识 概念图：用图结构表达句子的语义 知识图谱：RDF 三元组与 SPARQL 查询 从自然语言到知识表示 其他知识表示方法概览 本章方法对比与重点梳理  1 知识表示为什么重要：从专家系统说起 1.1 普通程序与专家系统的差异 材料 一开始用两个公式把本章的核心问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Knowledge Representation">
+<meta property="og:url" content="http://example.com/2026/07/09/AI/Knowledge%20Representation/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  知识表示为什么重要：从专家系统说起 语义网络：把知识组织成概念层级 框架表示法：用对象模板组织常识 概念图：用图结构表达句子的语义 知识图谱：RDF 三元组与 SPARQL 查询 从自然语言到知识表示 其他知识表示方法概览 本章方法对比与重点梳理  1 知识表示为什么重要：从专家系统说起 1.1 普通程序与专家系统的差异 材料 一开始用两个公式把本章的核心问题">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220417781.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220832438.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221034590.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221407337.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221719830.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221850872.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221948605.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222230968.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222439454.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222523118.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222555980.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222614979.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222902091.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223257880.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223355054.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223436992.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223527813.png">
+<meta property="article:published_time" content="2026-07-09T07:12:29.434Z">
+<meta property="article:modified_time" content="2026-07-09T07:12:29.434Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="RDF">
+<meta property="article:tag" content="知识图谱">
+<meta property="article:tag" content="知识表示">
+<meta property="article:tag" content="语义网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220417781.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/AI/Knowledge%20Representation/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/AI/Knowledge%20Representation/","path":"2026/07/09/AI/Knowledge Representation/","title":"Knowledge Representation"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Knowledge Representation | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA%E4%B8%BA%E4%BB%80%E4%B9%88%E9%87%8D%E8%A6%81%E4%BB%8E%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F%E8%AF%B4%E8%B5%B7"><span class="nav-number">2.</span> <span class="nav-text">1
+知识表示为什么重要：从专家系统说起</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E7%A8%8B%E5%BA%8F%E4%B8%8E%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%B7%AE%E5%BC%82"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 普通程序与专家系统的差异</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA%E7%9F%A5%E8%AF%86%E8%8E%B7%E5%8F%96%E4%B8%8E%E7%9F%A5%E8%AF%86%E4%BD%BF%E7%94%A8"><span class="nav-number">2.2.</span> <span class="nav-text">1.2
+知识表示、知识获取与知识使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA%E9%9C%80%E8%A6%81%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 知识表示需要解决什么问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E7%BD%91%E7%BB%9C%E6%8A%8A%E7%9F%A5%E8%AF%86%E7%BB%84%E7%BB%87%E6%88%90%E6%A6%82%E5%BF%B5%E5%B1%82%E7%BA%A7"><span class="nav-number">3.</span> <span class="nav-text">2
+语义网络：把知识组织成概念层级</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BF%83%E7%90%86%E5%AD%A6%E8%AF%81%E6%8D%AE%E4%BA%BA%E7%B1%BB%E7%9F%A5%E8%AF%86%E5%8F%AF%E8%83%BD%E6%8C%89%E5%B1%82%E7%BA%A7%E7%BB%84%E7%BB%87"><span class="nav-number">3.1.</span> <span class="nav-text">2.1
+心理学证据：人类知识可能按层级组织</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E7%BD%91%E7%BB%9C%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 语义网络的基本结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E7%BD%91%E7%BB%9C%E4%B8%AD%E7%9A%84%E7%BB%A7%E6%89%BF%E6%8E%A8%E7%90%86"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 语义网络中的继承推理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E7%BD%91%E7%BB%9C%E7%9A%84%E4%BC%98%E7%82%B9%E4%B8%8E%E5%B1%80%E9%99%90"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 语义网络的优点与局限</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A1%86%E6%9E%B6%E8%A1%A8%E7%A4%BA%E6%B3%95%E7%94%A8%E5%AF%B9%E8%B1%A1%E6%A8%A1%E6%9D%BF%E7%BB%84%E7%BB%87%E5%B8%B8%E8%AF%86"><span class="nav-number">4.</span> <span class="nav-text">3
+框架表示法：用对象模板组织常识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#frame-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 Frame 的基本思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#slot-%E7%9A%84%E7%B1%BB%E5%9E%8B%E4%B8%8E%E4%BD%9C%E7%94%A8"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 Slot 的类型与作用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%86%E6%9E%B6%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E6%8E%A8%E7%90%86"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 框架系统中的推理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#john-is-like-a-fire-engine-%E4%BE%8B%E5%AD%90%E5%88%B0%E5%BA%95%E6%83%B3%E8%AF%B4%E6%98%8E%E4%BB%80%E4%B9%88"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 “John is like
+a fire engine” 例子到底想说明什么</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E5%9B%BE%E7%94%A8%E5%9B%BE%E7%BB%93%E6%9E%84%E8%A1%A8%E8%BE%BE%E5%8F%A5%E5%AD%90%E7%9A%84%E8%AF%AD%E4%B9%89"><span class="nav-number">5.</span> <span class="nav-text">4
+概念图：用图结构表达句子的语义</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E5%9B%BE%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%84%E6%88%90"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 概念图的基本组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%E7%9A%84%E5%85%83%E6%95%B0%E4%B8%80%E5%85%83%E4%BA%8C%E5%85%83%E5%92%8C%E4%B8%89%E5%85%83%E5%85%B3%E7%B3%BB"><span class="nav-number">5.2.</span> <span class="nav-text">4.2
+关系的元数：一元、二元和三元关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#marker%E5%94%AF%E4%B8%80%E6%A0%87%E8%AE%B0%E4%B8%8E%E9%80%9A%E7%94%A8%E6%A0%87%E8%AE%B0"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 Marker：唯一标记与通用标记</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E9%A2%98%E6%A6%82%E5%BF%B5%E6%8A%8A%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%BD%93%E4%BD%9C%E5%AF%B9%E8%B1%A1"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 命题概念：把一句话当作对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E5%9B%BE%E6%8E%A8%E7%90%86restrictionjoinsimplify"><span class="nav-number">5.5.</span> <span class="nav-text">4.5
+概念图推理：Restriction、Join、Simplify</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1rdf-%E4%B8%89%E5%85%83%E7%BB%84%E4%B8%8E-sparql-%E6%9F%A5%E8%AF%A2"><span class="nav-number">6.</span> <span class="nav-text">5 知识图谱：RDF 三元组与
+SPARQL 查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E5%85%83%E7%BB%84%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BA%8B%E5%AE%9E%E5%8D%95%E4%BD%8D"><span class="nav-number">6.1.</span> <span class="nav-text">5.1
+三元组：知识图谱的基本事实单位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rdf%E8%B5%84%E6%BA%90%E6%8F%8F%E8%BF%B0%E6%A1%86%E6%9E%B6"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 RDF：资源描述框架</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sparql%E6%9F%A5%E8%AF%A2-rdf-%E5%9B%BE%E7%9A%84%E8%AF%AD%E8%A8%80"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 SPARQL：查询 RDF 图的语言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E4%BD%93%E6%98%A0%E5%B0%84owlsameas-%E4%B8%8E-owlequivalentproperty"><span class="nav-number">6.4.</span> <span class="nav-text">5.4
+本体映射：owl:sameAs 与 owl:equivalentProperty</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%88%B0%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA"><span class="nav-number">7.</span> <span class="nav-text">6 从自然语言到知识表示</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%E4%B8%8E%E5%8F%A5%E6%B3%95%E5%88%86%E6%9E%90"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 输入与句法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AD%E4%B9%89%E8%A7%A3%E9%87%8A%E4%BB%8E%E8%AF%AD%E6%B3%95%E7%BB%93%E6%9E%84%E5%88%B0%E5%86%85%E9%83%A8%E8%A1%A8%E7%A4%BA"><span class="nav-number">7.2.</span> <span class="nav-text">6.2
+语义解释：从语法结构到内部表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E4%B8%96%E7%95%8C%E7%9F%A5%E8%AF%86%E8%A7%A3%E9%87%8A"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 上下文与世界知识解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E6%B8%B8%E5%BA%94%E7%94%A8%E9%97%AE%E7%AD%94%E6%9F%A5%E8%AF%A2%E7%BF%BB%E8%AF%91%E4%B8%8E%E7%94%9F%E6%88%90"><span class="nav-number">7.4.</span> <span class="nav-text">6.4
+下游应用：问答、查询、翻译与生成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95%E6%A6%82%E8%A7%88"><span class="nav-number">8.</span> <span class="nav-text">7 其他知识表示方法概览</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E4%BA%A7%E7%94%9F%E5%BC%8F%E8%A7%84%E5%88%99%E4%B8%8E%E5%86%B3%E7%AD%96%E8%A1%A8"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 逻辑、产生式规则与决策表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C%E4%B8%8E%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7%E8%A1%A8%E7%A4%BA"><span class="nav-number">8.2.</span> <span class="nav-text">7.2
+神经网络、贝叶斯网络与不确定性表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scriptpetri-netoav-triples-%E7%AD%89%E6%96%B9%E6%B3%95"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 Script、Petri Net、OAV
+triples 等方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94%E4%B8%8E%E9%87%8D%E7%82%B9%E6%A2%B3%E7%90%86"><span class="nav-number">9.</span> <span class="nav-text">8 本章方法对比与重点梳理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E7%A7%8D%E9%87%8D%E7%82%B9%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 四种重点方法对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E9%AB%98%E9%A2%91%E9%97%AE%E9%A2%98"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 本章高频问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E4%B8%80%E9%81%8D%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 最后一遍学习建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99%E4%B8%8E%E8%A1%A5%E5%85%85%E6%9D%A5%E6%BA%90"><span class="nav-number">10.</span> <span class="nav-text">9 参考资料与补充来源</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/Knowledge%20Representation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Knowledge Representation | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Knowledge Representation
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:12:29" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h2 id="目录">目录</h2>
+<ul>
+<li>知识表示为什么重要：从专家系统说起</li>
+<li>语义网络：把知识组织成概念层级</li>
+<li>框架表示法：用对象模板组织常识</li>
+<li>概念图：用图结构表达句子的语义</li>
+<li>知识图谱：RDF 三元组与 SPARQL 查询</li>
+<li>从自然语言到知识表示</li>
+<li>其他知识表示方法概览</li>
+<li>本章方法对比与重点梳理</li>
+</ul>
+<h2 id="知识表示为什么重要从专家系统说起">1
+知识表示为什么重要：从专家系统说起</h2>
+<h3 id="普通程序与专家系统的差异">1.1 普通程序与专家系统的差异</h3>
+<p>材料
+一开始用两个公式把本章的核心问题引出来。普通程序可以粗略写成：</p>
+<p><span class="math display">Programs = Algorithms + Data
+Structures</span></p>
+<p>也就是说，传统程序更关心“用什么算法处理什么数据结构”。例如排序程序的核心是排序算法，数据库索引的核心是数据结构设计。只要问题规则明确、流程固定，算法和数据结构就能很好地解决问题。</p>
+<p>但专家系统面对的是另一类问题。医生诊断、设备故障排查、法律咨询、配置推荐等任务，并不只是把一批数据喂给一个固定算法，而是要用大量领域知识进行判断。因此专家系统可以概括为：</p>
+<p><span class="math display">Expert
+Systems = Knowledge + Inference</span></p>
+<p>这里的 <strong>Knowledge</strong>
+指专家经验、事实、规则、概念关系和默认常识；<strong>Inference</strong>
+指系统根据已有知识推出新结论的过程。换句话说，专家系统的重点不是“算得快”，而是“知道什么，并且能根据这些知识推出什么”。</p>
+<p>一个典型专家系统通常包含知识库、推理机、工作记忆和解释模块。知识库存放领域事实和规则，推理机负责根据当前事实进行推理，工作记忆保存当前问题的具体信息，解释模块则回答“为什么系统会这样判断”。这也解释了为什么本章要讲知识表示：如果知识没有被清楚地表示出来，推理机就无从使用它。</p>
+<h3 id="知识表示知识获取与知识使用">1.2
+知识表示、知识获取与知识使用</h3>
+<p>人工智能中围绕知识的研究大致有三个方面：<strong>知识表示</strong>、<strong>知识获取</strong>和<strong>知识使用</strong>。三者不是并列孤立的关系，而是有先后依赖的关系。</p>
+<p>知识获取解决“知识从哪里来”的问题，例如从专家访谈、数据库、文本、传感器或互联网中获得知识。知识使用解决“知识如何发挥作用”的问题，例如检索、问答、分类、诊断和规划。而知识表示处在二者中间，它负责把获得的知识变成机器能够保存、组织和推理的形式。</p>
+<p>例如，人可以自然地说“金丝雀是鸟，鸟通常会飞”。但机器不能直接理解自然语言中的“是”“通常”和“会”。如果我们把它表示为概念层级和属性继承，机器就可以沿着层级推出“金丝雀通常会飞”。因此，知识表示的本质就是把人类知识翻译成机器可操作的结构。</p>
+<h3 id="知识表示需要解决什么问题">1.3 知识表示需要解决什么问题</h3>
+<p>好的知识表示方法至少要解决四类问题。第一是<strong>表达能力</strong>，也就是它能不能表示对象、属性、关系、事件、规则、默认值和例外情况。第二是<strong>推理能力</strong>，也就是系统能不能基于表示出来的知识推出新结论。第三是<strong>组织能力</strong>，也就是知识之间能不能形成层次、分类、继承和组合关系。第四是<strong>可维护性</strong>，也就是新增知识时不会轻易破坏已有结构。</p>
+<p>本章后面的语义网络、框架、概念图和知识图谱，都可以看成对这些问题的不同回答。语义网络擅长表达概念层级，框架擅长表达典型对象或场景，概念图擅长表达自然语言语义结构，知识图谱则适合大规模组织实体及其关系。</p>
+<h2 id="语义网络把知识组织成概念层级">2
+语义网络：把知识组织成概念层级</h2>
+<h3 id="心理学证据人类知识可能按层级组织">2.1
+心理学证据：人类知识可能按层级组织</h3>
+<p>材料
+先给出一个心理学实验，用来说明人类记忆中的知识可能具有层级结构。图中有
+<code>ANIMAL</code>、<code>BIRD</code>、<code>CANARY</code>、<code>OSTRICH</code>、<code>FISH</code>
+等概念，其中 <code>CANARY</code> 是 <code>BIRD</code>
+的一种，<code>BIRD</code> 又是 <code>ANIMAL</code>
+的一种。属性也被放在不同层级上，例如 <code>ANIMAL</code> 具有
+<code>can breathe</code>、<code>has skin</code>、<code>can move</code>属性，而
+<code>BIRD</code> 具有
+<code>can fly</code>、<code>has wings</code>、<code>has feathers</code>属性。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220417781.png" style="zoom: 33%;" /></p>
+<p>这个实验关注的是人判断句子真假的反应时间。判断 “A canary is a canary”
+最快，因为它几乎不需要跨层级查找；判断 “A canary is a bird”
+稍慢，因为要从 <code>CANARY</code> 往上一层找到 <code>BIRD</code>；判断
+“A canary is an animal” 更慢，因为要继续往上找到
+<code>ANIMAL</code>。同理，“A canary has skin” 也比较慢，因为
+<code>has skin</code> 这个属性存放在 <code>ANIMAL</code>
+层级，需要通过继承得到。</p>
+<p>这个例子说明，概念层级不仅能节省存储，还能解释某些认知现象。我们不需要在
+<code>CANARY</code>、<code>OSTRICH</code>、<code>FISH</code>
+等每一个概念下面重复写“会呼吸、有皮肤、会移动”，只要把这些属性放在更高层的
+<code>ANIMAL</code> 上，子类就可以继承它们。</p>
+<p>不过，这个例子也埋下了一个重要问题：继承并不总是无条件正确。图中
+<code>OSTRICH</code>（鸵鸟） 是
+<code>BIRD</code>，但鸵鸟不会飞。如果系统只知道“鸟会飞”和“鸵鸟是鸟”，就会推出错误结论“鸵鸟会飞”。因此，语义网络必须处理默认属性和例外之间的冲突。</p>
+<h3 id="语义网络的基本结构">2.2 语义网络的基本结构</h3>
+<p><strong>语义网络（Semantic Network）</strong>
+是一种图形化知识表示方法。它通常用节点表示概念、实例或属性值，用边表示节点之间的关系。常见关系包括
+<code>is-a</code>、<code>part-of</code>、<code>has</code>、<code>can</code>、<code>property</code>、<code>color</code>、<code>owns</code>
+等。</p>
+<p>在语义网络中，最重要的边之一是
+<code>is-a</code>。它表示“某个概念属于另一个更一般的概念”，例如
+<code>CANARY is-a BIRD</code>。这种关系使网络形成层级结构，也让属性继承成为可能。</p>
+<p>这里的推理例子如下：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220832438.png" style="zoom:50%;" /></p>
+<p>图里有几个基本事实：<code>TWEETY is-a CANARY</code>，<code>CANARY is-a BIRD</code>，<code>CANARY property CAN-FLY</code>，<code>CANARY color YELLOW</code>，并且
+<code>SYLVESTER owns TWEETY</code>。这些事实本身很简单，但它们组合起来之后就能产生新的结论。</p>
+<h3 id="语义网络中的继承推理">2.3 语义网络中的继承推理</h3>
+<p>语义网络推理的核心是沿着图中的边进行搜索，尤其是沿着
+<code>is-a</code> 边向上查找父类，然后继承父类或类别上的属性。</p>
+<p>例如，图中明确写着
+<code>CANARY is-a BIRD</code>，<code>BIRD property CAN-FLY</code>，所以可以得到
+<code>CAN-FLY(CANARY)</code>。又因为
+<code>TWEETY is-a CANARY</code>，所以 Tweety
+继承金丝雀的属性，系统可以推出 <code>CAN-FLY(TWEETY)</code> 和
+<code>TWEETY is YELLOW</code>。再结合
+<code>SYLVESTER owns TWEETY</code>，系统还能进一步推出 Sylvester
+拥有一只金丝雀，拥有一只鸟，并且拥有某个会飞的东西。</p>
+<p>这个推理过程的逻辑是连续的：先确定 Tweety
+的类别，再继承类别属性，最后把“拥有
+Tweety”这个关系推广为“拥有一只具有这些类别和属性的东西”。因此，语义网络不只是画图工具，它可以支持基于路径和继承的推理。</p>
+<h3 id="语义网络的优点与局限">2.4 语义网络的优点与局限</h3>
+<p>语义网络最大的优点是直观。它把知识画成图，很适合表示“谁属于谁”“谁拥有什么属性”“谁和谁有关系”。对于概念层级、分类体系和对象关系，语义网络尤其自然。</p>
+<p>但它的局限也很明显。首先，复杂逻辑表达能力有限。例如“所有鸟都会飞，除非它是鸵鸟或它受伤了”这类带例外和条件的知识，用普通边很难清楚表示。其次，如果没有严格形式语义，不同人可能对同一种边有不同理解。最后，继承冲突需要额外规则处理。比如某节点从父类继承“会飞”，又从自身属性得到“不会飞”，系统必须知道哪个结论优先。</p>
+<h2 id="框架表示法用对象模板组织常识">3
+框架表示法：用对象模板组织常识</h2>
+<h3 id="frame-的基本思想">3.1 Frame 的基本思想</h3>
+<p><strong>Frame（框架）</strong>
+是一种以对象、概念或场景为中心的知识表示方法。它有点像 UML
+中的类图，也像一个对象模板。一个框架描述“这个东西通常有什么属性、和什么东西有关、默认情况下是什么样子”。</p>
+<p>框架内部由许多 <strong>slot（槽）</strong>
+构成。每个槽可以存放属性值、关系、默认值、约束，甚至可以存放过程性信息。与语义网络相比，框架不是把所有知识都摊成节点和边，而是把关于同一个对象或场景的知识收拢到一个结构中。</p>
+<p>材料 用 hotel room 作为例子：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221034590.png" style="zoom:33%;" /></p>
+<p><code>hotel room</code> 这个框架可以有
+<code>specialization of: room</code>、<code>location: hotel</code>、<code>contains: hotel chair, hotel phone, hotel bed</code>
+等槽。<code>hotel bed</code> 又可以有
+<code>use: sleeping</code>、<code>size: king</code>、<code>part: mattress, frame</code>
+等槽。这样一来，“酒店房间”不再只是一个孤立概念，而是一个由位置、组成部分、用途和默认属性构成的知识结构。</p>
+<p>框架特别适合表示具有稳定结构的对象或场景，例如房间、课堂、餐厅、车辆、病例、会议流程等。它的优势在于人类看到一个场景时，常常会自动填补默认信息。例如听到“酒店房间”，我们通常会默认里面有床、椅子、电话或类似设备。框架正是用来表示这种“典型结构”的。</p>
+<h3 id="slot-的类型与作用">3.2 Slot 的类型与作用</h3>
+<p>这里列出了框架中常见的 slot 类型：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Slot 类型</th>
+<th>作用</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frame identification information</td>
+<td>标识这个框架是什么</td>
+<td><code>hotel room</code>、<code>hotel bed</code></td>
+</tr>
+<tr>
+<td>Relationship of this frame to other frames</td>
+<td>表示与其他框架的继承、包含、组成关系</td>
+<td><code>specialization of: room</code>、<code>part: mattress</code></td>
+</tr>
+<tr>
+<td>Descriptors of requirements for a frame</td>
+<td>描述该框架必须满足的属性或约束</td>
+<td>椅子有 4 条腿，床用于 sleeping</td>
+</tr>
+<tr>
+<td>Procedural information</td>
+<td>访问或修改槽时触发某些过程</td>
+<td>查询价格时自动计算费用</td>
+</tr>
+<tr>
+<td>Frame default information</td>
+<td>没有明确值时使用的默认信息</td>
+<td>酒店床默认可供 sleeping</td>
+</tr>
+<tr>
+<td>New instance information</td>
+<td>记录具体实例的新信息或覆盖默认值</td>
+<td>某个房间的床不是 king size</td>
+</tr>
+</tbody>
+</table>
+<p>这些槽说明，框架不是简单的属性表。它既可以表达静态事实，也可以表达默认假设、继承关系、约束条件和过程。比如某个
+<code>hotel chair</code> 默认高度是 <span class="math inline">20</span>
+到 <span class="math inline">40</span>
+cm，如果具体房间中的椅子高度被测量为 <span class="math inline">45</span>
+cm，那么实例信息就可以覆盖默认信息。</p>
+<h3 id="框架系统中的推理">3.3 框架系统中的推理</h3>
+<p>框架推理通常围绕槽值展开。最常见的是继承推理：子框架可以继承父框架的槽。例如
+<code>hotel chair</code> 是 <code>chair</code>
+的特殊形式，因此它可以继承椅子的一般属性，再增加酒店场景下的特殊属性。</p>
+<p>第二种常见推理是默认值填充。当系统没有得到某个槽的明确值时，可以使用框架中的默认值。比如只说“酒店房间里有一张床”，如果没有更多信息，系统可以默认这张床用于睡觉、有床垫和床架。默认值让系统能够在信息不完整时继续推理。</p>
+<p>第三种是实例覆盖。默认值并不等于永远正确，具体实例的信息通常优先级更高。比如酒店床默认是
+king size，但某个具体房间可能是 twin
+bed，那么具体实例的槽值应该覆盖默认值。</p>
+<h3 id="john-is-like-a-fire-engine-例子到底想说明什么">3.4 “John is like
+a fire engine” 例子到底想说明什么</h3>
+<p>这里有一个看起来很怪的例子：<code>John like a fire engine.</code>
+更自然地说应该是 <code>John is like a fire engine.</code>，意思是 John
+像一辆消防车。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221407337.png" style="zoom: 33%;" /></p>
+<p>消防车框架中有很多槽，例如
+<code>isa: motor vehicle</code>、<code>color: red</code>、<code>activity: high</code>、<code>volume: very high</code>、<code>fuel efficiency: average</code>、<code>ladder: 5m</code>。如果系统听到“John
+像消防车”，它不能把消防车的所有槽都复制给 John。否则会推出 John
+是机动车、John 是红色、John 有 <span class="math inline">5</span>
+米梯子，这显然荒唐。</p>
+<p>这个例子真正想说明的是：<strong>框架推理必须根据关系的语义选择相关槽，而不是机械复制所有槽。</strong>
+在 “like” 这个关系下，合理迁移的是 <code>activity: high</code> 和
+<code>volume: very high</code>，也就是 John
+可能很活跃、声音很大、动静很大；不应该迁移的是类别、颜色、燃油效率和梯子。</p>
+<p>因此，这个例子是框架系统中“选择性继承”或“类比推理”的示意。它提醒我们，知识表示不仅要保存属性，还要知道哪些属性在当前语境下
+relevant。</p>
+<h2 id="概念图用图结构表达句子的语义">4
+概念图：用图结构表达句子的语义</h2>
+<h3 id="概念图的基本组成">4.1 概念图的基本组成</h3>
+<p><strong>Conceptual Graph（概念图）</strong>
+是一种图形化知识表示方法，常用于表达自然语言句子的语义结构。它通常包含两类节点：<strong>概念节点（concept
+nodes）</strong> 和 <strong>关系节点（relation
+nodes）</strong>。概念节点表示实体、类别、属性值或命题中的对象；关系节点表示概念之间的语义关系。</p>
+<p>概念图和语义网络很像，但二者有一个重要区别：语义网络常把关系画成边，而概念图通常把关系也画成节点。这样做的好处是，关系可以明确连接一个、两个或多个概念，从而表示不同元数的关系。</p>
+<h3 id="关系的元数一元二元和三元关系">4.2
+关系的元数：一元、二元和三元关系</h3>
+<p>材料 先用简单例子说明关系的元数：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221719830.png" style="zoom:33%;" /></p>
+<p>如果关系只连接一个概念，它就是一元关系。例如
+<code>bird - flies</code> 表示鸟会飞，<code>flies</code> 是一个 <span
+class="math inline">1</span> 元关系。</p>
+<p>如果关系连接两个概念，它就是二元关系。例如
+<code>dog - color - brown</code> 表示狗的颜色是棕色，<code>color</code>
+是一个 <span class="math inline">2</span>
+元关系。这里的两个参与者分别是“被描述的对象”和“属性值”。</p>
+<p>如果关系连接三个概念，它就是三元关系。例如
+<code>father, child, mother - parents</code>
+表达父亲、母亲和孩子之间的亲子关系，<code>parents</code> 是一个 <span
+class="math inline">3</span>
+元关系。这个例子说明，概念图不局限于二元关系，它可以比较自然地表达多参与者关系。</p>
+<h3 id="marker唯一标记与通用标记">4.3 Marker：唯一标记与通用标记</h3>
+<p>概念图需要区分类别、具体个体和变量，因此 材料 引入了 marker。</p>
+<p><strong>Unique marker（唯一标记）</strong>
+用于标识某个具体个体。这里的 <code>dog:#007</code> 表示“编号为 #007
+的那只狗”。它不是泛泛地说狗这个类别，而是在说某个唯一确定的对象。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221850872.png" style="zoom:33%;" /></p>
+<p>这个图表达的意思是：有一只唯一编号为 <code>#007</code>
+的狗，它的名字是 Emma，颜色是
+brown。这里需要唯一标记，是因为现实世界里可能有很多只叫 Emma
+的狗。系统如果只根据名字识别对象，就可能把不同实体混淆。</p>
+<p><strong>Generic marker（通用标记）</strong>
+用于表示某个未特指的个体或变量。这里的 <code>dog:*X</code>
+表示“某只狗”，但不指定它的唯一编号。它和数学中的变量有点像：虽然不知道具体是哪一只狗，但图中所有连接到
+<code>dog:*X</code> 的关系都指向同一个对象。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221948605.png" style="zoom:33%;" /></p>
+<p>这个图表达句子 <code>The dog scratches its ear with its paw.</code>
+难点在于 <code>its</code>。英语里的 <code>its ear</code> 和
+<code>its paw</code> 都指同一只狗的身体部分。概念图通过
+<code>part</code> 关系把 <code>ear</code> 和 <code>paw</code>
+都连接回同一个 <code>dog:*X</code>，从而说明耳朵和爪子属于这只狗。</p>
+<p>可以用下表快速区分：</p>
+<table>
+<thead>
+<tr>
+<th>表达</th>
+<th>含义</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dog</code></td>
+<td>狗这个概念或类别</td>
+<td>泛指 dog</td>
+</tr>
+<tr>
+<td><code>dog:#007</code></td>
+<td>某个唯一确定的狗</td>
+<td>编号为 #007 的狗</td>
+</tr>
+<tr>
+<td><code>dog:*X</code></td>
+<td>某个未特指的狗，类似变量</td>
+<td>某只狗抓自己的耳朵</td>
+</tr>
+</tbody>
+</table>
+<h3 id="命题概念把一句话当作对象">4.4 命题概念：把一句话当作对象</h3>
+<p>自然语言中经常出现“相信、知道、认为、希望、说”等动词。这些动词的宾语往往不是一个普通对象，而是一整个命题。材料
+用句子 <code>Tom believes that Jane likes pizza.</code> 说明这一点。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222230968.png" style="zoom:33%;" /></p>
+<p>这句话的主干是 Tom believes something，但这个 something 不是
+pizza，也不是 Jane，而是完整命题 “Jane likes pizza”。因此概念图中需要把
+<code>Jane likes pizza</code> 包装成一个
+<strong>proposition（命题概念）</strong>，再作为 <code>believe</code> 的
+object。</p>
+<p>这和语法中的宾语从句很像。关键是要区分两个层次：第一层是 “Tom
+believes P”，第二层是命题 <span class="math inline"><em>P</em>=</span>
+“Jane likes pizza”。Tom 相信 <span
+class="math inline"><em>P</em></span>，并不自动意味着 <span
+class="math inline"><em>P</em></span>
+一定为真。也就是说，“某人相信一件事”和“这件事本身是真的”是两个不同问题。知识表示如果不能区分这两层，就会把信念误当事实。</p>
+<h3 id="概念图推理restrictionjoinsimplify">4.5
+概念图推理：Restriction、Join、Simplify</h3>
+<p>材料 最后展示了概念图中的三种基本操作：restriction、join 和
+simplify。它们的作用分别是细化概念、合并图和删除冗余。</p>
+<p>G1 表示某只狗作为 agent 执行 <code>eat</code>，object 是
+<code>bone</code>。G2 表示 <code>animal:"emma"</code> 的颜色是
+brown，并且位置在 porch。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222439454.png" style="zoom:33%;" /></p>
+<p><strong>Restriction operation，限制操作</strong>
+是把更一般的概念限制为更具体的概念。这里 G3 把
+<code>animal:"emma"</code> 限制为
+<code>dog:"emma"</code>。这背后的逻辑是，dog 是 animal
+的子类，因此如果我们知道 Emma 是狗，就能把原来较泛的 animal 类型具体化为
+dog。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222523118.png" style="zoom:33%;" /></p>
+<p><strong>Join operation，连接操作</strong>
+是把两个或多个图中可对应的节点合并，形成更大的图。这里 G4 把关于 Emma
+的吃骨头信息、颜色信息和位置信息合并到同一个实体上。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222555980.png" style="zoom:33%;" /></p>
+<p><strong>Simplify operation，简化操作</strong> 是删除 join
+后产生的重复节点或冗余结构，得到更紧凑的图 G5。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222614979.png" style="zoom:33%;" /></p>
+<p>最终，系统可以得到一组连贯知识：Emma 是一只狗，Emma 是棕色的，Emma 在
+porch，Emma 正在吃
+bone。这个例子说明，概念图推理不是靠单条规则完成的，而是通过图结构的细化、合并和化简逐步得到更完整的表示。</p>
+<h2 id="知识图谱rdf-三元组与-sparql-查询">5 知识图谱：RDF 三元组与
+SPARQL 查询</h2>
+<h3 id="三元组知识图谱的基本事实单位">5.1
+三元组：知识图谱的基本事实单位</h3>
+<p>材料 从 Sean Penn
+这个例子引入知识图谱中的三元组。知识图谱通常把事实表示为：</p>
+<p><span class="math display">(subject, predicate, object)</span></p>
+<p>也就是“主语、谓语、宾语”。例如：</p>
+<p><span class="math display">(Sean Penn, occupation, Actor)</span></p>
+<p>这条三元组表达的意思是：Sean Penn 的职业是演员。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222902091.png" style="zoom:33%;" /></p>
+<p>这里的例子可以整理为：</p>
+<table>
+<thead>
+<tr>
+<th>Subject</th>
+<th>Predicate</th>
+<th>Object</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>https://xxx/sean_penn/</code></td>
+<td><code>rdfs:type</code></td>
+<td><code>Person</code></td>
+</tr>
+<tr>
+<td><code>https://xxx/sean_penn/</code></td>
+<td><code>fullName</code></td>
+<td><code>"Sean Penn"</code></td>
+</tr>
+<tr>
+<td><code>https://xxx/sean_penn/</code></td>
+<td><code>mailbox</code></td>
+<td><code>"sean_penn@xxx.com"</code></td>
+</tr>
+<tr>
+<td><code>https://xxx/sean_penn/</code></td>
+<td><code>occupation</code></td>
+<td><code>"Actor"</code></td>
+</tr>
+</tbody>
+</table>
+<p>这些三元组共同描述了一个实体：它是一个人，名字叫 Sean
+Penn，有邮箱，有职业。每条三元组都很小，但大量三元组连接起来，就能形成知识图谱。</p>
+<h3 id="rdf资源描述框架">5.2 RDF：资源描述框架</h3>
+<p><strong>RDF，Resource Description
+Framework，资源描述框架</strong>，是 Web
+语义网和知识图谱中常用的一种标准数据模型。根据 W3C 的定义，RDF
+的核心思想就是用三元组描述资源之间的关系。</p>
+<p>在 RDF 中，subject 通常是一个资源 URI 或空白节点，predicate
+通常是表示属性或关系的 URI，object
+可以是另一个资源、空白节点，也可以是字符串、数字等字面量。这里
+<code>https://xxx/sean_penn/</code> 就是一个资源标识符，它比直接写 “Sean
+Penn” 更适合机器处理，因为 URI 可以尽量指向唯一资源。</p>
+<p>Sean Penn 是一个真实人物，中文通常译作西恩·潘，是美国演员和导演。材料
+并不是要介绍他的生平，而是把他作为知识图谱中的一个 entity，展示如何用
+RDF 三元组描述现实世界中的人。</p>
+<p>RDF
+与前面的语义网络、概念图有明显联系。它们都在表达“实体之间有什么关系”。区别在于，RDF
+是更工程化、标准化的数据模型，适合在 Web
+和数据库中大规模存储、交换和查询。</p>
+<h3 id="sparql查询-rdf-图的语言">5.3 SPARQL：查询 RDF 图的语言</h3>
+<p>如果 RDF 用来存储知识图谱，那么 <strong>SPARQL</strong> 就是用来查询
+RDF 图的语言。这里出现了：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT ?author ?titre ?homepage</span><br></pre></td></tr></table></figure>
+<p>这表示查询结果希望返回三个变量：作者、标题和主页。SPARQL
+查询的基本思想是写出一组图模式，让系统在 RDF
+图中寻找匹配的三元组，并把匹配到的资源绑定到变量上。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223257880.png" style="zoom:33%;" /></p>
+<p>可以把它类比为数据库中的 SQL，但 SPARQL 面向的是图结构数据。SQL
+常在表中查行列，而 SPARQL 常在三元组图中查节点和边的匹配关系。</p>
+<h3 id="本体映射owlsameas-与-owlequivalentproperty">5.4
+本体映射：owl:sameAs 与 owl:equivalentProperty</h3>
+<p>这里的 SPARQL
+例子不只是查询，还暗示了一个更重要的问题：不同数据源可能用不同名字描述同一件事。</p>
+<p>例如，一个英文数据源可能用 <code>a:title</code>
+表示书名，另一个法文数据源可能用 <code>b:titre</code>
+表示书名。它们名字不同，但语义相同。此时可以用
+<code>owl:equivalentProperty</code> 表示两个属性等价。类似地，如果两个
+URI 指向同一个真实作者，可以用 <code>owl:sameAs</code>
+表示它们其实是同一个实体。</p>
+<p>这类映射对知识图谱非常重要。没有映射时，系统可能把同一个作者看成两个人，把同一种属性看成两种关系；有了映射后，系统就能跨数据源合并信息。例如，一个数据源知道作者主页，另一个数据源知道作者写了哪本书，系统通过
+<code>owl:sameAs</code> 就能把这些事实连起来。</p>
+<h2 id="从自然语言到知识表示">6 从自然语言到知识表示</h2>
+<h3 id="输入与句法分析">6.1 输入与句法分析</h3>
+<p>材料 用 <code>Tarzan kissed Jane.</code>
+展示自然语言理解如何一步步转成知识表示。第一步是输入原始句子，第二步是
+parsing，也就是句法分析。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223355054.png" style="zoom: 33%;" /></p>
+<p>句法分析要回答的是“这个句子的语法结构是什么”。在这个例子中，整个句子可以分成名词短语
+<code>Tarzan</code> 和动词短语
+<code>kissed Jane</code>；动词短语中又包含动词 <code>kissed</code>
+和名词短语
+<code>Jane</code>。这一步还没有真正理解世界意义，只是在确定词语如何组成句子。</p>
+<h3 id="语义解释从语法结构到内部表示">6.2
+语义解释：从语法结构到内部表示</h3>
+<p>第三步是 semantic
+interpretation，也就是把句法结构转成内部语义表示。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223436992.png" style="zoom:33%;" /></p>
+<p>在这个内部表示中，<code>person: tarzan</code> 是 <code>kiss</code>
+这个动作的 agent，<code>person: jane</code> 是 object，<code>lips</code>
+是
+instrument。这里的重点是，系统不只是知道句子里有三个词，而是知道“谁对谁做了什么，用什么做”。</p>
+<p>这个过程体现了概念图和语义角色的作用。自然语言中的主语、宾语和介词短语，最终要转化为
+agent、object、instrument、location
+等语义角色。只有完成这一步，系统才可能回答问题或进一步推理。</p>
+<h3 id="上下文与世界知识解释">6.3 上下文与世界知识解释</h3>
+<p>第四步是 contextual / world knowledge
+interpretation，也就是结合上下文和世界知识扩展表示。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223527813.png" style="zoom:33%;" /></p>
+<p>扩展图中加入了 Tarzan 的宠物 Cheetah、Jane 与 love 的关系、jungle
+作为 location
+等背景信息。也就是说，系统不只处理句子字面信息，还把它放进更大的世界知识中解释。</p>
+<p>这一步很重要，因为自然语言常常省略大量常识。比如人类看到 “Tarzan
+kissed Jane” 可能会自动联想到 Tarzan、Jane、jungle
+等背景，但机器不会自动知道这些。知识表示系统需要把这些背景知识显式组织起来，才能做更深层的理解。</p>
+<h3 id="下游应用问答查询翻译与生成">6.4
+下游应用：问答、查询、翻译与生成</h3>
+<p>当句子被转换成内部知识表示后，它就可以服务于不同应用。这里列出了
+question answerer、database query handler、translator、language
+generator 和 speech synthesis。</p>
+<p>这条流程可以概括为：自然语言输入先变成句法结构，再变成语义结构，再结合世界知识扩展，最后交给问答、查询、翻译或生成模块使用。也就是说，知识表示是自然语言处理系统中连接“文字表面形式”和“机器可操作意义”的桥梁。</p>
+<h2 id="其他知识表示方法概览">7 其他知识表示方法概览</h2>
+<h3 id="逻辑产生式规则与决策表">7.1 逻辑、产生式规则与决策表</h3>
+<p>材料
+最后列出了一批其他知识表示方法。它们不需要在本讲中全部展开，但要知道各自适合什么问题。</p>
+<p><strong>逻辑表示</strong>包括命题逻辑、一阶逻辑、描述逻辑和模态逻辑。逻辑的优点是形式严谨，适合表达精确规则和进行严格推理。例如一阶逻辑可以写出“所有人都会死亡”这类带量词的命题。但逻辑表示的缺点是常识知识很庞杂，例外和不确定性处理起来不轻松。</p>
+<p><strong>产生式规则</strong>通常写成：</p>
+<p><span class="math display">IF 条件 THEN 结论或动作</span></p>
+<p>它在专家系统中非常常见。例如“如果病人发烧且咳嗽，那么怀疑呼吸道感染”。这种表示容易理解、容易维护，但当规则数量很多时，规则之间可能冲突，系统也可能难以解释复杂链式推理。</p>
+<p><strong>决策表</strong>适合把条件组合和对应动作整理成表格。它常用于业务规则、测试用例和诊断流程。相比产生式规则，决策表更适合系统检查“各种条件组合是否都覆盖到了”。</p>
+<h3 id="神经网络贝叶斯网络与不确定性表示">7.2
+神经网络、贝叶斯网络与不确定性表示</h3>
+<p><strong>人工神经网络</strong>用大量参数表示知识。它不像语义网络或框架那样把知识显式写成节点、边和槽，而是通过训练把模式分布在权重中。它的优点是擅长从数据中学习复杂模式，缺点是可解释性较弱。</p>
+<p><strong>贝叶斯网络</strong>用有向无环图表示随机变量之间的条件依赖，适合处理不确定性推理。例如疾病、症状、检测结果之间不是简单的必然关系，而是概率关系，贝叶斯网络就能表达“某症状在某疾病下出现的概率”。</p>
+<p><strong>Neurules</strong>
+可以理解为神经网络和规则方法的结合方向，目标是在学习能力和可解释性之间取得折中。它不像单纯神经网络那样完全黑箱，也不像传统规则那样完全依赖人工编写。</p>
+<h3 id="scriptpetri-netoav-triples-等方法">7.3 Script、Petri Net、OAV
+triples 等方法</h3>
+<p><strong>Script，脚本</strong>
+用于表示典型事件序列。例如“去餐厅吃饭”通常包括进入餐厅、入座、点餐、用餐、付款、离开。脚本适合表达常识场景和事件流程。</p>
+<p><strong>Knowledge Petri net，知识 Petri 网</strong> 借助 Petri
+网表达状态、变迁和流程，适合描述并发、资源流动和状态变化。</p>
+<p><strong>Object-attribute-value triples，对象-属性-值三元组</strong>
+的形式是：</p>
+<p><span class="math display">(object, attribute, value)</span></p>
+<p>例如 <code>(dog, color, brown)</code>。它和 RDF
+三元组很接近，但通常更强调对象属性描述，而 RDF 更强调 Web
+资源及其关系。</p>
+<p><strong>Language field theory，语言场论</strong> 在
+这里只列出名称，可以理解为从语言结构或语义场角度组织知识的一类理论。本章不要求深入展开，学习时知道它属于其他知识表示方向即可。</p>
+<h2 id="本章方法对比与重点梳理">8 本章方法对比与重点梳理</h2>
+<h3 id="四种重点方法对比">8.1 四种重点方法对比</h3>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>方法</th>
+<th>核心表示</th>
+<th>最适合表达</th>
+<th>主要推理方式</th>
+<th>典型问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>语义网络</td>
+<td>节点 + 关系边</td>
+<td>概念层级、属性继承、对象关系</td>
+<td>路径搜索、继承、关系组合</td>
+<td>例外和继承冲突</td>
+</tr>
+<tr>
+<td>框架</td>
+<td>对象/场景 + slot</td>
+<td>典型对象、场景结构、默认属性</td>
+<td>槽值继承、默认值填充、实例覆盖</td>
+<td>多重继承、默认值冲突</td>
+</tr>
+<tr>
+<td>概念图</td>
+<td>概念节点 + 关系节点</td>
+<td>自然语言语义、事件角色、多元关系</td>
+<td>restriction、join、simplify</td>
+<td>大规模使用时需要标准化工具</td>
+</tr>
+<tr>
+<td>知识图谱</td>
+<td>RDF 三元组</td>
+<td>大规模实体关系、Web 数据集成</td>
+<td>类型推理、属性映射、SPARQL 查询</td>
+<td>实体消歧、关系对齐、数据质量</td>
+</tr>
+</tbody>
+</table>
+<p>这四种方法不是互相替代的关系，而是面向不同任务。语义网络强调层级和继承，框架强调对象内部结构，概念图强调句子和事件语义，知识图谱强调大规模实体关系数据。练习如果让比较它们，不要只背定义，要说清楚“它们各自把知识组织成什么形式，以及这种形式适合做什么推理”。</p>
+<h3 id="本章高频问题">8.2 本章高频问题</h3>
+<ol type="1">
+<li>为什么专家系统可以概括为 <span
+class="math inline">Knowledge + Inference</span>？</li>
+<li>为什么知识表示是知识获取和知识使用的基础？</li>
+<li>语义网络如何通过 <code>is-a</code> 层级实现属性继承？</li>
+<li>为什么 ostrich 不能飞会挑战简单继承？</li>
+<li>框架中的 slot 有哪些类型？为什么 slot 不只是普通属性字段？</li>
+<li>“John is like a fire engine” 说明了框架推理中的什么问题？</li>
+<li>unique marker 和 generic marker 有什么区别？</li>
+<li>概念图如何表示一元、二元和三元关系？</li>
+<li>为什么 “Tom believes that Jane likes pizza” 需要命题概念？</li>
+<li>restriction、join、simplify 分别在概念图推理中做什么？</li>
+<li>RDF 三元组的 subject、predicate、object 分别是什么？</li>
+<li>Sean Penn 在 RDF 示例中代表什么？</li>
+<li>SPARQL 查询和普通数据库 SQL 查询有什么相似点和差异？</li>
+<li><code>owl:sameAs</code> 与 <code>owl:equivalentProperty</code>
+分别解决什么问题？</li>
+<li>自然语言理解为什么要从 parsing 进入 semantic interpretation，再进入
+world knowledge interpretation？</li>
+</ol>
+<h3 id="最后一遍学习建议">8.3 最后一遍学习建议</h3>
+<p>学习本章时，不要把每页 材料
+当成孤立知识点。可以按照“知识如何被组织、如何被推理、适合解决什么问题”这条线串起来。语义网络和框架都关心常识结构，但一个偏图，一个偏对象模板；概念图和自然语言理解联系紧密，因为它能表示动作、角色和命题；RDF
+和 SPARQL
+则把知识表示推进到工程层面，用标准三元组和查询语言支持大规模知识图谱。</p>
+<p>如果时间很紧，至少要掌握四个例子：金丝雀语义网络说明继承，hotel room
+说明框架和 slot，Tom believes that Jane likes pizza 说明命题概念，Sean
+Penn 说明 RDF
+三元组。把这四个例子讲清楚，本章大部分核心思想就能连起来。</p>
+<h2 id="参考资料与补充来源">9 参考资料与补充来源</h2>
+<ul>
+<li>W3C RDF 1.1 Concepts and Abstract Syntax：RDF
+以三元组形式表达资源之间的关系，三元组由 subject、predicate、object
+组成。参考：<a
+target="_blank" rel="noopener" href="https://www.w3.org/TR/rdf11-concepts/">https://www.w3.org/TR/rdf11-concepts/</a></li>
+<li>W3C SPARQL 1.1 Query Language：SPARQL 使用图模式匹配 RDF
+数据，并可通过 <code>SELECT</code> 返回变量绑定。参考：<a
+target="_blank" rel="noopener" href="https://www.w3.org/TR/sparql11-query/">https://www.w3.org/TR/sparql11-query/</a></li>
+<li>John F. Sowa, Conceptual
+Graphs：概念图用于以图结构表示概念与概念关系，可与逻辑形式对应。参考：<a
+target="_blank" rel="noopener" href="https://www.jfsowa.com/cg/">https://www.jfsowa.com/cg/</a></li>
+<li>Marvin Minsky, A Framework for Representing
+Knowledge：框架理论强调用结构化槽位表示典型对象和场景。参考：<a
+target="_blank" rel="noopener" href="https://web.media.mit.edu/~minsky/papers/Frames/frames.html">https://web.media.mit.edu/~minsky/papers/Frames/frames.html</a></li>
+<li>Semantic network
+补充：语义网络通常用图表示概念间关系，并支持继承式推理。参考：<a
+target="_blank" rel="noopener" href="https://www.britannica.com/technology/semantic-network">https://www.britannica.com/technology/semantic-network</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA/" rel="tag"># 知识表示</a>
+              <a href="/tags/%E8%AF%AD%E4%B9%89%E7%BD%91%E7%BB%9C/" rel="tag"># 语义网络</a>
+              <a href="/tags/%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1/" rel="tag"># 知识图谱</a>
+              <a href="/tags/RDF/" rel="tag"># RDF</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/%E4%BB%8EMGD%E5%88%B0Adam/" rel="prev" title="从MGD到Adam">
+                  <i class="fa fa-angle-left"></i> 从MGD到Adam
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/Uncertainty/" rel="next" title="Uncertainty">
+                  Uncertainty <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

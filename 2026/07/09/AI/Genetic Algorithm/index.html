@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="遗传算法（Genetic Algorithm, GA）是一类受生物进化启发的随机搜索与优化方法。本文从一个最大化函数的例子出发，依次介绍遗传算法的基本流程、选择&#x2F;交叉&#x2F;变异等遗传算子、背包问题、CNF 可满足性问题、旅行商问题、PLA 进化硬件应用中的编码方式，以及用于解释遗传算法有效性的 Schema Theorem（模式定理）。 0. 一页速查 核心概念">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Genetic Algorithm">
+<meta property="og:url" content="http://example.com/2026/07/09/AI/Genetic%20Algorithm/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="遗传算法（Genetic Algorithm, GA）是一类受生物进化启发的随机搜索与优化方法。本文从一个最大化函数的例子出发，依次介绍遗传算法的基本流程、选择&#x2F;交叉&#x2F;变异等遗传算子、背包问题、CNF 可满足性问题、旅行商问题、PLA 进化硬件应用中的编码方式，以及用于解释遗传算法有效性的 Schema Theorem（模式定理）。 0. 一页速查 核心概念">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530094923536.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530095148643.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530095753609.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530101719610.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530101939846.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530101954924.png">
+<meta property="article:published_time" content="2026-07-09T07:12:29.437Z">
+<meta property="article:modified_time" content="2026-07-09T07:13:14.842Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="优化">
+<meta property="article:tag" content="进化计算">
+<meta property="article:tag" content="遗传算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530094923536.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/AI/Genetic%20Algorithm/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/AI/Genetic%20Algorithm/","path":"2026/07/09/AI/Genetic Algorithm/","title":"Genetic Algorithm"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Genetic Algorithm | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E9%A1%B5%E9%80%9F%E6%9F%A5"><span class="nav-number">1.</span> <span class="nav-text">0. 一页速查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E9%A2%91%E5%85%AC%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">高频公式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3%E6%8A%8A%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98%E7%9C%8B%E6%88%90%E8%BF%9B%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">1.
+遗传算法的基本思想：把优化问题看成“进化”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E-fxx2-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%90%86%E8%A7%A3%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">2. 从 f(x) &#x3D; x2
+的例子理解遗传算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AE%E7%9B%98%E8%B5%8C%E9%80%89%E6%8B%A9%E7%9A%84%E7%9B%B4%E8%A7%82%E7%90%86%E8%A7%A3"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 轮盘赌选择的直观理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E9%87%8D%E7%BB%84%E5%B7%B2%E6%9C%89%E7%9A%84%E5%A5%BD%E7%BB%93%E6%9E%84"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 交叉：重组已有的好结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E5%BC%82%E7%BB%B4%E6%8C%81%E5%A4%9A%E6%A0%B7%E6%80%A7%E9%81%BF%E5%85%8D%E6%97%A9%E7%86%9F%E6%94%B6%E6%95%9B"><span class="nav-number">3.3.</span> <span class="nav-text">2.3
+变异：维持多样性，避免早熟收敛</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%80%E8%88%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">3. 遗传算法的一般流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E4%B8%8E%E9%80%82%E5%BA%94%E5%BA%A6%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E6%88%90%E8%B4%A5%E7%9A%84%E5%85%B3%E9%94%AE"><span class="nav-number">5.</span> <span class="nav-text">4.
+编码与适应度：遗传算法成败的关键</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%BC%96%E7%A0%81"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 二进制编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%92%E5%88%97%E7%BC%96%E7%A0%81"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 排列编码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%BC%E9%9B%B7%E7%BC%96%E7%A0%81"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 格雷编码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E5%BA%94%E7%94%A8%E9%97%AE%E9%A2%98"><span class="nav-number">6.</span> <span class="nav-text">5. 典型应用问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%8C%E5%8C%85%E9%97%AE%E9%A2%98"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 背包问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cnf-%E5%8F%AF%E6%BB%A1%E8%B6%B3%E6%80%A7%E9%97%AE%E9%A2%98"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 CNF 可满足性问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%85%E8%A1%8C%E5%95%86%E9%97%AE%E9%A2%98"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 旅行商问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#tsp-%E7%9A%84%E4%BA%A4%E5%8F%89"><span class="nav-number">6.3.1.</span> <span class="nav-text">5.3.1 TSP 的交叉</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tsp-%E7%9A%84%E5%8F%98%E5%BC%82%E5%8F%8D%E8%BD%AC%E5%8F%98%E5%BC%82"><span class="nav-number">6.3.2.</span> <span class="nav-text">5.3.2 TSP 的变异：反转变异</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E5%9C%A8-pla-%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 遗传算法在 PLA 中的应用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%89%E6%95%88%E4%BB%8E%E6%90%9C%E7%B4%A2%E7%A9%BA%E9%97%B4%E5%88%B0%E6%A8%A1%E5%BC%8F%E5%AE%9A%E7%90%86"><span class="nav-number">7.</span> <span class="nav-text">6.
+遗传算法为什么有效：从搜索空间到模式定理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E9%9A%8F%E6%9C%BA%E6%90%9C%E7%B4%A2%E5%88%B0%E6%9C%89%E6%96%B9%E5%90%91%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%90%9C%E7%B4%A2"><span class="nav-number">7.1.</span> <span class="nav-text">6.1
+从“随机搜索”到“有方向的随机搜索”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#schema%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E4%B8%AD%E7%9A%84%E6%9C%89%E7%94%A8%E7%BB%93%E6%9E%84"><span class="nav-number">8.</span> <span class="nav-text">7.
+Schema：遗传算法中的“有用结构”</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E9%98%B6%E6%95%B0-os"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 模式阶数 O(s)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E9%95%BF%E5%BA%A6-deltas"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 定义长度 δ(s)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E9%80%82%E5%BA%94%E5%BA%A6-fs"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 模式适应度 f(s)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#schema-theorem%E7%9F%AD%E4%BD%8E%E9%98%B6%E9%AB%98%E9%80%82%E5%BA%94%E5%BA%A6%E6%A8%A1%E5%BC%8F%E4%BC%9A%E5%A2%9E%E9%95%BF"><span class="nav-number">9.</span> <span class="nav-text">8. Schema
+Theorem：短、低阶、高适应度模式会增长</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AA%E8%80%83%E8%99%91%E9%80%89%E6%8B%A9"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 只考虑选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5%E4%BA%A4%E5%8F%89%E5%BD%B1%E5%93%8D"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 加入交叉影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5%E5%8F%98%E5%BC%82%E5%BD%B1%E5%93%8D"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 加入变异影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%97%B6%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84%E7%82%B9"><span class="nav-number">10.</span> <span class="nav-text">9. 学习时容易混淆的点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E5%BA%94%E5%BA%A6%E5%87%BD%E6%95%B0%E4%B8%8D%E4%B8%80%E5%AE%9A%E7%AD%89%E4%BA%8E%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0"><span class="nav-number">10.1.</span> <span class="nav-text">9.1
+适应度函数不一定等于目标函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E4%B8%8D%E6%98%AF%E6%80%BB%E8%83%BD%E4%BA%A7%E7%94%9F%E6%9B%B4%E5%A5%BD%E8%A7%A3"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 交叉不是总能产生更好解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E5%BC%82%E7%8E%87%E4%B8%8D%E6%98%AF%E8%B6%8A%E5%A4%A7%E8%B6%8A%E5%A5%BD"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 变异率不是越大越好</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F%E8%A6%81%E4%BF%9D%E6%8C%81%E5%8F%AF%E8%A1%8C%E6%80%A7"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 编码方式要保持可行性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E5%AE%9A%E7%90%86%E8%A7%A3%E9%87%8A%E7%9A%84%E6%98%AF%E8%B6%8B%E5%8A%BF%E4%B8%8D%E6%98%AF%E7%B2%BE%E7%A1%AE%E9%A2%84%E6%B5%8B"><span class="nav-number">10.5.</span> <span class="nav-text">9.5
+模式定理解释的是趋势，不是精确预测</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E8%AE%B2%E9%87%8D%E7%82%B9%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">10. 本讲重点总结</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/Genetic%20Algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Genetic Algorithm | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Genetic Algorithm
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-09 15:12:29 / Modified: 15:13:14" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p><strong>遗传算法（Genetic Algorithm,
+GA）</strong>是一类受生物进化启发的随机搜索与优化方法。本文从一个最大化函数的例子出发，依次介绍遗传算法的基本流程、选择/交叉/变异等遗传算子、背包问题、CNF
+可满足性问题、旅行商问题、PLA
+进化硬件应用中的编码方式，以及用于解释遗传算法有效性的 <strong>Schema
+Theorem（模式定理）</strong>。</p>
+<h2 id="一页速查">0. 一页速查</h2>
+<h3 id="核心概念">核心概念</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>概念</th>
+<th>重点内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Genetic Algorithm</td>
+<td>模拟“适者生存”和“遗传变异”的启发式优化算法，适合在巨大搜索空间中寻找近似最优解。</td>
+</tr>
+<tr>
+<td>Individual / Chromosome</td>
+<td>个体或染色体，表示一个候选解。它通常被编码成二进制串、排列、实数向量等形式。</td>
+</tr>
+<tr>
+<td>Gene</td>
+<td>染色体上的一个基本位置，例如二进制串中的某一位。</td>
+</tr>
+<tr>
+<td>Population</td>
+<td>种群，即同一代中的一组候选解。</td>
+</tr>
+<tr>
+<td>Fitness</td>
+<td>适应度，用来评价一个个体作为解的好坏。适应度越高，越可能被选择繁殖。</td>
+</tr>
+<tr>
+<td>Selection</td>
+<td>选择算子，根据适应度从当前种群中选出父代。轮盘赌选择是经典方法。</td>
+</tr>
+<tr>
+<td>Crossover</td>
+<td>交叉算子，把两个父代的部分结构重新组合，产生子代。</td>
+</tr>
+<tr>
+<td>Mutation</td>
+<td>变异算子，以较小概率随机改变个体的局部结构，防止搜索过早收敛。</td>
+</tr>
+<tr>
+<td>Encoding</td>
+<td>编码方式，即如何把实际问题的一个解表示为遗传算法可以操作的染色体。</td>
+</tr>
+<tr>
+<td>Evolutionary Hardware</td>
+<td>进化硬件，用遗传算法自动搜索硬件结构或可编程器件配置。PLA
+是其中一种典型示例。</td>
+</tr>
+<tr>
+<td>Schema</td>
+<td>模式，用带通配符的模板表示一类相似染色体，例如 <span
+class="math inline">(1 * *0 * 1)</span>。</td>
+</tr>
+<tr>
+<td>Schema Theorem</td>
+<td>短、低阶、适应度高于平均水平的模式，会在后续世代中呈指数增长。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="高频公式">高频公式</h3>
+<p><strong>轮盘赌选择概率</strong></p>
+<p>若个体 <span class="math inline"><em>i</em></span> 的适应度为 <span
+class="math inline"><em>f</em>(<em>i</em>)</span>，种群大小为 <span
+class="math inline"><em>n</em></span>，则它被选中的概率为：</p>
+<p><span class="math display">$$
+p_i=\frac{f(i)}{\sum_{j=1}^{n}f(j)}
+$$</span></p>
+<p><strong>平均适应度</strong></p>
+<p><span class="math display">$$
+\bar f=\frac{1}{n}\sum_{j=1}^{n}f(j)
+$$</span></p>
+<p><strong>只考虑选择时，模式数量的期望</strong></p>
+<p>若 <span
+class="math inline"><em>m</em>(<em>s</em>, <em>t</em>)</span> 表示第
+<span class="math inline"><em>t</em></span> 代中属于模式 <span
+class="math inline"><em>s</em></span> 的个体数量，<span
+class="math inline"><em>f</em>(<em>s</em>)</span> 表示模式 <span
+class="math inline"><em>s</em></span> 中个体的平均适应度，则：</p>
+<p><span class="math display">$$
+E[m(s,t+1)] = m(s,t)\cdot \frac{f(s)}{\bar f}
+$$</span></p>
+<p>如果 <span
+class="math inline"><em>f</em>(<em>s</em>) = (1 + <em>c</em>)<em>f̄</em></span>，即模式
+<span class="math inline"><em>s</em></span> 的适应度比平均水平高 <span
+class="math inline"><em>c</em></span>，则：</p>
+<p><span
+class="math display"><em>E</em>[<em>m</em>(<em>s</em>, <em>t</em> + 1)] = <em>m</em>(<em>s</em>, <em>t</em>)(1 + <em>c</em>)</span></p>
+<p>连续迭代后，高于平均适应度的模式会呈指数趋势增加。</p>
+<p><strong>考虑单点交叉对模式的破坏</strong></p>
+<p>设染色体长度为 <span
+class="math inline"><em>l</em></span>，交叉概率为 <span
+class="math inline"><em>p</em><sub><em>c</em></sub></span>，模式 <span
+class="math inline"><em>s</em></span> 的定义长度为 <span
+class="math inline"><em>δ</em>(<em>s</em>)</span>，则模式在交叉中不被破坏的概率至少为：</p>
+<p><span class="math display">$$
+p_s \ge 1-p_c\cdot \frac{\delta(s)}{l-1}
+$$</span></p>
+<p><strong>考虑变异对模式的破坏</strong></p>
+<p>设变异概率为 <span
+class="math inline"><em>p</em><sub><em>m</em></sub></span>，模式阶数为
+<span class="math inline"><em>O</em>(<em>s</em>)</span>，且 <span
+class="math inline"><em>p</em><sub><em>m</em></sub> ≪ 1</span>，则模式不被变异破坏的概率近似为：</p>
+<p><span
+class="math display"><em>p</em><sub><em>s</em></sub> = (1 − <em>p</em><sub><em>m</em></sub>)<sup><em>O</em>(<em>s</em>)</sup> ≈ 1 − <em>O</em>(<em>s</em>)<em>p</em><sub><em>m</em></sub></span></p>
+<p><strong>完整模式定理的常见近似形式</strong></p>
+<p><span class="math display">$$
+E[m(s,t+1)] \ge
+m(s,t)\cdot \frac{f(s)}{\bar f}
+\cdot
+\left[
+1-p_c\cdot \frac{\delta(s)}{l-1}-O(s)p_m
+\right]
+$$</span></p>
+<p>这个公式的含义是：一个模式能否保留下来并增长，主要取决于三件事：它的平均适应度是否高、定义长度是否短、固定位置是否少。</p>
+<h2 id="遗传算法的基本思想把优化问题看成进化">1.
+遗传算法的基本思想：把优化问题看成“进化”</h2>
+<p>遗传算法的出发点来自达尔文进化论：在自然界中，个体之间存在差异；环境会选择更适应的个体；被选择的个体通过繁殖把有利结构传递给下一代；同时，变异又会不断产生新的可能性。遗传算法把这个思想搬到计算问题中：一个候选解对应一个“个体”，一组候选解构成“种群”，评价函数对应“适应度”，算法不断让较好的候选解更容易繁殖，并通过交叉和变异生成新的候选解。</p>
+<p>它与穷举搜索的区别在于，遗传算法并不逐个检查所有可能解，而是维护一个种群，让搜索方向逐渐向高适应度区域集中。它与普通随机搜索的区别在于，随机搜索每次几乎重新开始，而遗传算法会保留和重组历史上已经发现的有用结构。因此，遗传算法特别适合搜索空间很大、目标函数复杂、无法轻易求导或没有精确多项式算法的问题。</p>
+<p>需要注意的是，遗传算法通常求的是<strong>近似最优解</strong>，不是严格保证的全局最优解。它的优势是通用、鲁棒、容易并行；它的弱点是参数敏感、可能早熟收敛，而且计算成本不一定低。</p>
+<h2 id="从-fxx2-的例子理解遗传算法">2. 从 <span
+class="math inline"><em>f</em>(<em>x</em>) = <em>x</em><sup>2</sup></span>
+的例子理解遗传算法</h2>
+<p>材料使用一个非常小的最大化问题说明遗传算法如何运行：</p>
+<p><span
+class="math display">max <em>f</em>(<em>x</em>) = <em>x</em><sup>2</sup>,  <em>x</em> ∈ [1, 31]</span></p>
+<p>因为 <span class="math inline"><em>x</em></span> 的取值范围是 <span
+class="math inline">1</span> 到 <span
+class="math inline">31</span>，可以用 5
+位二进制串表示一个候选解。例如：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">二进制染色体</th>
+<th style="text-align: left;">十进制</th>
+<th style="text-align: left;">适应度 <span
+class="math inline"><em>f</em>(<em>x</em>) = <em>x</em><sup>2</sup></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>01101</code></td>
+<td style="text-align: left;"><span class="math inline">13</span></td>
+<td style="text-align: left;"><span class="math inline">169</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>11000</code></td>
+<td style="text-align: left;"><span class="math inline">24</span></td>
+<td style="text-align: left;"><span class="math inline">576</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>01000</code></td>
+<td style="text-align: left;"><span class="math inline">8</span></td>
+<td style="text-align: left;"><span class="math inline">64</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>10011</code></td>
+<td style="text-align: left;"><span class="math inline">19</span></td>
+<td style="text-align: left;"><span class="math inline">361</span></td>
+</tr>
+</tbody>
+</table>
+<p>这一步体现了遗传算法的第一件事：<strong>表示（representation）</strong>。算法无法直接理解“求函数最大值”这个问题，它只能操作编码后的个体。因此，我们要先把问题中的解映射为染色体，再通过适应度函数评价染色体的好坏。</p>
+<p>在这个例子中，初始种群为：</p>
+<p><span
+class="math display"><em>P</em>(0) = {01101, 11000, 01000, 10011}</span></p>
+<p>它们的适应度总和为：</p>
+<p><span class="math display">169 + 576 + 64 + 361 = 1170</span></p>
+<p>于是每个个体在轮盘赌选择中的概率为：</p>
+<p><span class="math display">$$
+\begin{aligned}
+P(01101)&amp;=\frac{169}{1170}\approx0.14\\
+P(11000)&amp;=\frac{576}{1170}\approx0.49\\
+P(01000)&amp;=\frac{64}{1170}\approx0.06\\
+P(10011)&amp;=\frac{361}{1170}\approx0.31
+\end{aligned}
+$$</span></p>
+<p>可以看到，<code>11000</code> 对应的 <span
+class="math inline"><em>x</em> = 24</span>
+适应度最高，所以它占据了轮盘上最大的区域，被抽中的概率也最大。这里下一代选择结果为：</p>
+<p><span class="math display">01101, 11000, 11000, 10011</span></p>
+<p>这说明高适应度个体可能被复制多次，而低适应度个体可能被淘汰。这个过程类似自然选择，但它不是完全确定的：适应度高只是概率更大，并不意味着一定被选中；适应度低也仍然保留少量机会。</p>
+<h3 id="轮盘赌选择的直观理解">2.1 轮盘赌选择的直观理解</h3>
+<p>轮盘赌选择（Russian roulette / roulette wheel
+selection）可以理解为把每个个体按照适应度大小分配一个扇形区域，然后随机转动指针。适应度越高，扇形区域越大，被选中的概率越高。这里四个个体的概率分别是
+<span class="math inline">14%</span>、<span
+class="math inline">49%</span>、<span
+class="math inline">6%</span>、<span
+class="math inline">31%</span>，其中 <span
+class="math inline">49%</span> 的个体最容易被选中。</p>
+<p>这种方法的优点是简单，并且能保留随机性；缺点是当某个个体适应度远高于其他个体时，它可能过快支配种群，使算法陷入局部最优。实际应用中常会使用锦标赛选择、排序选择、精英保留等策略来调节选择压力。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530094923536.png" alt="image-20260530094923356" style="zoom: 33%;" /></p>
+<h3 id="交叉重组已有的好结构">2.2 交叉：重组已有的好结构</h3>
+<p>选择之后，算法通常把选出的个体两两配对，通过交叉产生子代。以单点交叉为例，若两个父代为：<span
+class="math inline">01101, 11000</span>，选择某个切分点后，可以把两个父代的前后片段交换，得到新的子代
+<span class="math inline">01100, 11001</span>。</p>
+<p>交叉的核心意义不是随机乱改，而是<strong>把不同个体中可能有用的局部结构重新组合</strong>。如果一个父代在前半部分编码了好的特征，另一个父代在后半部分编码了好的特征，交叉就可能把它们组合到同一个子代中。</p>
+<p>不过，交叉也可能破坏已经形成的好结构。模式定理中“定义长度越短越容易保留”这一点，正是因为短结构被单点交叉切断的概率较小。</p>
+<h3 id="变异维持多样性避免早熟收敛">2.3
+变异：维持多样性，避免早熟收敛</h3>
+<p>变异通常以较小概率随机翻转二进制串中的某一位。例如：</p>
+<p><span class="math display">01100 → 01101</span></p>
+<p>在二进制编码中，变异就是把某位从 <span class="math inline">0</span>
+改成 <span class="math inline">1</span>，或从 <span
+class="math inline">1</span> 改成 <span
+class="math inline">0</span>。变异的作用是给种群引入新基因，使算法有机会跳出当前搜索区域。若没有变异，种群中不存在的某些位值可能永远不会再出现；若变异概率过高，算法又会退化成接近随机搜索。因此，变异率一般较小。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530095148643.png" alt="image-20260530095148454" style="zoom: 50%;" /></p>
+<h2 id="遗传算法的一般流程">3. 遗传算法的一般流程</h2>
+<p>这里给出的遗传算法伪代码可以整理为以下步骤：</p>
+<ol type="1">
+<li>设定时间/代数 <span class="math inline"><em>t</em> = 0</span>。</li>
+<li>初始化种群 <span
+class="math inline"><em>P</em>(<em>t</em>)</span>。</li>
+<li>如果终止条件尚未满足，就重复以下过程。</li>
+<li>计算种群 <span class="math inline"><em>P</em>(<em>t</em>)</span>
+中每个个体的适应度。</li>
+<li>根据适应度从 <span class="math inline"><em>P</em>(<em>t</em>)</span>
+中选择个体作为父代。</li>
+<li>对父代使用遗传算子，例如交叉和变异，生成子代。</li>
+<li>用子代替换当前种群中的部分或全部候选个体。</li>
+<li>令 <span
+class="math inline"><em>t</em> = <em>t</em> + 1</span>，进入下一代。</li>
+</ol>
+<p>对应的逻辑可以写成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">begin</span><br><span class="line">    set time t = 0</span><br><span class="line">    initialize population P(t)</span><br><span class="line">    while termination condition is not met do</span><br><span class="line">        evaluate fitness of each member in P(t)</span><br><span class="line">        select members from P(t) based on fitness</span><br><span class="line">        produce offspring using genetic operators</span><br><span class="line">        replace candidates of P(t) with offspring</span><br><span class="line">        set t = t + 1</span><br><span class="line">    end</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>这里最重要的是理解“评价、选择、生成、替换”四个环节的闭环。评价决定谁更好，选择决定谁更有繁殖机会，交叉和变异决定下一代会出现什么新解，替换策略决定旧解和新解如何共存。</p>
+<p>常见终止条件包括：达到最大代数、适应度达到预设阈值、连续多代没有明显改进，或者计算时间用尽。课程梳理时要特别注意：遗传算法不是单个解在移动，而是<strong>一群解在演化</strong>，这也是它区别于许多局部搜索算法的重要特征。</p>
+<h2 id="编码与适应度遗传算法成败的关键">4.
+编码与适应度：遗传算法成败的关键</h2>
+<p>遗传算法本身只提供一种通用搜索框架，真正决定它能否解决问题的是编码方式和适应度函数。如果编码不能正确表达可行解，或者适应度函数不能反映解的质量，那么选择、交叉、变异再精巧也很难得到好结果。</p>
+<h3 id="二进制编码">4.1 二进制编码</h3>
+<p>二进制编码是最经典的表示方法。它把一个候选解表示为固定长度的 <span
+class="math inline">0/1</span>
+字符串，适合整数参数、布尔变量、子集选择等问题。例如 <span
+class="math inline"><em>x</em> ∈ [1, 31]</span> 可以用 5
+位二进制表示，CNF-SAT 中每个布尔变量的真假也可以用一位表示。</p>
+<p>二进制编码的优点是结构简单，交叉和变异操作非常自然；缺点是不同问题的语义可能不适合简单位串。例如旅行商问题中，一个解必须是城市排列，若直接用二进制串交叉，可能产生重复城市或遗漏城市，从而得到非法路线。</p>
+<h3 id="排列编码">4.2 排列编码</h3>
+<p>旅行商问题（TSP）常使用排列编码。一个染色体就是访问城市的顺序，例如：</p>
+<p><span class="math display">(1, 9, 2, 4, 6, 5, 7, 8, 3)</span></p>
+<p>这表示从城市 <span class="math inline">1</span> 出发，依次访问 <span
+class="math inline">9, 2, 4, …, 3</span>，最后回到起点。排列编码的关键约束是：每个城市必须出现且只出现一次。因此，TSP
+的交叉和变异不能随便按二进制串处理，而必须保证子代仍然是合法排列。</p>
+<h3 id="格雷编码">4.3 格雷编码</h3>
+<p>材料还给出了二进制编码与格雷编码（Gray
+coding）的对照表。格雷编码的特点是相邻数值的编码只相差一位。例如普通二进制中
+<span class="math inline">7</span> 到 <span class="math inline">8</span>
+会从 <code>0111</code> 变成
+<code>1000</code>，四位全部改变；而在格雷编码中，相邻数通常只改变一位。</p>
+<p>格雷编码在遗传算法中的意义是改善“编码空间”和“问题空间”之间的连续性。如果两个数值上非常接近的解，在编码上却相差很多位，那么一次小变异可能造成很大的语义变化，搜索会变得不平滑。格雷编码通过让相邻数值具有更小的汉明距离，使局部搜索更稳定。</p>
+<p>普通二进制转格雷码的常见公式为：</p>
+<p><span
+class="math display"><em>g</em> = <em>b</em> ⊕ (<em>b</em> &gt;  &gt; 1)</span></p>
+<p>其中 <span class="math inline">⊕</span> 表示按位异或，<span
+class="math inline"> &gt;  &gt; 1</span>
+表示右移一位。学习时不一定要记住所有转换表，但要理解它为什么有助于遗传算法：<strong>好的编码应该让“相似的染色体”尽量对应“相似的解”</strong>。</p>
+<h2 id="典型应用问题">5. 典型应用问题</h2>
+<h3 id="背包问题">5.1 背包问题</h3>
+<p>这里给出的背包问题描述是：小偷抢劫商店时有 <span
+class="math inline"><em>n</em></span> 个物品，第 <span
+class="math inline"><em>i</em></span> 个物品价值为 <span
+class="math inline"><em>v</em><sub><em>i</em></sub></span>，重量为 <span
+class="math inline"><em>w</em><sub><em>i</em></sub></span>，背包最多承重
+<span
+class="math inline"><em>W</em></span>。问题是选择哪些物品，使总价值尽可能大，同时总重量不超过
+<span class="math inline"><em>W</em></span>。</p>
+<p>它可以形式化为：</p>
+<p><span class="math display">$$
+\max \sum_{i=1}^{n}v_i x_i
+$$</span></p>
+<p>约束为：</p>
+<p><span class="math display">$$
+\sum_{i=1}^{n}w_i x_i \le W,\quad x_i\in\{0,1\}
+$$</span></p>
+<p>其中 <span
+class="math inline"><em>x</em><sub><em>i</em></sub> = 1</span>
+表示选择第 <span class="math inline"><em>i</em></span> 个物品，<span
+class="math inline"><em>x</em><sub><em>i</em></sub> = 0</span>
+表示不选择。这个问题天然适合二进制编码：一个长度为 <span
+class="math inline"><em>n</em></span>
+的染色体就表示一组物品选择方案。例如：</p>
+<p><span class="math display">10110</span></p>
+<p>表示选择第 <span class="math inline">1</span>、第 <span
+class="math inline">3</span>、第 <span class="math inline">4</span>
+个物品，不选择第 <span class="math inline">2</span>、第 <span
+class="math inline">5</span> 个物品。</p>
+<p>背包问题中的难点是约束处理。若某个染色体对应的总重量超过 <span
+class="math inline"><em>W</em></span>，它就是不可行解。常见处理方式有三种：第一，把不可行解的适应度设为很低；第二，在适应度中加入惩罚项，例如超重越多惩罚越大；第三，对不可行解进行修复，删除部分物品直到满足约束。材料没有展开这些策略，但学习时应知道：带约束优化问题不能只看目标函数，还要处理可行性。</p>
+<h3 id="cnf-可满足性问题">5.2 CNF 可满足性问题</h3>
+<p>CNF-satisfaction problem
+指的是判断一个合取范式公式是否存在一组布尔变量赋值，使整个公式为真。合取范式（Conjunctive
+Normal Form, CNF）由多个子句用 AND 连接，每个子句内部由文字用 OR
+连接。这里的例子类似：</p>
+<p><span
+class="math display">(¬<em>a</em> ∨ <em>c</em>) ∧ (¬<em>a</em> ∨ <em>c</em> ∨ ¬<em>e</em>) ∧ (¬<em>b</em> ∨ <em>c</em> ∨ <em>d</em> ∨ ¬<em>e</em>) ∧ (<em>a</em> ∨ ¬<em>b</em> ∨ <em>c</em>) ∧ (¬<em>e</em> ∨ <em>v</em>)</span></p>
+<p>在 CNF-SAT 中，一个染色体可以表示所有变量的一组真假赋值。例如变量为
+<span
+class="math inline"><em>a</em>, <em>b</em>, <em>c</em>, <em>d</em>, <em>e</em>, <em>v</em></span>
+时，可以用 6 位二进制串表示：</p>
+<p><span class="math display">101001</span></p>
+<p>如果约定 <span class="math inline">1</span> 表示真、<span
+class="math inline">0</span>
+表示假，那么它对应一组具体赋值。适应度函数可以设计为“被满足的子句数量”。例如共有
+5 个子句，某个赋值满足 4 个子句，那么适应度可以是 <span
+class="math inline">4</span>；如果满足全部子句，说明找到了一个可满足解。</p>
+<p>材料第 13
+页出现了语义树示意图，它体现了逻辑赋值的搜索树思想：每一层为某个命题或项选择真假，沿着树的一条路径就得到一个完整赋值。遗传算法与语义树的区别在于，语义树更像系统枚举或回溯搜索，而遗传算法维护多个赋值候选，并通过适应度引导搜索。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530095753609.png" alt="image-20260530095753421" style="zoom: 50%;" /></p>
+<h3 id="旅行商问题">5.3 旅行商问题</h3>
+<p>旅行商问题（Traveling Salesman Problem,
+TSP）要求在给定若干城市及两两旅行成本的情况下，找出一条总成本最低的路线，使旅行商从某城市出发，每个城市恰好访问一次，最后回到出发城市。</p>
+<p>如果有 19 个城市，并固定起点，那么可能路线数量约为：</p>
+<p><span class="math display">18! = 6.40237 × 10<sup>15</sup></span></p>
+<p>材料用这个数字说明穷举搜索的不可行性。即使一台计算机每秒检查 <span
+class="math inline">10000</span> 条路线，人的一生约为：</p>
+<p><span
+class="math display">80 × 365 × 24 × 60 × 60 = 2.52288 × 10<sup>9</sup> seconds</span></p>
+<p>穷举所有路线所需时间也远远超过可接受范围。因此，TSP
+是说明遗传算法价值的典型例子：我们不追求枚举所有路线，而是在巨大排列空间中寻找足够好的路线。</p>
+<h4 id="tsp-的交叉">5.3.1 TSP 的交叉</h4>
+<p>这里给出两个父代排列：</p>
+<p><span
+class="math display"><em>p</em><sub>1</sub> = (1 9 2 | 4 6 5 7 | 8 3)</span></p>
+<p><span
+class="math display"><em>p</em><sub>2</sub> = (4 5 9 | 1 8 7 6 | 2 3)</span></p>
+<p>TSP
+的交叉需要保持“每个城市出现一次”。材料描述的方法类似顺序交叉（Order
+Crossover,
+OX）：先在一个父代中保留两个切点之间的片段，然后从另一个父代的第二个切点之后开始，按顺序复制尚未出现的城市；到末尾后再从开头继续。</p>
+<p>材料这里相当于保留第 4 位到第 7 位这一段。<strong>先看 <span
+class="math inline"><em>c</em><sub>1</sub></span>
+的产生过程：</strong>从 <span
+class="math inline"><em>p</em><sub>1</sub></span> 中复制中间片段：</p>
+<p><span class="math display">$$
+p_1=(1,9,2,\boxed{4,6,5,7},8,3)
+$$</span></p>
+<p>因此 <span class="math inline"><em>c</em><sub>1</sub></span>
+先变成：</p>
+<p><span
+class="math display"><em>c</em><sub>1</sub> = (*, *, *, 4, 6, 5, 7, *, *)</span></p>
+<p>接着从另一个父代 <span
+class="math inline"><em>p</em><sub>2</sub></span>
+的第二个切点后开始读，读到末尾后再绕回开头，可以得到顺序：</p>
+<p><span class="math display">2, 3, 4, 5, 9, 1, 8, 7, 6</span></p>
+<p>但是 <span class="math inline"><em>c</em><sub>1</sub></span> 里已经有
+<span
+class="math inline">4, 6, 5, 7</span>，所以这些城市不能再填一次。也就是说，在序列
+<span class="math inline">2, 3, 4, 5, 9, 1, 8, 7, 6</span> 中跳过 <span
+class="math inline">4, 5, 7, 6</span>，剩下的城市是：</p>
+<p><span class="math display">2, 3, 9, 1, 8</span></p>
+<p>把它们依次填入 <span
+class="math inline"><em>c</em><sub>1</sub></span> 的空位，就得到：</p>
+<p><span
+class="math display"><em>c</em><sub>1</sub> = (2, 3, 9, 4, 6, 5, 7, 1, 8)</span></p>
+<p><strong><span class="math inline"><em>c</em><sub>2</sub></span>
+的产生过程是对称的。</strong>先从 <span
+class="math inline"><em>p</em><sub>2</sub></span> 中复制同样位置的片段：
+<span class="math display">$$
+p_2=(4,5,9,\boxed{1,8,7,6},2,3)
+$$</span></p>
+<p>因此：</p>
+<p><span
+class="math display"><em>c</em><sub>2</sub> = (*, *, *, 1, 8, 7, 6, *, *)</span></p>
+<p>然后从 <span class="math inline"><em>p</em><sub>1</sub></span>
+的第二个切点后开始读，绕回开头得到：</p>
+<p><span class="math display">8, 3, 1, 9, 2, 4, 6, 5, 7</span></p>
+<p>删去 <span class="math inline"><em>c</em><sub>2</sub></span>
+中已经出现的 <span
+class="math inline">1, 8, 7, 6</span>。也就是说，在序列 <span
+class="math inline">8, 3, 1, 9, 2, 4, 6, 5, 7</span> 中跳过 <span
+class="math inline">8, 1, 6, 7</span>，剩下：</p>
+<p><span class="math display">3, 9, 2, 4, 5</span></p>
+<p>依次填入空位，就得到：</p>
+<p><span
+class="math display"><em>c</em><sub>2</sub> = (3, 9, 2, 1, 8, 7, 6, 4, 5)</span></p>
+<p>所以，顺序交叉的核心规则是：<strong>一个父代贡献固定片段，另一个父代贡献剩余城市的相对顺序，已经出现过的城市全部跳过</strong>。</p>
+<h4 id="tsp-的变异反转变异">5.3.2 TSP 的变异：反转变异</h4>
+<p>这里的 TSP 变异使用了 inversion（反转）。例如：</p>
+<p><span
+class="math display"><em>c</em><sub>1</sub> = (2, 3, 9, 4, 6, 5, 7, 1, 8)</span></p>
+<p>经过反转后得到：</p>
+<p><span
+class="math display"><em>c</em><sub>1</sub><sup>′</sup> = (2, 3, 9, 7, 5, 6, 4, 1, 8)</span></p>
+<p>也就是说，中间某一段排列被反向。反转变异非常适合
+TSP，因为它不会改变城市集合，只会改变访问顺序，因此一定保持可行性。它还有明确的路径意义：反转某一段路线，相当于在路径中进行局部重连，可能明显缩短路程。</p>
+<h3 id="遗传算法在-pla-中的应用">5.4 遗传算法在 PLA 中的应用</h3>
+<p>材料第 18 页的示意图属于 <strong>Evolutionary
+Hardware（进化硬件）</strong>
+的例子，它说明遗传算法不只可以求函数最大值、背包问题或
+TSP，也可以用于自动设计硬件电路。这里的 PLA 指 <strong>Programmable
+Logic
+Array（可编程逻辑阵列）</strong>，它是一种可以通过配置连接关系来实现组合逻辑函数的硬件结构。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530101719610.png" alt="image-20260530101719390" style="zoom:50%;" /></p>
+<p>PLA 通常可以理解成两级逻辑阵列：前一级是可编程 AND
+阵列，用来形成若干乘积项；后一级是可编程 OR
+阵列，用来把这些乘积项组合成输出函数。对于一个布尔函数，例如：</p>
+<p><span class="math display">$$
+F(A,B,C)=\overline A B + A C
+$$</span></p>
+<p>PLA
+的任务就是通过配置输入信号、反相信号、中间乘积项和输出连接，让硬件最终实现目标逻辑函数。传统方法需要人工或逻辑综合工具设计连接方式，而进化硬件的思路是：把
+PLA 的连接配置编码成染色体，让遗传算法自动搜索更好的电路配置。</p>
+<p>在这个场景中，遗传算法各部分可以对应如下：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>遗传算法概念</th>
+<th>PLA 中的含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>个体 / 染色体</td>
+<td>一种 PLA 配置方案，例如哪些输入接入 AND 阵列、哪些乘积项接入 OR
+阵列。</td>
+</tr>
+<tr>
+<td>基因</td>
+<td>某一个可编程连接点的状态，例如连接为 <span
+class="math inline">1</span>、不连接为 <span
+class="math inline">0</span>。</td>
+</tr>
+<tr>
+<td>种群</td>
+<td>多个候选 PLA 配置方案。</td>
+</tr>
+<tr>
+<td>适应度</td>
+<td>电路输出与目标真值表的匹配程度，也可以同时考虑面积、延迟、功耗等指标。</td>
+</tr>
+<tr>
+<td>选择</td>
+<td>保留更接近目标逻辑函数的配置。</td>
+</tr>
+<tr>
+<td>交叉</td>
+<td>把两个较好 PLA 配置的一部分连接结构重新组合。</td>
+</tr>
+<tr>
+<td>变异</td>
+<td>随机打开或关闭某些连接点，产生新的电路结构。</td>
+</tr>
+</tbody>
+</table>
+<p>如果把 PLA
+中所有可编程连接点按固定顺序排成一个二进制串，那么一个染色体就可以写成：</p>
+<p><span class="math display">1010010110…</span></p>
+<p>其中每一位表示一个连接点是否被启用。遗传算法首先随机生成一批这样的配置，然后把每个配置加载到
+PLA
+模型中，测试它对所有输入组合产生的输出是否符合目标真值表。若目标函数有
+<span class="math inline"><em>k</em></span> 个输入，就有 <span
+class="math inline">2<sup><em>k</em></sup></span>
+种输入组合；适应度可以简单设计为：</p>
+<p><span class="math display">$$
+fitness=\frac{\text{输出正确的输入组合数}}{2^k}
+$$</span></p>
+<p>如果还希望电路更简单，可以加入惩罚项，例如连接点越多、乘积项越多，适应度越低：</p>
+<p><span
+class="math display"><em>f</em><em>i</em><em>t</em><em>n</em><em>e</em><em>s</em><em>s</em> = <em>α</em> ⋅ <em>a</em><em>c</em><em>c</em><em>u</em><em>r</em><em>a</em><em>c</em><em>y</em> − <em>β</em> ⋅ <em>c</em><em>o</em><em>m</em><em>p</em><em>l</em><em>e</em><em>x</em><em>i</em><em>t</em><em>y</em></span></p>
+<p>其中 <span
+class="math inline"><em>a</em><em>c</em><em>c</em><em>u</em><em>r</em><em>a</em><em>c</em><em>y</em></span>
+表示逻辑正确率，<span
+class="math inline"><em>c</em><em>o</em><em>m</em><em>p</em><em>l</em><em>e</em><em>x</em><em>i</em><em>t</em><em>y</em></span>
+表示电路复杂度，<span class="math inline"><em>α</em></span> 和 <span
+class="math inline"><em>β</em></span>
+用来调节“正确性”和“简洁性”的权重。</p>
+<p>这个例子的重点是：<strong>硬件设计也可以被看成搜索问题</strong>。只要能把一种硬件结构表示成染色体，并能用适应度函数评价它是否接近目标功能，遗传算法就可以通过选择、交叉和变异逐步改进硬件配置。PLA
+示例体现的正是这种思想：遗传算法不是直接“理解电路”，而是在大量可编程连接方案中搜索能实现目标逻辑的那一种。</p>
+<h2 id="遗传算法为什么有效从搜索空间到模式定理">6.
+遗传算法为什么有效：从搜索空间到模式定理</h2>
+<h3 id="从随机搜索到有方向的随机搜索">6.1
+从“随机搜索”到“有方向的随机搜索”</h3>
+<p>材料第 20-25
+页通过图示说明遗传算法在搜索空间中的作用。初始种群通常只是搜索空间中的一批随机点，因此一开始解的质量可能参差不齐。随着选择、交叉和变异不断进行，高适应度个体更可能留下来，优秀结构更可能被组合，种群会逐渐向较好的区域移动。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530101939846.png" alt="image-20260530101939634" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530101954924.png" alt="image-20260530101954718" style="zoom:33%;" /></p>
+<p>这说明遗传算法不是完全随机搜索。随机搜索每次抽样相互独立，前一次发现的好解不会对下一次产生结构性影响；遗传算法则会利用历史信息，让较好的结构拥有更高的复制概率。因此，它是一种<strong>带有选择压力的随机优化方法</strong>。</p>
+<p>不过，搜索空间被压缩到高适应度区域并不总是好事。如果种群过早集中在某个局部区域，算法可能失去多样性，无法发现更好的区域。这就是所谓早熟收敛。交叉、变异、较大的种群、多样性维护策略，都可以在一定程度上缓解这个问题。</p>
+<h2 id="schema遗传算法中的有用结构">7.
+Schema：遗传算法中的“有用结构”</h2>
+<p>模式（schema）是遗传算法理论中非常重要的概念。一个模式不是单个染色体，而是一类染色体的模板。它由固定符号和通配符组成。通配符
+<span class="math inline">*</span> 表示该位置可以是 <span
+class="math inline">0</span> 或 <span class="math inline">1</span>。</p>
+<p>例如这里的模式：</p>
+<p><span class="math display">(1 * * 0 * 1)</span></p>
+<p>它描述所有长度为 6，并且第 1 位为 <span
+class="math inline">1</span>、第 4 位为 <span
+class="math inline">0</span>、第 6 位为 <span
+class="math inline">1</span> 的二进制串。第 2、3、5
+位是通配符，因此可以任意取值。这个模式对应的具体染色体包括：</p>
+<p><span
+class="math display">100001, 100011, 101001, 101011, 110001, …</span></p>
+<p>理解 schema
+的关键是：遗传算法并不只是在复制完整染色体，它也在隐含地复制某些局部结构。例如一个高适应度个体可能好，是因为它包含某个有用片段；交叉和选择会让这些片段在种群中越来越常见。</p>
+<h3 id="模式阶数-os">7.1 模式阶数 <span
+class="math inline"><em>O</em>(<em>s</em>)</span></h3>
+<p>模式阶数 <span class="math inline"><em>O</em>(<em>s</em>)</span>
+定义为模板中固定位置的数量。对模式：</p>
+<p><span class="math display"><em>s</em> = (1 * * 0 * 1)</span></p>
+<p>固定位置为第 1 位、第 4 位、第 6 位，所以：</p>
+<p><span class="math display"><em>O</em>(<em>s</em>) = 3</span></p>
+<p>阶数越高，说明模式约束越多，也越容易被变异破坏。因为只要固定位置中的某一位发生变异，个体就可能不再属于该模式。</p>
+<h3 id="定义长度-deltas">7.2 定义长度 <span
+class="math inline"><em>δ</em>(<em>s</em>)</span></h3>
+<p>定义长度 <span class="math inline"><em>δ</em>(<em>s</em>)</span>
+是第一个固定位置和最后一个固定位置之间的距离。对：</p>
+<p><span class="math display"><em>s</em> = (1 * * 0 * 1)</span></p>
+<p>第一个固定位置是第 1 位，最后一个固定位置是第 6 位，因此：</p>
+<p><span
+class="math display"><em>δ</em>(<em>s</em>) = 6 − 1 = 5</span></p>
+<p>定义长度越大，模式跨越的范围越长，单点交叉越容易切断它。反过来，短模式更容易在交叉中被完整保留下来。</p>
+<h3 id="模式适应度-fs">7.3 模式适应度 <span
+class="math inline"><em>f</em>(<em>s</em>)</span></h3>
+<p>模式适应度是所有匹配该模式的染色体的平均适应度。它不评价某一个具体个体，而是评价一类相似结构整体上是否有优势。若某个模式的平均适应度高于种群平均水平，那么选择会让它在后续世代中更常出现。</p>
+<p>这也是遗传算法理论解释中的核心直觉：遗传算法通过选择让优秀个体增多，同时也隐含地让优秀个体所包含的高质量模式增多。</p>
+<h2 id="schema-theorem短低阶高适应度模式会增长">8. Schema
+Theorem：短、低阶、高适应度模式会增长</h2>
+<p>Schema
+Theorem（模式定理）通常被视为解释遗传算法能力的基础。它研究的是：某个模式
+<span class="math inline"><em>s</em></span> 在第 <span
+class="math inline"><em>t</em></span> 代出现了 <span
+class="math inline"><em>m</em>(<em>s</em>, <em>t</em>)</span>
+次，那么在第 <span class="math inline"><em>t</em> + 1</span>
+代中，它期望会出现多少次？</p>
+<h3 id="只考虑选择">8.1 只考虑选择</h3>
+<p>设种群中个体 <span class="math inline"><em>i</em></span>
+的选择概率为：</p>
+<p><span class="math display">$$
+p_i=\frac{f(i)}{\sum \limits_{j=1}^{n}f(j)}
+$$</span></p>
+<p>若模式 <span class="math inline"><em>s</em></span> 的平均适应度为
+<span
+class="math inline"><em>f</em>(<em>s</em>)</span>，种群平均适应度为
+<span class="math inline"><em>f̄</em></span>，则只考虑选择时：</p>
+<p><span class="math display">$$
+E[m(s,t+1)] = m(s,t)\cdot \frac{f(s)}{\bar f}
+$$</span></p>
+<p>这个公式非常直观：如果 <span
+class="math inline"><em>f</em>(<em>s</em>) &gt; <em>f̄</em></span>，则
+<span class="math inline">$\frac{f(s)}{\bar
+f}&gt;1$</span>，该模式数量期望增加；如果 <span
+class="math inline"><em>f</em>(<em>s</em>) &lt; <em>f̄</em></span>，则该模式数量期望减少。</p>
+<p>进一步，如果：</p>
+<p><span
+class="math display"><em>f</em>(<em>s</em>) = (1 + <em>c</em>)<em>f̄</em></span></p>
+<p>则：</p>
+<p><span
+class="math display"><em>E</em>[<em>m</em>(<em>s</em>, <em>t</em> + 1)] = <em>m</em>(<em>s</em>, <em>t</em>)(1 + <em>c</em>)</span></p>
+<p>持续多代后，模式数量会近似按指数增长：</p>
+<p><span
+class="math display"><em>m</em>(<em>s</em>, <em>t</em>) ≈ <em>m</em>(<em>s</em>, 0)(1 + <em>c</em>)<sup><em>t</em></sup></span></p>
+<p>这说明选择会放大高适应度模式。</p>
+<h3 id="加入交叉影响">8.2 加入交叉影响</h3>
+<p>交叉虽然能组合好结构，但也可能破坏一个模式。对长度为 <span
+class="math inline"><em>l</em></span> 的染色体，单点交叉的切点有 <span
+class="math inline"><em>l</em> − 1</span> 个。如果模式 <span
+class="math inline"><em>s</em></span> 的定义长度为 <span
+class="math inline"><em>δ</em>(<em>s</em>)</span>，那么落在模式内部的切点越多，模式越容易被破坏。因此模式不被交叉破坏的概率至少为：</p>
+<p><span class="math display">$$
+p_s\ge 1-p_c\cdot \frac{\delta(s)}{l-1}
+$$</span></p>
+<p>其中 <span class="math inline"><em>p</em><sub><em>c</em></sub></span>
+是交叉概率。加入交叉后，模式数量期望为：</p>
+<p><span class="math display">$$
+E[m(s,t+1)] \ge
+m(s,t)\cdot \frac{f(s)}{\bar f}
+\cdot
+\left[
+1-p_c\cdot \frac{\delta(s)}{l-1}
+\right]
+$$</span></p>
+<p>这个式子告诉我们：即使一个模式适应度高，如果它定义长度太长，也容易被交叉破坏；短模式更容易保留。</p>
+<h3 id="加入变异影响">8.3 加入变异影响</h3>
+<p>变异会随机改变基因位。对模式 <span
+class="math inline"><em>s</em></span>
+来说，只有固定位置需要保持不变，通配符位置怎么变都不影响是否属于该模式。如果模式阶数为
+<span
+class="math inline"><em>O</em>(<em>s</em>)</span>，每个基因位变异概率为
+<span
+class="math inline"><em>p</em><sub><em>m</em></sub></span>，则模式不被变异破坏的概率是：</p>
+<p><span
+class="math display"><em>p</em><sub><em>s</em></sub> = (1 − <em>p</em><sub><em>m</em></sub>)<sup><em>O</em>(<em>s</em>)</sup></span></p>
+<p>当 <span class="math inline"><em>p</em><sub><em>m</em></sub></span>
+很小时，可以近似为：</p>
+<p><span
+class="math display">(1 − <em>p</em><sub><em>m</em></sub>)<sup><em>O</em>(<em>s</em>)</sup> ≈ 1 − <em>O</em>(<em>s</em>)<em>p</em><sub><em>m</em></sub></span></p>
+<p>加入变异后得到模式定理的近似形式：</p>
+<p><span class="math display">$$
+E[m(s,t+1)] \ge
+m(s,t)\cdot \frac{f(s)}{\bar f}
+\cdot
+\left[
+1-p_c\cdot \frac{\delta(s)}{l-1}-O(s)p_m
+\right]
+$$</span></p>
+<p>因此，能够在遗传算法中快速增长的模式通常具有三个特点：</p>
+<ul>
+<li><strong>适应度高于平均水平</strong>，这样选择会放大它。</li>
+<li><strong>定义长度短</strong>，这样交叉不容易切断它。</li>
+<li><strong>阶数低</strong>，这样变异不容易破坏它。</li>
+</ul>
+<p>材料最后总结为：<strong>short, low-order schemata with above-average
+fitness increase exponentially in successive
+generations</strong>。这句话是本讲理论部分最重要的结论。</p>
+<h2 id="学习时容易混淆的点">9. 学习时容易混淆的点</h2>
+<h3 id="适应度函数不一定等于目标函数">9.1
+适应度函数不一定等于目标函数</h3>
+<p>在简单问题中，适应度函数可以直接等于目标函数，例如最大化 <span
+class="math inline"><em>f</em>(<em>x</em>) = <em>x</em><sup>2</sup></span>
+时，适应度就是 <span
+class="math inline"><em>x</em><sup>2</sup></span>。但在实际问题中，适应度函数往往还需要处理约束、惩罚、归一化或多目标权衡。例如背包问题中，如果某个方案超重，即使价值很高，也不能简单给它很高适应度。</p>
+<h3 id="交叉不是总能产生更好解">9.2 交叉不是总能产生更好解</h3>
+<p>交叉只是重组父代结构，它可能产生更好子代，也可能产生更差子代。遗传算法依靠“生成大量候选
++ 选择压力”来保留好的结果，而不是保证每次交叉都改进。</p>
+<h3 id="变异率不是越大越好">9.3 变异率不是越大越好</h3>
+<p>变异太小会导致多样性不足，算法可能早熟收敛；变异太大则会破坏选择和交叉积累的结构，使搜索接近随机抽样。因此，变异率通常设置得较小，并与种群大小、编码方式、问题复杂度一起调节。</p>
+<h3 id="编码方式要保持可行性">9.4 编码方式要保持可行性</h3>
+<p>背包问题可以直接用二进制串，因为每一位自然表示“选或不选”。TSP
+则更适合排列编码，因为路线必须包含每个城市且只包含一次。学习应用题时，首先要问：<strong>一个染色体如何对应一个合法解？遗传算子是否会破坏合法性？</strong></p>
+<h3 id="模式定理解释的是趋势不是精确预测">9.5
+模式定理解释的是趋势，不是精确预测</h3>
+<p>模式定理给的是期望意义上的增长趋势，而且依赖一些简化假设。它不能保证某个具体运行一定找到全局最优解，但它解释了遗传算法为什么倾向于保留并组合短的、有用的局部结构。</p>
+<h2 id="本讲重点总结">10. 本讲重点总结</h2>
+<p>遗传算法是一种基于种群的随机优化方法，它通过选择、交叉和变异模拟自然进化。一个完整遗传算法必须明确四件事：如何编码候选解，如何初始化种群，如何计算适应度，以及如何通过遗传算子生成下一代。</p>
+<p>本讲中的 <span
+class="math inline"><em>f</em>(<em>x</em>) = <em>x</em><sup>2</sup></span>
+例子展示了遗传算法最基本的运行过程：先把 <span
+class="math inline"><em>x</em></span>
+编码为二进制染色体，再计算每个个体的适应度，接着用轮盘赌选择让高适应度个体更容易进入下一代，最后通过交叉和变异产生新的候选解。</p>
+<p>背包问题、CNF-SAT、TSP 和 PLA
+进化硬件展示了遗传算法在不同问题中的表示方法。背包问题适合二进制选择编码；CNF-SAT
+可以用布尔变量赋值编码，并用满足子句数作为适应度；TSP
+使用排列编码，并需要专门的交叉和变异算子保证路线合法；PLA
+可以把可编程连接点编码成二进制串，并用电路输出与目标真值表的匹配程度作为适应度。</p>
+<p>理论上，Schema Theorem
+说明遗传算法会放大那些短、低阶、适应度高于平均水平的模式。这个定理抓住了遗传算法的核心：算法表面上在进化完整个体，实际上也在隐含地发现、保留和组合有用的局部结构。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95/" rel="tag"># 遗传算法</a>
+              <a href="/tags/%E8%BF%9B%E5%8C%96%E8%AE%A1%E7%AE%97/" rel="tag"># 进化计算</a>
+              <a href="/tags/%E4%BC%98%E5%8C%96/" rel="tag"># 优化</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/Uncertainty/" rel="prev" title="Uncertainty">
+                  <i class="fa fa-angle-left"></i> Uncertainty
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/Logics%20and%20Prolog/" rel="next" title="Logics and Prolog">
+                  Logics and Prolog <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
