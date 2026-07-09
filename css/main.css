@@ -1384,7 +1384,7 @@ pre code {
   vertical-align: middle;
 }
 .links-of-author a::before {
-  background: #ff060b;
+  background: #9e0183;
   display: inline-block;
   margin-right: 3px;
   transform: translateY(-2px);
@@ -2819,4 +2819,56 @@ header.header {
 }
 .sub-menu .menu-item {
   display: inline-block;
+}
+.course-home .post-content {
+  padding-top: 8px;
+}
+.course-home__header {
+  margin-bottom: 24px;
+}
+.course-home__header h1 {
+  margin: 0 0 8px;
+  font-size: 2em;
+  line-height: 1.25;
+  text-align: left;
+}
+.course-home__header p {
+  margin: 0;
+  color: var(--text-color-light);
+  line-height: 1.7;
+  text-align: left;
+}
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.course-card {
+  display: flex;
+  min-height: 112px;
+  padding: 18px;
+  border: 1px solid var(--table-border-color);
+  border-radius: 8px;
+  background: var(--content-bg-color);
+  color: var(--text-color);
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.course-card:hover {
+  border-color: var(--link-hover-color);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  color: var(--text-color);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+.course-card__name {
+  font-size: 1.12em;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.course-card__meta {
+  color: var(--text-color-light);
+  font-size: 0.92em;
 }
