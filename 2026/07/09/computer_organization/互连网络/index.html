@@ -1,265 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
-
-    <meta name="description" content="目录  互连网络的基本概念 互连函数 互连网络的特性参数 互连网络的结构 重点对比与提示  1 互连网络的基本概念 1.1 什么是互连网络 互连网络是由开关元件按照一定的拓扑结构和控制方式构成的连接网络，用来实现计算机系统中各类结点之间的通信。这里的结点可以是处理器、存储模块，也可以是其他输入输出设备。 从抽象角度看，互连网络完成的是一种从输入结点到输出结点的连接或映射。若某">
-<meta property="og:type" content="article">
-<meta property="og:title" content="互连网络">
-<meta property="og:url" content="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/index.html">
-<meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="目录  互连网络的基本概念 互连函数 互连网络的特性参数 互连网络的结构 重点对比与提示  1 互连网络的基本概念 1.1 什么是互连网络 互连网络是由开关元件按照一定的拓扑结构和控制方式构成的连接网络，用来实现计算机系统中各类结点之间的通信。这里的结点可以是处理器、存储模块，也可以是其他输入输出设备。 从抽象角度看，互连网络完成的是一种从输入结点到输出结点的连接或映射。若某">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135617416.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135707603.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135736457.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135820017.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135959409.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140048810.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140208086.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140310978.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140319984.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140415495.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140525650.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140537140.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140729312.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142045436.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603141936776.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142338790.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142647453.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603143030786.png">
-<meta property="article:published_time" content="2026-07-09T06:51:22.597Z">
-<meta property="article:modified_time" content="2026-07-09T08:04:47.744Z">
-<meta property="article:author" content="Fqmmm">
-<meta property="article:tag" content="互连网络">
-<meta property="article:tag" content="多级网络">
-<meta property="article:tag" content="拓扑结构">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135617416.png">
-
-
-<link rel="canonical" href="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/">
-
-
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/","path":"2026/07/09/computer_organization/互连网络/","title":"互连网络"}</script>
-
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>互连网络 | Fqmmm's Blog</title>
-  
+    <meta name="author" content="Fqmmm">
 
 
 
 
 
+<title>互连网络 | Fqmmm&#39;s Blog</title>
 
 
 
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
-
-  
-
+    <link rel="icon" href="/favicon.ico">
 
 
 
 
-
-  
-
-
-
-
-  
-
-  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
-<script src="/js/third-party/math/mathjax.js" defer></script>
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
 
 
 
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">Fqmmm's Blog</p>
-      <i class="logo-line"></i>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="Search" role="button">
-    </div>
-  </div>
-</div>
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
 
 
 
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
-  </ul>
-</nav>
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 
 
+        
+    
 
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
 
 </header>
-        
-  
-  <aside class="sidebar">
-
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">1 互连网络的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 什么是互连网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C%E7%9A%84%E5%9B%9B%E4%B8%AA%E8%A7%92%E5%BA%A6"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 描述互连网络的四个角度</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">2 互连函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E5%87%BD%E6%95%B0%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 互连函数的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A4%E6%8D%A2%E5%87%BD%E6%95%B0"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 交换函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9D%87%E5%8C%80%E6%B4%97%E7%89%8C%E5%87%BD%E6%95%B0%E4%B8%8E%E9%80%86%E5%9D%87%E5%8C%80%E6%B4%97%E7%89%8C%E5%87%BD%E6%95%B0"><span class="nav-number">3.3.</span> <span class="nav-text">2.3
-均匀洗牌函数与逆均匀洗牌函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A2%9F%E5%BC%8F%E5%87%BD%E6%95%B0"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 碟式函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E4%BD%8D%E5%BA%8F%E5%87%BD%E6%95%B0"><span class="nav-number">3.5.</span> <span class="nav-text">2.5 反位序函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pm2i-%E5%87%BD%E6%95%B0"><span class="nav-number">3.6.</span> <span class="nav-text">2.6 PM2I 函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C%E7%9A%84%E7%89%B9%E6%80%A7%E5%8F%82%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">3 互连网络的特性参数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E8%A7%84%E6%A8%A1"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 网络规模</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E7%82%B9%E5%BA%A6"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 结点度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%9D%E7%A6%BB%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%9B%B4%E5%BE%84"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 距离与网络直径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E9%95%BF"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 线长</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%89%E5%88%86%E5%AE%BD%E5%BA%A6"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 等分宽度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E7%A7%B0%E6%80%A7"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 对称性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">5.</span> <span class="nav-text">4 互连网络的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 静态互连网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E9%98%B5%E5%88%97"><span class="nav-number">5.1.1.</span> <span class="nav-text">4.1.1 线性阵列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%92%8C%E5%B8%A6%E5%BC%A6%E7%8E%AF"><span class="nav-number">5.1.2.</span> <span class="nav-text">4.1.2 环和带弦环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E8%BF%9E%E6%8E%A5%E7%BD%91%E7%BB%9C"><span class="nav-number">5.1.3.</span> <span class="nav-text">4.1.3 全连接网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E7%A7%BB%E6%95%B0%E7%BD%91%E7%BB%9C"><span class="nav-number">5.1.4.</span> <span class="nav-text">4.1.4 循环移数网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%91%E5%BD%A2%E4%B8%8E%E6%98%9F%E5%BD%A2"><span class="nav-number">5.1.5.</span> <span class="nav-text">4.1.5 树形与星形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%96%E6%A0%91%E5%BD%A2"><span class="nav-number">5.1.6.</span> <span class="nav-text">4.1.6 胖树形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E6%A0%BC%E5%BD%A2%E4%B8%8E%E7%8E%AF%E7%BD%91%E5%BD%A2"><span class="nav-number">5.1.7.</span> <span class="nav-text">4.1.7 网格形与环网形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B6%85%E7%AB%8B%E6%96%B9%E4%BD%93"><span class="nav-number">5.1.8.</span> <span class="nav-text">4.1.8 超立方体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 动态互连网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BA%BF"><span class="nav-number">5.2.1.</span> <span class="nav-text">4.2.1 总线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%A7%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.2.</span> <span class="nav-text">4.2.2 多级互连网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#omega-%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.3.</span> <span class="nav-text">4.2.3 Omega 网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%A7%E7%AB%8B%E6%96%B9%E4%BD%93%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.4.</span> <span class="nav-text">4.2.4 多级立方体网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E5%BC%80%E5%85%B3%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.5.</span> <span class="nav-text">4.2.5 交叉开关网络</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E5%AF%B9%E6%AF%94"><span class="nav-number">6.</span> <span class="nav-text">5 总结与对比</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E7%BD%91%E7%BB%9C%E5%8F%82%E6%95%B0%E5%AF%B9%E6%AF%94"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 静态网络参数对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E7%BD%91%E7%BB%9C%E5%AF%B9%E6%AF%94"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 动态网络对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E8%BE%A8%E6%9E%90"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 概念辨析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E8%AE%A1%E7%AE%97"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 常用计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E6%A0%B8%E5%BF%83%E7%BA%BF%E7%B4%A2"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 本章核心线索</span></a></li></ol></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Fqmmm</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">27</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-          <a href="/categories/">
-        <span class="site-state-item-count">6</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-          <a href="/tags/">
-        <span class="site-state-item-count">87</span>
-        <span class="site-state-item-name">tags</span></a>
-      </div>
-  </nav>
-</div>
-
-        </div>
-      </div>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
     </div>
-
-    
-  </aside>
-
-
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
     </div>
-
-    <div class="main-inner post posts-expand">
-
-
-  
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Fqmmm">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="互连网络 | Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          互连网络
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-07-09 14:51:22 / Modified: 16:04:47" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
-        </span>
-    </span>
-
-  
 </div>
 
-        </div>
-      </header>
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
 
     
-    
-    
-    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">互连网络</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 9, 2026&nbsp;&nbsp;14:51:22</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/">计算机组成与体系结构</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="目录">目录</h1>
 <ol type="1">
 <li>互连网络的基本概念</li>
 <li>互连函数</li>
@@ -1158,77 +1166,69 @@ class="math inline">\(C_0,C_1,C_2\)</span> 等交换函数的输出。</li>
 <p>本章的主线可以概括为：<strong>互连网络用拓扑和控制方式实现结点间通信；互连函数用数学映射描述输入到输出的连接；特性参数用来评价网络好坏；静态网络重在固定拓扑，动态网络重在开关控制。</strong></p>
 <p>从内容结构看，应优先理解互连函数的位操作、典型网络结构的参数、静态/动态网络分类，以及总线、多级网络、交叉开关网络之间的性能与成本差异。</p>
 
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/" rel="tag"># 互连网络</a>
-              <a href="/tags/%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84/" rel="tag"># 拓扑结构</a>
-              <a href="/tags/%E5%A4%9A%E7%BA%A7%E7%BD%91%E7%BB%9C/" rel="tag"># 多级网络</a>
-          </div>
+        </div>
 
         
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
 
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2026/07/09/computer_organization/%E7%BA%BF%E7%A8%8B%E7%BA%A7%E5%B9%B6%E8%A1%8C/" rel="prev" title="线程级并行-量化第5章">
-                  <i class="fa fa-angle-left"></i> 线程级并行-量化第5章
-                </a>
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/"># 互连网络</a>
+                    
+                        <a href="/tags/%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84/"># 拓扑结构</a>
+                    
+                        <a href="/tags/%E5%A4%9A%E7%BA%A7%E7%BD%91%E7%BB%9C/"># 多级网络</a>
+                    
+                        
+                </span>
             </div>
-            <div class="post-nav-item">
-                <a href="/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/" rel="next" title="互连及输入输出组织">
-                  互连及输入输出组织 <i class="fa fa-angle-right"></i>
-                </a>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
             </div>
-          </div>
-    </footer>
-  </article>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/">互连及输入输出组织</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/09/computer_organization/%E7%BA%BF%E7%A8%8B%E7%BA%A7%E5%B9%B6%E8%A1%8C/">线程级并行-量化第5章</a>
+            
+        </section>
+
+
+    </article>
 </div>
 
-
-
-
-
-
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2026</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
-  </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
-  </div>
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
 
     </div>
-  </footer>
-
-  
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="Back to top">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
-  </div>
-
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
-
 </body>
+
 </html>

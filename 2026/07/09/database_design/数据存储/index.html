@@ -1,250 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
-
-    <meta name="description" content="目录  存储层次结构 Moore 定律与数据库 I&#x2F;O 瓶颈 磁盘结构与块访问机制 磁盘访问时间模型 DBMS 的 I&#x2F;O 计算模型 磁盘上的排序：两阶段多路归并排序 更大关系的多阶段归并排序 二级存储访问优化方法 总结与概念对比  1 存储层次结构 1.1 为什么要学习数据存储 数据库系统处理的数据通常远大于主存，且必须长期保存。因此，DBMS 不可能只依赖 CPU">
-<meta property="og:type" content="article">
-<meta property="og:title" content="数据存储">
-<meta property="og:url" content="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/index.html">
-<meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="目录  存储层次结构 Moore 定律与数据库 I&#x2F;O 瓶颈 磁盘结构与块访问机制 磁盘访问时间模型 DBMS 的 I&#x2F;O 计算模型 磁盘上的排序：两阶段多路归并排序 更大关系的多阶段归并排序 二级存储访问优化方法 总结与概念对比  1 存储层次结构 1.1 为什么要学习数据存储 数据库系统处理的数据通常远大于主存，且必须长期保存。因此，DBMS 不可能只依赖 CPU">
-<meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260628135135798.jpg">
-<meta property="article:published_time" content="2026-07-09T07:16:58.855Z">
-<meta property="article:modified_time" content="2026-07-09T08:04:47.342Z">
-<meta property="article:author" content="Fqmmm">
-<meta property="article:tag" content="TPMMS">
-<meta property="article:tag" content="外部排序">
-<meta property="article:tag" content="数据存储">
-<meta property="article:tag" content="磁盘I&#x2F;O">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260628135135798.jpg">
-
-
-<link rel="canonical" href="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">
-
-
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/","path":"2026/07/09/database_design/数据存储/","title":"数据存储"}</script>
-
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>数据存储 | Fqmmm's Blog</title>
-  
+    <meta name="author" content="Fqmmm">
 
 
 
 
 
+<title>数据存储 | Fqmmm&#39;s Blog</title>
 
 
 
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
-
-  
-
+    <link rel="icon" href="/favicon.ico">
 
 
 
 
-
-  
-
-
-
-
-  
-
-  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
-<script src="/js/third-party/math/mathjax.js" defer></script>
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
 
 
 
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">Fqmmm's Blog</p>
-      <i class="logo-line"></i>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="Search" role="button">
-    </div>
-  </div>
-</div>
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
 
 
 
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
-  </ul>
-</nav>
+    
+    
+        
+            <!-- MathJax配置，可通过单美元符号书写行内公式等 -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    "HTML-CSS": {
+        preferredFont: "TeX",
+        availableFonts: ["STIX","TeX"],
+        linebreaks: { automatic:true },
+        EqnChunk: (MathJax.Hub.Browser.isMobile ? 10 : 50)
+    },
+    tex2jax: {
+        inlineMath: [ ["$", "$"], ["\\(","\\)"] ],
+        processEscapes: true,
+        ignoreClass: "tex2jax_ignore|dno",
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+        equationNumbers: { autoNumber: "AMS" },
+        noUndefined: { attributes: { mathcolor: "red", mathbackground: "#FFEEEE", mathsize: "90%" } },
+        Macros: { href: "{}" }
+    },
+    messageStyle: "none"
+    });
+</script>
+<!-- 给MathJax元素添加has-jax class -->
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<!-- 通过连接CDN加载MathJax的js代码 -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 
 
+        
+    
 
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
 
 </header>
-        
-  
-  <aside class="sidebar">
-
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">1 存储层次结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%AD%A6%E4%B9%A0%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 为什么要学习数据存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cache%E5%A4%84%E7%90%86%E5%99%A8%E9%99%84%E8%BF%91%E7%9A%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 Cache：处理器附近的高速缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#main-memory%E4%B8%BB%E5%AD%98"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 Main Memory：主存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtual-memory%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="nav-number">2.4.</span> <span class="nav-text">1.4 Virtual Memory：虚拟内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#secondary-storage%E4%BA%8C%E7%BA%A7%E5%AD%98%E5%82%A8"><span class="nav-number">2.5.</span> <span class="nav-text">1.5 Secondary Storage：二级存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tertiary-storage%E4%B8%89%E7%BA%A7%E5%AD%98%E5%82%A8"><span class="nav-number">2.6.</span> <span class="nav-text">1.6 Tertiary Storage：三级存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%93%E5%A4%B1%E6%80%A7%E4%B8%8E%E9%9D%9E%E6%98%93%E5%A4%B1%E6%80%A7"><span class="nav-number">2.7.</span> <span class="nav-text">1.7 易失性与非易失性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#moore-%E5%AE%9A%E5%BE%8B%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%BA%93-io-%E7%93%B6%E9%A2%88"><span class="nav-number">3.</span> <span class="nav-text">2 Moore 定律与数据库 I&#x2F;O 瓶颈</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#moore-%E5%AE%9A%E5%BE%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%90%AB%E4%B9%89"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 Moore 定律的基本含义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E8%AE%BF%E9%97%AE%E7%9B%B8%E5%AF%B9%E5%8F%98%E6%85%A2"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 存储访问相对变慢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#data-flood%E6%95%B0%E6%8D%AE%E6%B4%AA%E6%B5%81"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 Data Flood：数据洪流</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%BB%93%E6%9E%84%E4%B8%8E%E5%9D%97%E8%AE%BF%E9%97%AE%E6%9C%BA%E5%88%B6"><span class="nav-number">4.</span> <span class="nav-text">3 磁盘结构与块访问机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%9A%84%E6%9C%BA%E6%A2%B0%E7%BB%84%E6%88%90"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 磁盘的机械组成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E6%8E%A7%E5%88%B6%E5%99%A8"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 磁盘控制器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E5%AD%98%E5%82%A8%E5%8F%82%E6%95%B0"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 磁盘存储参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E4%B8%80%E4%B8%AA%E7%A3%81%E7%9B%98%E5%9D%97%E7%9A%84%E4%B8%89%E4%B8%AA%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 访问一个磁盘块的三个步骤</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">4 磁盘访问时间模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#seek-time%E5%AF%BB%E9%81%93%E6%97%B6%E9%97%B4"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 Seek Time：寻道时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rotational-delay%E6%97%8B%E8%BD%AC%E5%BB%B6%E8%BF%9F"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 Rotational Delay：旋转延迟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#transfer-time%E4%BC%A0%E8%BE%93%E6%97%B6%E9%97%B4"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 Transfer Time：传输时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#other-delays%E5%85%B6%E4%BB%96%E5%BB%B6%E8%BF%9F"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 Other Delays：其他延迟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA-io-%E4%B8%8E%E9%A1%BA%E5%BA%8F-io"><span class="nav-number">5.5.</span> <span class="nav-text">4.5 随机 I&#x2F;O 与顺序 I&#x2F;O</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E6%93%8D%E4%BD%9C%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%9D%97"><span class="nav-number">5.6.</span> <span class="nav-text">4.6 写操作与修改块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dbms-%E7%9A%84-io-%E8%AE%A1%E7%AE%97%E6%A8%A1%E5%9E%8B"><span class="nav-number">6.</span> <span class="nav-text">5 DBMS 的 I&#x2F;O 计算模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ram-%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%B1%80%E9%99%90"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 RAM 模型的局限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#io-model-of-computation"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 I&#x2F;O Model of Computation</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E4%B8%8A%E7%9A%84%E6%8E%92%E5%BA%8F%E4%B8%A4%E9%98%B6%E6%AE%B5%E5%A4%9A%E8%B7%AF%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F"><span class="nav-number">7.</span> <span class="nav-text">6
-磁盘上的排序：两阶段多路归并排序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%9B%9E%E9%A1%BE"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 内存归并排序回顾</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%A3%81%E7%9B%98%E6%8E%92%E5%BA%8F%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E5%A5%97%E7%94%A8%E5%86%85%E5%AD%98%E6%8E%92%E5%BA%8F"><span class="nav-number">7.2.</span> <span class="nav-text">6.2
-为什么磁盘排序不能直接套用内存排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tpmms-%E7%9A%84%E4%B8%A4%E4%B8%AA%E9%98%B6%E6%AE%B5"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 TPMMS 的两个阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#phase-1%E7%94%9F%E6%88%90%E6%9C%89%E5%BA%8F%E5%AD%90%E5%88%97%E8%A1%A8"><span class="nav-number">7.3.1.</span> <span class="nav-text">6.3.1 Phase 1：生成有序子列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#phase-2%E5%A4%9A%E8%B7%AF%E5%BD%92%E5%B9%B6"><span class="nav-number">7.3.2.</span> <span class="nav-text">6.3.2 Phase 2：多路归并</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tpmms-%E7%9A%84-io-%E4%BB%A3%E4%BB%B7"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 TPMMS 的 I&#x2F;O 代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tpmms-%E5%8F%AF%E6%8E%92%E5%BA%8F%E6%95%B0%E6%8D%AE%E8%A7%84%E6%A8%A1%E4%B8%8A%E7%95%8C"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 TPMMS 可排序数据规模上界</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9B%B4%E5%A4%A7%E5%85%B3%E7%B3%BB%E7%9A%84%E5%A4%9A%E9%98%B6%E6%AE%B5%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F"><span class="nav-number">8.</span> <span class="nav-text">7 更大关系的多阶段归并排序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E7%AC%AC%E4%B8%89%E9%98%B6%E6%AE%B5"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 为什么需要第三阶段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E9%98%B6%E6%AE%B5%E8%83%BD%E5%8A%9B%E4%B8%8A%E7%95%8C"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 三阶段能力上界</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E7%BA%A7%E5%AD%98%E5%82%A8%E8%AE%BF%E9%97%AE%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95"><span class="nav-number">9.</span> <span class="nav-text">8 二级存储访问优化方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%9B%AE%E6%A0%87"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 优化目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E6%9F%B1%E9%9D%A2%E7%BB%84%E7%BB%87%E6%95%B0%E6%8D%AE"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 按柱面组织数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AA%E7%A3%81%E7%9B%98%E4%B8%8E%E6%9D%A1%E5%B8%A6%E5%8C%96"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 使用多个磁盘与条带化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E9%95%9C%E5%83%8F"><span class="nav-number">9.4.</span> <span class="nav-text">8.4 磁盘镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6%E7%94%B5%E6%A2%AF%E7%AE%97%E6%B3%95"><span class="nav-number">9.5.</span> <span class="nav-text">8.5 磁盘调度：电梯算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%8F%96%E4%B8%8E%E5%A4%A7%E8%A7%84%E6%A8%A1%E7%BC%93%E5%86%B2"><span class="nav-number">9.6.</span> <span class="nav-text">8.6 预取与大规模缓冲</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E7%BC%93%E5%86%B2%E4%B8%8E%E5%8F%8C%E7%BC%93%E5%86%B2"><span class="nav-number">9.7.</span> <span class="nav-text">8.7 单缓冲与双缓冲</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E7%BC%93%E5%86%B2"><span class="nav-number">9.7.1.</span> <span class="nav-text">8.7.1 单缓冲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E7%BC%93%E5%86%B2"><span class="nav-number">9.7.2.</span> <span class="nav-text">8.7.2 双缓冲</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">10.</span> <span class="nav-text">9 总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%BB%93%E8%AE%BA"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 核心结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E6%A6%82%E5%BF%B5%E5%AF%B9%E6%AF%94"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 常见概念对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E8%AE%A1%E7%AE%97%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 典型计算题思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.1.</span> <span class="nav-text">9.3.1 磁盘访问时间计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tpmms-%E4%BB%A3%E4%BB%B7%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.2.</span> <span class="nav-text">9.3.2 TPMMS 代价计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tpmms-%E4%B8%8A%E7%95%8C%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.3.</span> <span class="nav-text">9.3.3 TPMMS 上界计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%86%B2%E6%97%B6%E9%97%B4%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.4.</span> <span class="nav-text">9.3.4 缓冲时间计算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 本章学习建议</span></a></li></ol></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">Fqmmm</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">27</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-          <a href="/categories/">
-        <span class="site-state-item-count">6</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-          <a href="/tags/">
-        <span class="site-state-item-count">87</span>
-        <span class="site-state-item-name">tags</span></a>
-      </div>
-  </nav>
-</div>
-
-        </div>
-      </div>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
     </div>
-
-    
-  </aside>
-
-
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
     </div>
-
-    <div class="main-inner post posts-expand">
-
-
-  
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Fqmmm">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="数据存储 | Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          数据存储
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-07-09 15:16:58 / Modified: 16:04:47" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">数据库设计</span></a>
-        </span>
-    </span>
-
-  
 </div>
 
-        </div>
-      </header>
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
 
     
-    
-    
-    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">数据存储</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 9, 2026&nbsp;&nbsp;15:16:58</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/">数据库设计</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="目录">目录</h1>
 <ol type="1">
 <li>存储层次结构</li>
 <li>Moore 定律与数据库 I/O 瓶颈</li>
@@ -1181,78 +1204,71 @@ I/O、重叠计算与 I/O。</strong></p>
 <p>如果能围绕这条主线解释存储层次、磁盘访问时间、I/O 模型、TPMMS
 和双缓冲，本章的主要内容就已经串起来了。</p>
 
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/" rel="tag"># 数据存储</a>
-              <a href="/tags/%E7%A3%81%E7%9B%98I-O/" rel="tag"># 磁盘I/O</a>
-              <a href="/tags/%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/" rel="tag"># 外部排序</a>
-              <a href="/tags/TPMMS/" rel="tag"># TPMMS</a>
-          </div>
+        </div>
 
         
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
 
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2026/07/09/AI/Reinforcement%20Learning/" rel="prev" title="Reinforcement Learning">
-                  <i class="fa fa-angle-left"></i> Reinforcement Learning
-                </a>
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/"># 数据存储</a>
+                    
+                        <a href="/tags/%E7%A3%81%E7%9B%98I-O/"># 磁盘I/O</a>
+                    
+                        <a href="/tags/%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/"># 外部排序</a>
+                    
+                        <a href="/tags/TPMMS/"># TPMMS</a>
+                    
+                        
+                </span>
             </div>
-            <div class="post-nav-item">
-                <a href="/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" rel="next" title="数据的存储结构">
-                  数据的存储结构 <i class="fa fa-angle-right"></i>
-                </a>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
             </div>
-          </div>
-    </footer>
-  </article>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/">数据的存储结构</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/09/AI/Reinforcement%20Learning/">Reinforcement Learning</a>
+            
+        </section>
+
+
+    </article>
 </div>
 
-
-
-
-
-
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2026</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
-  </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
-  </div>
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
 
     </div>
-  </footer>
-
-  
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="Back to top">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
-  </div>
-
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
-
 </body>
+
 </html>
