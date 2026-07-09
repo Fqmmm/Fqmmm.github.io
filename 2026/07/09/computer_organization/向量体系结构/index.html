@@ -22,7 +22,7 @@
 
     <meta name="description" content="数据级并行-量化第4章 0. 目录与公式速查 0.1 内容目录 第 1 节：数据级并行的研究动机：ILP 的瓶颈、DLP 的应用背景、SIMD 的基本思想。 第 2 节：向量体系结构：向量处理模型、标量&#x2F;向量处理区别、向量超级计算机、向量处理机组成。 第 3 节：向量执行、链接与性能评估：多体交叉存储、链接技术、护航指令组、钟鸣、启动时间。 第 4 节：向量体系结构中的关键优化">
 <meta property="og:type" content="article">
-<meta property="og:title" content="向量体系结构">
+<meta property="og:title" content="数据级并行-量化第4章">
 <meta property="og:url" content="http://example.com/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
 <meta property="og:description" content="数据级并行-量化第4章 0. 目录与公式速查 0.1 内容目录 第 1 节：数据级并行的研究动机：ILP 的瓶颈、DLP 的应用背景、SIMD 的基本思想。 第 2 节：向量体系结构：向量处理模型、标量&#x2F;向量处理区别、向量超级计算机、向量处理机组成。 第 3 节：向量执行、链接与性能评估：多体交叉存储、链接技术、护航指令组、钟鸣、启动时间。 第 4 节：向量体系结构中的关键优化">
@@ -45,7 +45,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141322748.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141436004.png">
 <meta property="article:published_time" content="2026-07-09T06:51:22.594Z">
-<meta property="article:modified_time" content="2026-07-09T06:57:16.548Z">
+<meta property="article:modified_time" content="2026-07-09T07:02:32.530Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="GPU">
 <meta property="article:tag" content="SIMD">
@@ -58,10 +58,10 @@
 <link rel="canonical" href="http://example.com/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/","path":"2026/07/09/computer_organization/向量体系结构/","title":"向量体系结构"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/","path":"2026/07/09/computer_organization/向量体系结构/","title":"数据级并行-量化第4章"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>向量体系结构 | Fqmmm's Blog</title>
+<title>数据级并行-量化第4章 | Fqmmm's Blog</title>
   
 
 
@@ -230,12 +230,12 @@ Divergence）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="向量体系结构 | Fqmmm's Blog">
+      <meta itemprop="name" content="数据级并行-量化第4章 | Fqmmm's Blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          向量体系结构
+          数据级并行-量化第4章
         </h1>
 
         <div class="post-meta-container">
@@ -247,7 +247,7 @@ Divergence）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 14:51:22 / Modified: 14:57:16" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 15:02:32" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1207,8 +1207,8 @@ Vector Extension 说明</a>：用于补充 RISC-V 向量寄存器
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/2026/07/09/computer_organization/%E7%BA%BF%E7%A8%8B%E7%BA%A7%E5%B9%B6%E8%A1%8C/" rel="next" title="线程级并行">
-                  线程级并行 <i class="fa fa-angle-right"></i>
+                <a href="/2026/07/09/computer_organization/%E7%BA%BF%E7%A8%8B%E7%BA%A7%E5%B9%B6%E8%A1%8C/" rel="next" title="线程级并行-量化第5章">
+                  线程级并行-量化第5章 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
           </div>
