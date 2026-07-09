@@ -45,7 +45,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141322748.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141436004.png">
 <meta property="article:published_time" content="2026-07-09T06:51:22.594Z">
-<meta property="article:modified_time" content="2026-07-09T07:02:32.530Z">
+<meta property="article:modified_time" content="2026-07-09T07:37:03.777Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="GPU">
 <meta property="article:tag" content="SIMD">
@@ -247,7 +247,7 @@ Divergence）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 14:51:22 / Modified: 15:02:32" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 15:37:03" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -658,7 +658,7 @@ class="math inline"><em>N</em><sub><em>V</em></sub></span>：向量方式开始�
 <p>注意：多媒体 SIMD
 对内存访问通常要求连续并对齐，否则性能会下降或需要额外处理。</p>
 <h2 id="daxpy-例子的-simd-化思路">5.3 DAXPY 例子的 SIMD 化思路</h2>
-<p>原例标题写作 DXPY；但从代码看，它实际对应经典 DAXPY
+<p>题目标题写作 DXPY；但从代码看，它实际对应经典 DAXPY
 形式：<code>Y = a × X + Y</code>。SIMD
 版本每次循环处理多个元素，例如一次处理 4 个 double：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">L.D    F0, a       ; load scalar a  </span><br><span class="line">MOV    F1, F0      ; copy a into F1 for SIMD MUL  </span><br><span class="line">MOV    F2, F0      ; copy a into F2 for SIMD MUL  </span><br><span class="line">MOV    F3, F0      ; copy a into F3 for SIMD MUL  </span><br><span class="line">DADDIU R4, Rx, #512 ; last address to load  </span><br><span class="line"></span><br><span class="line">Loop:</span><br><span class="line">L.4D   F4, 0[Rx]   ; load X[i], X[i+1], X[i+2], X[i+3]  </span><br><span class="line">MUL.4D F4, F4, F0  ; a×X[i], a×X[i+1], a×X[i+2], a×X[i+3]  </span><br><span class="line">L.4D   F8, 0[Ry]   ; load Y[i], Y[i+1], Y[i+2], Y[i+3]  </span><br><span class="line">ADD.4D F8, F8, F4  ; a×X[i]+Y[i], ..., a×X[i+3]+Y[i+3]  </span><br><span class="line">S.4D   0[Ry], F8   ; store into Y[i], Y[i+1], Y[i+2], Y[i+3]  </span><br><span class="line">DADDIU Rx, Rx, #32 ; increment index to X  </span><br><span class="line">DADDIU Ry, Ry, #32 ; increment index to Y  </span><br><span class="line">DSUBU  R20, R4, Rx ; compute bound  </span><br><span class="line">BNEZ   R20, Loop   ; check if done</span><br></pre></td></tr></table></figure>

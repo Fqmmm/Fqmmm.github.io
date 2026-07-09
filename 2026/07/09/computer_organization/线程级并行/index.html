@@ -43,7 +43,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260608105314638.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260608105356077.png">
 <meta property="article:published_time" content="2026-07-09T06:51:22.596Z">
-<meta property="article:modified_time" content="2026-07-09T07:02:43.088Z">
+<meta property="article:modified_time" content="2026-07-09T07:37:03.677Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="Cache一致性">
 <meta property="article:tag" content="同步">
@@ -253,7 +253,7 @@ Compare&amp;Swap 实现非阻塞队列同步</span></a></li></ol></li><li class=
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 14:51:22 / Modified: 15:02:43" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 15:37:03" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -1146,7 +1146,7 @@ class="math inline"><em>y</em></span></td>
 class="math inline"><em>x</em></span>。由于该块一开始是共享状态，P1
 不能直接在共享副本上写，它需要获得独占权限，因此会使 P2 中同一个 Cache
 块的副本失效。严格说，P1
-本地已经有这个块，所以从“是否需要取数据”的角度看它像一次写命中；但从一致性协议角度看，它需要一次写升级或作废事务。如果课堂把这种升级也记作
+本地已经有这个块，所以从“是否需要取数据”的角度看它像一次写命中；但从一致性协议角度看，它需要一次写升级或作废事务。如果把这种升级也计入
 coherence
 miss，那么它属于<strong>真共享缺失</strong>，因为写的是块中的真实共享字
 <span class="math inline"><em>x</em></span>。</p></li>
@@ -1439,9 +1439,9 @@ class="math inline"><em>p</em><em>r</em><em>e</em><em>s</em><em>e</em><em>n</em>
 表示节点 <span class="math inline"><em>P</em></span>
 当前不持有该块副本。</p>
 </blockquote>
-<p>目录端状态机描述的是<strong>“主目录如何记录某个内存块在整个系统中的共享情况”</strong>。这里使用的是比
-6.5 更细的 MOSI 目录状态：Uncached、Shared、Modified 和 Owned by shared
-cache。这里的状态不是某个私有 Cache
+<p>目录端状态机描述的是<strong>“主目录如何记录某个内存块在整个系统中的共享情况”</strong>。MOSI
+目录状态比 6.5 中的简化模型更细，包含 Uncached、Shared、Modified 和
+Owned by shared cache。需要注意，这些状态不是某个私有 Cache
 的状态，而是目录对该块全局情况的记录。</p>
 <ul>
 <li>Uncached 表示没有任何节点缓存该块，数据只在主存中。
@@ -2044,7 +2044,7 @@ Compare&amp;Swap 实现非阻塞队列同步</h3>
 <p>只用普通 Load/Store 也可以设计同步协议，例如前面 8.3 的 Dekker
 协议，但这类协议非常难写对。在现代处理器中，Load 和 Store
 还可能被乱序执行，所以往往还需要 fence
-来保证顺序。这里强调的是：同步性能不仅取决于指令名字，还取决于竞争程度、Cache
+来保证顺序。同步性能不仅取决于指令名字，还取决于竞争程度、Cache
 结构、Cache 一致性协议造成的通信开销，以及处理器对 Load/Store
 的乱序执行能力。可以这样比较：阻塞式锁把竞争集中到锁变量上，容易造成锁变量热点；非阻塞算法把竞争集中到
 CAS 提交点上，失败者会重试；普通 Load/Store
