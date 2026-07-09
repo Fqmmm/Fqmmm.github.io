@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="大体上可以分为流出&#x2F;发射、执行、写结果三步，下面举一个例子。  初始状态如下。由于指令队列中没有 store 指令，所以不需要 store 缓冲器。  cycle1，指令1流出（发射），load缓冲器中新增一条记录。34+R2表示要load的地址。同时寄存器状态表中，指令1的目的寄存器（F6）的状态更新为 load1（类似于一个指针，指向load缓冲器中的 load1）。  cyc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Naive Tomasulo例子">
+<meta property="og:url" content="http://example.com/2026/07/10/computer_organization/Naive%20Tomasulo%E4%BE%8B%E5%AD%90/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="大体上可以分为流出&#x2F;发射、执行、写结果三步，下面举一个例子。  初始状态如下。由于指令队列中没有 store 指令，所以不需要 store 缓冲器。  cycle1，指令1流出（发射），load缓冲器中新增一条记录。34+R2表示要load的地址。同时寄存器状态表中，指令1的目的寄存器（F6）的状态更新为 load1（类似于一个指针，指向load缓冲器中的 load1）。  cyc">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111442045.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111114543.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111207059.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111412284.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111736267.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415112551123.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415113401942.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415125352036.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415125729884.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130052383.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130509157.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130634035.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130844793.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131059387.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131153472.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131356788.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131649954.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131820385.png">
+<meta property="article:published_time" content="2026-07-09T22:41:57.950Z">
+<meta property="article:modified_time" content="2026-07-09T22:42:40.980Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="Tomasulo">
+<meta property="article:tag" content="指令级并行">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111442045.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/10/computer_organization/Naive%20Tomasulo%E4%BE%8B%E5%AD%90/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/10/computer_organization/Naive%20Tomasulo%E4%BE%8B%E5%AD%90/","path":"2026/07/10/computer_organization/Naive Tomasulo例子/","title":"Naive Tomasulo例子"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Naive Tomasulo例子 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">87</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/10/computer_organization/Naive%20Tomasulo%E4%BE%8B%E5%AD%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Naive Tomasulo例子 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Naive Tomasulo例子
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-10 06:41:57 / Modified: 06:42:40" itemprop="dateCreated datePublished" datetime="2026-07-10T06:41:57+08:00">2026-07-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>大体上可以分为流出/发射、执行、写结果三步，下面举一个例子。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111442045.png" alt="554eb7cf63b63ba4bf4c18a2a1e34226" style="zoom:33%;" /></p>
+<p>初始状态如下。由于指令队列中没有 store 指令，所以不需要 store
+缓冲器。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111114543.png" alt="image-20260415111107316" style="zoom:33%;" /></p>
+<p><strong>cycle1，</strong>指令1流出（发射），load缓冲器中新增一条记录。34+R2表示要load的地址。同时寄存器状态表中，指令1的目的寄存器（F6）的状态更新为
+load1（类似于一个指针，指向load缓冲器中的 load1）。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111207059.png" alt="image-20260415111206880" style="zoom:33%;" /></p>
+<p><strong>cycle2，</strong></p>
+<ul>
+<li><p>由于指令1是load，而load有两个时钟周期的延迟，所以在cycle3才会执行，cycle2不做什么事情。</p></li>
+<li><p>同时指令2流出，load缓冲器中新增一条记录，寄存器状态表中 F2
+的状态更新为 load2。</p></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111412284.png" alt="image-20260415111412138" style="zoom:33%;" /></p>
+<p><strong>cycle3，</strong></p>
+<ul>
+<li>指令1经过2周期的延迟后进入执行阶段</li>
+<li>指令2要经过2周期才进入执行阶段，因此不执行</li>
+<li>指令3流出。
+<ul>
+<li>这是一条乘法指令，因此保留站中占用Multi1这一行。Op（操作类型）记为
+MULTD（乘法）；从寄存器状态表中可知，源寄存器1 F2 处于 Load2
+状态，还没准备好，因此 <span
+class="math inline">\(Q_j=Load2\)</span>；源寄存器2 F4
+处于空闲状态，已经准备好了，因此 <span class="math inline">\(V_k
+=R(F_4)\)</span>，即 <span class="math inline">\(V_k\)</span>
+被填充为寄存器 F4 的值。</li>
+<li>寄存器状态表中 F0 的状态设为 Mult1，相当于一个指针，指向保留站中
+Mult1 这一行。</li>
+</ul></li>
+</ul>
+<blockquote>
+<p><span class="math inline">\(j,k\)</span>
+分别代表源寄存器1和源寄存器2，<span class="math inline">\(V\)</span>
+代表已经准备好，<span class="math inline">\(Q\)</span>
+代表还没准备好。因此，</p>
+<ul>
+<li><span class="math inline">\(V_j\)</span>
+表示源寄存器1已经准备好</li>
+<li><span class="math inline">\(V_k\)</span>
+表示源寄存器2已经准备好</li>
+<li><span class="math inline">\(Q_j\)</span>
+表示源寄存器1还没准备好</li>
+<li><span class="math inline">\(Q_k\)</span>
+表示源寄存器2已经准备好</li>
+</ul>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111736267.png" alt="image-20260415111736117" style="zoom:33%;" /></p>
+<p><strong>cycle4，</strong></p>
+<ul>
+<li><p>指令1刚刚执行完，需要写入结果，因此寄存器状态表中 F6 的值被更新为
+M(34+R2)，即地址R2+34处的值（实际上应该设置为空，但为了方便，记录其值）。同时清空
+load 缓冲器中的记录 load1，因为第1条指令已经执行完了。</p></li>
+<li><p>指令2经过2周期的延迟后进入执行阶段。</p></li>
+<li><p>指令3，由于保留站中 Mult1 这一行的 <span
+class="math inline">\(Q_j=Load2\)</span>，说明还没有准备好，因此不会进入执行阶段。</p></li>
+<li><p>指令4流出。</p>
+<ul>
+<li>它是一条减法指令，会占用保留站中 Add1
+这一行（加法减法同宗同源）。查询寄存器状态表可知，源寄存器1 F6
+的值已经准备好，因此 <span
+class="math inline">\(V_j=M(34+R_2)\)</span>，而源寄存器2 F2 尚处于
+Load2 状态，还没准备好，因此 <span
+class="math inline">\(Q_k=Load2\)</span>。</li>
+<li>寄存器状态表中 F8 的状态设为 Add1。</li>
+</ul></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415112551123.png" alt="image-20260415112550957" style="zoom:33%;" /></p>
+<p><strong>cycle5，</strong></p>
+<ul>
+<li>指令2刚刚执行完，需要写入结果，load缓冲器中Load2这一行清空，同时更新寄存器状态表中
+F2 的状态。之前 F2 的状态是 Load2，此时需要把 F2
+的值<strong>广播</strong>到所有填了Load2的地方。广播是通过CDB（公共数据总线）实现的。具体有2个地方填了Load2：
+<ul>
+<li>保留站Add1这一行，本来 <span class="math inline">\(Q_k\)</span> 填了
+Load2，现在 F2 的值准备好了，于是 <span
+class="math inline">\(Q_k\)</span> 清空，<span
+class="math inline">\(V_k\)</span> 填充为新的 F2 的值 <span
+class="math inline">\(M[45+R_3]\)</span>。此时 Add1
+这一行两个源寄存器都准备好了（<span
+class="math inline">\(V_j\)</span>，<span
+class="math inline">\(V_k\)</span>
+都有值），进入倒计时（左边时间那一列写着2，因为加法操作要延迟2个周期）</li>
+<li>同理，保留站Mult1这一行，清空 <span
+class="math inline">\(Q_j\)</span>，并设 <span
+class="math inline">\(V_j=M[45+R_3]\)</span>。这一行两个源寄存器也都准备好了，进入倒计时（乘法需要延时10个周期）</li>
+</ul></li>
+<li>指令3，4进入倒计时，如前所述。</li>
+<li>指令5流出。
+<ul>
+<li>保留站 Mult2 这一行新增一条记录（乘法除法同宗同源），其中源寄存器1
+F0 的状态为 Mul1，尚未准备好；源寄存器2 F6 的状态为 <span
+class="math inline">\(M[43+R_2]\)</span>，准备好了，因此分别设置 <span
+class="math inline">\(Q_j\)</span>，<span
+class="math inline">\(V_k\)</span> 的值。</li>
+<li>寄存器状态表中 F10 的状态标记为 Multi2。</li>
+</ul></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415113401942.png" alt="image-20260415113401780" style="zoom: 33%;" /></p>
+<p><strong>cycle6，</strong></p>
+<ul>
+<li>指令3，4的倒计时-1</li>
+<li>指令5由于源寄存器还没准备好，阻塞</li>
+<li>指令6流出，占用保留站 Add2 这一行，<span
+class="math inline">\(V_k\)</span>，<span
+class="math inline">\(Q_j\)</span> 的赋值不再赘述。同时目的寄存器 F6
+的状态设置为 Add2。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415125352036.png" alt="image-20260415125351852" style="zoom:33%;" /></p>
+<p><strong>cycle7，</strong></p>
+<ul>
+<li>保留站Add1这一行（对应指令4）倒计时归零，指令4进入执行阶段。</li>
+<li>指令3在等倒计时，阻塞</li>
+<li>指令4，6的源寄存器还没准备好，阻塞</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415125729884.png" alt="image-20260415125729663" style="zoom:33%;" /></p>
+<p><strong>cycle8，</strong></p>
+<ul>
+<li>指令4进入写回阶段。
+<ul>
+<li>寄存器F8的状态更新为计算得到的值，这里用 <span
+class="math inline">\(M[]-M[]\)</span> 表示。</li>
+<li>保留站中Add1这一行清空。</li>
+<li>把所有填了 Add1 的地方（这里只有 Add2 这一行的 <span
+class="math inline">\(Q_j\)</span> 填了 Add1）替换为 F8 的新值，并更新
+<span class="math inline">\(V_j\)</span>。（即前面说的广播机制）</li>
+<li>此时 Add2 这一行两个源寄存器都准备好了，进入倒计时。</li>
+</ul></li>
+<li>指令3，5，6要么在等倒计时，要么源寄存器还没准备好</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130052383.png" alt="image-20260415130052220" style="zoom:33%;" /></p>
+<p><strong>cycle9，</strong>只有倒计时，无事发生</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130509157.png" alt="image-20260415130508985" style="zoom:33%;" /></p>
+<p><strong>cycle10，</strong>保留站Add2这一行（对应指令6）倒计时归零，进入执行阶段。其它只有倒计时-1，无事发生。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130634035.png" alt="image-20260415130633856" style="zoom:33%;" /></p>
+<p><strong>cycle11，</strong>保留站Add2这一行（对应指令6）开始写回，寄存器
+F6
+的状态更新，同时保留站Add2这一行清空。由于保留站中没有Add2标记，因此不需要广播。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130844793.png" alt="image-20260415130822328" style="zoom:33%;" /></p>
+<p><strong>cycle12，</strong>只有倒计时-1，无事发生。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131059387.png" alt="image-20260415131059190" style="zoom:33%;" /></p>
+<p><strong>快进到cycle15，</strong>保留站 Mult1
+这一行（对应指令3）终于倒计时清零，进入执行阶段。其它无事发生。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131153472.png" alt="image-20260415131153294" style="zoom:33%;" /></p>
+<p><strong>cycle16，</strong>指令3刚刚执行完，进入写回阶段。寄存器 F0
+的状态更新为计算出的结果，同时保留站中 Mult2
+这一行的两个源寄存器也准备好了，更新 <span
+class="math inline">\(V_j\)</span>，并进入倒计时阶段（除法需要40个周期的延迟）</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131356788.png" alt="image-20260415131356606" style="zoom:33%;" /></p>
+<p><strong>快进到cycle56，</strong>保留站 Mult2
+这一行（对应指令6）终于倒计时归零，进入执行阶段。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131649954.png" alt="image-20260415131649781" style="zoom:33%;" /></p>
+<p>cycle57，<strong>保留站</strong> Mult2
+这一行（对应指令6）进入写回阶段，寄存器 F10
+的状态更新为计算出的结果，同时保留站 Mult2 这一行清空。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131820385.png" alt="image-20260415131820215" style="zoom:33%;" /></p>
+<p>至此，这六条指令就执行完了，可以看到它们是乱序执行的，顺序为1→2→4→6→3→5，总共使用57个周期。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C/" rel="tag"># 指令级并行</a>
+              <a href="/tags/Tomasulo/" rel="tag"># Tomasulo</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/10/computer_organization/%E5%8A%A0%E5%85%A5ROB%E7%9A%84Tomasulo%E4%BE%8B%E5%AD%90/" rel="prev" title="加入ROB的Tomasulo例子">
+                  <i class="fa fa-angle-left"></i> 加入ROB的Tomasulo例子
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

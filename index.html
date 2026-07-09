@@ -142,7 +142,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-count">27</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -153,7 +153,7 @@
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-count">87</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -170,6 +170,479 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/10/computer_organization/Naive%20Tomasulo%E4%BE%8B%E5%AD%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/07/10/computer_organization/Naive%20Tomasulo%E4%BE%8B%E5%AD%90/" class="post-title-link" itemprop="url">Naive Tomasulo例子</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-10 06:41:57 / Modified: 06:42:40" itemprop="dateCreated datePublished" datetime="2026-07-10T06:41:57+08:00">2026-07-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>大体上可以分为流出/发射、执行、写结果三步，下面举一个例子。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111442045.png" alt="554eb7cf63b63ba4bf4c18a2a1e34226" style="zoom:33%;" /></p>
+<p>初始状态如下。由于指令队列中没有 store 指令，所以不需要 store
+缓冲器。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111114543.png" alt="image-20260415111107316" style="zoom:33%;" /></p>
+<p><strong>cycle1，</strong>指令1流出（发射），load缓冲器中新增一条记录。34+R2表示要load的地址。同时寄存器状态表中，指令1的目的寄存器（F6）的状态更新为
+load1（类似于一个指针，指向load缓冲器中的 load1）。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111207059.png" alt="image-20260415111206880" style="zoom:33%;" /></p>
+<p><strong>cycle2，</strong></p>
+<ul>
+<li><p>由于指令1是load，而load有两个时钟周期的延迟，所以在cycle3才会执行，cycle2不做什么事情。</p></li>
+<li><p>同时指令2流出，load缓冲器中新增一条记录，寄存器状态表中 F2
+的状态更新为 load2。</p></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111412284.png" alt="image-20260415111412138" style="zoom:33%;" /></p>
+<p><strong>cycle3，</strong></p>
+<ul>
+<li>指令1经过2周期的延迟后进入执行阶段</li>
+<li>指令2要经过2周期才进入执行阶段，因此不执行</li>
+<li>指令3流出。
+<ul>
+<li>这是一条乘法指令，因此保留站中占用Multi1这一行。Op（操作类型）记为
+MULTD（乘法）；从寄存器状态表中可知，源寄存器1 F2 处于 Load2
+状态，还没准备好，因此 <span
+class="math inline">\(Q_j=Load2\)</span>；源寄存器2 F4
+处于空闲状态，已经准备好了，因此 <span class="math inline">\(V_k
+=R(F_4)\)</span>，即 <span class="math inline">\(V_k\)</span>
+被填充为寄存器 F4 的值。</li>
+<li>寄存器状态表中 F0 的状态设为 Mult1，相当于一个指针，指向保留站中
+Mult1 这一行。</li>
+</ul></li>
+</ul>
+<blockquote>
+<p><span class="math inline">\(j,k\)</span>
+分别代表源寄存器1和源寄存器2，<span class="math inline">\(V\)</span>
+代表已经准备好，<span class="math inline">\(Q\)</span>
+代表还没准备好。因此，</p>
+<ul>
+<li><span class="math inline">\(V_j\)</span>
+表示源寄存器1已经准备好</li>
+<li><span class="math inline">\(V_k\)</span>
+表示源寄存器2已经准备好</li>
+<li><span class="math inline">\(Q_j\)</span>
+表示源寄存器1还没准备好</li>
+<li><span class="math inline">\(Q_k\)</span>
+表示源寄存器2已经准备好</li>
+</ul>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111736267.png" alt="image-20260415111736117" style="zoom:33%;" /></p>
+<p><strong>cycle4，</strong></p>
+<ul>
+<li><p>指令1刚刚执行完，需要写入结果，因此寄存器状态表中 F6 的值被更新为
+M(34+R2)，即地址R2+34处的值（实际上应该设置为空，但为了方便，记录其值）。同时清空
+load 缓冲器中的记录 load1，因为第1条指令已经执行完了。</p></li>
+<li><p>指令2经过2周期的延迟后进入执行阶段。</p></li>
+<li><p>指令3，由于保留站中 Mult1 这一行的 <span
+class="math inline">\(Q_j=Load2\)</span>，说明还没有准备好，因此不会进入执行阶段。</p></li>
+<li><p>指令4流出。</p>
+<ul>
+<li>它是一条减法指令，会占用保留站中 Add1
+这一行（加法减法同宗同源）。查询寄存器状态表可知，源寄存器1 F6
+的值已经准备好，因此 <span
+class="math inline">\(V_j=M(34+R_2)\)</span>，而源寄存器2 F2 尚处于
+Load2 状态，还没准备好，因此 <span
+class="math inline">\(Q_k=Load2\)</span>。</li>
+<li>寄存器状态表中 F8 的状态设为 Add1。</li>
+</ul></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415112551123.png" alt="image-20260415112550957" style="zoom:33%;" /></p>
+<p><strong>cycle5，</strong></p>
+<ul>
+<li>指令2刚刚执行完，需要写入结果，load缓冲器中Load2这一行清空，同时更新寄存器状态表中
+F2 的状态。之前 F2 的状态是 Load2，此时需要把 F2
+的值<strong>广播</strong>到所有填了Load2的地方。广播是通过CDB（公共数据总线）实现的。具体有2个地方填了Load2：
+<ul>
+<li>保留站Add1这一行，本来 <span class="math inline">\(Q_k\)</span> 填了
+Load2，现在 F2 的值准备好了，于是 <span
+class="math inline">\(Q_k\)</span> 清空，<span
+class="math inline">\(V_k\)</span> 填充为新的 F2 的值 <span
+class="math inline">\(M[45+R_3]\)</span>。此时 Add1
+这一行两个源寄存器都准备好了（<span
+class="math inline">\(V_j\)</span>，<span
+class="math inline">\(V_k\)</span>
+都有值），进入倒计时（左边时间那一列写着2，因为加法操作要延迟2个周期）</li>
+<li>同理，保留站Mult1这一行，清空 <span
+class="math inline">\(Q_j\)</span>，并设 <span
+class="math inline">\(V_j=M[45+R_3]\)</span>。这一行两个源寄存器也都准备好了，进入倒计时（乘法需要延时10个周期）</li>
+</ul></li>
+<li>指令3，4进入倒计时，如前所述。</li>
+<li>指令5流出。
+<ul>
+<li>保留站 Mult2 这一行新增一条记录（乘法除法同宗同源），其中源寄存器1
+F0 的状态为 Mul1，尚未准备好；源寄存器2 F6 的状态为 <span
+class="math inline">\(M[43+R_2]\)</span>，准备好了，因此分别设置 <span
+class="math inline">\(Q_j\)</span>，<span
+class="math inline">\(V_k\)</span> 的值。</li>
+<li>寄存器状态表中 F10 的状态标记为 Multi2。</li>
+</ul></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415113401942.png" alt="image-20260415113401780" style="zoom: 33%;" /></p>
+<p><strong>cycle6，</strong></p>
+<ul>
+<li>指令3，4的倒计时-1</li>
+<li>指令5由于源寄存器还没准备好，阻塞</li>
+<li>指令6流出，占用保留站 Add2 这一行，<span
+class="math inline">\(V_k\)</span>，<span
+class="math inline">\(Q_j\)</span> 的赋值不再赘述。同时目的寄存器 F6
+的状态设置为 Add2。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415125352036.png" alt="image-20260415125351852" style="zoom:33%;" /></p>
+<p><strong>cycle7，</strong></p>
+<ul>
+<li>保留站Add1这一行（对应指令4）倒计时归零，指令4进入执行阶段。</li>
+<li>指令3在等倒计时，阻塞</li>
+<li>指令4，6的源寄存器还没准备好，阻塞</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415125729884.png" alt="image-20260415125729663" style="zoom:33%;" /></p>
+<p><strong>cycle8，</strong></p>
+<ul>
+<li>指令4进入写回阶段。
+<ul>
+<li>寄存器F8的状态更新为计算得到的值，这里用 <span
+class="math inline">\(M[]-M[]\)</span> 表示。</li>
+<li>保留站中Add1这一行清空。</li>
+<li>把所有填了 Add1 的地方（这里只有 Add2 这一行的 <span
+class="math inline">\(Q_j\)</span> 填了 Add1）替换为 F8 的新值，并更新
+<span class="math inline">\(V_j\)</span>。（即前面说的广播机制）</li>
+<li>此时 Add2 这一行两个源寄存器都准备好了，进入倒计时。</li>
+</ul></li>
+<li>指令3，5，6要么在等倒计时，要么源寄存器还没准备好</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130052383.png" alt="image-20260415130052220" style="zoom:33%;" /></p>
+<p><strong>cycle9，</strong>只有倒计时，无事发生</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130509157.png" alt="image-20260415130508985" style="zoom:33%;" /></p>
+<p><strong>cycle10，</strong>保留站Add2这一行（对应指令6）倒计时归零，进入执行阶段。其它只有倒计时-1，无事发生。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130634035.png" alt="image-20260415130633856" style="zoom:33%;" /></p>
+<p><strong>cycle11，</strong>保留站Add2这一行（对应指令6）开始写回，寄存器
+F6
+的状态更新，同时保留站Add2这一行清空。由于保留站中没有Add2标记，因此不需要广播。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415130844793.png" alt="image-20260415130822328" style="zoom:33%;" /></p>
+<p><strong>cycle12，</strong>只有倒计时-1，无事发生。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131059387.png" alt="image-20260415131059190" style="zoom:33%;" /></p>
+<p><strong>快进到cycle15，</strong>保留站 Mult1
+这一行（对应指令3）终于倒计时清零，进入执行阶段。其它无事发生。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131153472.png" alt="image-20260415131153294" style="zoom:33%;" /></p>
+<p><strong>cycle16，</strong>指令3刚刚执行完，进入写回阶段。寄存器 F0
+的状态更新为计算出的结果，同时保留站中 Mult2
+这一行的两个源寄存器也准备好了，更新 <span
+class="math inline">\(V_j\)</span>，并进入倒计时阶段（除法需要40个周期的延迟）</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131356788.png" alt="image-20260415131356606" style="zoom:33%;" /></p>
+<p><strong>快进到cycle56，</strong>保留站 Mult2
+这一行（对应指令6）终于倒计时归零，进入执行阶段。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131649954.png" alt="image-20260415131649781" style="zoom:33%;" /></p>
+<p>cycle57，<strong>保留站</strong> Mult2
+这一行（对应指令6）进入写回阶段，寄存器 F10
+的状态更新为计算出的结果，同时保留站 Mult2 这一行清空。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415131820385.png" alt="image-20260415131820215" style="zoom:33%;" /></p>
+<p>至此，这六条指令就执行完了，可以看到它们是乱序执行的，顺序为1→2→4→6→3→5，总共使用57个周期。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/10/computer_organization/%E5%8A%A0%E5%85%A5ROB%E7%9A%84Tomasulo%E4%BE%8B%E5%AD%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/07/10/computer_organization/%E5%8A%A0%E5%85%A5ROB%E7%9A%84Tomasulo%E4%BE%8B%E5%AD%90/" class="post-title-link" itemprop="url">加入ROB的Tomasulo例子</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-10 06:41:57 / Modified: 06:42:42" itemprop="dateCreated datePublished" datetime="2026-07-10T06:41:57+08:00">2026-07-10</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>假设：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415111442045.png" alt="554eb7cf63b63ba4bf4c18a2a1e34226" style="zoom:33%;" /></p>
+<p><strong>cycle0，</strong>初始状态</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174756961.png" alt="image-20260524164622545" style="zoom: 50%;" /></p>
+<p><strong>cycle1，</strong>指令1发射，ROB 中新增一条记录。load
+缓冲器中新增一条记录，地址记为 <span
+class="math inline">\(Regs[R_2]+34\)</span>。寄存器 F6 的状态设置为
+#1（即Load1）。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524164927857.png" alt="image-20260524164927723" style="zoom:50%;" /></p>
+<p><strong>cycle2，</strong></p>
+<ul>
+<li>指令1进入执行阶段</li>
+<li>指令2发射，ROB表中新增一条记录。load缓冲器中也新增一条记录。寄存器
+F2 的状态设置为 #2。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174755886.png" alt="image-20260524165157986" style="zoom:50%;" /></p>
+<p><strong>cycle3，</strong></p>
+<ul>
+<li>指令1写回，保留站中删除这条记录。但由于还没提交，所以寄存器 F6
+的状态不变。</li>
+<li>指令2开始执行。</li>
+<li>指令3开始发射，ROB中新增一条记录，同时保留站中 Mult1
+这一行新增一条记录。
+<ul>
+<li>F2 还没准备好，所以 <span
+class="math inline">\(Q_j=\#2\)</span>。</li>
+<li>F4 准备好了，所以 <span
+class="math inline">\(V_k=Regs[F4]\)</span>。</li>
+</ul></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524165640590.png" alt="image-20260524165640450" style="zoom:50%;" /></p>
+<p><strong>cycle4，</strong></p>
+<ul>
+<li>指令1提交，寄存器 F6
+的状态更新为”unbusy“，即清空。同时保留站中所有标了 #1 的地方都要替换为
+F6 的值，但保留站中没有标 #1，所以不变。</li>
+<li>指令2写回，
+<ul>
+<li>保留站中 Load2 这一行清空。</li>
+<li>寄存器 F2 的结果被广播到所有的 #2，因此保留站中Mult1这一行 <span
+class="math inline">\(V_j=Mem[45+Regs[R_3]\)</span>。</li>
+<li>但由于还未提交，所以寄存器 F2 的状态不变。</li>
+</ul></li>
+<li>指令3发现两个操作数都准备好了，开始倒计时（按照之前的约定，乘法共需20周期）。但此时尚未进入执行，仍处于发射阶段。</li>
+<li>指令4发射，
+<ul>
+<li>寄存器 F8 的状态设置为 #4。</li>
+<li>寄存器 F6 已准备好，所以 <span
+class="math inline">\(V_j=Regs[F_6]\)</span>。</li>
+<li>寄存器 F2 已准备好（虽然它的状态还是 #2，但只是没提交而已），所以
+<span class="math inline">\(V_k=Mem[45+regs[R3]]\)</span>。</li>
+<li>因此两个操作数都准备好了，进入倒计时。但此时尚未进入执行，仍处于发射阶段。</li>
+</ul></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524170151693.png" alt="image-20260524170151551" style="zoom:50%;" /></p>
+<blockquote>
+<p>这里图片应该错了，保留站Add1这一行的 <span
+class="math inline">\(Q_k\)</span> 应该是空的</p>
+</blockquote>
+<p><strong>cycle5，</strong></p>
+<ul>
+<li>指令2提交，寄存器 F2 的状态终于更新为unbusy。</li>
+<li>指令3进入执行阶段的第1周期（Ex1），同时倒计时-1。</li>
+<li>指令4也进入执行阶段的第1周期，同时倒计时-1。</li>
+<li>指令5发射，
+<ul>
+<li>占用保留站Mult2这一行。</li>
+<li>F0 尚未准备好，所以 <span
+class="math inline">\(Q_j=\#3\)</span>。</li>
+<li>F6 准备好了，所以 <span
+class="math inline">\(V_k=Regs[F_6]\)</span>。</li>
+</ul></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174756204.png" alt="image-20260524171731458" style="zoom:50%;" /></p>
+<p><strong>cycle6，</strong></p>
+<ul>
+<li>指令3继续执行，倒计时-1</li>
+<li>指令4继续执行，倒计时-1</li>
+<li>指令5等待 F0 的结果，不动</li>
+<li>指令6发射，
+<ul>
+<li>占用保留站 Add2 这一行</li>
+<li>寄存器 F6 的状态设为 #6</li>
+<li>寄存器 F8 还没准备好，所以 <span
+class="math inline">\(Q_j=\#4\)</span></li>
+<li>寄存器 F2 准备好了，所以 <span
+class="math inline">\(V_k=Regs[F_2]\)</span></li>
+</ul></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174802483.png" alt="image-20260524172142627" style="zoom:50%;" /></p>
+<p><strong>cycle7，</strong></p>
+<ul>
+<li>指令3仍在执行，倒计时-1</li>
+<li>指令4在上一周期执行完毕，此周期进入写回阶段。把寄存器 F8
+的值广播到所有写了 #4 的地方。</li>
+<li>指令5仍在等待 #3</li>
+<li>指令6的两个操作数都准备好了，开始倒计时</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174800566.png" alt="image-20260524172445884" style="zoom:50%;" /></p>
+<p><strong>cycle8，</strong></p>
+<ul>
+<li>指令3仍在执行，倒计时-1</li>
+<li><strong>指令4不能提交</strong>，因为在它之前的指令3还没提交，所以寄存器
+F8 的状态仍为 #4</li>
+<li>指令5仍在等待 F0 的结果</li>
+<li>指令6开始执行，倒计时-1</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174802035.png" alt="image-20260524172707125" style="zoom:50%;" /></p>
+<p><strong>cycle9，</strong></p>
+<ul>
+<li>指令3仍在执行，倒计时-1</li>
+<li>指令4还是不能提交，保持写回状态</li>
+<li>指令5仍在等待 F0 的结果</li>
+<li>指令6执行完毕，倒计时归零</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524173052451.png" alt="image-20260524173052301" style="zoom:50%;" /></p>
+<p><strong>cycle10，</strong></p>
+<ul>
+<li><p>指令3仍在执行，倒计时-1</p></li>
+<li><p>指令4仍在等待指令3提交</p></li>
+<li><p>指令5仍在等待寄存器 F0 的值</p></li>
+<li><p>指令6执行结束，进入写回阶段，寄存器 F6 的值广播到所有 #6
+的地方，但这里似乎没有</p></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174804841.png" alt="image-20260524173328532" style="zoom:50%;" /></p>
+<p><strong>快进到cycle14，</strong>指令3执行完毕</p>
+<p><strong>cycle15，</strong></p>
+<ul>
+<li>指令3开始写回，寄存器 F0 的值广播到所有 #3 的地方</li>
+<li>指令4等待指令3提交</li>
+<li>指令5发现两个操作数都准备好了，开始倒计时</li>
+<li>指令6还不能提交</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174807135.png" alt="image-20260524173600228" style="zoom:50%;" /></p>
+<p><strong>cycle16，</strong></p>
+<ul>
+<li>指令3提交，寄存器 F0 的状态更新为unbusy</li>
+<li>指令4继续等待</li>
+<li>指令5开始执行，倒计时-1</li>
+<li>指令6继续等待</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174806744.png" alt="image-20260524173756218" style="zoom:50%;" /></p>
+<p><strong>cycle17，</strong></p>
+<ul>
+<li>指令4终于可以提交，寄存器 F8 的状态更新为 unbusy</li>
+<li>指令5继续执行，倒计时-1</li>
+<li>指令6继续等待</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174807254.png" alt="image-20260524173910652" style="zoom:50%;" /></p>
+<p><strong>快进到cycle55，</strong>指令5执行完毕，倒计时归零</p>
+<p><strong>cycle56，</strong></p>
+<ul>
+<li>指令5写回，寄存器 F10 的值广播到所有 #5</li>
+<li>指令6等待指令5提交</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260524174104087.png" alt="image-20260524174103942" style="zoom:50%;" /></p>
+<p>cycle57，指令5提交，寄存器 F10 的状态更新为 unbusy</p>
+<p>cycle58，指令6提交，寄存器 F6 的状态更新为 unbusy</p>
+<p>至此，执行结束！</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -14774,2034 +15247,6 @@ class="math inline">\(x\)</span>
 可以把可编程连接点编码成二进制串，并用电路输出与目标真值表的匹配程度作为适应度。</p>
 <p>理论上，Schema Theorem
 说明遗传算法会放大那些短、低阶、适应度高于平均水平的模式。这个定理抓住了遗传算法的核心：算法表面上在进化完整个体，实际上也在隐含地发现、保留和组合有用的局部结构。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/Uncertainty/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Fqmmm">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/07/09/AI/Uncertainty/" class="post-title-link" itemprop="url">Uncertainty</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-07-09 15:12:29 / Modified: 16:02:09" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h1 id="目录">目录</h1>
-<ul>
-<li>不确定性、错误类型与归纳推理</li>
-<li>非单调推理：为什么新信息会推翻旧结论</li>
-<li>经典概率与假设检验的局限</li>
-<li>贝叶斯定理与贝叶斯决策</li>
-<li>贝叶斯方法的困难与贝叶斯网络</li>
-<li>MYCIN、信任/不信任与确定性因子</li>
-<li>时间推理、随机过程与马尔可夫链</li>
-<li>模糊集、语言变量与模糊推理</li>
-<li>方法总结：概念区分与计算流程</li>
-</ul>
-<h1 id="不确定性错误类型与归纳推理">1 不确定性、错误类型与归纳推理</h1>
-<h2 id="什么是不确定性">1.1 什么是不确定性</h2>
-<p>本章讨论的核心问题是：智能系统在信息不完整、不精确甚至互相冲突的情况下，应该如何推理和决策。<strong>不确定性</strong>可以理解为“缺少足够信息来做出完全确定的判断”。在现实任务中，系统很少能拿到完美事实。例如医疗诊断中症状可能不典型，矿产勘探中测试结果可能误报，控制系统中传感器读数可能有误差。因此，人工智能不能只依赖经典逻辑中“真或假”的推理方式，还需要处理概率、置信度、时间变化和模糊概念。</p>
-<p>这也是本章从逻辑推理过渡到概率推理、确定性因子和模糊推理的原因：<strong>现实中的智能决策不是只问结论是否必然为真，而是要问结论有多可信、采取某个行动是否划算、证据之间如何组合。</strong></p>
-<h2 id="常见错误类型">1.2 常见错误类型</h2>
-<p>阀门控制例子可以说明错误来源。错误不只是“结论错了”这么简单，它可能来自指令表达、测量过程、设备可靠性，也可能来自推理方式本身。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260529200553327.png" alt="image-20260529200552972" style="zoom: 33%;" /></p>
-<table>
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr>
-<th>错误类型</th>
-<th>含义</th>
-<th>这里的直观例子</th>
-<th>理解</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Ambiguous</td>
-<td>信息有歧义</td>
-<td>“Turn the valve off”</td>
-<td>没说哪个阀门，接收者无法唯一理解。</td>
-</tr>
-<tr>
-<td>Incomplete</td>
-<td>信息不完整</td>
-<td>“Turn valve-1”</td>
-<td>只说对象，没说操作方向。</td>
-</tr>
-<tr>
-<td>Incorrect</td>
-<td>信息本身错误</td>
-<td>“Turn valve-1 off”，但正确应为 on</td>
-<td>指令明确但内容错。</td>
-</tr>
-<tr>
-<td>False positive, Type I</td>
-<td>假阳性</td>
-<td>判断阀门卡住，但实际上没卡住</td>
-<td>把不存在的问题判断为存在。</td>
-</tr>
-<tr>
-<td>False negative, Type II</td>
-<td>假阴性</td>
-<td>判断阀门没卡住，但实际上卡住</td>
-<td>把存在的问题判断为不存在。</td>
-</tr>
-<tr>
-<td>Imprecise</td>
-<td>精度不足</td>
-<td>要调到 <span class="math inline">\(5\)</span>，但正确值是 <span
-class="math inline">\(5.4\)</span></td>
-<td>给出的值太粗。</td>
-</tr>
-<tr>
-<td>Inaccurate</td>
-<td>不准确</td>
-<td>指示 <span class="math inline">\(5.4\)</span>，但正确值是 <span
-class="math inline">\(9.2\)</span></td>
-<td>给得很精细但离真值远。</td>
-</tr>
-<tr>
-<td>Unreliable</td>
-<td>不可靠</td>
-<td>多个读数互相冲突</td>
-<td>设备或信息源不稳定。</td>
-</tr>
-<tr>
-<td>Random error</td>
-<td>随机误差</td>
-<td>阀门读数在 <span class="math inline">\(5.4,5.5,5.1\)</span>
-间波动</td>
-<td>由统计波动导致。</td>
-</tr>
-<tr>
-<td>Invalid induction</td>
-<td>无效归纳</td>
-<td>“以前没卡住过，所以现在也不会卡住”</td>
-<td>过去经验不能保证未来。</td>
-</tr>
-<tr>
-<td>Invalid deduction</td>
-<td>无效演绎</td>
-<td>“输出正常，所以阀门一定良好”</td>
-<td>可能有其他原因导致输出正常。</td>
-</tr>
-</tbody>
-</table>
-<h2 id="演绎推理与归纳推理">1.3 演绎推理与归纳推理</h2>
-<p>可以用两个例子区分演绎和归纳。</p>
-<p>演绎推理是从一般规律和具体事实推出必然结论。例如：</p>
-<p><span class="math display">\[
-\text{All men are mortal},\quad \text{Socrates is a man}
-\Rightarrow \text{Socrates is mortal}
-\]</span></p>
-<p>只要前提为真且推理形式有效，演绎结论就是必然正确的。</p>
-<p>归纳推理则不同。比如“我的硬盘从来没有坏过，所以它永远不会坏”，这个结论并不是必然成立。归纳推理只能给出某种<strong>置信程度</strong>，它的本质是从过去经验推测未来或从部分样本推测总体。人工智能系统处理现实问题时大量依赖归纳，因此必须承认结论可能被新证据推翻。</p>
-<h2 id="形式谬误肯定后件">1.4 形式谬误：肯定后件</h2>
-<p>经典错误形式是：</p>
-<p><span class="math display">\[
-\begin{aligned}
-p &amp;\to q\\
-q &amp;\\
-\therefore p&amp;
-\end{aligned}
-\]</span></p>
-<p>这个推理是错误的。以阀门为例，“如果阀门状态良好，那么输出正常”并不意味着“输出正常，所以阀门一定状态良好”。因为输出正常可能由其他原因造成，例如阀门卡在打开位置时，某些输出也可能暂时正常。</p>
-<p>这说明一个重要思想：<strong>在不确定环境下，一个观察结果往往可以由多个原因解释。</strong>后面贝叶斯推理正是要比较不同原因在给定证据下的可能性。</p>
-<h1 id="非单调推理为什么新信息会推翻旧结论">2
-非单调推理：为什么新信息会推翻旧结论</h1>
-<h2 id="非单调推理的基本思想">2.1 非单调推理的基本思想</h2>
-<p>经典逻辑通常是单调的：如果某个结论能从已有知识推出，那么增加新知识后，这个结论仍然成立。但现实推理常常不是这样。<strong>非单调推理</strong>指的是：随着新信息加入，原本合理的结论可能被撤销。</p>
-<p>例如：</p>
-<p><span class="math display">\[
-x\ \text{looks red}\Rightarrow x\ \text{is red}
-\]</span></p>
-<p>如果只知道物体看起来是红的，我们可能暂时相信它是红的。但如果后来知道它被红光照着，而红光会让非红色物体看起来像红色，那么“它是红的”这个结论就被削弱甚至推翻。</p>
-<h2 id="非单调推理中的典型难题">2.2 非单调推理中的典型难题</h2>
-<p>非单调推理中有几个典型问题。</p>
-<p><strong>Buridan’s ass</strong>
-描述的是两个选择完全对称时主体无法决策的问题。它说明单靠“哪边更好”有时不足以行动，因为两个选项可能在可用信息下没有差别。</p>
-<p><strong>彩票悖论</strong>的直觉是：每一张彩票中奖概率都极低，因此对每一张彩票都可以说“它大概率不会中奖”；但如果整个彩票系统保证会有一张中奖，那么把这些单个信念合起来就会得到矛盾。这反映了个体置信与整体一致性之间的冲突。</p>
-<p><strong>序言悖论</strong>讲的是作者相信书中每个具体论断，但也承认一本很长的书几乎必然至少有一个错误。于是，“相信每个命题”和“相信至少一个命题为假”会同时出现。它提醒我们：<strong>很多单独看来合理的信念，合在一起可能不再合理。</strong></p>
-<p><strong>defeat cycle</strong> 则是证据相互攻击形成循环。例如 Smith 说
-Peter 不可靠，Peter 说 Jones 不可靠，Jones 又说 Smith
-不可靠。这类循环会导致系统难以稳定地决定谁可信。</p>
-<p>这些问题共同说明：AI
-不仅要能推出结论，还要能处理证据冲突、置信削弱和集体不一致。</p>
-<h1 id="经典概率与假设检验的局限">3 经典概率与假设检验的局限</h1>
-<h2 id="经典概率在本章中的位置">3.1 经典概率在本章中的位置</h2>
-<p>进入贝叶斯推理前，需要先回顾经典概率中的几个主题：实验概率、主观概率、复合概率、条件概率和假设检验。它们的共同任务是量化不确定性，但不同方法回答的问题不同。经典假设检验更常问“在某个原假设为真时，观察到当前数据有多罕见”；贝叶斯决策则更关心“给定证据后，各个假设有多可信，以及应该采取什么行动”。</p>
-<h2 id="三个统计实验与原假设">3.2 三个统计实验与原假设</h2>
-<p>考虑三个实验：女士判断一杯奶茶茶和牛奶谁先倒，音乐专家判断乐谱来自
-Haydn 还是 Mozart，醉酒朋友预测公平硬币正反。三个人都进行了 <span
-class="math inline">\(10\)</span> 次实验且全部正确。</p>
-<p>设 <span class="math inline">\(\theta\)</span>
-表示“该人回答正确的概率”，经典显著性检验可设置原假设：</p>
-<p><span class="math display">\[
-H_0:\theta=0.5
-\]</span></p>
-<p>如果一个人只是随机猜测，连续 <span class="math inline">\(10\)</span>
-次全对的概率是：</p>
-<p><span class="math display">\[
-2^{-10}=\frac{1}{1024}
-\]</span></p>
-<p>这个概率很小，因此在单尾显著性水平 <span
-class="math inline">\(2^{-10}\)</span> 下，三个实验都会拒绝原假设。</p>
-<h2 id="为什么这会有问题">3.3 为什么这会有问题</h2>
-<p>这三个实验的统计形式相同，但我们的直觉判断并不相同。女士可能真的能分辨茶和牛奶的顺序，音乐专家也可能确实有能力，而醉酒朋友连续猜中硬币则更像巧合。仅靠“拒绝
-<span class="math inline">\(H_0\)</span>”无法充分表达这些背景差异。</p>
-<p>经典假设检验还有两个问题。</p>
-<p>第一，<strong>点零假设几乎不可能严格为真</strong>。现实中某个参数刚好等于
-<span class="math inline">\(0.5\)</span>
-的可能性很低，样本足够大时，极小差异也会变得显著。</p>
-<p>第二，<strong>拟合检验也容易在大样本下拒绝模型</strong>。任何模型都是现实的近似，样本足够大时，模型和现实之间的微小偏差也会被检测出来。</p>
-<p>因此，本章希望引出一种更适合 AI
-决策的理论：它既要连接“应该相信什么”的认识推理，也要连接“应该做什么”的实践推理，还要考虑个体偏好和行动后果。</p>
-<h1 id="贝叶斯定理与贝叶斯决策">4 贝叶斯定理与贝叶斯决策</h1>
-<h2 id="贝叶斯思想从先验到后验">4.1 贝叶斯思想：从先验到后验</h2>
-<p>贝叶斯方法的基本思想是：系统在观察证据之前已有先验判断，观察证据之后根据条件概率更新为后验判断。一般形式为：</p>
-<p><span class="math display">\[
-P(H_i\mid E)=\frac{P(E\mid H_i)P(H_i)}{P(E)}
-\]</span></p>
-<p>如果有多个互斥且穷尽的假设 <span
-class="math inline">\(H_1,H_2,\ldots,H_n\)</span>，则：</p>
-<p><span class="math display">\[
-P(H_i\mid E)=
-\frac{P(E\mid H_i)P(H_i)}
-{\sum_j P(E\mid H_j)P(H_j)}
-\]</span></p>
-<p>这里 <span class="math inline">\(P(H_i)\)</span> 是先验概率，<span
-class="math inline">\(P(E\mid H_i)\)</span> 是似然，<span
-class="math inline">\(P(H_i\mid E)\)</span>
-是后验概率。学习时可以把贝叶斯公式理解成一句话：<strong>后验可信度 <span
-class="math inline">\(\propto\)</span> 先验可信度 <span
-class="math inline">\(\times\)</span>
-证据对该假设的支持程度。</strong></p>
-<h2 id="prospector-石油勘探例子">4.2 PROSPECTOR 石油勘探例子</h2>
-<p>PROSPECTOR
-专家系统可以用来说明贝叶斯决策。系统要判断某地点是否适合勘探石油。设
-<span class="math inline">\(O\)</span> 表示有油，<span
-class="math inline">\(O&#39;\)</span> 表示无油。地震勘探测试结果有阳性
-<span class="math inline">\(+\)</span> 和阴性 <span
-class="math inline">\(-\)</span>：阳性表示测试更支持“可能有油”，阴性表示测试更支持“可能无油”。</p>
-<p>已知先验概率与条件概率：</p>
-<p><span class="math display">\[
-\begin{aligned}
-P(O)&amp;=0.6,&amp; P(O&#39;)&amp;=0.4\\
-P(+\mid O)&amp;=0.8,&amp; P(-\mid O)&amp;=0.2\\
-P(+\mid O&#39;)&amp;=0.1,&amp; P(-\mid O&#39;)&amp;=0.9
-\end{aligned}
-\]</span></p>
-<p>先算联合概率：</p>
-<p><span class="math display">\[
-\begin{aligned}
-P(-\cap O&#39;)&amp;=P(-\mid O&#39;)P(O&#39;)=0.9\times0.4=0.36\\
-P(+\cap O&#39;)&amp;=P(+\mid O&#39;)P(O&#39;)=0.1\times0.4=0.04\\
-P(-\cap O)&amp;=P(-\mid O)P(O)=0.2\times0.6=0.12\\
-P(+\cap O)&amp;=P(+\mid O)P(O)=0.8\times0.6=0.48
-\end{aligned}
-\]</span></p>
-<p>于是测试结果的总概率为：</p>
-<p><span class="math display">\[
-P(-)=0.36+0.12=0.48,\qquad P(+)=0.04+0.48=0.52
-\]</span></p>
-<p>后验概率为：</p>
-<p><span class="math display">\[
-\begin{aligned}
-P(O&#39;\mid -)&amp;=\frac{0.36}{0.48}=\frac{3}{4},&amp;
-P(O\mid -)&amp;=\frac{0.12}{0.48}=\frac{1}{4}\\
-P(O&#39;\mid +)&amp;=\frac{0.04}{0.52}=\frac{1}{13},&amp;
-P(O\mid +)&amp;=\frac{0.48}{0.52}=\frac{12}{13}
-\end{aligned}
-\]</span></p>
-<p>这组计算的含义非常清楚：阴性结果并不意味着一定没油，只是把“有油”的概率降到了
-<span
-class="math inline">\(\frac{1}{4}\)</span>；阳性结果也不意味着一定有油，而是把“有油”的概率升到了
-<span class="math inline">\(\frac{12}{13}\)</span>。</p>
-<h2 id="从后验概率到决策">4.3 从后验概率到决策</h2>
-<p>贝叶斯决策不仅要问“有油的概率是多少”，还要问“钻井或退出哪个期望收益更高”。收益信息如下：</p>
-<p><span class="math display">\[
-\begin{aligned}
-\text{successful oil lease} &amp;= \$1{,}250{,}000\\
-\text{drilling expense} &amp;= -\$200{,}000\\
-\text{seismic survey} &amp;= -\$50{,}000
-\end{aligned}
-\]</span></p>
-<p>如果钻井且有油，净收益可理解为：</p>
-<p><span class="math display">\[
-1{,}250{,}000-200{,}000-50{,}000=1{,}000{,}000
-\]</span></p>
-<p>如果钻井但无油，则损失为：</p>
-<p><span class="math display">\[
--200{,}000-50{,}000=-250{,}000
-\]</span></p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522203658206.png" style="zoom: 50%;" /></p>
-<p>如果看到阴性结果后仍选择钻井，则期望收益为： <span
-class="math display">\[
-\begin{aligned}
-EV(\text{drill}\mid -)
-&amp;=P(O\mid -)\cdot1{,}000{,}000+P(O&#39;\mid -)\cdot(-250{,}000)\\
-&amp;=\frac{1}{4}\cdot1{,}000{,}000+\frac{3}{4}\cdot(-250{,}000)\\
-&amp;=62{,}500
-\end{aligned}
-\]</span></p>
-<p>这说明即使测试为阴性，只要成功收益足够高，钻井仍可能比直接退出更划算。阳性结果下，由于
-<span class="math inline">\(P(O\mid
-+)=\frac{12}{13}\)</span>，钻井的期望收益更高。对应节点约为 <span
-class="math inline">\(\$846{,}153\)</span>，测试前总体期望约为 <span
-class="math inline">\(\$470{,}000\)</span>。</p>
-<p>学习时要抓住这条逻辑链：<strong>先用贝叶斯公式更新概率，再用收益/损失计算期望值，最后选择期望收益更高或期望损失更低的行动。</strong></p>
-<h2 id="农夫种作物的贝叶斯分析">4.4 农夫种作物的贝叶斯分析</h2>
-<p>第二个例子是农夫根据天气预报决定种什么作物。设 <span
-class="math inline">\(a\)</span> 为农民第二年的行为，可以旋转：<span
-class="math inline">\(a_1\)</span> 为种抗旱作物，<span
-class="math inline">\(a_2\)</span> 为种高产作物，<span
-class="math inline">\(\theta\)</span> 表示下一年的真实降水量，<span
-class="math inline">\(x\)</span>
-表示天气预报的下一年降水量。损失函数为：</p>
-<p><span class="math display">\[
-l(\theta,a)=
-\begin{cases}
-200-2\theta,&amp; a=a_1\\
-3000-10\theta,&amp; a=a_2
-\end{cases}
-\]</span></p>
-<p>农夫的决策规则是：如果天气预报的降水量小于 <span
-class="math inline">\(400\text{mm}\)</span>，就选择抗旱作物；否则选择高产作物。也就是：</p>
-<p><span class="math display">\[
-\delta(x)=
-\begin{cases}
-a_1,&amp; x&lt;400\\
-a_2,&amp; x\ge 400
-\end{cases}
-\]</span></p>
-<p>天气预报的误差用一个 Cauchy 型密度表示：</p>
-<p><span class="math display">\[
-f(x\mid\theta)=
-\begin{cases}
-\dfrac{1}{\pi}\dfrac{400}{400^2+(x-\theta)^2},&amp; x\ge0\\
-0,&amp; x&lt;0
-\end{cases}
-\]</span></p>
-<p>于是该决策规则在真实降水量为 <span
-class="math inline">\(\theta\)</span> 时的风险为：</p>
-<p><span class="math display">\[
-R(\theta,\delta)
-=\int_0^{400}f(x\mid\theta)(200-2\theta)\,dx
-+\int_{400}^{\infty}f(x\mid\theta)(3000-10\theta)\,dx
-\]</span></p>
-<p>农夫根据经验给出了 <span class="math inline">\(\theta\)</span>
-的先验分布：</p>
-<table style="width:100%;">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-<col style="width: 10%" />
-</colgroup>
-<thead>
-<tr>
-<th style="text-align: right;"><span
-class="math inline">\(\theta\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(0\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(100\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(200\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(300\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(400\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(500\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(600\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(700\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(800\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: right;"><span
-class="math inline">\(\pi(\theta)\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.052\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.104\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.153\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.178\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.204\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.153\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.104\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.052\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>Bayes risk 是对所有可能 <span class="math inline">\(\theta\)</span>
-的风险加权平均：</p>
-<p><span class="math display">\[
-r(\pi,\delta)=\sum_{\theta}R(\theta,\delta)\pi(\theta)=-1176
-\]</span></p>
-<p>也就是说风险的期望为负，收益的期望为正。因此 “The farmer is smart”
-的意思不是说该规则必然正确，而是说在给定先验经验和损失函数下，这个决策规则的贝叶斯风险表现不错。</p>
-<h1 id="贝叶斯方法的困难与贝叶斯网络">5
-贝叶斯方法的困难与贝叶斯网络</h1>
-<h2 id="多证据下的概率数量爆炸">5.1 多证据下的概率数量爆炸</h2>
-<p>在医学诊断中，设 <span class="math inline">\(D_i\)</span> 表示第
-<span class="math inline">\(i\)</span> 种疾病，<span
-class="math inline">\(E\)</span>
-表示某个证据或症状。贝叶斯公式可写为：</p>
-<p><span class="math display">\[
-P(D_i\mid E)=
-\frac{P(E\mid D_i)P(D_i)}
-{\sum_j P(E\mid D_j)P(D_j)}
-\]</span></p>
-<p>如果系统不断加入新证据，例如已有证据 <span
-class="math inline">\(E_1\)</span>，现在又加入新证据 <span
-class="math inline">\(E_2\)</span>，则递推形式为：</p>
-<p><span class="math display">\[
-P(D_i\mid E_1,E_2)=
-\frac{P(E_2\mid D_i\cap E_1)P(D_i\mid E_1)}
-{\sum_j P(E_2\mid D_j\cap E_1)P(D_j\mid E_1)}
-\]</span></p>
-<p>问题在于：证据越多，系统需要的条件概率越复杂。医生或专家很难准确给出所有形如
-<span class="math inline">\(P(E_2\mid D_i\cap E_1)\)</span>
-的概率；如果有很多疾病和很多症状，完整概率表会迅速变得不可管理。</p>
-<h2 id="贝叶斯网络的意义">5.2 贝叶斯网络的意义</h2>
-<p>贝叶斯网络的价值在于，它用图结构表达变量之间的条件依赖关系，从而避免直接枚举所有联合概率。每个节点代表一个随机变量，边表示直接依赖。只要图中体现了合理的条件独立性，系统就可以用较少的局部条件概率进行推理。</p>
-<p>贝叶斯网络可以在医学诊断中把概率方法与神经计算等方法结合起来，在计算开销和结论准确性之间取得实用平衡。</p>
-<p>这一节不要求展开贝叶斯网络算法，但要理解它为什么出现：<strong>完整贝叶斯方法理论上优美，但实际需要的概率太多；贝叶斯网络用结构化依赖关系降低建模成本。</strong></p>
-<h1 id="mycin信任不信任与确定性因子">6
-MYCIN、信任/不信任与确定性因子</h1>
-<h2 id="mycin-规则为什么不用纯概率表达">6.1 MYCIN
-规则为什么不用纯概率表达</h2>
-<p>MYCIN 是早期医疗专家系统。它的规则可以写成：如果微生物染色为 gram
-positive，形态为 coccus，生长排列为 chains，那么有 <span
-class="math inline">\(0.7\)</span> 的 suggestive evidence 支持该微生物是
-streptococcus。</p>
-<p>如果用概率语言写，可以写成：</p>
-<p><span class="math display">\[
-P(H\mid E_1\cap E_2\cap E_3)=0.7
-\]</span></p>
-<p>这里 <span class="math inline">\(H\)</span> 是“该微生物是
-streptococcus”，<span class="math inline">\(E_1,E_2,E_3\)</span>
-分别是三个前提证据。专家通常愿意接受这个表达，但不愿意马上接受：</p>
-<p><span class="math display">\[
-P(H&#39;\mid E_1\cap E_2\cap E_3)=0.3
-\]</span></p>
-<p>原因是专家的“支持程度”并不总是严格概率意义上的互补。比如某个证据支持
-streptococcus 的程度是 <span
-class="math inline">\(0.7\)</span>，并不意味着剩下的 <span
-class="math inline">\(0.3\)</span> 都明确支持“不是
-streptococcus”。可能还有未知信息、未考虑疾病、证据质量问题等。</p>
-<h2 id="belief-与-disbelief">6.2 Belief 与 disbelief</h2>
-<p>毕业例子可以说明 belief 和 disbelief
-不一定简单互补。如果知道“这门课拿 A”，那么学生毕业概率可能是：</p>
-<p><span class="math display">\[
-P(\text{graduating}\mid A\ \text{in this course})=0.70
-\]</span></p>
-<p>但这并不直观地等价于：</p>
-<p><span class="math display">\[
-P(\text{not graduating}\mid A\ \text{in this course})=0.30
-\]</span></p>
-<p>因为不毕业可能来自很多额外原因：课程目录变化、忘修必修课、转学分不被承认、欠费、GPA
-估计错误等。这个例子想说明：在专家系统中，<strong>支持某个结论的证据和反对某个结论的证据最好分开建模。</strong></p>
-<h2 id="确定性因子的定义">6.3 确定性因子的定义</h2>
-<p>确定性因子 Certainty Factor, 简称 CF，用来描述证据 <span
-class="math inline">\(E\)</span> 对假设 <span
-class="math inline">\(H\)</span> 的支持或反对程度。MYCIN
-将其定义为：</p>
-<p><span class="math display">\[
-CF(H,E)=MB(H,E)-MD(H,E)
-\]</span></p>
-<p>其中 <span class="math inline">\(MB(H,E)\)</span> 表示证据 <span
-class="math inline">\(E\)</span> 对假设 <span
-class="math inline">\(H\)</span> 增加的信任程度，<span
-class="math inline">\(MD(H,E)\)</span> 表示证据 <span
-class="math inline">\(E\)</span> 对假设 <span
-class="math inline">\(H\)</span> 增加的不信任程度。范围为：</p>
-<p><span class="math display">\[
-0\le MB\le1,\qquad 0\le MD\le1,\qquad -1\le CF\le1
-\]</span></p>
-<p>如果 <span class="math inline">\(CF&gt;0\)</span>，证据支持假设；如果
-<span class="math inline">\(CF&lt;0\)</span>，证据反对假设；如果 <span
-class="math inline">\(CF=0\)</span>，证据没有提供有效倾向。</p>
-<p><span class="math inline">\(MB\)</span> 和 <span
-class="math inline">\(MD\)</span> 的概率定义为：</p>
-<p><span class="math display">\[
-MB(H,E)=
-\begin{cases}
-1,&amp; P(H)=1\\
-\dfrac{\max(P(H\mid E),P(H))-P(H)}{1-P(H)},&amp; \text{otherwise}
-\end{cases}
-\]</span></p>
-<p><span class="math display">\[
-MD(H,E)=
-\begin{cases}
-1,&amp; P(H)=0\\
-\dfrac{\min(P(H\mid E),P(H))-P(H)}{0-P(H)},&amp; \text{otherwise}
-\end{cases}
-\]</span></p>
-<p>可以把它理解为：如果证据让 <span class="math inline">\(P(H)\)</span>
-上升，就体现为 belief 增加；如果证据让 <span
-class="math inline">\(P(H)\)</span> 下降，就体现为 disbelief 增加。</p>
-<h2 id="证据组合andornot">6.4 证据组合：AND、OR、NOT</h2>
-<p>当规则前提由多个证据组合而成时，MYCIN 使用简单的组合规则：</p>
-<p><span class="math display">\[
-\begin{aligned}
-E_1\land E_2 &amp;: \min(CF(E_1,e),CF(E_2,e))\\
-E_1\lor E_2 &amp;: \max(CF(E_1,e),CF(E_2,e))\\
-\lnot E &amp;: -CF(E,e)
-\end{aligned}
-\]</span></p>
-<p>这里要特别区分 <span class="math inline">\(E\)</span> 和 <span
-class="math inline">\(e\)</span>。<span class="math inline">\(E\)</span>
-是规则里的证据命题或证据表达式，例如 <span
-class="math inline">\(E_1\land E_2\land E_3\)</span>；<span
-class="math inline">\(e\)</span>
-是当前实际观察到的所有事实背景。例如在一次诊断中，实验室观察结果使得
-<span
-class="math inline">\(CF(E_1,e)=0.5\)</span>，这表示“在当前观察资料
-<span class="math inline">\(e\)</span> 下，命题 <span
-class="math inline">\(E_1\)</span> 的可信度是 <span
-class="math inline">\(0.5\)</span>”。</p>
-<p>如果：</p>
-<p><span class="math display">\[
-E=(E_1\land E_2\land E_3)\lor(E_4\land\lnot E_5)
-\]</span></p>
-<p>则：</p>
-<p><span class="math display">\[
-CF(E,e)=\max\{\min(CF(E_1,e),CF(E_2,e),CF(E_3,e)),\min(CF(E_4,e),-CF(E_5,e))\}
-\]</span></p>
-<h2 id="streptococcus-规则的-cf-计算">6.5 streptococcus 规则的 CF
-计算</h2>
-<p>对 MYCIN 规则，设：</p>
-<p><span class="math display">\[
-CF(H,E)=CF(H,E_1\cap E_2\cap E_3)=0.7
-\]</span></p>
-<p>如果当前观察资料 <span class="math inline">\(e\)</span> 下：</p>
-<p><span class="math display">\[
-CF(E_1,e)=0.5,\qquad CF(E_2,e)=0.6,\qquad CF(E_3,e)=0.3
-\]</span></p>
-<p>由于前提是 AND 关系，所以整体前提可信度为：</p>
-<p><span class="math display">\[
-CF(E,e)=\min(0.5,0.6,0.3)=0.3
-\]</span></p>
-<p>规则结论的 CF 为：</p>
-<p><span class="math display">\[
-CF(H,e)=CF(E,e)CF(H,E)=0.3\times0.7=0.21
-\]</span></p>
-<p>这个例子很适合练习。它体现了三层含义：先算当前证据对规则前提 <span
-class="math inline">\(E\)</span> 的支持程度，再乘以规则本身 <span
-class="math inline">\(E\Rightarrow H\)</span>
-的强度，最后得到当前证据背景 <span class="math inline">\(e\)</span>
-下对结论 <span class="math inline">\(H\)</span> 的支持程度。</p>
-<h2 id="多条规则支持同一假设时的合成">6.6
-多条规则支持同一假设时的合成</h2>
-<p>如果两条规则都推出同一个假设 <span
-class="math inline">\(H\)</span>，先分别计算：</p>
-<p><span class="math display">\[
-CF_1=CF(H,e_1)=CF(E_1,e_1)CF(H,E_1),\qquad
-CF_2=CF(H,e_2)=CF(E_2,e_2)CF(H,E_2)
-\]</span></p>
-<p>然后用组合函数：</p>
-<p><span class="math display">\[
-CF_{\mathrm{COMB}}(CF_1,CF_2)=
-\begin{cases}
-CF_1+CF_2(1-CF_1),&amp; CF_1&gt;0,\ CF_2&gt;0\\
-\dfrac{CF_1+CF_2}{1-\min(|CF_1|,|CF_2|)},&amp; \text{one positive and
-one negative}\\
-CF_1+CF_2(1+CF_1),&amp; CF_1&lt;0,\ CF_2&lt;0
-\end{cases}
-\]</span></p>
-<p>该函数满足交换性：</p>
-<p><span class="math display">\[
-CF_{\mathrm{COMB}}(X,Y)=CF_{\mathrm{COMB}}(Y,X)
-\]</span></p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260529202258312.png" alt="image-20260529202257963" style="zoom:50%;" /></p>
-<h2 id="确定性因子的局限">6.7 确定性因子的局限</h2>
-<p>CF 的第一个问题是，它可能与条件概率的排序相反。例如：</p>
-<p><span class="math display">\[
-P(H_1)=0.8,\quad P(H_2)=0.2,\quad
-P(H_1\mid E)=0.9,\quad P(H_2\mid E)=0.8
-\]</span></p>
-<p>计算得到：</p>
-<p><span class="math display">\[
-CF(H_1,E)=0.5,\qquad CF(H_2,E)=0.75
-\]</span></p>
-<p>虽然 <span class="math inline">\(P(H_1\mid E)&gt;P(H_2\mid
-E)\)</span>，但 <span
-class="math inline">\(CF(H_1,E)&lt;CF(H_2,E)\)</span>。如果系统用 CF
-对疾病可能性排序，就可能出现与后验概率不一致的结果。</p>
-<p>第二个问题是，规则链中简单相乘并不等价于一般概率推理。一般情况下：</p>
-<p><span class="math display">\[
-P(H\mid e)\ne P(H\mid i)P(i\mid e)
-\]</span></p>
-<p>但 CF 链式推理使用：</p>
-<p><span class="math display">\[
-CF(H,e)=CF(E,e)CF(H,E)
-\]</span></p>
-<p>这说明 CF
-是一种工程上方便的启发式方法，而不是严格概率论的完整替代品。</p>
-<h1 id="时间推理随机过程与马尔可夫链">7
-时间推理、随机过程与马尔可夫链</h1>
-<h2 id="时间推理的基本任务">7.1 时间推理的基本任务</h2>
-<p>时间推理 temporal reasoning
-研究的是随时间变化的事件。例如航空交通控制需要根据飞机位置随时间的变化进行判断，医学专家系统也可能要根据病情发展过程进行推理。随机过程和马尔可夫链提供了一种处理时间变化的方法。</p>
-<h2 id="随机过程与转移矩阵">7.2 随机过程与转移矩阵</h2>
-<p>转移矩阵描述系统从当前状态转移到未来状态的概率。若有两个状态 <span
-class="math inline">\(S_1,S_2\)</span>，转移矩阵可写成：</p>
-<p><span class="math display">\[
-P=
-\begin{bmatrix}
-P_{11} &amp; P_{12}\\
-P_{21} &amp; P_{22}
-\end{bmatrix}
-\]</span></p>
-<p>其中 <span class="math inline">\(P_{mn}\)</span> 表示从状态 <span
-class="math inline">\(m\)</span> 转移到状态 <span
-class="math inline">\(n\)</span> 的概率。</p>
-<p>以电脑品牌选择为例。设 <span class="math inline">\(C_1\)</span>
-表示购买 Lenovo，<span class="math inline">\(C_2\)</span> 表示购买
-Apple，转移矩阵为：</p>
-<p><span class="math display">\[
-P=
-\begin{bmatrix}
-0.1 &amp; 0.9\\
-0.6 &amp; 0.4
-\end{bmatrix}
-\]</span></p>
-<p>这表示当前买 Lenovo 的人下一次继续买 Lenovo 的概率是 <span
-class="math inline">\(0.1\)</span>，转去买 Apple 的概率是 <span
-class="math inline">\(0.9\)</span>；当前买 Apple 的人下一次买 Lenovo
-的概率是 <span class="math inline">\(0.6\)</span>，继续买 Apple 的概率是
-<span class="math inline">\(0.4\)</span>。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260529202405512.png" alt="image-20260529202405191" style="zoom:33%;" /></p>
-<h2 id="状态矩阵更新与稳态">7.3 状态矩阵更新与稳态</h2>
-<p>设当前用户分布为：</p>
-<p><span class="math display">\[
-S_1=[0.8,0.2]
-\]</span></p>
-<p>即 <span class="math inline">\(80\%\)</span> 的人买 Lenovo，<span
-class="math inline">\(20\%\)</span> 的人买 Apple。下一期状态为：</p>
-<p><span class="math display">\[
-S_2=S_1P=[0.8,0.2]
-\begin{bmatrix}
-0.1 &amp; 0.9\\
-0.6 &amp; 0.4
-\end{bmatrix}
-=[0.2,0.8]
-\]</span></p>
-<p>继续迭代会得到：</p>
-<p><span class="math display">\[
-\begin{aligned}
-S_3&amp;=[0.5,0.5],&amp;
-S_4&amp;=[0.35,0.65]\\
-S_5&amp;=[0.425,0.575],&amp;
-S_6&amp;=[0.3875,0.6125]\\
-S_7&amp;=[0.40625,0.59375],&amp;
-S_8&amp;=[0.396875,0.602125]
-\end{aligned}
-\]</span></p>
-<p>可以看到状态逐渐靠近：</p>
-<p><span class="math display">\[
-S_n=[0.4,0.6]
-\]</span></p>
-<p>如果转移矩阵是
-regular，也就是某个幂矩阵的所有元素都为正，则存在唯一稳态。</p>
-<h2 id="马尔可夫链与稳态求解">7.4 马尔可夫链与稳态求解</h2>
-<p>马尔可夫链满足四个条件：状态数有限；任一时刻只能处于一个状态；系统随时间一步步转移；下一步只依赖当前状态，而不依赖更早历史。这最后一点称为马尔可夫性。</p>
-<p>稳态向量 <span class="math inline">\([P_1,P_2]\)</span> 满足：</p>
-<p><span class="math display">\[
-[P_1\ P_2]P=[P_1\ P_2]
-\]</span></p>
-<p>对 这里的矩阵，有：</p>
-<p><span class="math display">\[
-\begin{cases}
-0.1P_1+0.6P_2=P_1\\
-0.9P_1+0.4P_2=P_2\\
-P_1+P_2=1
-\end{cases}
-\]</span></p>
-<p>由第一式得：</p>
-<p><span class="math display">\[
-P_1=\frac{2}{3}P_2
-\]</span></p>
-<p>代入 <span class="math inline">\(P_1+P_2=1\)</span>：</p>
-<p><span class="math display">\[
-\frac{2}{3}P_2+P_2=1
-\]</span></p>
-<p>因此：</p>
-<p><span class="math display">\[
-P_2=0.6,\qquad P_1=0.4
-\]</span></p>
-<p>稳态为：</p>
-<p><span class="math display">\[
-[0.4,0.6]
-\]</span></p>
-<h2 id="pagerank-的基本原理">7.5 PageRank 的基本原理</h2>
-<h3 id="pagerank-与马尔可夫链的关系">7.5.1 PageRank
-与马尔可夫链的关系</h3>
-<p>PageRank
-本质上可以看成马尔可夫链稳态分布的一个经典应用。它最初用于衡量网页的重要性：一个网页越容易被“随机浏览者”长期访问到，它的
-PageRank 就越高。</p>
-<p>PageRank
-的直觉有两层。第一，<strong>被很多网页指向的网页通常更重要</strong>。如果很多页面都链接到页面
-<span class="math inline">\(A\)</span>，说明 <span
-class="math inline">\(A\)</span>
-可能有较高价值。第二，<strong>来自重要网页的链接更有分量</strong>。如果一个很重要的网页链接到
-<span
-class="math inline">\(A\)</span>，这个链接带来的权重应该比普通网页的链接更大。</p>
-<h3 id="随机浏览者模型">7.5.2 随机浏览者模型</h3>
-<p>为了把这个直觉变成数学模型，可以把整个互联网看成一个有向图。每个网页是一个状态，网页之间的超链接是状态转移。假设某个用户正在网页
-<span class="math inline">\(j\)</span>，如果该网页有 <span
-class="math inline">\(L(j)\)</span> 个出链，并且其中一个链接指向网页
-<span class="math inline">\(i\)</span>，那么用户从 <span
-class="math inline">\(j\)</span> 跳到 <span
-class="math inline">\(i\)</span> 的概率可以设为：</p>
-<p><span class="math display">\[
-P_{ji}=\frac{1}{L(j)}
-\]</span></p>
-<p>如果网页 <span class="math inline">\(j\)</span> 没有链接到 <span
-class="math inline">\(i\)</span>，则：</p>
-<p><span class="math display">\[
-P_{ji}=0
-\]</span></p>
-<p>这样，网页跳转就形成了一个转移矩阵 <span
-class="math inline">\(P\)</span>。不断点击链接相当于不断做马尔可夫链状态更新：</p>
-<p><span class="math display">\[
-r_{t+1}=r_tP
-\]</span></p>
-<p>其中 <span class="math inline">\(r_t\)</span> 是第 <span
-class="math inline">\(t\)</span>
-步时随机浏览者位于各网页的概率分布。当这个分布收敛后，得到的稳态向量
-<span class="math inline">\(r\)</span> 满足：</p>
-<p><span class="math display">\[
-r=rP
-\]</span></p>
-<p>这个稳态向量中的每个分量就是对应网页的
-PageRank。也就是说，<strong>PageRank
-不是简单数入链数量，而是计算随机浏览者长期停留在每个网页上的概率。</strong></p>
-<h3 id="阻尼因子与-pagerank-公式">7.5.3 阻尼因子与 PageRank 公式</h3>
-<p>不过，真实网页图会出现两个问题。第一，有些网页没有出链，随机浏览者到了那里就“卡住”了；第二，有些网页群可能只在内部互相链接，使随机浏览者困在小圈子里。为了解决这个问题，PageRank
-引入阻尼因子 <span class="math inline">\(d\)</span>。常见取值是 <span
-class="math inline">\(d=0.85\)</span>。其含义是：用户有 <span
-class="math inline">\(d\)</span> 的概率沿着当前网页的链接继续点击，有
-<span class="math inline">\(1-d\)</span> 的概率随机跳转到任意网页。</p>
-<p>若总共有 <span class="math inline">\(N\)</span> 个网页，则 PageRank
-常写为：</p>
-<p><span class="math display">\[
-PR(i)=\frac{1-d}{N}
-+d\sum_{j\in In(i)}\frac{PR(j)}{L(j)}
-\]</span></p>
-<p>其中 <span class="math inline">\(In(i)\)</span> 表示所有链接到网页
-<span class="math inline">\(i\)</span> 的网页集合，<span
-class="math inline">\(L(j)\)</span> 表示网页 <span
-class="math inline">\(j\)</span> 的出链数量，<span
-class="math inline">\(PR(i)\)</span>
-表示网页的重要性。这个公式可以这样读：网页 <span
-class="math inline">\(i\)</span>
-的重要性来自两部分，一部分是随机跳转给所有网页的基础分数 <span
-class="math inline">\(\frac{1-d}{N}\)</span>，另一部分是所有指向 <span
-class="math inline">\(i\)</span> 的网页传递过来的重要性。</p>
-<h3 id="所有网页的-pagerank-如何迭代计算">7.5.4 所有网页的 PageRank
-如何迭代计算</h3>
-<p>由于 <span class="math inline">\(PR(i)\)</span>
-的定义右边又包含其他网页的 <span
-class="math inline">\(PR(j)\)</span>，所以 PageRank
-不是直接代入一次就能算出的公式，而是一个递归定义。实际计算时通常使用迭代法。最常见的初始值是让所有网页一开始同等重要：</p>
-<p><span class="math display">\[
-PR_0(i)=\frac{1}{N}
-\]</span></p>
-<p>这里 <span class="math inline">\(N\)</span> 是网页总数，<span
-class="math inline">\(PR_0(i)\)</span> 表示第 <span
-class="math inline">\(0\)</span> 轮时网页 <span
-class="math inline">\(i\)</span> 的
-PageRank。这样初始化的含义是：在还没有利用链接结构之前，先假设随机浏览者均匀分布在所有网页上。</p>
-<p>初始化后，每一轮都用上一轮的 PageRank 计算下一轮：</p>
-<p><span class="math display">\[
-PR_{t+1}(i)=\frac{1-d}{N}
-+d\sum_{j\in In(i)}\frac{PR_t(j)}{L(j)}
-\]</span></p>
-<p>这个公式必须对所有网页同时更新。也就是说，第 <span
-class="math inline">\(t+1\)</span> 轮的每个网页分数都由第 <span
-class="math inline">\(t\)</span> 轮的分数算出，不能先更新网页 <span
-class="math inline">\(A\)</span>，再拿新的 <span
-class="math inline">\(PR_{t+1}(A)\)</span> 去更新网页 <span
-class="math inline">\(B\)</span>。从概率角度看，每一轮都表示随机浏览者又点击了一次链接或发生了一次随机跳转。</p>
-<p>迭代会一直进行到前后两轮变化足够小。例如可以设一个很小的阈值 <span
-class="math inline">\(\epsilon\)</span>，当所有网页都满足：</p>
-<p><span class="math display">\[
-|PR_{t+1}(i)-PR_t(i)|&lt;\epsilon
-\]</span></p>
-<p>就认为 PageRank 已经收敛。收敛后的向量就是各网页的最终
-PageRank。换成马尔可夫链语言，就是我们通过反复计算：</p>
-<p><span class="math display">\[
-r_{t+1}=r_tP
-\]</span></p>
-<p>逐步逼近稳态分布 <span class="math inline">\(r\)</span>。</p>
-<h3 id="一个三网页计算例子">7.5.5 一个三网页计算例子</h3>
-<p>假设有三个网页 <span
-class="math inline">\(A,B,C\)</span>，链接关系如下：</p>
-<ul>
-<li><span class="math inline">\(A\)</span> 链接到 <span
-class="math inline">\(B,C\)</span>，所以 <span
-class="math inline">\(L(A)=2\)</span>；</li>
-<li><span class="math inline">\(B\)</span> 链接到 <span
-class="math inline">\(C\)</span>，所以 <span
-class="math inline">\(L(B)=1\)</span>；</li>
-<li><span class="math inline">\(C\)</span> 链接到 <span
-class="math inline">\(A\)</span>，所以 <span
-class="math inline">\(L(C)=1\)</span>。</li>
-</ul>
-<p>一开始令三个网页同等重要：</p>
-<p><span class="math display">\[
-PR_0(A)=PR_0(B)=PR_0(C)=\frac{1}{3}
-\]</span></p>
-<p>取阻尼因子 <span
-class="math inline">\(d=0.85\)</span>。第一轮计算时，<span
-class="math inline">\(A\)</span> 只有来自 <span
-class="math inline">\(C\)</span> 的入链，<span
-class="math inline">\(B\)</span> 只有来自 <span
-class="math inline">\(A\)</span> 的入链，<span
-class="math inline">\(C\)</span> 有来自 <span
-class="math inline">\(A\)</span> 和 <span
-class="math inline">\(B\)</span> 的入链，所以：</p>
-<p><span class="math display">\[
-\begin{aligned}
-PR_1(A)&amp;=\frac{0.15}{3}+0.85\cdot\frac{PR_0(C)}{1}\\
-PR_1(B)&amp;=\frac{0.15}{3}+0.85\cdot\frac{PR_0(A)}{2}\\
-PR_1(C)&amp;=\frac{0.15}{3}+0.85\left(\frac{PR_0(A)}{2}+\frac{PR_0(B)}{1}\right)
-\end{aligned}
-\]</span></p>
-<p>代入 <span
-class="math inline">\(PR_0(A)=PR_0(B)=PR_0(C)=\frac{1}{3}\)</span>，得到：</p>
-<p><span class="math display">\[
-\begin{aligned}
-PR_1(A)&amp;=0.05+0.85\times\frac{1}{3}=0.3333\\
-PR_1(B)&amp;=0.05+0.85\times\frac{1}{6}=0.1917\\
-PR_1(C)&amp;=0.05+0.85\times\left(\frac{1}{6}+\frac{1}{3}\right)=0.475
-\end{aligned}
-\]</span></p>
-<p>这说明第一轮后 <span class="math inline">\(C\)</span> 的 PageRank
-最高，因为它同时收到 <span class="math inline">\(A\)</span> 和 <span
-class="math inline">\(B\)</span> 的链接，其中 <span
-class="math inline">\(B\)</span> 只有一个出链，会把自己的权重全部传给
-<span class="math inline">\(C\)</span>。后续继续用 <span
-class="math inline">\(PR_1\)</span> 计算 <span
-class="math inline">\(PR_2\)</span>，再用 <span
-class="math inline">\(PR_2\)</span> 计算 <span
-class="math inline">\(PR_3\)</span>，直到分数稳定。</p>
-<h1 id="模糊集语言变量与模糊推理">8 模糊集、语言变量与模糊推理</h1>
-<h2 id="为什么需要模糊集">8.1 为什么需要模糊集</h2>
-<p>概率处理的是事件发生的不确定性，而模糊集处理的是概念边界的不清晰。例如
-tall、hot、dangerous、a little 这些自然语言词语没有明确边界。一个人
-<span class="math inline">\(1.80\text{m}\)</span>
-是否算高，不是简单的是或否，而是“多大程度上算高”。</p>
-<p>经典集合使用二值逻辑：</p>
-<p><span class="math display">\[
-x\in A\quad\text{or}\quad x\notin A
-\]</span></p>
-<p>模糊集则允许元素以某个程度属于集合：</p>
-<p><span class="math display">\[
-\mu_A(x):x\to[0,1],\qquad 0\le\mu_A(x)\le1
-\]</span></p>
-<p>这里 <span class="math inline">\(\mu_A(x)\)</span>
-称为隶属函数或兼容函数。<span class="math inline">\(\mu_A(x)=1\)</span>
-表示完全属于，<span class="math inline">\(\mu_A(x)=0\)</span>
-表示完全不属于，中间值表示部分符合。</p>
-<p>下面是一个隶属函数：</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260529222553759.png" alt="image-20260529222553347" style="zoom:50%;" /></p>
-<h2 id="语言变量">8.2 语言变量</h2>
-<p>语言变量的取值不是普通数字，而是自然语言词。例如：</p>
-<table>
-<thead>
-<tr>
-<th>语言变量</th>
-<th>典型取值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>height</td>
-<td>dwarf, short, average, tall, giant</td>
-</tr>
-<tr>
-<td>number</td>
-<td>almost none, several, few, many</td>
-</tr>
-<tr>
-<td>stage of life</td>
-<td>infant, toddler, child, teenager, adult</td>
-</tr>
-<tr>
-<td>color</td>
-<td>red, blue, green, yellow, orange</td>
-</tr>
-<tr>
-<td>light</td>
-<td>dim, faint, normal, bright, intense</td>
-</tr>
-</tbody>
-</table>
-<p>语言变量的意义在于，它让系统可以用接近人类表达的方式建立规则。例如“如果电视太暗，就调高亮度”比精确写出某个亮度阈值更自然。</p>
-<h2 id="模糊规则与-linguistic-hedges">8.3 模糊规则与 linguistic
-hedges</h2>
-<p>模糊规则通常写成：</p>
-<p><span class="math display">\[
-\text{IF condition THEN conclusion/action}
-\]</span></p>
-<p>例如：如果温度太高，就加入冷水；如果压力太高，就打开泄压阀；如果利率上升，就买债券。这些规则中的
-too hot、too high、going up 都可以由模糊集合描述。</p>
-<p>linguistic hedges 也就是修饰词，它们通过运算改变隶属度：</p>
-<table>
-<thead>
-<tr>
-<th>Hedge</th>
-<th>运算</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Very <span class="math inline">\(F\)</span></td>
-<td><span class="math inline">\(CON(F)=F^2\)</span></td>
-</tr>
-<tr>
-<td>More or Less <span class="math inline">\(F\)</span></td>
-<td><span class="math inline">\(DIL(F)=F^{0.5}\)</span></td>
-</tr>
-<tr>
-<td>Plus <span class="math inline">\(F\)</span></td>
-<td><span class="math inline">\(F^{1.25}\)</span></td>
-</tr>
-<tr>
-<td>Not <span class="math inline">\(F\)</span></td>
-<td><span class="math inline">\(1-F\)</span></td>
-</tr>
-<tr>
-<td>Not Very <span class="math inline">\(F\)</span></td>
-<td><span class="math inline">\(1-F^2\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>例如：</p>
-<p><span class="math display">\[
-TALL=\{0.125/5.5,\ 0.5/6,\ 0.875/6.5,\ 1/7\}
-\]</span></p>
-<p>这里 <span class="math inline">\(0.125/5.5\)</span> 是指 <span
-class="math inline">\(5.5\)</span> feet 有 <span
-class="math inline">\(0.125\)</span> 的程度属于 <span
-class="math inline">\(TALL\)</span>，其它同理。则：</p>
-<p><span class="math display">\[
-VERY\ TALL
-=\{0.0156/5.5,\ 0.25/6,\ 0.7656/6.5,\ 1/7\}
-\]</span></p>
-<p>每个隶属度都被平方。相反：</p>
-<p><span class="math display">\[
-NOT\ TALL=\{0.875/5.5,\ 0.5/6,\ 0.125/6.5,\ 0/7\}
-\]</span></p>
-<p>每个隶属度都变成 <span class="math inline">\(1-\mu\)</span>。</p>
-<h2 id="模糊关系与合成">8.4 模糊关系与合成</h2>
-<p>体重近似相等可以表示成一个模糊关系：</p>
-<p><span class="math display">\[
-R_2(x,y)=\text{APPROXIMATELY EQUAL}
-\]</span></p>
-<table>
-<thead>
-<tr>
-<th style="text-align: right;"><span class="math inline">\(x\backslash
-y\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(120\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(130\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(140\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(150\)</span></th>
-<th style="text-align: right;"><span
-class="math inline">\(160\)</span></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: right;"><span
-class="math inline">\(120\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(1.0\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.7\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.4\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.2\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.0\)</span></td>
-</tr>
-<tr>
-<td style="text-align: right;"><span
-class="math inline">\(130\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.7\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(1.0\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.6\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.5\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.2\)</span></td>
-</tr>
-<tr>
-<td style="text-align: right;"><span
-class="math inline">\(140\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.4\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.6\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(1.0\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.8\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.5\)</span></td>
-</tr>
-<tr>
-<td style="text-align: right;"><span
-class="math inline">\(150\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.2\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.5\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.8\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(1.0\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.8\)</span></td>
-</tr>
-<tr>
-<td style="text-align: right;"><span
-class="math inline">\(160\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.0\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.2\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.5\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(0.8\)</span></td>
-<td style="text-align: right;"><span
-class="math inline">\(1.0\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>这个表的含义是：两个体重越接近，它们“approximately
-equal”的隶属度越高。</p>
-<p>若：</p>
-<p><span class="math display">\[
-R_1(x)=HEAVY=\{0.6/140,\ 0.8/150,\ 1/160\}
-\]</span></p>
-<p>并用 <span class="math inline">\(R_2(x,y)\)</span> 表示 approximately
-equal，则通过 max-min 合成得到：</p>
-<p><span class="math display">\[
-\mu_{R_3}(y)=\max_x\min(\mu_{R_1}(x),\mu_{R_2}(x,y))
-\]</span></p>
-<p><span class="math inline">\(R_3(y)\)</span> 表示 more or less
-heavy。如果一个体重本身很 heavy，或者它和某个 heavy
-的体重很接近，那么它就可以算 more or less
-heavy。也就是：“不一定严格重，但差不多算重”。</p>
-<p>下面是 max-min 的计算过程。因为 <span
-class="math inline">\(R_1\)</span> 只明确给出了 <span
-class="math inline">\(140,150,160\)</span> 的 heavy 程度，所以先把 <span
-class="math inline">\(120,130\)</span> 的 heavy 程度补成 <span
-class="math inline">\(0\)</span>： <span class="math display">\[
-R_1=[0.0,\ 0.0,\ 0.6,\ 0.8,\ 1.0]
-\]</span></p>
-<p>它对应的 <span class="math inline">\(x\)</span> 顺序是：</p>
-<p><span class="math display">\[
-x=[120,\ 130,\ 140,\ 150,\ 160]
-\]</span></p>
-<p>于是 这里的合成可以写成：</p>
-<p><span class="math display">\[
-R_3
-=
-[0.0,\ 0.0,\ 0.6,\ 0.8,\ 1.0]
-\circ
-\begin{bmatrix}
-1.0 &amp; 0.7 &amp; 0.4 &amp; 0.2 &amp; 0.0\\
-0.7 &amp; 1.0 &amp; 0.6 &amp; 0.5 &amp; 0.2\\
-0.4 &amp; 0.6 &amp; 1.0 &amp; 0.8 &amp; 0.5\\
-0.2 &amp; 0.5 &amp; 0.8 &amp; 1.0 &amp; 0.8\\
-0.0 &amp; 0.2 &amp; 0.5 &amp; 0.8 &amp; 1.0
-\end{bmatrix}
-\]</span></p>
-<p>这里的 <span class="math inline">\(\circ\)</span>
-不是普通矩阵乘法，而是 max-min
-composition。普通矩阵乘法是“乘完再相加”，而这里是“先取 <span
-class="math inline">\(\min\)</span>，再取 <span
-class="math inline">\(\max\)</span>”。也就是说，对每一个目标体重 <span
-class="math inline">\(y\)</span>，都要拿 <span
-class="math inline">\(R_1\)</span> 和关系矩阵中 <span
-class="math inline">\(y\)</span> 对应的那一列逐项取 <span
-class="math inline">\(\min\)</span>，最后再取最大值。</p>
-<p>例如计算 <span class="math inline">\(y=120\)</span> 时，取关系矩阵中
-<span class="math inline">\(120\)</span> 这一列：</p>
-<p><span class="math display">\[
-[1.0,\ 0.7,\ 0.4,\ 0.2,\ 0.0]^T
-\]</span></p>
-<p>逐项取 <span class="math inline">\(\min\)</span>：</p>
-<p><span class="math display">\[
-\begin{aligned}
-\mu_{R_3}(120)
-&amp;=\max\{\min(0.0,1.0),\min(0.0,0.7),\min(0.6,0.4),\min(0.8,0.2),\min(1.0,0.0)\}\\
-&amp;=\max\{0.0,0.0,0.4,0.2,0.0\}\\
-&amp;=0.4
-\end{aligned}
-\]</span></p>
-<p>计算 <span class="math inline">\(y=130\)</span> 时，取 <span
-class="math inline">\(130\)</span> 这一列：</p>
-<p><span class="math display">\[
-\begin{aligned}
-\mu_{R_3}(130)
-&amp;=\max\{\min(0.0,0.7),\min(0.0,1.0),\min(0.6,0.6),\min(0.8,0.5),\min(1.0,0.2)\}\\
-&amp;=\max\{0.0,0.0,0.6,0.5,0.2\}\\
-&amp;=0.6
-\end{aligned}
-\]</span></p>
-<p>同理，剩下三列为：</p>
-<p><span class="math display">\[
-\begin{aligned}
-\mu_{R_3}(140)
-&amp;=\max\{\min(0.0,0.4),\min(0.0,0.6),\min(0.6,1.0),\min(0.8,0.8),\min(1.0,0.5)\}\\
-&amp;=\max\{0.0,0.0,0.6,0.8,0.5\}=0.8\\
-\mu_{R_3}(150)
-&amp;=\max\{\min(0.0,0.2),\min(0.0,0.5),\min(0.6,0.8),\min(0.8,1.0),\min(1.0,0.8)\}\\
-&amp;=\max\{0.0,0.0,0.6,0.8,0.8\}=0.8\\
-\mu_{R_3}(160)
-&amp;=\max\{\min(0.0,0.0),\min(0.0,0.2),\min(0.6,0.5),\min(0.8,0.8),\min(1.0,1.0)\}\\
-&amp;=\max\{0.0,0.0,0.5,0.8,1.0\}=1.0
-\end{aligned}
-\]</span></p>
-<p>于是：</p>
-<p><span class="math display">\[
-R_3=\{0.4/120,\ 0.6/130,\ 0.8/140,\ 0.8/150,\ 1/160\}
-\]</span></p>
-<blockquote>
-<h3 id="min-max-到底在干什么">Min-max 到底在干什么？</h3>
-<p>对某个目标体重 <span class="math inline">\(y\)</span>，比如 <span
-class="math inline">\(y=130\)</span>，我们想判断：130 有多大程度算 more
-or less heavy？</p>
-<p>我们会拿它和所有可能的 heavy 体重比较：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">参考体重 <span
-class="math inline">\(x\)</span></th>
-<th style="text-align: left;"><span class="math inline">\(x\)</span>
-本身有多 heavy</th>
-<th style="text-align: left;"><span class="math inline">\(x\)</span> 和
-<span class="math inline">\(130\)</span> 有多接近</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;"><span
-class="math inline">\(120\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(0.0\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(0.7\)</span></td>
-</tr>
-<tr>
-<td style="text-align: left;"><span
-class="math inline">\(130\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(0.0\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(1.0\)</span></td>
-</tr>
-<tr>
-<td style="text-align: left;"><span
-class="math inline">\(140\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(0.6\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(0.6\)</span></td>
-</tr>
-<tr>
-<td style="text-align: left;"><span
-class="math inline">\(150\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(0.8\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(0.5\)</span></td>
-</tr>
-<tr>
-<td style="text-align: left;"><span
-class="math inline">\(160\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(1.0\)</span></td>
-<td style="text-align: left;"><span
-class="math inline">\(0.2\)</span></td>
-</tr>
-</tbody>
-</table>
-<p>现在问题是：每个参考体重 <span class="math inline">\(x\)</span> 能给
-<span class="math inline">\(130\)</span>
-提供多强的<strong>支持</strong>？</p>
-<p>它必须同时满足两个条件：</p>
-<ol type="1">
-<li><span class="math inline">\(x\)</span> 自己要 heavy；</li>
-<li><span class="math inline">\(x\)</span> 要和 <span
-class="math inline">\(130\)</span> 接近。</li>
-</ol>
-<p>只要其中一个条件很弱，支持力度就不能很强。所以用：</p>
-<p><span class="math display">\[
-\min(\text{x 有多 heavy},\text{x 和 y 有多接近})
-\]</span></p>
-<p>这就是 <strong>min 的作用：取短板</strong>。比如 <span
-class="math inline">\(x=160\)</span>，160本身 heavy 程度=1.0，但：160 和
-130 接近程度=0.2，所以它对“130 算 more or less heavy”的支持最多只有
-<span class="math inline">\(\min(1.0,0.2)=0.2\)</span>， 因为 160
-虽然很重，但离 130 太远。</p>
-<p>算完所有参考体重后，我们有一堆“支持理由”：</p>
-<p><span class="math display">\[
-0.0,\ 0.0,\ 0.6,\ 0.5,\ 0.2
-\]</span></p>
-<p>现在问：最终 <span class="math inline">\(130\)</span> 算 more or less
-heavy 的程度是多少？只要有一个理由足够强，就可以支持它。所以取最大：</p>
-<p><span class="math display">\[
-\max(0.0,0.0,0.6,0.5,0.2)=0.6
-\]</span></p>
-<p>这就是 <strong>max 的作用：取最强支持</strong>。</p>
-<p>所以 min-max 公式：</p>
-<p><span class="math display">\[
-\mu_{R_3}(y)=\max_x\min(\mu_{R_1}(x),\mu_{R_2}(x,y))
-\]</span></p>
-<p>可以翻译成：</p>
-<p><strong>对于目标体重 <span
-class="math inline">\(y\)</span>，找所有参考体重 <span
-class="math inline">\(x\)</span>。每个 <span
-class="math inline">\(x\)</span> 对 <span
-class="math inline">\(y\)</span> 的支持力度等于“<span
-class="math inline">\(x\)</span> 有多 heavy”和“<span
-class="math inline">\(x\)</span> 与 <span
-class="math inline">\(y\)</span> 有多接近”二者中的较小值。最后从所有
-<span class="math inline">\(x\)</span> 的支持力度里取最大值，作为 <span
-class="math inline">\(y\)</span> 属于 more or less heavy
-的程度。</strong></p>
-</blockquote>
-<h2 id="飞机识别中的模糊推理">8.5 飞机识别中的模糊推理</h2>
-<p>以飞机图像识别为例，每张图像对 Missile、Fighter、Airliner
-都有不同隶属度。例如 IMAGE4 对三类目标的隶属度为：</p>
-<p><span class="math display">\[
-TARGET_4=0.2/M+0.3/F+0.5/A
-\]</span></p>
-<p>IMAGE6 为：</p>
-<p><span class="math display">\[
-TARGET_6=0.1/M+0.6/F+0.4/A
-\]</span></p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260529225220463.png" alt="image-20260529225219996" style="zoom:50%;" /></p>
-<p>如果两个规则都触发（即系统当前识别到的输入里，既包含或匹配了
-IMAGE4，又包含或匹配了 IMAGE6），则合并时对同一元素取最大隶属度： <span
-class="math display">\[
-\begin{aligned}
-TARGET&amp;=TARGET_4+TARGET_6\\
-&amp;=0.2/M+0.3/F+0.5/A+0.1/M+0.6/F+0.4/A\\
-&amp;=0.2/M+0.6/F+0.5/A
-\end{aligned}
-\]</span></p>
-<p>这里的 <span class="math inline">\(+\)</span>
-不是普通加法，而是模糊集合的并：相同元素保留最大隶属度。类似地，模糊集合的交是取
-<span class="math inline">\(\min\)</span>。</p>
-<h2 id="一般模糊推理形式">8.6 一般模糊推理形式</h2>
-<p>一般地，如果有 <span class="math inline">\(n\)</span> 条规则：</p>
-<p><span class="math display">\[
-\text{IF }E_i\text{ THEN }H_i,\qquad i=1,2,\ldots,n
-\]</span></p>
-<p>则总体结论可以由各规则结论的最大值合成：</p>
-<p><span class="math display">\[
-\mu_H=\max(\mu_{H_1},\mu_{H_2},\ldots,\mu_{H_n})
-\]</span></p>
-<p>如果前提本身是复合表达式，例如：</p>
-<p><span class="math display">\[
-E_1=E_A\land(E_B\lor\lnot E_C)
-\]</span></p>
-<p>则：</p>
-<p><span class="math display">\[
-\mu_{E_1}=\min\{\mu_{E_A},\max(\mu_{E_B},1-\mu_{E_C})\}
-\]</span></p>
-<p>这与 CF 中 AND 用 <span class="math inline">\(\min\)</span>、OR 用
-<span class="math inline">\(\max\)</span>、NOT
-用取反很相似，但模糊推理处理的是“概念隶属度”，而 CF
-处理的是“证据对假设的确定性支持”。</p>
-<h1 id="方法总结">9 方法总结</h1>
-<h2 id="概念区分">9.1 概念区分</h2>
-<p><strong>概率和模糊隶属度不要混淆。</strong>概率表示事件发生的不确定性，例如明天下雨的概率是
-<span
-class="math inline">\(0.6\)</span>；模糊隶属度表示对象符合某个概念的程度，例如一个人属于
-tall 的程度是 <span class="math inline">\(0.6\)</span>。</p>
-<p><strong>CF 不是后验概率。</strong>后验概率 <span
-class="math inline">\(P(H\mid E)\)</span> 是严格概率意义上的条件概率，而
-<span class="math inline">\(CF(H,E)\)</span> 是 MYCIN
-中为了表达专家信任和不信任而设计的启发式指标。</p>
-<p><strong><span class="math inline">\(E\)</span> 和 <span
-class="math inline">\(e\)</span> 的区别要清楚。</strong>在 CF 中，<span
-class="math inline">\(E\)</span> 是规则前提里的证据表达式，<span
-class="math inline">\(e\)</span> 是当前真实观察到的证据背景。<span
-class="math inline">\(CF(E,e)\)</span> 表示在当前观察背景下，规则前提
-<span class="math inline">\(E\)</span> 的可信度。</p>
-<p><strong>贝叶斯决策不只算概率。</strong>贝叶斯更新解决“哪个假设更可信”，而决策还要考虑收益和损失。</p>
-<h2 id="贝叶斯决策计算流程">9.2 贝叶斯决策计算流程</h2>
-<p>贝叶斯决策可以按以下顺序计算：</p>
-<ol type="1">
-<li>写出假设 <span class="math inline">\(H_i\)</span> 和先验 <span
-class="math inline">\(P(H_i)\)</span>。</li>
-<li>写出证据 <span class="math inline">\(E\)</span> 下的条件概率 <span
-class="math inline">\(P(E\mid H_i)\)</span>。</li>
-<li>计算联合概率 <span class="math inline">\(P(E\cap H_i)=P(E\mid
-H_i)P(H_i)\)</span>。</li>
-<li>计算证据总概率 <span class="math inline">\(P(E)=\sum_iP(E\cap
-H_i)\)</span>。</li>
-<li>计算后验概率 <span class="math inline">\(P(H_i\mid E)=\dfrac{P(E\cap
-H_i)}{P(E)}\)</span>。</li>
-<li>如果是决策题，再用后验概率乘以收益或损失，比较期望值。</li>
-</ol>
-<h2 id="cf-计算流程">9.3 CF 计算流程</h2>
-<p>CF 计算通常分三步。第一步先算复合前提：</p>
-<p><span class="math display">\[
-AND\to\min,\qquad OR\to\max,\qquad NOT\to-
-\]</span></p>
-<p>第二步算规则结论：</p>
-<p><span class="math display">\[
-CF(H,e)=CF(E,e)CF(H,E)
-\]</span></p>
-<p>第三步如果多条规则都推出同一假设，就使用 <span
-class="math inline">\(CF_{\mathrm{COMB}}\)</span> 合成。</p>
-<h2 id="马尔可夫链计算流程">9.4 马尔可夫链计算流程</h2>
-<p>马尔可夫链计算一般先写状态向量 <span
-class="math inline">\(S_t\)</span> 和转移矩阵 <span
-class="math inline">\(P\)</span>，再做状态更新：</p>
-<p><span class="math display">\[
-S_{t+1}=S_tP
-\]</span></p>
-<p>如果要求稳态，就设：</p>
-<p><span class="math display">\[
-SP=S,\qquad \sum_i S_i=1
-\]</span></p>
-<p>然后解线性方程组。</p>
-<h2 id="模糊推理计算流程">9.5 模糊推理计算流程</h2>
-<p>模糊推理首先把每个自然语言条件转成隶属度。复合条件按：</p>
-<p><span class="math display">\[
-AND\to\min,\qquad OR\to\max,\qquad NOT\to 1-\mu
-\]</span></p>
-<p>如果有 linguistic hedge，要先变换隶属度，例如 very 对应平方，more or
-less 对应开方。若是模糊关系合成，则使用：</p>
-<p><span class="math display">\[
-\mu_{R_3}(y)=\max_x\min(\mu_{R_1}(x),\mu_{R_2}(x,y))
-\]</span></p>
-<p>如果多个模糊结论合并，同一元素取最大隶属度。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/Knowledge%20Representation/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Fqmmm">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/07/09/AI/Knowledge%20Representation/" class="post-title-link" itemprop="url">Knowledge Representation</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-07-09 15:12:29 / Modified: 16:04:48" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h2 id="目录">目录</h2>
-<ul>
-<li>知识表示为什么重要：从专家系统说起</li>
-<li>语义网络：把知识组织成概念层级</li>
-<li>框架表示法：用对象模板组织常识</li>
-<li>概念图：用图结构表达句子的语义</li>
-<li>知识图谱：RDF 三元组与 SPARQL 查询</li>
-<li>从自然语言到知识表示</li>
-<li>其他知识表示方法概览</li>
-<li>本章方法对比与总结</li>
-</ul>
-<h2 id="知识表示为什么重要从专家系统说起">1
-知识表示为什么重要：从专家系统说起</h2>
-<h3 id="普通程序与专家系统的差异">1.1 普通程序与专家系统的差异</h3>
-<p>知识表示的核心问题可以先通过两个公式看出来。普通程序可以粗略写成：</p>
-<p><span class="math display">\[
-\text{Programs}=\text{Algorithms}+\text{Data Structures}
-\]</span></p>
-<p>也就是说，传统程序更关心“用什么算法处理什么数据结构”。例如排序程序的核心是排序算法，数据库索引的核心是数据结构设计。只要问题规则明确、流程固定，算法和数据结构就能很好地解决问题。</p>
-<p>但专家系统面对的是另一类问题。医生诊断、设备故障排查、法律咨询、配置推荐等任务，并不只是把一批数据喂给一个固定算法，而是要用大量领域知识进行判断。因此专家系统可以概括为：</p>
-<p><span class="math display">\[
-\text{Expert Systems}=\text{Knowledge}+\text{Inference}
-\]</span></p>
-<p>这里的 <strong>Knowledge</strong>
-指专家经验、事实、规则、概念关系和默认常识；<strong>Inference</strong>
-指系统根据已有知识推出新结论的过程。换句话说，专家系统的重点不是“算得快”，而是“知道什么，并且能根据这些知识推出什么”。</p>
-<p>一个典型专家系统通常包含知识库、推理机、工作记忆和解释模块。知识库存放领域事实和规则，推理机负责根据当前事实进行推理，工作记忆保存当前问题的具体信息，解释模块则回答“为什么系统会这样判断”。这也解释了为什么本章要讲知识表示：如果知识没有被清楚地表示出来，推理机就无从使用它。</p>
-<h3 id="知识表示知识获取与知识使用">1.2
-知识表示、知识获取与知识使用</h3>
-<p>人工智能中围绕知识的研究大致有三个方面：<strong>知识表示</strong>、<strong>知识获取</strong>和<strong>知识使用</strong>。三者不是并列孤立的关系，而是有先后依赖的关系。</p>
-<p>知识获取解决“知识从哪里来”的问题，例如从专家访谈、数据库、文本、传感器或互联网中获得知识。知识使用解决“知识如何发挥作用”的问题，例如检索、问答、分类、诊断和规划。而知识表示处在二者中间，它负责把获得的知识变成机器能够保存、组织和推理的形式。</p>
-<p>例如，人可以自然地说“金丝雀是鸟，鸟通常会飞”。但机器不能直接理解自然语言中的“是”“通常”和“会”。如果我们把它表示为概念层级和属性继承，机器就可以沿着层级推出“金丝雀通常会飞”。因此，知识表示的本质就是把人类知识翻译成机器可操作的结构。</p>
-<h3 id="知识表示需要解决什么问题">1.3 知识表示需要解决什么问题</h3>
-<p>好的知识表示方法至少要解决四类问题。第一是<strong>表达能力</strong>，也就是它能不能表示对象、属性、关系、事件、规则、默认值和例外情况。第二是<strong>推理能力</strong>，也就是系统能不能基于表示出来的知识推出新结论。第三是<strong>组织能力</strong>，也就是知识之间能不能形成层次、分类、继承和组合关系。第四是<strong>可维护性</strong>，也就是新增知识时不会轻易破坏已有结构。</p>
-<p>本章后面的语义网络、框架、概念图和知识图谱，都可以看成对这些问题的不同回答。语义网络擅长表达概念层级，框架擅长表达典型对象或场景，概念图擅长表达自然语言语义结构，知识图谱则适合大规模组织实体及其关系。</p>
-<h2 id="语义网络把知识组织成概念层级">2
-语义网络：把知识组织成概念层级</h2>
-<h3 id="心理学证据人类知识可能按层级组织">2.1
-心理学证据：人类知识可能按层级组织</h3>
-<p>人类记忆中的知识往往具有层级结构。例如
-<code>ANIMAL</code>、<code>BIRD</code>、<code>CANARY</code>、<code>OSTRICH</code>、<code>FISH</code>
-等概念可以组织成上下位关系：<code>CANARY</code> 是 <code>BIRD</code>
-的一种，<code>BIRD</code> 又是 <code>ANIMAL</code>
-的一种。属性也可以放在不同层级上，例如 <code>ANIMAL</code> 具有
-<code>can breathe</code>、<code>has skin</code>、<code>can move</code>
-属性，而 <code>BIRD</code> 具有
-<code>can fly</code>、<code>has wings</code>、<code>has feathers</code>
-属性。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220417781.png" style="zoom: 33%;" /></p>
-<p>这个实验关注的是人判断句子真假的反应时间。判断 “A canary is a canary”
-最快，因为它几乎不需要跨层级查找；判断 “A canary is a bird”
-稍慢，因为要从 <code>CANARY</code> 往上一层找到 <code>BIRD</code>；判断
-“A canary is an animal” 更慢，因为要继续往上找到
-<code>ANIMAL</code>。同理，“A canary has skin” 也比较慢，因为
-<code>has skin</code> 这个属性存放在 <code>ANIMAL</code>
-层级，需要通过继承得到。</p>
-<p>这个例子说明，概念层级不仅能节省存储，还能解释某些认知现象。我们不需要在
-<code>CANARY</code>、<code>OSTRICH</code>、<code>FISH</code>
-等每一个概念下面重复写“会呼吸、有皮肤、会移动”，只要把这些属性放在更高层的
-<code>ANIMAL</code> 上，子类就可以继承它们。</p>
-<p>不过，这个例子也埋下了一个重要问题：继承并不总是无条件正确。图中
-<code>OSTRICH</code>（鸵鸟） 是
-<code>BIRD</code>，但鸵鸟不会飞。如果系统只知道“鸟会飞”和“鸵鸟是鸟”，就会推出错误结论“鸵鸟会飞”。因此，语义网络必须处理默认属性和例外之间的冲突。</p>
-<h3 id="语义网络的基本结构">2.2 语义网络的基本结构</h3>
-<p><strong>语义网络（Semantic Network）</strong>
-是一种图形化知识表示方法。它通常用节点表示概念、实例或属性值，用边表示节点之间的关系。常见关系包括
-<code>is-a</code>、<code>part-of</code>、<code>has</code>、<code>can</code>、<code>property</code>、<code>color</code>、<code>owns</code>
-等。</p>
-<p>在语义网络中，最重要的边之一是
-<code>is-a</code>。它表示“某个概念属于另一个更一般的概念”，例如
-<code>CANARY is-a BIRD</code>。这种关系使网络形成层级结构，也让属性继承成为可能。</p>
-<p>这里的推理例子如下：</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220832438.png" style="zoom:50%;" /></p>
-<p>图里有几个基本事实：<code>TWEETY is-a CANARY</code>，<code>CANARY is-a BIRD</code>，<code>CANARY property CAN-FLY</code>，<code>CANARY color YELLOW</code>，并且
-<code>SYLVESTER owns TWEETY</code>。这些事实本身很简单，但它们组合起来之后就能产生新的结论。</p>
-<h3 id="语义网络中的继承推理">2.3 语义网络中的继承推理</h3>
-<p>语义网络推理的核心是沿着图中的边进行搜索，尤其是沿着
-<code>is-a</code> 边向上查找父类，然后继承父类或类别上的属性。</p>
-<p>例如，图中明确写着
-<code>CANARY is-a BIRD</code>，<code>BIRD property CAN-FLY</code>，所以可以得到
-<code>CAN-FLY(CANARY)</code>。又因为
-<code>TWEETY is-a CANARY</code>，所以 Tweety
-继承金丝雀的属性，系统可以推出 <code>CAN-FLY(TWEETY)</code> 和
-<code>TWEETY is YELLOW</code>。再结合
-<code>SYLVESTER owns TWEETY</code>，系统还能进一步推出 Sylvester
-拥有一只金丝雀，拥有一只鸟，并且拥有某个会飞的东西。</p>
-<p>这个推理过程的逻辑是连续的：先确定 Tweety
-的类别，再继承类别属性，最后把“拥有
-Tweety”这个关系推广为“拥有一只具有这些类别和属性的东西”。因此，语义网络不只是画图工具，它可以支持基于路径和继承的推理。</p>
-<h3 id="语义网络的优点与局限">2.4 语义网络的优点与局限</h3>
-<p>语义网络最大的优点是直观。它把知识画成图，很适合表示“谁属于谁”“谁拥有什么属性”“谁和谁有关系”。对于概念层级、分类体系和对象关系，语义网络尤其自然。</p>
-<p>但它的局限也很明显。首先，复杂逻辑表达能力有限。例如“所有鸟都会飞，除非它是鸵鸟或它受伤了”这类带例外和条件的知识，用普通边很难清楚表示。其次，如果没有严格形式语义，不同人可能对同一种边有不同理解。最后，继承冲突需要额外规则处理。比如某节点从父类继承“会飞”，又从自身属性得到“不会飞”，系统必须知道哪个结论优先。</p>
-<h2 id="框架表示法用对象模板组织常识">3
-框架表示法：用对象模板组织常识</h2>
-<h3 id="frame-的基本思想">3.1 Frame 的基本思想</h3>
-<p><strong>Frame（框架）</strong>
-是一种以对象、概念或场景为中心的知识表示方法。它有点像 UML
-中的类图，也像一个对象模板。一个框架描述“这个东西通常有什么属性、和什么东西有关、默认情况下是什么样子”。</p>
-<p>框架内部由许多 <strong>slot（槽）</strong>
-构成。每个槽可以存放属性值、关系、默认值、约束，甚至可以存放过程性信息。与语义网络相比，框架不是把所有知识都摊成节点和边，而是把关于同一个对象或场景的知识收拢到一个结构中。</p>
-<p>以 hotel room 为例：</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221034590.png" style="zoom:33%;" /></p>
-<p><code>hotel room</code> 这个框架可以有
-<code>specialization of: room</code>、<code>location: hotel</code>、<code>contains: hotel chair, hotel phone, hotel bed</code>
-等槽。<code>hotel bed</code> 又可以有
-<code>use: sleeping</code>、<code>size: king</code>、<code>part: mattress, frame</code>
-等槽。这样一来，“酒店房间”不再只是一个孤立概念，而是一个由位置、组成部分、用途和默认属性构成的知识结构。</p>
-<p>框架特别适合表示具有稳定结构的对象或场景，例如房间、课堂、餐厅、车辆、病例、会议流程等。它的优势在于人类看到一个场景时，常常会自动填补默认信息。例如听到“酒店房间”，我们通常会默认里面有床、椅子、电话或类似设备。框架正是用来表示这种“典型结构”的。</p>
-<h3 id="slot-的类型与作用">3.2 Slot 的类型与作用</h3>
-<p>框架中常见的 slot 类型包括：</p>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr>
-<th>Slot 类型</th>
-<th>作用</th>
-<th>例子</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Frame identification information</td>
-<td>标识这个框架是什么</td>
-<td><code>hotel room</code>、<code>hotel bed</code></td>
-</tr>
-<tr>
-<td>Relationship of this frame to other frames</td>
-<td>表示与其他框架的继承、包含、组成关系</td>
-<td><code>specialization of: room</code>、<code>part: mattress</code></td>
-</tr>
-<tr>
-<td>Descriptors of requirements for a frame</td>
-<td>描述该框架必须满足的属性或约束</td>
-<td>椅子有 4 条腿，床用于 sleeping</td>
-</tr>
-<tr>
-<td>Procedural information</td>
-<td>访问或修改槽时触发某些过程</td>
-<td>查询价格时自动计算费用</td>
-</tr>
-<tr>
-<td>Frame default information</td>
-<td>没有明确值时使用的默认信息</td>
-<td>酒店床默认可供 sleeping</td>
-</tr>
-<tr>
-<td>New instance information</td>
-<td>记录具体实例的新信息或覆盖默认值</td>
-<td>某个房间的床不是 king size</td>
-</tr>
-</tbody>
-</table>
-<p>这些槽说明，框架不是简单的属性表。它既可以表达静态事实，也可以表达默认假设、继承关系、约束条件和过程。比如某个
-<code>hotel chair</code> 默认高度是 <span
-class="math inline">\(20\)</span> 到 <span
-class="math inline">\(40\)</span> cm，如果具体房间中的椅子高度被测量为
-<span class="math inline">\(45\)</span>
-cm，那么实例信息就可以覆盖默认信息。</p>
-<h3 id="框架系统中的推理">3.3 框架系统中的推理</h3>
-<p>框架推理通常围绕槽值展开。最常见的是继承推理：子框架可以继承父框架的槽。例如
-<code>hotel chair</code> 是 <code>chair</code>
-的特殊形式，因此它可以继承椅子的一般属性，再增加酒店场景下的特殊属性。</p>
-<p>第二种常见推理是默认值填充。当系统没有得到某个槽的明确值时，可以使用框架中的默认值。比如只说“酒店房间里有一张床”，如果没有更多信息，系统可以默认这张床用于睡觉、有床垫和床架。默认值让系统能够在信息不完整时继续推理。</p>
-<p>第三种是实例覆盖。默认值并不等于永远正确，具体实例的信息通常优先级更高。比如酒店床默认是
-king size，但某个具体房间可能是 twin
-bed，那么具体实例的槽值应该覆盖默认值。</p>
-<h3 id="john-is-like-a-fire-engine-例子到底想说明什么">3.4 “John is like
-a fire engine” 例子到底想说明什么</h3>
-<p>这里有一个看起来很怪的例子：<code>John like a fire engine.</code>
-更自然地说应该是 <code>John is like a fire engine.</code>，意思是 John
-像一辆消防车。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221407337.png" style="zoom: 33%;" /></p>
-<p>消防车框架中有很多槽，例如
-<code>isa: motor vehicle</code>、<code>color: red</code>、<code>activity: high</code>、<code>volume: very high</code>、<code>fuel efficiency: average</code>、<code>ladder: 5m</code>。如果系统听到“John
-像消防车”，它不能把消防车的所有槽都复制给 John。否则会推出 John
-是机动车、John 是红色、John 有 <span class="math inline">\(5\)</span>
-米梯子，这显然荒唐。</p>
-<p>这个例子真正想说明的是：<strong>框架推理必须根据关系的语义选择相关槽，而不是机械复制所有槽。</strong>
-在 “like” 这个关系下，合理迁移的是 <code>activity: high</code> 和
-<code>volume: very high</code>，也就是 John
-可能很活跃、声音很大、动静很大；不应该迁移的是类别、颜色、燃油效率和梯子。</p>
-<p>因此，这个例子是框架系统中“选择性继承”或“类比推理”的示意。它提醒我们，知识表示不仅要保存属性，还要知道哪些属性在当前语境下
-relevant。</p>
-<h2 id="概念图用图结构表达句子的语义">4
-概念图：用图结构表达句子的语义</h2>
-<h3 id="概念图的基本组成">4.1 概念图的基本组成</h3>
-<p><strong>Conceptual Graph（概念图）</strong>
-是一种图形化知识表示方法，常用于表达自然语言句子的语义结构。它通常包含两类节点：<strong>概念节点（concept
-nodes）</strong> 和 <strong>关系节点（relation
-nodes）</strong>。概念节点表示实体、类别、属性值或命题中的对象；关系节点表示概念之间的语义关系。</p>
-<p>概念图和语义网络很像，但二者有一个重要区别：语义网络常把关系画成边，而概念图通常把关系也画成节点。这样做的好处是，关系可以明确连接一个、两个或多个概念，从而表示不同元数的关系。</p>
-<h3 id="关系的元数一元二元和三元关系">4.2
-关系的元数：一元、二元和三元关系</h3>
-<p>关系的元数可以通过几个简单例子理解：</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221719830.png" style="zoom:33%;" /></p>
-<p>如果关系只连接一个概念，它就是一元关系。例如
-<code>bird - flies</code> 表示鸟会飞，<code>flies</code> 是一个 <span
-class="math inline">\(1\)</span> 元关系。</p>
-<p>如果关系连接两个概念，它就是二元关系。例如
-<code>dog - color - brown</code> 表示狗的颜色是棕色，<code>color</code>
-是一个 <span class="math inline">\(2\)</span>
-元关系。这里的两个参与者分别是“被描述的对象”和“属性值”。</p>
-<p>如果关系连接三个概念，它就是三元关系。例如
-<code>father, child, mother - parents</code>
-表达父亲、母亲和孩子之间的亲子关系，<code>parents</code> 是一个 <span
-class="math inline">\(3\)</span>
-元关系。这个例子说明，概念图不局限于二元关系，它可以比较自然地表达多参与者关系。</p>
-<h3 id="marker唯一标记与通用标记">4.3 Marker：唯一标记与通用标记</h3>
-<p>概念图需要区分类别、具体个体和变量，因此引入了 marker。</p>
-<p><strong>Unique marker（唯一标记）</strong>
-用于标识某个具体个体。这里的 <code>dog:#007</code> 表示“编号为 #007
-的那只狗”。它不是泛泛地说狗这个类别，而是在说某个唯一确定的对象。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221850872.png" style="zoom:33%;" /></p>
-<p>这个图表达的意思是：有一只唯一编号为 <code>#007</code>
-的狗，它的名字是 Emma，颜色是
-brown。这里需要唯一标记，是因为现实世界里可能有很多只叫 Emma
-的狗。系统如果只根据名字识别对象，就可能把不同实体混淆。</p>
-<p><strong>Generic marker（通用标记）</strong>
-用于表示某个未特指的个体或变量。这里的 <code>dog:*X</code>
-表示“某只狗”，但不指定它的唯一编号。它和数学中的变量有点像：虽然不知道具体是哪一只狗，但图中所有连接到
-<code>dog:*X</code> 的关系都指向同一个对象。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522221948605.png" style="zoom:33%;" /></p>
-<p>这个图表达句子 <code>The dog scratches its ear with its paw.</code>
-难点在于 <code>its</code>。英语里的 <code>its ear</code> 和
-<code>its paw</code> 都指同一只狗的身体部分。概念图通过
-<code>part</code> 关系把 <code>ear</code> 和 <code>paw</code>
-都连接回同一个 <code>dog:*X</code>，从而说明耳朵和爪子属于这只狗。</p>
-<p>可以用下表快速区分：</p>
-<table>
-<thead>
-<tr>
-<th>表达</th>
-<th>含义</th>
-<th>例子</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>dog</code></td>
-<td>狗这个概念或类别</td>
-<td>泛指 dog</td>
-</tr>
-<tr>
-<td><code>dog:#007</code></td>
-<td>某个唯一确定的狗</td>
-<td>编号为 #007 的狗</td>
-</tr>
-<tr>
-<td><code>dog:*X</code></td>
-<td>某个未特指的狗，类似变量</td>
-<td>某只狗抓自己的耳朵</td>
-</tr>
-</tbody>
-</table>
-<h3 id="命题概念把一句话当作对象">4.4 命题概念：把一句话当作对象</h3>
-<p>自然语言中经常出现“相信、知道、认为、希望、说”等动词。这些动词的宾语往往不是一个普通对象，而是一整个命题。例如
-<code>Tom believes that Jane likes pizza.</code> 中，Tom
-相信的不是某个普通名词对象，而是 “Jane likes pizza” 这个完整命题。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222230968.png" style="zoom:33%;" /></p>
-<p>这句话的主干是 Tom believes something，但这个 something 不是
-pizza，也不是 Jane，而是完整命题 “Jane likes pizza”。因此概念图中需要把
-<code>Jane likes pizza</code> 包装成一个
-<strong>proposition（命题概念）</strong>，再作为 <code>believe</code> 的
-object。</p>
-<p>这和语法中的宾语从句很像。关键是要区分两个层次：第一层是 “Tom
-believes P”，第二层是命题 <span class="math inline">\(P=\)</span> “Jane
-likes pizza”。Tom 相信 <span
-class="math inline">\(P\)</span>，并不自动意味着 <span
-class="math inline">\(P\)</span>
-一定为真。也就是说，“某人相信一件事”和“这件事本身是真的”是两个不同问题。知识表示如果不能区分这两层，就会把信念误当事实。</p>
-<h3 id="概念图推理restrictionjoinsimplify">4.5
-概念图推理：Restriction、Join、Simplify</h3>
-<p>概念图有三种基本操作：restriction、join 和
-simplify。它们的作用分别是细化概念、合并图和删除冗余。</p>
-<p>G1 表示某只狗作为 agent 执行 <code>eat</code>，object 是
-<code>bone</code>。G2 表示 <code>animal:"emma"</code> 的颜色是
-brown，并且位置在 porch。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222439454.png" style="zoom:33%;" /></p>
-<p><strong>Restriction operation，限制操作</strong>
-是把更一般的概念限制为更具体的概念。这里 G3 把
-<code>animal:"emma"</code> 限制为
-<code>dog:"emma"</code>。这背后的逻辑是，dog 是 animal
-的子类，因此如果我们知道 Emma 是狗，就能把原来较泛的 animal 类型具体化为
-dog。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222523118.png" style="zoom:33%;" /></p>
-<p><strong>Join operation，连接操作</strong>
-是把两个或多个图中可对应的节点合并，形成更大的图。这里 G4 把关于 Emma
-的吃骨头信息、颜色信息和位置信息合并到同一个实体上。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222555980.png" style="zoom:33%;" /></p>
-<p><strong>Simplify operation，简化操作</strong> 是删除 join
-后产生的重复节点或冗余结构，得到更紧凑的图 G5。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222614979.png" style="zoom:33%;" /></p>
-<p>最终，系统可以得到一组连贯知识：Emma 是一只狗，Emma 是棕色的，Emma 在
-porch，Emma 正在吃
-bone。这个例子说明，概念图推理不是靠单条规则完成的，而是通过图结构的细化、合并和化简逐步得到更完整的表示。</p>
-<h2 id="知识图谱rdf-三元组与-sparql-查询">5 知识图谱：RDF 三元组与
-SPARQL 查询</h2>
-<h3 id="三元组知识图谱的基本事实单位">5.1
-三元组：知识图谱的基本事实单位</h3>
-<p>Sean Penn
-这个例子可以用来说明知识图谱中的三元组。知识图谱通常把事实表示为：</p>
-<p><span class="math display">\[
-(\text{subject},\text{predicate},\text{object})
-\]</span></p>
-<p>也就是“主语、谓语、宾语”。例如：</p>
-<p><span class="math display">\[
-(\text{Sean Penn},\text{occupation},\text{Actor})
-\]</span></p>
-<p>这条三元组表达的意思是：Sean Penn 的职业是演员。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522222902091.png" style="zoom:33%;" /></p>
-<p>这里的例子可以整理为：</p>
-<table>
-<thead>
-<tr>
-<th>Subject</th>
-<th>Predicate</th>
-<th>Object</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>https://xxx/sean_penn/</code></td>
-<td><code>rdfs:type</code></td>
-<td><code>Person</code></td>
-</tr>
-<tr>
-<td><code>https://xxx/sean_penn/</code></td>
-<td><code>fullName</code></td>
-<td><code>"Sean Penn"</code></td>
-</tr>
-<tr>
-<td><code>https://xxx/sean_penn/</code></td>
-<td><code>mailbox</code></td>
-<td><code>"sean_penn@xxx.com"</code></td>
-</tr>
-<tr>
-<td><code>https://xxx/sean_penn/</code></td>
-<td><code>occupation</code></td>
-<td><code>"Actor"</code></td>
-</tr>
-</tbody>
-</table>
-<p>这些三元组共同描述了一个实体：它是一个人，名字叫 Sean
-Penn，有邮箱，有职业。每条三元组都很小，但大量三元组连接起来，就能形成知识图谱。</p>
-<h3 id="rdf资源描述框架">5.2 RDF：资源描述框架</h3>
-<p><strong>RDF，Resource Description
-Framework，资源描述框架</strong>，是 Web
-语义网和知识图谱中常用的一种标准数据模型。根据 W3C 的定义，RDF
-的核心思想就是用三元组描述资源之间的关系。</p>
-<p>在 RDF 中，subject 通常是一个资源 URI 或空白节点，predicate
-通常是表示属性或关系的 URI，object
-可以是另一个资源、空白节点，也可以是字符串、数字等字面量。这里
-<code>https://xxx/sean_penn/</code> 就是一个资源标识符，它比直接写 “Sean
-Penn” 更适合机器处理，因为 URI 可以尽量指向唯一资源。</p>
-<p>Sean Penn
-是一个真实人物，中文通常译作西恩·潘，是美国演员和导演。这里关注的不是他的生平，而是如何把他作为知识图谱中的一个
-entity，并用 RDF 三元组描述现实世界中的人。</p>
-<p>RDF
-与前面的语义网络、概念图有明显联系。它们都在表达“实体之间有什么关系”。区别在于，RDF
-是更工程化、标准化的数据模型，适合在 Web
-和数据库中大规模存储、交换和查询。</p>
-<h3 id="sparql查询-rdf-图的语言">5.3 SPARQL：查询 RDF 图的语言</h3>
-<p>如果 RDF 用来存储知识图谱，那么 <strong>SPARQL</strong> 就是用来查询
-RDF 图的语言。这里出现了：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT ?author ?titre ?homepage</span><br></pre></td></tr></table></figure>
-<p>这表示查询结果希望返回三个变量：作者、标题和主页。SPARQL
-查询的基本思想是写出一组图模式，让系统在 RDF
-图中寻找匹配的三元组，并把匹配到的资源绑定到变量上。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223257880.png" style="zoom:33%;" /></p>
-<p>可以把它类比为数据库中的 SQL，但 SPARQL 面向的是图结构数据。SQL
-常在表中查行列，而 SPARQL 常在三元组图中查节点和边的匹配关系。</p>
-<h3 id="本体映射owlsameas-与-owlequivalentproperty">5.4
-本体映射：owl:sameAs 与 owl:equivalentProperty</h3>
-<p>这里的 SPARQL
-例子不只是查询，还暗示了一个更重要的问题：不同数据源可能用不同名字描述同一件事。</p>
-<p>例如，一个英文数据源可能用 <code>a:title</code>
-表示书名，另一个法文数据源可能用 <code>b:titre</code>
-表示书名。它们名字不同，但语义相同。此时可以用
-<code>owl:equivalentProperty</code> 表示两个属性等价。类似地，如果两个
-URI 指向同一个真实作者，可以用 <code>owl:sameAs</code>
-表示它们其实是同一个实体。</p>
-<p>这类映射对知识图谱非常重要。没有映射时，系统可能把同一个作者看成两个人，把同一种属性看成两种关系；有了映射后，系统就能跨数据源合并信息。例如，一个数据源知道作者主页，另一个数据源知道作者写了哪本书，系统通过
-<code>owl:sameAs</code> 就能把这些事实连起来。</p>
-<h2 id="从自然语言到知识表示">6 从自然语言到知识表示</h2>
-<h3 id="输入与句法分析">6.1 输入与句法分析</h3>
-<p><code>Tarzan kissed Jane.</code>
-可以用来展示自然语言理解如何一步步转成知识表示。第一步是输入原始句子，第二步是
-parsing，也就是句法分析。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223355054.png" style="zoom: 33%;" /></p>
-<p>句法分析要回答的是“这个句子的语法结构是什么”。在这个例子中，整个句子可以分成名词短语
-<code>Tarzan</code> 和动词短语
-<code>kissed Jane</code>；动词短语中又包含动词 <code>kissed</code>
-和名词短语
-<code>Jane</code>。这一步还没有真正理解世界意义，只是在确定词语如何组成句子。</p>
-<h3 id="语义解释从语法结构到内部表示">6.2
-语义解释：从语法结构到内部表示</h3>
-<p>第三步是 semantic
-interpretation，也就是把句法结构转成内部语义表示。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223436992.png" style="zoom:33%;" /></p>
-<p>在这个内部表示中，<code>person: tarzan</code> 是 <code>kiss</code>
-这个动作的 agent，<code>person: jane</code> 是 object，<code>lips</code>
-是
-instrument。这里的重点是，系统不只是知道句子里有三个词，而是知道“谁对谁做了什么，用什么做”。</p>
-<p>这个过程体现了概念图和语义角色的作用。自然语言中的主语、宾语和介词短语，最终要转化为
-agent、object、instrument、location
-等语义角色。只有完成这一步，系统才可能回答问题或进一步推理。</p>
-<h3 id="上下文与世界知识解释">6.3 上下文与世界知识解释</h3>
-<p>第四步是 contextual / world knowledge
-interpretation，也就是结合上下文和世界知识扩展表示。</p>
-<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223527813.png" style="zoom:33%;" /></p>
-<p>扩展图中加入了 Tarzan 的宠物 Cheetah、Jane 与 love 的关系、jungle
-作为 location
-等背景信息。也就是说，系统不只处理句子字面信息，还把它放进更大的世界知识中解释。</p>
-<p>这一步很重要，因为自然语言常常省略大量常识。比如人类看到 “Tarzan
-kissed Jane” 可能会自动联想到 Tarzan、Jane、jungle
-等背景，但机器不会自动知道这些。知识表示系统需要把这些背景知识显式组织起来，才能做更深层的理解。</p>
-<h3 id="下游应用问答查询翻译与生成">6.4
-下游应用：问答、查询、翻译与生成</h3>
-<p>当句子被转换成内部知识表示后，它就可以服务于 question
-answerer、database query handler、translator、language generator 和
-speech synthesis 等应用。</p>
-<p>这条流程可以概括为：自然语言输入先变成句法结构，再变成语义结构，再结合世界知识扩展，最后交给问答、查询、翻译或生成模块使用。也就是说，知识表示是自然语言处理系统中连接“文字表面形式”和“机器可操作意义”的桥梁。</p>
-<h2 id="其他知识表示方法概览">7 其他知识表示方法概览</h2>
-<h3 id="逻辑产生式规则与决策表">7.1 逻辑、产生式规则与决策表</h3>
-<p>除了前面几类方法，还有一批其他知识表示方法。它们不需要全部展开，但要知道各自适合什么问题。</p>
-<p><strong>逻辑表示</strong>包括命题逻辑、一阶逻辑、描述逻辑和模态逻辑。逻辑的优点是形式严谨，适合表达精确规则和进行严格推理。例如一阶逻辑可以写出“所有人都会死亡”这类带量词的命题。但逻辑表示的缺点是常识知识很庞杂，例外和不确定性处理起来不轻松。</p>
-<p><strong>产生式规则</strong>通常写成：</p>
-<p><span class="math display">\[
-\text{IF 条件 THEN 结论或动作}
-\]</span></p>
-<p>它在专家系统中非常常见。例如“如果病人发烧且咳嗽，那么怀疑呼吸道感染”。这种表示容易理解、容易维护，但当规则数量很多时，规则之间可能冲突，系统也可能难以解释复杂链式推理。</p>
-<p><strong>决策表</strong>适合把条件组合和对应动作整理成表格。它常用于业务规则、测试用例和诊断流程。相比产生式规则，决策表更适合系统检查“各种条件组合是否都覆盖到了”。</p>
-<h3 id="神经网络贝叶斯网络与不确定性表示">7.2
-神经网络、贝叶斯网络与不确定性表示</h3>
-<p><strong>人工神经网络</strong>用大量参数表示知识。它不像语义网络或框架那样把知识显式写成节点、边和槽，而是通过训练把模式分布在权重中。它的优点是擅长从数据中学习复杂模式，缺点是可解释性较弱。</p>
-<p><strong>贝叶斯网络</strong>用有向无环图表示随机变量之间的条件依赖，适合处理不确定性推理。例如疾病、症状、检测结果之间不是简单的必然关系，而是概率关系，贝叶斯网络就能表达“某症状在某疾病下出现的概率”。</p>
-<p><strong>Neurules</strong>
-可以理解为神经网络和规则方法的结合方向，目标是在学习能力和可解释性之间取得折中。它不像单纯神经网络那样完全黑箱，也不像传统规则那样完全依赖人工编写。</p>
-<h3 id="scriptpetri-netoav-triples-等方法">7.3 Script、Petri Net、OAV
-triples 等方法</h3>
-<p><strong>Script，脚本</strong>
-用于表示典型事件序列。例如“去餐厅吃饭”通常包括进入餐厅、入座、点餐、用餐、付款、离开。脚本适合表达常识场景和事件流程。</p>
-<p><strong>Knowledge Petri net，知识 Petri 网</strong> 借助 Petri
-网表达状态、变迁和流程，适合描述并发、资源流动和状态变化。</p>
-<p><strong>Object-attribute-value triples，对象-属性-值三元组</strong>
-的形式是：</p>
-<p><span class="math display">\[
-(\text{object},\text{attribute},\text{value})
-\]</span></p>
-<p>例如 <code>(dog, color, brown)</code>。它和 RDF
-三元组很接近，但通常更强调对象属性描述，而 RDF 更强调 Web
-资源及其关系。</p>
-<p><strong>Language field theory，语言场论</strong> 在
-这里只列出名称，可以理解为从语言结构或语义场角度组织知识的一类理论。本章不要求深入展开，学习时知道它属于其他知识表示方向即可。</p>
-<h2 id="方法对比与学习主线">8 方法对比与学习主线</h2>
-<h3 id="四种方法对比">8.1 四种方法对比</h3>
-<table>
-<colgroup>
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-<col style="width: 20%" />
-</colgroup>
-<thead>
-<tr>
-<th>方法</th>
-<th>核心表示</th>
-<th>最适合表达</th>
-<th>主要推理方式</th>
-<th>典型问题</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>语义网络</td>
-<td>节点 + 关系边</td>
-<td>概念层级、属性继承、对象关系</td>
-<td>路径搜索、继承、关系组合</td>
-<td>例外和继承冲突</td>
-</tr>
-<tr>
-<td>框架</td>
-<td>对象/场景 + slot</td>
-<td>典型对象、场景结构、默认属性</td>
-<td>槽值继承、默认值填充、实例覆盖</td>
-<td>多重继承、默认值冲突</td>
-</tr>
-<tr>
-<td>概念图</td>
-<td>概念节点 + 关系节点</td>
-<td>自然语言语义、事件角色、多元关系</td>
-<td>restriction、join、simplify</td>
-<td>大规模使用时需要标准化工具</td>
-</tr>
-<tr>
-<td>知识图谱</td>
-<td>RDF 三元组</td>
-<td>大规模实体关系、Web 数据集成</td>
-<td>类型推理、属性映射、SPARQL 查询</td>
-<td>实体消歧、关系对齐、数据质量</td>
-</tr>
-</tbody>
-</table>
-<p>这四种方法不是互相替代的关系，而是面向不同任务。语义网络强调层级和继承，框架强调对象内部结构，概念图强调句子和事件语义，知识图谱强调大规模实体关系数据。练习如果让比较它们，不要只背定义，要说清楚“它们各自把知识组织成什么形式，以及这种形式适合做什么推理”。</p>
-<h3 id="学习主线">8.2 学习主线</h3>
-<p>理解这些知识表示方法时，不要把每个知识点孤立看待。可以按照“知识如何被组织、如何被推理、适合解决什么问题”这条线串起来。语义网络和框架都关心常识结构，但一个偏图，一个偏对象模板；概念图和自然语言理解联系紧密，因为它能表示动作、角色和命题；RDF
-和 SPARQL
-则把知识表示推进到工程层面，用标准三元组和查询语言支持大规模知识图谱。</p>
-<p>四个例子可以把本章核心思想串起来：金丝雀语义网络说明继承，hotel room
-说明框架和 slot，Tom believes that Jane likes pizza 说明命题概念，Sean
-Penn 说明 RDF 三元组。</p>
-<h2 id="参考资料与补充来源">9 参考资料与补充来源</h2>
-<ul>
-<li>W3C RDF 1.1 Concepts and Abstract Syntax：RDF
-以三元组形式表达资源之间的关系，三元组由 subject、predicate、object
-组成。参考：<a
-target="_blank" rel="noopener" href="https://www.w3.org/TR/rdf11-concepts/">https://www.w3.org/TR/rdf11-concepts/</a></li>
-<li>W3C SPARQL 1.1 Query Language：SPARQL 使用图模式匹配 RDF
-数据，并可通过 <code>SELECT</code> 返回变量绑定。参考：<a
-target="_blank" rel="noopener" href="https://www.w3.org/TR/sparql11-query/">https://www.w3.org/TR/sparql11-query/</a></li>
-<li>John F. Sowa, Conceptual
-Graphs：概念图用于以图结构表示概念与概念关系，可与逻辑形式对应。参考：<a
-target="_blank" rel="noopener" href="https://www.jfsowa.com/cg/">https://www.jfsowa.com/cg/</a></li>
-<li>Marvin Minsky, A Framework for Representing
-Knowledge：框架理论强调用结构化槽位表示典型对象和场景。参考：<a
-target="_blank" rel="noopener" href="https://web.media.mit.edu/~minsky/papers/Frames/frames.html">https://web.media.mit.edu/~minsky/papers/Frames/frames.html</a></li>
-<li>Semantic network
-补充：语义网络通常用图表示概念间关系，并支持继承式推理。参考：<a
-target="_blank" rel="noopener" href="https://www.britannica.com/technology/semantic-network">https://www.britannica.com/technology/semantic-network</a></li>
-</ul>
 
       
     </div>
