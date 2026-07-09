@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="数据级并行-量化第4章 0. 目录与公式速查 0.1 内容目录 第 1 节：数据级并行的研究动机：ILP 的瓶颈、DLP 的应用背景、SIMD 的基本思想。 第 2 节：向量体系结构：向量处理模型、标量&#x2F;向量处理区别、向量超级计算机、向量处理机组成。 第 3 节：向量执行、链接与性能评估：多体交叉存储、链接技术、护航指令组、钟鸣、启动时间。 第 4 节：向量体系结构中的关键优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="向量体系结构">
+<meta property="og:url" content="http://example.com/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="数据级并行-量化第4章 0. 目录与公式速查 0.1 内容目录 第 1 节：数据级并行的研究动机：ILP 的瓶颈、DLP 的应用背景、SIMD 的基本思想。 第 2 节：向量体系结构：向量处理模型、标量&#x2F;向量处理区别、向量超级计算机、向量处理机组成。 第 3 节：向量执行、链接与性能评估：多体交叉存储、链接技术、护航指令组、钟鸣、启动时间。 第 4 节：向量体系结构中的关键优化">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523105056837.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523105218391.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523111401404.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260525103142859.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523112803480.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523114234757.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523130834419.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523131719677.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523131854051.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523132025606.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523132043669.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523132831748.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523134732974.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523140952710.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141126116.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141322748.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141436004.png">
+<meta property="article:published_time" content="2026-07-09T06:51:22.594Z">
+<meta property="article:modified_time" content="2026-07-09T06:57:16.548Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="GPU">
+<meta property="article:tag" content="SIMD">
+<meta property="article:tag" content="向量处理器">
+<meta property="article:tag" content="数据级并行">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523105056837.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/","path":"2026/07/09/computer_organization/向量体系结构/","title":"向量体系结构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>向量体系结构 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BA%A7%E5%B9%B6%E8%A1%8C-%E9%87%8F%E5%8C%96%E7%AC%AC4%E7%AB%A0"><span class="nav-number">1.</span> <span class="nav-text">数据级并行-量化第4章</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95%E4%B8%8E%E5%85%AC%E5%BC%8F%E9%80%9F%E6%9F%A5"><span class="nav-number">2.</span> <span class="nav-text">0. 目录与公式速查</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AE%B9%E7%9B%AE%E5%BD%95"><span class="nav-number">2.1.</span> <span class="nav-text">0.1 内容目录</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BA%A7%E5%B9%B6%E8%A1%8C%E7%9A%84%E7%A0%94%E7%A9%B6%E5%8A%A8%E6%9C%BA"><span class="nav-number">3.</span> <span class="nav-text">1. 数据级并行的研究动机</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8Cilp%E7%9A%84%E7%93%B6%E9%A2%88"><span class="nav-number">3.1.</span> <span class="nav-text">1.1 传统指令级并行（ILP）的瓶颈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BA%A7%E5%B9%B6%E8%A1%8C%E9%80%82%E5%90%88%E7%9A%84%E5%BA%94%E7%94%A8"><span class="nav-number">3.2.</span> <span class="nav-text">1.2 数据级并行适合的应用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#simd-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3%E4%B8%8E%E4%BC%98%E5%8A%BF"><span class="nav-number">3.3.</span> <span class="nav-text">1.3 SIMD 的基本思想与优势</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">2. 向量体系结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E5%A4%84%E7%90%86%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.1.</span> <span class="nav-text">2.1 向量处理模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%87%E9%87%8F%E5%A4%84%E7%90%86%E4%B8%8E%E5%90%91%E9%87%8F%E5%A4%84%E7%90%86%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">4.2.</span> <span class="nav-text">2.2 标量处理与向量处理的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E8%B6%85%E7%BA%A7%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%9A%84%E5%8F%91%E5%B1%95"><span class="nav-number">4.3.</span> <span class="nav-text">2.3 向量超级计算机的发展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E5%A4%84%E7%90%86%E6%9C%BA%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%89%B9%E6%80%A7"><span class="nav-number">4.4.</span> <span class="nav-text">2.4 向量处理机的基本特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%99%A8-%E5%AD%98%E5%82%A8%E5%99%A8%E5%9E%8B%E4%B8%8E%E5%AF%84%E5%AD%98%E5%99%A8%E5%9E%8B%E5%90%91%E9%87%8F%E6%9C%BA"><span class="nav-number">4.5.</span> <span class="nav-text">2.5
+存储器-存储器型与寄存器型向量机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E6%8C%87%E4%BB%A4%E9%9B%86%E7%9A%84%E4%BC%98%E5%8A%BF"><span class="nav-number">4.6.</span> <span class="nav-text">2.6 向量指令集的优势</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E5%A4%84%E7%90%86%E6%9C%BA%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%84%E6%88%90"><span class="nav-number">4.7.</span> <span class="nav-text">2.7 向量处理机的基本组成</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E6%89%A7%E8%A1%8C%E9%93%BE%E6%8E%A5%E4%B8%8E%E6%80%A7%E8%83%BD%E8%AF%84%E4%BC%B0"><span class="nav-number">5.</span> <span class="nav-text">3. 向量执行、链接与性能评估</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E7%AE%97%E6%9C%AF%E6%89%A7%E8%A1%8C%E8%BD%A6%E9%81%93lane"><span class="nav-number">5.1.</span> <span class="nav-text">3.1 向量算术执行：车道（Lane）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E4%BD%93%E4%BA%A4%E5%8F%89%E5%AD%98%E5%82%A8%E7%B3%BB%E7%BB%9F%E5%AD%98%E5%82%A8%E4%BD%93bank"><span class="nav-number">5.2.</span> <span class="nav-text">3.2
+多体交叉存储系统：存储体（Bank）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5%E6%8A%80%E6%9C%AFchaining"><span class="nav-number">5.3.</span> <span class="nav-text">3.3 链接技术：Chaining</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%93%BE%E6%8E%A5%E4%BE%8B%E9%A2%98"><span class="nav-number">5.4.</span> <span class="nav-text">3.4 链接例题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8A%A4%E8%88%AA%E6%8C%87%E4%BB%A4%E7%BB%84%E4%B8%8E%E9%92%9F%E9%B8%A3"><span class="nav-number">5.5.</span> <span class="nav-text">3.5 护航指令组与钟鸣</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E5%90%AF%E5%8A%A8%E6%97%B6%E9%97%B4"><span class="nav-number">5.6.</span> <span class="nav-text">3.6 向量启动时间</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E4%B8%AD%E7%9A%84%E5%85%B3%E9%94%AE%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98"><span class="nav-number">6.</span> <span class="nav-text">4.
+向量体系结构中的关键优化问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E6%9D%A1%E8%BD%A6%E9%81%93multiple-lanes"><span class="nav-number">6.1.</span> <span class="nav-text">4.1 多条车道（Multiple Lanes）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E9%95%BF%E5%BA%A6%E5%AF%84%E5%AD%98%E5%99%A8vlr%E4%B8%8E%E6%9D%A1%E5%B8%A6%E6%8C%96%E6%8E%98"><span class="nav-number">6.2.</span> <span class="nav-text">4.2
+向量长度寄存器（VLR）与条带挖掘</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E9%81%AE%E7%BD%A9%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">6.3.</span> <span class="nav-text">4.3 向量遮罩寄存器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E5%B9%85%E8%AE%BF%E9%97%AE%E4%B8%8E%E5%A4%9A%E7%BB%B4%E6%95%B0%E7%BB%84"><span class="nav-number">6.4.</span> <span class="nav-text">4.4 步幅访问与多维数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E4%B8%AD-%E5%88%86%E6%95%A3%E8%AE%BF%E9%97%AE%E4%B8%8E%E7%A8%80%E7%96%8F%E5%90%91%E9%87%8F"><span class="nav-number">6.5.</span> <span class="nav-text">4.5 集中-分散访问与稀疏向量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%91%E9%87%8F%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="nav-number">6.6.</span> <span class="nav-text">4.6 向量性能指标</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%9D%A2%E5%90%91%E5%A4%9A%E5%AA%92%E4%BD%93%E5%BA%94%E7%94%A8%E7%9A%84-simd-%E6%8C%87%E4%BB%A4%E9%9B%86%E6%89%A9%E5%B1%95"><span class="nav-number">7.</span> <span class="nav-text">5. 面向多媒体应用的 SIMD
+指令集扩展</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#simd-%E6%89%A9%E5%B1%95%E4%B8%8E%E4%BC%A0%E7%BB%9F%E5%90%91%E9%87%8F%E6%9C%BA%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">7.1.</span> <span class="nav-text">5.1 SIMD
+扩展与传统向量机的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#x86-simd-%E6%89%A9%E5%B1%95%E5%8F%91%E5%B1%95"><span class="nav-number">7.2.</span> <span class="nav-text">5.2 x86 SIMD 扩展发展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#daxpy-%E4%BE%8B%E5%AD%90%E7%9A%84-simd-%E5%8C%96%E6%80%9D%E8%B7%AF"><span class="nav-number">7.3.</span> <span class="nav-text">5.3 DAXPY 例子的 SIMD 化思路</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#roofline-%E5%8F%AF%E8%A7%86%E5%8C%96%E6%80%A7%E8%83%BD%E6%A8%A1%E5%9E%8B"><span class="nav-number">8.</span> <span class="nav-text">6. Roofline 可视化性能模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">8.1.</span> <span class="nav-text">6.1 基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E7%90%86%E8%A7%A3-roofline"><span class="nav-number">8.2.</span> <span class="nav-text">6.2 如何理解 Roofline</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E5%A4%84%E7%90%86%E5%99%A8-gpu-%E4%B8%8E-simt"><span class="nav-number">9.</span> <span class="nav-text">7. 图形处理器 GPU 与 SIMT</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#gpu-%E9%80%82%E5%90%88%E7%9A%84%E4%BB%BB%E5%8A%A1"><span class="nav-number">9.1.</span> <span class="nav-text">7.1 GPU 适合的任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cpu-%E4%B8%8E-gpu-%E7%9A%84%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E5%B7%AE%E5%BC%82"><span class="nav-number">9.2.</span> <span class="nav-text">7.2 CPU 与 GPU 的体系结构差异</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E5%B9%B6%E8%A1%8C%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B%E5%AF%B9%E6%AF%94"><span class="nav-number">9.3.</span> <span class="nav-text">7.3 三种并行编程模型对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sisd%E9%A1%BA%E5%BA%8F%E6%89%A7%E8%A1%8C"><span class="nav-number">9.3.1.</span> <span class="nav-text">1. SISD：顺序执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#simd%E4%B8%80%E6%9D%A1%E6%8C%87%E4%BB%A4%E5%A4%84%E7%90%86%E5%A4%9A%E4%B8%AA%E6%95%B0%E6%8D%AE"><span class="nav-number">9.3.2.</span> <span class="nav-text">2. SIMD：一条指令处理多个数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8Bspmd%E5%A4%9A%E4%B8%AA%E7%BA%BF%E7%A8%8B%E5%90%84%E7%AE%97%E4%B8%80%E4%B8%AA%E5%85%83%E7%B4%A0"><span class="nav-number">9.3.3.</span> <span class="nav-text">3.
+多线程&#x2F;SPMD：多个线程各算一个元素</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#simtgpu-%E7%9A%84%E6%89%A7%E8%A1%8C%E6%A8%A1%E5%9E%8B"><span class="nav-number">9.4.</span> <span class="nav-text">7.4 SIMT：GPU 的执行模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cuda-%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">9.5.</span> <span class="nav-text">7.5 CUDA 编程模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="nav-number">9.5.1.</span> <span class="nav-text">1. 核心思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cuda%E7%9A%84%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84"><span class="nav-number">9.5.2.</span> <span class="nav-text">2. CUDA的层级结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cuda%E7%9A%84%E5%AD%98%E5%82%A8%E5%99%A8%E6%A8%A1%E5%9E%8B"><span class="nav-number">9.5.3.</span> <span class="nav-text">3. CUDA的存储器模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#gpu-%E6%9D%A1%E4%BB%B6%E5%88%86%E6%94%AF%E4%B8%8E%E5%88%86%E6%94%AF%E5%8F%91%E6%95%A3"><span class="nav-number">10.</span> <span class="nav-text">8. GPU 条件分支与分支发散</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#warp-%E4%B8%8E%E5%A4%9A%E7%BA%BF%E7%A8%8B%E9%9A%90%E8%97%8F%E5%BB%B6%E8%BF%9F"><span class="nav-number">10.1.</span> <span class="nav-text">8.1 Warp 与多线程隐藏延迟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E6%89%A7%E8%A1%8C%E6%9C%BA%E5%88%B6"><span class="nav-number">10.2.</span> <span class="nav-text">8.2 条件执行机制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%94%AF%E5%8F%91%E6%95%A3branch-divergence"><span class="nav-number">10.3.</span> <span class="nav-text">8.3 分支发散（Branch
+Divergence）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81-warp-%E5%BD%A2%E6%88%90%E4%B8%8E%E5%AD%98%E5%82%A8%E5%8F%91%E6%95%A3"><span class="nav-number">10.4.</span> <span class="nav-text">8.4 动态 Warp 形成与存储发散</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A3%80%E6%B5%8B%E4%B8%8E%E5%A2%9E%E5%BC%BA%E5%BE%AA%E7%8E%AF%E7%BA%A7%E5%B9%B6%E8%A1%8C"><span class="nav-number">11.</span> <span class="nav-text">9. 检测与增强循环级并行</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E7%BA%A7%E5%B9%B6%E8%A1%8C%E4%B8%8E%E5%BE%AA%E7%8E%AF%E9%97%B4%E7%9B%B8%E5%85%B3"><span class="nav-number">11.1.</span> <span class="nav-text">9.1 循环级并行与循环间相关</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%E5%88%86%E6%9E%90"><span class="nav-number">11.2.</span> <span class="nav-text">9.2 例题分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E6%89%BE%E7%9B%B8%E5%85%B3%E4%BB%BF%E5%B0%84%E4%B8%8B%E6%A0%87%E4%B8%8E-gcd-%E6%B5%8B%E8%AF%95"><span class="nav-number">11.3.</span> <span class="nav-text">9.3 查找相关：仿射下标与 GCD
+测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B6%88%E9%99%A4%E7%9B%B8%E5%85%B3%E8%AE%A1%E7%AE%97%E7%BA%A6%E7%AE%80"><span class="nav-number">11.4.</span> <span class="nav-text">9.4 消除相关计算：约简</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E9%97%AE%E9%A2%98%E8%83%BD%E8%80%97%E6%98%BE%E5%AD%98%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%AD%98%E5%82%A8"><span class="nav-number">12.</span> <span class="nav-text">10.
+交叉问题：能耗、显存与虚拟存储</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%BD%E8%80%97%E4%B8%8E-dlp"><span class="nav-number">12.1.</span> <span class="nav-text">10.1 能耗与 DLP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E5%AD%98%E5%82%A8%E5%99%A8%E4%B8%8E%E9%AB%98%E5%B8%A6%E5%AE%BD"><span class="nav-number">12.2.</span> <span class="nav-text">10.2 图形存储器与高带宽</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="向量体系结构 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          向量体系结构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 14:57:16" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="数据级并行-量化第4章">数据级并行-量化第4章</h1>
+<h1 id="目录与公式速查">0. 目录与公式速查</h1>
+<h2 id="内容目录">0.1 内容目录</h2>
+<p>第 1 节：数据级并行的研究动机：ILP 的瓶颈、DLP 的应用背景、SIMD
+的基本思想。</p>
+<p>第 2
+节：向量体系结构：向量处理模型、标量/向量处理区别、向量超级计算机、向量处理机组成。</p>
+<p>第 3
+节：向量执行、链接与性能评估：多体交叉存储、链接技术、护航指令组、钟鸣、启动时间。</p>
+<p>第 4
+节：向量体系结构中的关键优化问题：多车道、VLR、条带挖掘、向量遮罩、步幅访问、集中-分散访问、性能指标。</p>
+<p>第 5 节：面向多媒体应用的 SIMD
+指令集扩展：MMX、SSE、AVX、AVX-512，以及 DXPY/DAXPY 类例子。</p>
+<p>第 6 节：Roofline
+可视化性能模型：运算密度、存储器带宽上限、峰值浮点性能上限。</p>
+<p>第 7 节：图形处理器 GPU 与 SIMT：CPU/GPU 差异、SISD/SIMD/SPMD、CUDA
+编程模型。</p>
+<p>第 8 节：GPU 条件分支与分支发散：warp、mask、SIMT stack、branch
+divergence、reconvergence。</p>
+<p>第 9 节：检测与增强循环级并行：循环间相关、仿射下标、GCD
+测试、约简。</p>
+<p>第 10 节：交叉问题：DLP 能耗优势、显存带宽、步幅访问与 TLB 缺失。</p>
+<p>第 11 节：补充资料来源：CUDA、GPU 访存、RISC-V Vector 等补充资料。 ##
+0.2 核心概念速查</p>
+<ul>
+<li>DLP：数据级并行，即同一种计算对大量数据同时做。</li>
+<li>SIMD：一条指令处理多个数据元素。</li>
+<li>SIMT：程序员写线程，GPU 硬件把线程组成 warp，以类似 SIMD
+的方式执行。</li>
+<li>车道 lane：并行处理向量/SIMD 元素的一条硬件通道。</li>
+<li>VLR：向量长度寄存器，控制本次向量操作实际处理多少元素。</li>
+<li>MVL：最大向量长度，硬件一次最多能处理的向量元素数。</li>
+<li>链接 chaining：相关向量指令之间按元素流水重叠执行。</li>
+<li>分支发散：同一 warp 内线程走不同分支，GPU 只能用 mask
+分批执行，导致部分 lane 空闲。</li>
+<li>循环间相关：后一次迭代依赖前一次迭代产生的数据，是循环并行化的主要障碍。</li>
+</ul>
+<h1 id="数据级并行的研究动机">1. 数据级并行的研究动机</h1>
+<h2 id="传统指令级并行ilp的瓶颈">1.1 传统指令级并行（ILP）的瓶颈</h2>
+<p>传统提高性能的方法主要依靠挖掘指令级并行，例如更深流水线、超标量发射、乱序执行、分支预测、提高主频、提高
+Cache 命中率等。但这些方法存在明显限制：</p>
+<ul>
+<li>程序本身未必有足够的指令级并行。</li>
+<li>主频提高会加重分支、数据冒险和结构冒险带来的 CPI 损失。</li>
+<li>每周期取出并译码多条复杂指令并不容易。</li>
+<li>科学计算、图像/视频/语音、机器学习等应用往往处理大规模数组或连续媒体流，数据局部性不一定好，单靠
+Cache 难以充分提升性能。</li>
+</ul>
+<p>因此，体系结构开始更重视<strong>数据级并行（Data-Level Parallelism,
+DLP）</strong>，即<strong>对许多不同数据执行相同或相似操作。</strong></p>
+<h2 id="数据级并行适合的应用">1.2 数据级并行适合的应用</h2>
+<p>数据级并行适合图形处理、机器视觉、语音识别、机器学习、矩阵计算、天气预报、工业仿真、生物信息学等应用。它们的典型特点：</p>
+<ul>
+<li>数据量大。</li>
+<li>单个数据元素之间相关性弱。</li>
+<li>同一条计算规则可以作用在很多数据元素上。</li>
+<li>计算密度高时，特别适合使用向量处理器、SIMD 扩展或 GPU。</li>
+</ul>
+<h2 id="simd-的基本思想与优势">1.3 SIMD 的基本思想与优势</h2>
+<p>SIMD（Single Instruction, Multiple
+Data）表示<strong>“单指令，多数据”</strong>：一条指令同时作用于多个数据元素。其主要优势：</p>
+<ul>
+<li>每组数据操作只需取指一次，降低取指和译码能耗。</li>
+<li>同一控制流驱动多个执行部件，硬件控制开销小。</li>
+<li>程序员或编译器可以保持类似顺序程序的思维，同时获得并行加速。</li>
+<li>对移动设备和高性能计算都具有较高能效。</li>
+</ul>
+<p>这里涉及 SIMD 的三种主要形态： - 向量体系结构。 - 面向多媒体应用的
+SIMD 指令集扩展。 - 图形处理单元 GPU，其执行模型常称为 SIMT。</p>
+<h1 id="向量体系结构">2. 向量体系结构</h1>
+<h2 id="向量处理模型">2.1 向量处理模型</h2>
+<ul>
+<li><p><strong>向量体系结构</strong>从存储器中取出一组数据元素，将它们放入大型顺序向量寄存器中，再对向量寄存器中的元素执行操作，最后将结果写回存储器。</p></li>
+<li><p>一条<strong>向量指令</strong>可以表示几十个甚至上百个“寄存器-寄存器”元素操作。</p></li>
+<li><p><strong>向量寄存器</strong>相当于由编译器控制的高速缓冲区：</p>
+<ul>
+<li>可以隐藏存储器访问延迟。</li>
+<li>可以集中利用存储器带宽。</li>
+<li>可以明确告诉硬件这些元素之间通常互不相关。</li>
+</ul></li>
+</ul>
+<h2 id="标量处理与向量处理的区别">2.2 标量处理与向量处理的区别</h2>
+<ul>
+<li>标量指令一次只处理一个或一对操作数，例如
+<code>add r3, r1, r2</code>。</li>
+<li>向量指令<strong>一次处理 N 个或 N 对操作数</strong>，例如
+<code>add.vv v3, v1, v2</code>，表示对两个向量中对应位置的元素逐个相加。</li>
+<li>向量处理机的核心思想是：用更高层次的指令表达更多计算，减少指令数量，并让硬件流水线持续处理元素流。</li>
+</ul>
+<h2 id="向量超级计算机的发展">2.3 向量超级计算机的发展</h2>
+<ul>
+<li>20 世纪 70-80 年代，超级计算机几乎等同于向量机。</li>
+<li>CDC 6600 通常被认为是第一台超级计算机：60
+位字长；多个功能部件；使用记分牌进行动态调度；主要面向科学计算和大型数值任务。</li>
+<li>Cray-1（1976）是典型向量超级计算机：标量单元加向量扩展；Load/Store
+结构；向量寄存器；向量指令；深度流水化功能部件；多体交叉存储系统；没有数据
+Cache，也不支持虚拟存储器。</li>
+<li>NEC SX
+系列代表现代向量超级计算机：具有标量乱序/超标量单元；具有多个向量寄存器、向量功能部件和高带宽存储系统；通过多车道和共享内存结构提升峰值性能。</li>
+</ul>
+<h2 id="向量处理机的基本特性">2.4 向量处理机的基本特性</h2>
+<ul>
+<li>一条向量指令包含多个元素操作，因此减少指令取指次数。</li>
+<li>同一向量中各元素的结果通常相互独立，适合深流水线执行。</li>
+<li>编译器负责保证向量内部操作之间没有相关性，硬件主要检测不同向量指令之间的相关性。</li>
+<li>向量指令往往按照已知模式访问存储器：
+<ul>
+<li><strong>连续访问（unit-stride）</strong>。例如
+<code>A[0], A[1], A[2], A[3]</code>。</li>
+<li><strong>固定步幅访问（strided access）</strong>。例如
+<code>A[0], A[2], A[4], A[6]</code>。</li>
+<li><strong>索引访问（gather/scatter）。</strong>访问地址不是简单连续，也不是固定间隔，而是由另一个索引数组决定。例如
+<code>A[K[0]], A[K[1]], A[K[2]], A[K[3]]</code>，而
+<code>K = [3, 10, 2, 99]</code>。</li>
+</ul></li>
+<li>已知访问模式可以更好地发挥多体交叉存储器带宽，并减少控制相关。</li>
+</ul>
+<h2 id="存储器-存储器型与寄存器型向量机">2.5
+存储器-存储器型与寄存器型向量机</h2>
+<ul>
+<li><strong>存储器-存储器型向量机。所有向量操作的操作数都来自存储器，结果也直接写回存储器。</strong>早期机器如
+CDC Star-100、TI ASC
+属于此类。缺点是需要极高存储器带宽，多个向量操作之间重叠困难，而且启动时间较长。</li>
+<li><strong>寄存器型向量机。</strong>除 Load/Store
+外，向量操作在<strong>向量寄存器之间进行。</strong>Cray-1
+是第一台典型寄存器型向量机，1980
+年以后主流向量处理机多采用这种结构。</li>
+</ul>
+<p>对于 <code>C=A+B</code> 这个运算，存储器-存储器型可用
+<code>ADDV C,A,B</code> 直接计算 <code>C=A+B</code>，但寄存器型需要
+<code>LV V1,A</code>、<code>LV V2,B</code>、<code>ADDV V3,V1,V2</code>、<code>SV V3,C</code>四条指令。虽然寄存器型指令数可能更多，但能复用已经装入寄存器的数据，降低存储器压力。</p>
+<h2 id="向量指令集的优势">2.6 向量指令集的优势</h2>
+<ul>
+<li><strong>格式紧凑。</strong>一条指令表达 N 个操作。</li>
+<li><strong>表达能力强。</strong>向量指令告诉硬件：
+<ul>
+<li>元素操作之间无相关。</li>
+<li>使用同类功能部件。</li>
+<li>访问不相交寄存器或规律存储器地址。</li>
+<li>可使用连续、步幅或索引访问方式。</li>
+</ul></li>
+<li><strong>可扩展性好。</strong>同一段向量代码可以运行在不同数量的并行流水线或车道（lanes）上。</li>
+</ul>
+<blockquote>
+<p>RISC-V 向量扩展也采用向量寄存器思想，提供 32 个向量寄存器
+<code>v0-v31</code>，并通过 <code>vl</code>
+等配置控制本次向量操作的实际元素数。</p>
+</blockquote>
+<h2 id="向量处理机的基本组成">2.7 向量处理机的基本组成</h2>
+<ul>
+<li><p><strong>向量寄存器（Vector
+Register）。</strong>是一个长度固定的区域，用于存放一个向量，通常有多个读端口和写端口。例如，VMIPS
+有 8 个向量寄存器，每个寄存器包含 64 个 64 位元素。</p></li>
+<li><p><strong>向量功能部件（Vector Functional Units,
+FUs）。</strong>是全流水化的，每个时钟周期可以启动一个新元素操作。常见功能包括浮点加、浮点乘、倒数、整数加、逻辑、移位等。一般会有
+4-8 个
+FU，包含浮点加法、浮点乘法、浮点倒数（1/X）、整数加法、整数逻辑运算、整数移位运算等功能。</p></li>
+<li><p><strong>向量 Load/Store
+单元（LSUs）。</strong>负责全流水化地装入或存储向量，高性能机器可能配置多个
+LSU。</p></li>
+<li><p><strong>标量寄存器（Scalar
+Register）。</strong>存放单个元素、常数或地址。用于向量-标量操作，例如
+<code>Y = a * X + Y</code> 中的标量 <code>a</code>。</p></li>
+<li><p><strong>互连结构。</strong>常用交叉开关连接功能部件、Load/Store
+单元和寄存器堆。<strong>交叉开关</strong>就是向量处理机内部连接寄存器、功能部件和访存单元的数据交换网络，用来灵活搬运操作数和运算结果。比如有两条指令
+<code>V3 = V1 + V2</code>，<code>V5 = V4 * V6</code>，交叉开关可以把 V1
+送到加法器输入端 1，把 V2 送到加法器输入端 2，加法器输出送回 V3；同时把
+V4、V6 接到乘法器，把乘法结果送回 V5。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">       		  +-------- 加法器</span><br><span class="line">V0 -----------|</span><br><span class="line">V1 -----------|-------- 乘法器</span><br><span class="line">V2 -----------|</span><br><span class="line">V3 -----------|-------- Load/Store 单元</span><br><span class="line">V4 -----------|</span><br><span class="line">V5 -----------|-------- 写回寄存器</span><br><span class="line">              |</span><br><span class="line">           交叉开关</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>下面是一个典型的向量处理机的示意图：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523105056837.png" alt="image-20260523105056719" style="zoom:33%;" /></p>
+<h1 id="向量执行链接与性能评估">3. 向量执行、链接与性能评估</h1>
+<h2 id="向量算术执行车道lane">3.1 向量算术执行：车道（Lane）</h2>
+<ul>
+<li><p>向量功能部件常采用深流水线，启动延迟较长。但一旦流水线填满，可以每个周期产生一个元素结果。</p></li>
+<li><p>因为元素之间独立，向量流水线控制比普通标量深流水线简单。</p></li>
+<li><p><strong>多车道结构</strong>可以在同一周期处理多个元素，例如 4
+条车道可以同时处理 4 个元素。向量寄存器中的元素按车道交错分布，例如元素
+0、4、8 在同一车道。</p></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523105218391.png" alt="image-20260523105218288" style="zoom: 33%;" /></p>
+<blockquote>
+<p>“车道”（lane）就是向量处理机 / SIMD / GPU
+里<strong>并行处理向量元素的一条硬件执行通路</strong>。</p>
+<p>可以把一条向量指令想成一批任务：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&gt;C = A + B</span><br><span class="line"></span><br><span class="line">&gt;C[0] = A[0] + B[0]</span><br><span class="line">&gt;C[1] = A[1] + B[1]</span><br><span class="line">&gt;C[2] = A[2] + B[2]</span><br><span class="line">&gt;C[3] = A[3] + B[3]</span><br><span class="line">&gt;...</span><br></pre></td></tr></table></figure>
+<p>如果只有 <strong>1 条车道</strong>，硬件每个周期大致只能启动/处理 1
+个元素：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;第1周期：算 C[0]</span><br><span class="line">&gt;第2周期：算 C[1]</span><br><span class="line">&gt;第3周期：算 C[2]</span><br><span class="line">&gt;第4周期：算 C[3]</span><br></pre></td></tr></table></figure>
+<p>如果有 <strong>4 条车道</strong>，就像一条公路有 4
+个车道，可以同时处理 4 个元素：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&gt;第1周期：</span><br><span class="line">&gt;车道0：算 C[0]</span><br><span class="line">&gt;车道1：算 C[1]</span><br><span class="line">&gt;车道2：算 C[2]</span><br><span class="line">&gt;车道3：算 C[3]</span><br><span class="line"></span><br><span class="line">&gt;第2周期：</span><br><span class="line">&gt;车道0：算 C[4]</span><br><span class="line">&gt;车道1：算 C[5]</span><br><span class="line">&gt;车道2：算 C[6]</span><br><span class="line">&gt;车道3：算 C[7]</span><br></pre></td></tr></table></figure>
+<p>所以，车道越多，同一条向量指令每个周期能处理的元素越多，吞吐量越高。</p>
+<p>在向量机里，车道通常包括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;一部分向量寄存器读写端口</span><br><span class="line">&gt;一条或一组功能部件流水线</span><br><span class="line">&gt;到存储系统的数据通路</span><br></pre></td></tr></table></figure>
+<p>比如这里的 “8 lanes” 可以理解为：同一条向量指令最多可以让 8
+个元素并行向前流动。</p>
+<p>一句话记忆：<strong>车道就是执行同一条向量/SIMD
+指令时，用来并行处理不同数据元素的硬件通道。</strong></p>
+</blockquote>
+<h2 id="多体交叉存储系统存储体bank">3.2
+多体交叉存储系统：存储体（Bank）</h2>
+<p>向量处理器需要高带宽存储系统，以支持连续的向量读写。多体交叉存储系统将存储器划分为多个
+bank，不同 bank 可以并行服务访问。假设有 4 个存储体：Bank0 Bank1 Bank2
+Bank3。连续地址可以交错放进去：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">A[0] -&gt; Bank0</span><br><span class="line">A[1] -&gt; Bank1</span><br><span class="line">A[2] -&gt; Bank2</span><br><span class="line">A[3] -&gt; Bank3</span><br><span class="line">A[4] -&gt; Bank0</span><br><span class="line">A[5] -&gt; Bank1</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>这样读取连续向量时，访问会轮流落到不同 bank：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">第1拍：访问 Bank0 的 A[0]</span><br><span class="line">第2拍：访问 Bank1 的 A[1]</span><br><span class="line">第3拍：访问 Bank2 的 A[2]</span><br><span class="line">第4拍：访问 Bank3 的 A[3]</span><br><span class="line">第5拍：访问 Bank0 的 A[4]</span><br></pre></td></tr></table></figure>
+<p><strong>轮流访问。</strong>如果每个 bank
+需要几拍才能再次接受访问，只要 bank
+数足够多，就能保证流水线几乎每拍都有数据。例如 Cray-1 有 16 个
+bank，bank busy time 为 4 个周期，访存延迟为 12 个周期。因为有 16 个
+bank，而一个 bank 忙 4 个周期，所以连续访问时可以轮流访问不同
+bank。等再次访问 Bank0 时，它已经恢复好了。</p>
+<p><strong>Bank conflict。</strong>当访问步幅与 bank
+数存在不利关系时，可能频繁访问同一 bank，造成冲突。比如有 4 个
+bank，按地址对 4 取模分配：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A[0] -&gt; Bank0</span><br><span class="line">A[1] -&gt; Bank1</span><br><span class="line">A[2] -&gt; Bank2</span><br><span class="line">A[3] -&gt; Bank3</span><br><span class="line">A[4] -&gt; Bank0</span><br></pre></td></tr></table></figure>
+<p>如果访问步幅是 4：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A[0], A[4], A[8], A[12]</span><br></pre></td></tr></table></figure>
+<p>它们全都落在 Bank0。这样虽然有 4 个 bank，但实际只用了 1 个，其他
+bank 空着，性能会很差。</p>
+<h2 id="链接技术chaining">3.3 链接技术：Chaining</h2>
+<p>链接技术用于具有<strong>先写后读（RAW）</strong>相关的两条向量指令。<strong>其本质在于把标量流水线中的
+forward 思想引入向量执行。</strong></p>
+<p>无链接时，后一条相关向量指令必须等待前一条向量指令最后一个元素写回。而有链接时，当前一条指令产生第一个元素结果后，后一条指令即可对该元素开始处理，从而显著缩短整个向量序列的完成时间。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523111401404.png" alt="image-20260523111401297" style="zoom:33%;" /></p>
+<h2 id="链接例题">3.4 链接例题</h2>
+<p>假设要计算 <code>D = A × (B + C)</code>。向量长度
+<code>N &lt;= 64</code>，<code>B</code> 和 <code>C</code> 已在
+<code>V0</code> 和 <code>V1</code> 中。指令序列为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">V3 &lt;- 存储器	  // 取向量 A</span><br><span class="line">V2 &lt;- V0 + V1	// 计算 B + C</span><br><span class="line">V4 &lt;- V2 × V3	// 乘以 A</span><br></pre></td></tr></table></figure>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260525103142859.png" alt="image-20260525103142722" style="zoom:33%;" /></p>
+<p><strong>下面给出三种执行方式的执行时间。</strong></p>
+<ul>
+<li><strong>三条指令完全串行：</strong><span
+class="math inline">[(1 + 6 + 1) + <em>N</em> − 1] + [(1 + 6 + 1) + <em>N</em> − 1] + [(1 + 7 + 1) + <em>N</em> − 1] = 3<em>N</em> + 22</span>
+拍。</li>
+<li><strong>前两条并行，第三条串行：</strong><span
+class="math inline">[(1 + 6 + 1) + <em>N</em> − 1] + [(1 + 7 + 1) + <em>N</em> − 1] = 2<em>N</em> + 15</span>
+拍。</li>
+<li><strong>前两条并行且第三条链接执行：</strong><span
+class="math inline">[(1 + 6 + 1)] + [(1 + 7 + 1)] + (<em>N</em> − 1) = <em>N</em> + 16</span>​
+拍。</li>
+</ul>
+<p>链接执行时，第三条乘法不用等 V2 和 V3 的所有元素都算完。只要第一个
+V2[0] 和第一个 V3[0] 准备好，乘法就可以开始处理第一个元素。</p>
+<h2 id="护航指令组与钟鸣">3.5 护航指令组与钟鸣</h2>
+<p><strong>护航指令组（convoy）</strong>是一组可以一起执行的向量指令，组内不能有结构冒险。若存在写后读相关，通常应分到不同护航组；但如果能链接，则可以放在同一护航组中。</p>
+<p><strong>钟鸣（chime）</strong>是执行一个护航指令组所花费的时间单位。若向量序列由
+<code>m</code> 个护航组组成，向量长度为
+<code>n</code>（一次钟鸣≈n个时钟周期），在 VMIPS 中大约需要
+<code>m × n</code> 个时钟周期（不计启动开销）。</p>
+<p>例如计算 <code>Y[i] = a * X[i] + Y[i]</code>，指令为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">VLD V1,Rx			// load vector X</span><br><span class="line">MUL V2,V1,F0		// V2 = X * a</span><br><span class="line">LV V3,Ry			// load vector Y</span><br><span class="line">ADDVV.D V4,V2,V3	// V4 = a*X + Y</span><br><span class="line">SV Ry,V4			// store result</span><br></pre></td></tr></table></figure>
+<p>护航组排列： - 第 1 组：<code>LV</code> 与
+<code>MULVS.D</code>（即前两条指令，此护航组内使用了链接技术） - 第 2
+组：<code>LV</code> 与
+<code>ADDVV.D</code>（即后两条指令，此护航组内使用了链接技术） - 第 3
+组：<code>SV</code></p>
+<p>共 3 次钟鸣。对每个 i 来说，要做 2 次浮点运算：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">第 1 次浮点运算：a * X[i]        // 浮点乘法</span><br><span class="line">第 2 次浮点运算：a * X[i] + Y[i] // 浮点加法</span><br></pre></td></tr></table></figure>
+<p>所以每个结果元素包含 2 次 FLOP。总周期数 = 护航组数 * 向量长度 =
+3n，总 FLOP = 2n，所以每个 FLOP 的周期数 = 3n / 2n = 1.5。</p>
+<h2 id="向量启动时间">3.6 向量启动时间</h2>
+<p>向量启动时间由两部分构成： -
+功能部件延时：元素通过功能部件流水线所需时间，是主要因素。 -
+截止/恢复时间：下一条向量指令启动前的间隔。</p>
+<p>启动时间使短向量性能较差；向量越长，启动开销摊得越薄。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523112803480.png" alt="image-20260523112803368" style="zoom:33%;" /></p>
+<h1 id="向量体系结构中的关键优化问题">4.
+向量体系结构中的关键优化问题</h1>
+<h2 id="多条车道multiple-lanes">4.1 多条车道（Multiple Lanes）</h2>
+<p>单个向量功能部件每周期通常只能处理一个元素。为了快于“每周期一个元素”，可以复制流水线形成多条车道。每条车道处理向量中的一部分元素，从而提高吞吐量。</p>
+<p>多车道结构要求：向量寄存器端口足够、存储系统带宽足够、互连结构能支持多路并发传输。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523114234757.png" alt="image-20260523114234629" style="zoom:50%;" /></p>
+<h2 id="向量长度寄存器vlr与条带挖掘">4.2
+向量长度寄存器（VLR）与条带挖掘</h2>
+<p>普通向量寄存器的长度通常是固定的，但程序中的向量长度通常运行时才知道，且可能大于硬件最大向量长度（MVL）。因此<strong>向量长度寄存器（VLR）</strong>被发明了出来。它控制着当前向量操作实际处理的元素数，且<code>VLR &lt;= MVL</code>。Load/Store
+和算术向量操作都受 VLR 控制。</p>
+<p><strong>条带挖掘（Strip
+Mining）</strong>将任意长度向量拆成多个长度不超过 MVL
+的片段。第一个片段常处理余数部分，后续片段按 MVL 满长度处理。例如：
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">low = <span class="number">0</span>;</span><br><span class="line">VL = (n % MVL); <span class="comment">/* find odd-size piece using modulo op % */</span></span><br><span class="line"><span class="keyword">for</span> (j = <span class="number">0</span>; j &lt;= (n / MVL); j = j + <span class="number">1</span>) &#123; <span class="comment">/* outer loop */</span></span><br><span class="line">  <span class="keyword">for</span> (i = low; i &lt; (low + VL); i = i + <span class="number">1</span>) <span class="comment">/* runs for length VL */</span></span><br><span class="line">      Y[i] = a * X[i] + Y[i]; <span class="comment">/* main operation */</span></span><br><span class="line">  low = low + VL; <span class="comment">/* start of next vector */</span></span><br><span class="line">  VL = MVL; <span class="comment">/* reset the length to maximum vector length */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>执行时间计算公式：处理长度为 n
+的向量，总共需要多少时间/时钟周期？</p>
+<ul>
+<li><span class="math inline">$T_n = ceil (\frac{n}{MVL}) × (T_{loop} +
+T_{start}) + n × T_{chime}$</span></li>
+<li><span
+class="math inline"><em>T</em><sub><em>n</em></sub></span>：处理长度为
+<span class="math inline"><em>n</em></span>
+的整个向量所需的总时间。</li>
+<li><span
+class="math inline"><em>M</em><em>V</em><em>L</em></span>：最大向量长度，即硬件一次向量操作最多能处理多少个元素。</li>
+<li><span
+class="math inline"><em>T</em><sub><em>l</em><em>o</em><em>o</em><em>p</em></sub></span>：每处理一个条带时，循环控制本身带来的开销。</li>
+<li><span
+class="math inline"><em>T</em><sub><em>s</em><em>t</em><em>a</em><em>r</em><em>t</em></sub></span>：每处理一个条带时，向量指令启动开销的总和。</li>
+<li><span
+class="math inline"><em>T</em><sub><em>c</em><em>h</em><em>i</em><em>m</em><em>e</em></sub></span>：每个元素在稳定流水状态下的执行时间。如果一个向量循环需要若干个护航组，每个护航组大致每个元素
+1 拍，那么 <span
+class="math inline"><em>T</em><sub><em>c</em><em>h</em><em>i</em><em>m</em><em>e</em></sub></span>
+= 护航组数量。</li>
+</ul>
+<p>示例：<code>A = B × s</code> - <code>A</code>、<code>B</code> 长度为
+200，即 <span
+class="math inline"><em>n</em> = 200</span>。<code>s</code> 是标量。</p>
+<ul>
+<li><p>向量寄存器长度 64，即 <span
+class="math inline"><em>M</em><em>V</em><em>L</em> = 64</span>。</p></li>
+<li><p><code>Tloop = 15</code>。</p></li>
+<li><p><code>Tstart = 12 + 7 + 12 = 31</code>。假设load启动时间=12周期，store启动时间=12周期，惩罚启动时间为7周期。</p></li>
+<li><p><code>Tchime=3</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">LV      V1, B       ; 读 B</span><br><span class="line">MULVS   V2, V1, s   ; V2 = B × s</span><br><span class="line">SV      A, V2       ; 写回 A</span><br></pre></td></tr></table></figure></li>
+<li><p><code>T200 = ceil(200/64) * (15+31) + 200 * 3 = 784</code>。</p></li>
+<li><p>每元素执行时间约 <code>784/200 = 3.9</code> 周期。</p></li>
+</ul>
+<h2 id="向量遮罩寄存器">4.3 向量遮罩寄存器</h2>
+<p>向量代码中可能包含 <code>if</code>
+条件，不能简单地让所有元素都执行写回。例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">64</span>; i++)</span><br><span class="line">    <span class="keyword">if</span> (X[i] != <span class="number">0</span>)</span><br><span class="line">        X[i] = X[i] - Y[i];</span><br></pre></td></tr></table></figure>
+<p>于是人们发明了向量遮罩寄存器，用于控制一条向量指令中每个元素是否真正执行或提交结果。对于上面的代码，利用向量遮罩寄存器，生成的指令为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">LV     V1, Rx    ; load vector X into V1</span><br><span class="line">LV     V2, Ry    ; load vector Y into V2</span><br><span class="line">L.D    F0, #0    ; load FP zero into F0</span><br><span class="line">SNEVS.D V1, F0   ; sets VM(i) to 1 if V1(i) != F0，VM就是向量遮罩寄存器；只对遮罩为 1 的元素执行减法或提交结果</span><br><span class="line">SUBVV.D V1, V1, V2 ; subtract under vector mask</span><br><span class="line">SV     Rx, V1    ; store the result in X</span><br></pre></td></tr></table></figure>
+<p>遮罩能处理条件执行，但被遮蔽的元素仍可能占用部分执行资源。此外，若条件分布很不均匀，实际
+SIMD 利用率会下降。</p>
+<h2 id="步幅访问与多维数组">4.4 步幅访问与多维数组</h2>
+<p>多维数组按行或列访问时，内存地址可能不是连续的。向量机通过带步幅的向量
+Load/Store 处理非单位步幅访问。例如，VMIPS 中有这两条指令：</p>
+<ul>
+<li><p><code>LVWS</code>：带步幅向量装入。也就是把这些地址的数据装进向量寄存器：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">base</span><br><span class="line">base + stride</span><br><span class="line">base + 2 × stride</span><br><span class="line">base + 3 × stride</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+<li><p><code>SVWS</code>：带步幅向量存储。</p></li>
+</ul>
+<p>矩阵乘法中访问 <code>D[k][j]</code> 时，如果数组按行存放，而
+<code>k</code> 变化、<code>j</code>
+固定，通常形成非单位步幅访问。其风险在于，步幅与 bank
+数不匹配时容易造成存储器组冲突。比如 4 个 bank，访问步幅是 4：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A[0], A[4], A[8], A[12]</span><br></pre></td></tr></table></figure>
+<p>它们可能都落到 Bank0。结果是：4 个 bank 只用了 1 个
+bank。此外，大步幅还可能导致 TLB 缺失频繁。</p>
+<h2 id="集中-分散访问与稀疏向量">4.5 集中-分散访问与稀疏向量</h2>
+<p>稀疏向量是指 0 元素很多、非 0
+元素很少的向量。为节省空间，稀疏向量通常采用压缩存储。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523130834419.png" alt="image-20260523130834296" style="zoom:33%;" /></p>
+<p>对稀疏访问，向量机提供集中-分散（gather-scatter）操作： -
+<strong>集中（gather）：</strong>根据索引向量从不连续地址取数据。 -
+<strong>分散（scatter）：</strong>根据索引向量把结果写到不连续地址。</p>
+<p>例如： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">    A[K[i]] = A[K[i]] + C[M[i]];</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">LV    Vk, Rk    		;load 索引K</span><br><span class="line">LVI   Va, (Ra+Vk)    	;load A[K[]] (Gather) 	Ra是数组A的基地址</span><br><span class="line">LV    Vm, Rm    		;load 索引M</span><br><span class="line">LVI   Vc, (Rc+Vm)    	;load C[M[]] (Gather)	Rc是数组C的基地址</span><br><span class="line">ADDVV.D  Va, Va, Vc    	;add them</span><br><span class="line">SVI   (Ra+Vk), Va    	;store A[K[]](Scatter)</span><br></pre></td></tr></table></figure>
+<h2 id="向量性能指标">4.6 向量性能指标</h2>
+<ul>
+<li><span
+class="math inline"><em>R</em><sub>∞</sub></span>：向量长度趋于无穷大时的最大向量流水线性能。常用于评价峰值性能，单位通常为
+MFLOPS。</li>
+<li><span
+class="math inline"><em>R</em><sub><em>n</em></sub></span>：向量长度为
+<span class="math inline"><em>n</em></span> 时的实际性能。</li>
+<li><span class="math inline"><em>N</em><sub>1/2</sub></span>：达到
+<span class="math inline"><em>R</em><sub>∞</sub></span>
+一半性能所需的向量长度。用于衡量启动时间对性能的影响。</li>
+<li><span
+class="math inline"><em>N</em><sub><em>V</em></sub></span>：向量方式开始快于标量串行方式所需的临界向量长度。反映启动开销和标量/向量速度比。</li>
+</ul>
+<h1 id="面向多媒体应用的-simd-指令集扩展">5. 面向多媒体应用的 SIMD
+指令集扩展</h1>
+<h2 id="simd-扩展与传统向量机的区别">5.1 SIMD
+扩展与传统向量机的区别</h2>
+<p>多媒体应用常处理 8 位、16 位、32 位等较窄数据类型。SIMD
+指令集扩展把一个较宽寄存器划分为多个子字，同时执行多份相同操作。与完整向量体系结构相比，SIMD
+扩展有三点简化：</p>
+<ul>
+<li>操作数个数固定，通常由寄存器宽度和元素宽度决定。</li>
+<li>不提供复杂向量寻址方式，如步幅访问、集中-分散访问。</li>
+<li>早期 SIMD 扩展通常没有完整的向量遮罩寄存器。</li>
+</ul>
+<h2 id="x86-simd-扩展发展">5.2 x86 SIMD 扩展发展</h2>
+<ul>
+<li>Intel MMX（1996）：复用 64 位浮点寄存器。可同时执行 8 个 8 位或 4 个
+16 位运算。</li>
+<li>SSE（1999）：引入 128 位独立寄存器。可同时执行 16 个 8 位、8 个 16
+位或 4 个 32 位运算。</li>
+<li>AVX（2010）：寄存器宽度扩展到 256 位。</li>
+<li>AVX-512（2017）：可支持 8 个 64
+位整数/浮点运算。引入更强的掩码执行能力。</li>
+</ul>
+<p>注意：多媒体 SIMD
+对内存访问通常要求连续并对齐，否则性能会下降或需要额外处理。</p>
+<h2 id="daxpy-例子的-simd-化思路">5.3 DAXPY 例子的 SIMD 化思路</h2>
+<p>原例标题写作 DXPY；但从代码看，它实际对应经典 DAXPY
+形式：<code>Y = a × X + Y</code>。SIMD
+版本每次循环处理多个元素，例如一次处理 4 个 double：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">L.D    F0, a       ; load scalar a  </span><br><span class="line">MOV    F1, F0      ; copy a into F1 for SIMD MUL  </span><br><span class="line">MOV    F2, F0      ; copy a into F2 for SIMD MUL  </span><br><span class="line">MOV    F3, F0      ; copy a into F3 for SIMD MUL  </span><br><span class="line">DADDIU R4, Rx, #512 ; last address to load  </span><br><span class="line"></span><br><span class="line">Loop:</span><br><span class="line">L.4D   F4, 0[Rx]   ; load X[i], X[i+1], X[i+2], X[i+3]  </span><br><span class="line">MUL.4D F4, F4, F0  ; a×X[i], a×X[i+1], a×X[i+2], a×X[i+3]  </span><br><span class="line">L.4D   F8, 0[Ry]   ; load Y[i], Y[i+1], Y[i+2], Y[i+3]  </span><br><span class="line">ADD.4D F8, F8, F4  ; a×X[i]+Y[i], ..., a×X[i+3]+Y[i+3]  </span><br><span class="line">S.4D   0[Ry], F8   ; store into Y[i], Y[i+1], Y[i+2], Y[i+3]  </span><br><span class="line">DADDIU Rx, Rx, #32 ; increment index to X  </span><br><span class="line">DADDIU Ry, Ry, #32 ; increment index to Y  </span><br><span class="line">DSUBU  R20, R4, Rx ; compute bound  </span><br><span class="line">BNEZ   R20, Loop   ; check if done</span><br></pre></td></tr></table></figure>
+<p>与向量机相比，SIMD 扩展更像“短向量”，需要软件循环控制多次执行。</p>
+<h1 id="roofline-可视化性能模型">6. Roofline 可视化性能模型</h1>
+<h2 id="基本概念">6.1 基本概念</h2>
+<ul>
+<li><p>Roofline
+模型把浮点性能、存储器带宽和程序运算密度放到同一张二维图中。</p></li>
+<li><p>运算密度（Operational Intensity）= 程序执行的浮点运算数 /
+从主存访问的字节数，单位通常为 FLOPs/Byte。</p></li>
+<li><p>可获得的GFLOP/s = min(峰值存储器带宽 × 运算密度,
+峰值浮点性能)。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523131719677.png" alt="image-20260523131719566" style="zoom: 50%;" /></p></li>
+</ul>
+<h2 id="如何理解-roofline">6.2 如何理解 Roofline</h2>
+<ul>
+<li>当运算密度低时，性能受存储器带宽限制。增加计算单元未必有效，关键是减少访存或提高带宽利用率。</li>
+<li>当运算密度高时，性能受峰值计算能力限制。关键是提高向量化、SIMD
+利用率和指令吞吐。</li>
+</ul>
+<h1 id="图形处理器-gpu-与-simt">7. 图形处理器 GPU 与 SIMT</h1>
+<h2 id="gpu-适合的任务">7.1 GPU 适合的任务</h2>
+<p>GPU
+适合对大量数据使用同一计算方法进行并行处理。适合条件：数据相关度低、可产生大量线程、计算密度较高、计算时间相对数据搬运时间足够大。</p>
+<h2 id="cpu-与-gpu-的体系结构差异">7.2 CPU 与 GPU 的体系结构差异</h2>
+<ul>
+<li>CPU 目标：降低单线程指令延迟。<strong>大
+Cache。</strong>复杂控制逻辑。分支预测、乱序执行、推测执行。</li>
+<li>GPU
+目标：提高总体吞吐量。更多执行单元和寄存器。<strong>高带宽显存。</strong>多线程轮换隐藏访存和功能部件延迟。多个线程共享控制逻辑。</li>
+<li>因此，CPU 更像“少量复杂核心”，GPU
+更像“大量简单执行资源加高带宽存储”。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523131854051.png" alt="image-20260523131853935" style="zoom: 33%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523132025606.png" alt="image-20260523132025486" style="zoom: 33%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523132043669.png" alt="image-20260523132043551" style="zoom:33%;" /></p>
+<h2 id="三种并行编程模型对比">7.3 三种并行编程模型对比</h2>
+<ul>
+<li><strong>SISD
+顺序模型：</strong>普通标量循环由流水线、乱序执行、超标量等硬件动态挖掘并行。并行性由硬件在指令窗口中发现。</li>
+<li><strong>SIMD 数据并行模型：</strong>程序员或编译器生成向量/SIMD
+指令。一条指令处理多个循环迭代的数据。最适合向量机或数组处理器。</li>
+<li><strong>多线程模型：</strong>程序员或编译器为每个迭代生成线程。每个线程执行相同代码，但处理不同数据。可在
+MIMD 或 GPU SIMT 机器上运行。</li>
+</ul>
+<p>下面用一个例子说明三种模型的区别：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++)</span><br><span class="line">	C[i] = A[i] + B[i];</span><br></pre></td></tr></table></figure>
+<p>也就是做 8 个加法：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">C[0]=A[0]+B[0]</span><br><span class="line">C[1]=A[1]+B[1]</span><br><span class="line">...</span><br><span class="line">C[7]=A[7]+B[7]</span><br></pre></td></tr></table></figure>
+<h3 id="sisd顺序执行">1. SISD：顺序执行</h3>
+<p>SISD 是 <strong>Single Instruction, Single
+Data</strong>，单指令单数据。普通 CPU 顺序程序就是这种写法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">8</span>; i++)</span><br><span class="line">	C[i] = A[i] + B[i];</span><br></pre></td></tr></table></figure>
+<p>执行过程大致是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">第1次循环：算 C[0]</span><br><span class="line">第2次循环：算 C[1]</span><br><span class="line">第3次循环：算 C[2]</span><br><span class="line">...</span><br><span class="line">第8次循环：算 C[7]</span><br></pre></td></tr></table></figure>
+<p><strong>特点：只有一个指令流；一次主要处理一个数据元素；靠流水线、乱序执行、超标量等
+CPU 技术偷偷加速。</strong></p>
+<h3 id="simd一条指令处理多个数据">2. SIMD：一条指令处理多个数据</h3>
+<p>SIMD 是 <strong>Single Instruction, Multiple
+Data</strong>，单指令多数据。向量化后可以写成类似：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">VLD   V1, A      ; 一次装入 A[0..7]</span><br><span class="line">VLD   V2, B      ; 一次装入 B[0..7]</span><br><span class="line">VADD  V3, V1,V2  ; 一条指令同时算 8 个加法</span><br><span class="line">VST   C, V3      ; 一次写回 C[0..7]</span><br></pre></td></tr></table></figure>
+<p>执行过程是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">一条 VADD 指令同时做：</span><br><span class="line">C[0]=A[0]+B[0]</span><br><span class="line">C[1]=A[1]+B[1]</span><br><span class="line">C[2]=A[2]+B[2]</span><br><span class="line">...</span><br><span class="line">C[7]=A[7]+B[7]</span><br></pre></td></tr></table></figure>
+<p><strong>特点：只有一个指令流；一次处理多个数据元素；所有数据执行同一个操作。</strong></p>
+<h3 id="多线程spmd多个线程各算一个元素">3.
+多线程/SPMD：多个线程各算一个元素</h3>
+<p>SPMD 是 <strong>Single Program, Multiple
+Data</strong>，单程序多数据。GPU
+常用这种模式。程序员会写一个“单个线程要做什么”的程序：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">__global__ <span class="type">void</span> <span class="title function_">vecAdd</span><span class="params">(<span class="type">double</span> *A, <span class="type">double</span> *B, <span class="type">double</span> *C)</span> &#123;</span><br><span class="line">    <span class="type">int</span> i = blockDim.x * blockIdx.x + threadIdx.x;</span><br><span class="line">    C[i] = A[i] + B[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看起来每个线程只做一个元素：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">线程0：C[0] = A[0] + B[0]</span><br><span class="line">线程1：C[1] = A[1] + B[1]</span><br><span class="line">线程2：C[2] = A[2] + B[2]</span><br><span class="line">...</span><br><span class="line">线程7：C[7] = A[7] + B[7]</span><br></pre></td></tr></table></figure>
+<p><strong>特点：多个线程，每个线程运行同一份程序，每个线程处理不同数据。</strong></p>
+<p>在 GPU 里，硬件会把一组线程，比如 32 个线程，组成一个
+warp。如果这些线程刚好执行同一条语句，硬件就像 SIMD
+一样一起执行它们。</p>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 19%" />
+<col style="width: 23%" />
+<col style="width: 47%" />
+</colgroup>
+<thead>
+<tr>
+<th>模型</th>
+<th>程序看起来</th>
+<th>谁表达并行</th>
+<th>执行方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SISD</td>
+<td>一个普通循环</td>
+<td>主要靠 CPU 硬件动态挖掘</td>
+<td>一个接一个算，内部可能偷偷重叠</td>
+</tr>
+<tr>
+<td>SIMD</td>
+<td>一条向量/SIMD 指令</td>
+<td>编译器或程序员显式向量化</td>
+<td>一条指令同时处理多个元素</td>
+</tr>
+<tr>
+<td>SPMD/SIMT</td>
+<td>很多线程运行同一程序</td>
+<td>程序员创建大量线程</td>
+<td>每个线程处理一个数据，GPU 再把线程组成 warp 执行</td>
+</tr>
+</tbody>
+</table>
+<h2 id="simtgpu-的执行模型">7.4 SIMT：GPU 的执行模型</h2>
+<p>GPU 面向线程编程，程序员通常写标量线程代码，而不是直接写 SIMD
+指令。每个线程有自己的上下文，可以独立执行或重新调度。硬件把执行相同指令的一组线程动态组成
+warp。Warp 本质上是硬件形成的一次 SIMD 操作。</p>
+<p>SIMT 的优势： - 可把每个线程当作独立标量线程处理，具有一定 MIMD
+灵活性。 - 可把执行同一指令的线程组成 warp，获得 SIMD
+的能效和吞吐优势。</p>
+<h2 id="cuda-编程模型">7.5 CUDA 编程模型</h2>
+<h3 id="核心思想">1. 核心思想</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523132831748.png" alt="image-20260523132831599" style="zoom:33%;" /></p>
+<p>CUDA 的核心思想是，程序员编写一个由单个线程执行的函数，GPU
+启动大量线程，让每个线程处理不同数据。这个由 GPU 上大量线程执行的函数叫
+<strong>kernel</strong>，用 <code>__global__</code>
+声明。下面是一个向量加法例子：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>对比项</th>
+<th>普通 CPU 写法</th>
+<th>CUDA 写法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>程序形式</td>
+<td>一个循环顺序遍历数组</td>
+<td>一个 kernel 被大量线程并行执行</td>
+</tr>
+<tr>
+<td>代码示例</td>
+<td><code>for (int i = 0; i &lt; 100000; i++) C[i] = A[i] + B[i];</code></td>
+<td>每个线程用自己的 <code>tid</code> 计算
+<code>C[tid] = A[tid] + B[tid];</code></td>
+</tr>
+<tr>
+<td>执行主体</td>
+<td>一个或少量 CPU 线程</td>
+<td>成千上万个 GPU thread</td>
+</tr>
+<tr>
+<td>每个执行单位负责的工作</td>
+<td>一个线程反复处理很多个 <code>i</code></td>
+<td>一个 GPU thread 通常处理一个或少量元素</td>
+</tr>
+<tr>
+<td>并行表达方式</td>
+<td>循环写成顺序形式，并行主要依靠 CPU 或编译器优化</td>
+<td>程序员显式启动大量线程</td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>控制复杂、分支多、数据规模不大或串行依赖强</td>
+<td>数据量大、同一操作作用于大量元素、线程之间依赖少</td>
+</tr>
+</tbody>
+</table>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">__global__ <span class="type">void</span> <span class="title function_">KernelFunction</span><span class="params">(...)</span> &#123;</span><br><span class="line">    <span class="type">int</span> tid = blockDim.x * blockIdx.x + threadIdx.x;</span><br><span class="line">    <span class="type">int</span> varA = aa[tid];</span><br><span class="line">    <span class="type">int</span> varB = bb[tid];</span><br><span class="line">    C[tid] = varA + varB;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>KernelFunction</code> 是 GPU kernel。</li>
+<li>每个线程都会执行同一份 kernel 代码。</li>
+<li>每个线程计算出自己的全局编号 <code>tid</code>。</li>
+<li>线程 <code>tid</code> 负责计算
+<code>C[tid] = aa[tid] + bb[tid]</code>。</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>CUDA 变量</th>
+<th>含义</th>
+<th>例子：每个 block 有 256 个线程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>threadIdx.x</code></td>
+<td>当前线程在本 block 内的编号</td>
+<td>取值 <code>0~255</code></td>
+</tr>
+<tr>
+<td><code>blockIdx.x</code></td>
+<td>当前 block 在 grid 中的编号</td>
+<td>第 0 个 block 为 0，第 1 个 block 为 1</td>
+</tr>
+<tr>
+<td><code>blockDim.x</code></td>
+<td>每个 block 中的线程数</td>
+<td><code>256</code></td>
+</tr>
+<tr>
+<td><code>tid = blockDim.x * blockIdx.x + threadIdx.x</code></td>
+<td>当前线程对应的全局数组下标</td>
+<td>block 1 的 thread 3 对应 <code>256*1+3=259</code></td>
+</tr>
+</tbody>
+</table>
+<p>如果有 100000 个元素、每个 block 256 个线程，则大约需要 ceil(100000 /
+256) = 391 个 block</p>
+<h3 id="cuda的层级结构">2. CUDA的层级结构</h3>
+<p>CUDA 可分为 grid，block和thread三个层次：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Grid</span><br><span class="line"> ├── Block 0</span><br><span class="line"> │    ├── Thread 0</span><br><span class="line"> │    ├── Thread 1</span><br><span class="line"> │    └── ...</span><br><span class="line"> ├── Block 1</span><br><span class="line"> │    ├── Thread 0</span><br><span class="line"> │    ├── Thread 1</span><br><span class="line"> │    └── ...</span><br><span class="line"> └── ...</span><br></pre></td></tr></table></figure>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>层级</th>
+<th>中文名</th>
+<th>软件含义</th>
+<th>硬件对应</th>
+<th>通信/同步特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Thread</td>
+<td>线程</td>
+<td>最小执行单位，通常负责一个或少量数据元素</td>
+<td>SP / CUDA core 上的执行上下文。<code>SP</code> 可粗略理解为 GPU
+里的小计算核心。</td>
+<td>线程自己有私有寄存器</td>
+</tr>
+<tr>
+<td>Block</td>
+<td>线程块</td>
+<td>一组 thread 的集合</td>
+<td>通常调度到一个 SM 上执行。<code>SM</code> 是 Streaming
+Multiprocessor，可理解为包含许多执行资源的“大计算单元”。</td>
+<td>同一 block 内线程可通过 shared memory 通信，可使用同步</td>
+</tr>
+<tr>
+<td>Grid</td>
+<td>网格</td>
+<td>一次 kernel 启动的所有 block</td>
+<td>整个 GPU 执行</td>
+<td>不同 block 不能直接同步，通常通过 global memory 间接交换数据</td>
+</tr>
+</tbody>
+</table>
+<p>映射关系可以这样记：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Thread -&gt; SP</span><br><span class="line">Block  -&gt; SM</span><br><span class="line">Grid   -&gt; GPU</span><br></pre></td></tr></table></figure>
+<h3 id="cuda的存储器模型">3. CUDA的存储器模型</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523134732974.png" alt="image-20260523134732812" style="zoom:33%;" /></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th>存储类型</th>
+<th>访问范围/权限</th>
+<th>速度</th>
+<th>典型用途</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Register</td>
+<td>thread 私有，读写</td>
+<td>最快</td>
+<td>线程内部临时变量、循环变量、中间结果</td>
+<td>数量有限；寄存器不够可能溢出到 local memory</td>
+</tr>
+<tr>
+<td>Local memory</td>
+<td>thread 私有，读写</td>
+<td>慢，通常在显存中</td>
+<td>过大的局部数组、寄存器溢出数据</td>
+<td>名字叫 local，但不代表快</td>
+</tr>
+<tr>
+<td>Shared memory</td>
+<td>同一 block 内线程共享，读写</td>
+<td>很快，接近片上存储速度</td>
+<td>block 内线程协作、数据复用、矩阵分块</td>
+<td>不同 block 不能访问彼此的 shared memory</td>
+</tr>
+<tr>
+<td>Global memory</td>
+<td>grid 中所有线程可读写</td>
+<td>慢，但容量大</td>
+<td>输入数组、输出数组、不同 block 间间接交换数据</td>
+<td><code>A</code>、<code>B</code>、<code>C</code>
+这类大数组通常在这里</td>
+</tr>
+<tr>
+<td>Constant memory</td>
+<td>grid 中线程只读</td>
+<td>命中时较快</td>
+<td>所有线程都读取的常量</td>
+<td>适合广播式读取</td>
+</tr>
+<tr>
+<td>Texture memory</td>
+<td>grid 中线程只读</td>
+<td>对特定空间局部性访问较友好</td>
+<td>图像、纹理、特殊只读访问</td>
+<td>主要服务图形/空间局部访问模式</td>
+</tr>
+<tr>
+<td>Host memory</td>
+<td>CPU 端内存</td>
+<td>GPU 直接访问通常较慢</td>
+<td>CPU 准备输入数据、接收结果</td>
+<td>Host 通过 API 与 GPU 显存交换数据</td>
+</tr>
+</tbody>
+</table>
+<p>Block 之间不能直接通信的原因： - GPU 为了高吞吐，会把不同 block
+调度到不同 SM 上。 - 不同 block 的执行先后顺序通常不由程序员控制。 -
+CUDA 因此只保证同一 block 内线程可以通过 shared memory 和同步指令协作。
+- 不同 block 若要交换数据，一般通过 global memory，并常常需要分成多个
+kernel 阶段。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>并行粒度</th>
+<th>通信方式</th>
+<th>适合描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>block 内 thread</td>
+<td>shared memory + 同步指令</td>
+<td>细粒度并行</td>
+</tr>
+<tr>
+<td>block 与 block 之间</td>
+<td>global memory，通常不能在同一 kernel 内直接同步</td>
+<td>粗粒度并行</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>补充：NVIDIA 官方 CUDA 文档说明，kernel 启动时会指定 grid 与 thread
+block 维度；同一 block 内线程可通过 shared memory
+协作，并可使用同步操作协调访存。</p>
+</blockquote>
+<h1 id="gpu-条件分支与分支发散">8. GPU 条件分支与分支发散</h1>
+<h2 id="warp-与多线程隐藏延迟">8.1 Warp 与多线程隐藏延迟</h2>
+<p>GPU 不是一个线程一个线程单独跑，而是<strong>把一组线程打包成一个
+warp</strong>一起跑。一个 NVIDIA warp 通常由 32 个线程组成。<strong>多个
+warp 在同一核心/SM 上交错运行，</strong>当某个 warp
+等待访存或功能部件时，调度器切换到其他可执行
+warp，这样可以隐藏高延迟操作。</p>
+<p>一个线程块可包含多个 warp，这些 warp 映射到同一个 SM
+上。多个线程块也可能同时驻留在同一 SM 上，取决于寄存器、shared memory
+和硬件资源。</p>
+<h2 id="条件执行机制">8.2 条件执行机制</h2>
+<p>GPU 使用多种机制处理条件分支： - <strong>内部
+mask。</strong>原理与向量遮罩寄存器相同。 - <strong>分支同步栈（SIMT
+stack）。</strong> 代码中经常会出现<strong>嵌套</strong>的
+if-else，为了管理这种复杂的分支层级，GPU硬件中引入了分支同步栈。当遇到一个分支时，GPU会将当前的“状态”（包括即将前往的另一个分支的地址、以及对应的
+mask）压入栈中。然后拿着新的 mask
+去执行当前分支。当当前分支执行完毕时，再从栈中弹出之前的状态，去执行另一个分支。这就保证了多重嵌套的条件语句能够正确无误地按顺序执行。
+-
+<strong>指令标记。</strong>在汇编指令级别使用的特殊标记，用来告诉硬件当前分支控制流的状态。由于GPU把
+if 和 else
+都走了一遍，硬件需要知道这些分开走的线程<strong>在什么时候需要重新汇合</strong>。编译器会在指令序列中插入特殊的标记（比如同步指令或重聚点标记）。当硬件遇到这些标记时，就知道一个分支块结束了，可以去栈里取下一个分支来执行，或者恢复所有线程的统一执行。
+-
+<strong>显式谓词寄存器。</strong>这是一种将“控制流”（跳转）转化为“数据流”（条件执行）的技术。谓词寄存器是一种只存
+1
+bit（真/假）的特殊寄存器。对于只有几条指令的极短分支，使用上述的“压栈/出栈/遮罩”机制开销太大了。此时，编译器会使用<strong>谓词指令</strong>。它会先计算条件，将
+True 或 False 存入谓词寄存器（例如 <span class="citation"
+data-cites="P1">@P1</span>）。之后的指令都会带上这个前缀（比如 <span
+class="citation" data-cites="P1">@P1</span> ADD R1, R2,
+R3）。这句话的意思是：“如果 P1
+为真，则执行加法并写回；如果为假，则这当作一条空指令（NOP）”。这避免了真正的指令跳转，非常高效。</p>
+<h2 id="分支发散branch-divergence">8.3 分支发散（Branch
+Divergence）</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523140952710.png" alt="image-20260523140952596" style="zoom:33%;" /></p>
+<p>当同一 warp
+内的线程走不同控制流路径时，会产生分支发散。假设代码是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (A[i] &gt; <span class="number">0</span>) &#123;</span><br><span class="line">  	C[i] = A[i] + B[i];</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">  	C[i] = A[i] - B[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假设判断结果是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">线程0：true   走 if</span><br><span class="line">线程1：true   走 if</span><br><span class="line">线程2：false  走 else</span><br><span class="line">线程3：false  走 else</span><br></pre></td></tr></table></figure>
+<p>同一个 warp 里面，有的线程要执行加法，有的线程要执行减法。但 warp
+的特点是：同一时刻只能执行同一条指令。它不能在同一拍里让线程0、1执行加法，同时让线程2、3执行减法。所以
+GPU 只能分两步：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">第1步：执行 if 路径</span><br><span class="line">    线程0、1 活动</span><br><span class="line">    线程2、3 暂时关闭</span><br><span class="line"></span><br><span class="line">第2步：执行 else 路径</span><br><span class="line">    线程2、3 活动</span><br><span class="line">    线程0、1 暂时关闭</span><br></pre></td></tr></table></figure>
+<p>这就叫分支发散。（下图与示例无关）</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141126116.png" alt="image-20260523141125982" style="zoom: 33%;" /></p>
+<p>如果所有线程走同一路径，warp 可以保持高效 SIMD
+执行。如果线程方向不一致，硬件会生成
+mask，表示哪些线程走哪条路径。例如上面的 if 路径，mask = 1100；else
+路径，mask = 0011。</p>
+<p>具体的执行过程是，先执行其中一条路径，另一条路径及其 mask
+压入<strong>分支同步栈</strong>，后续通过 pop
+恢复另一路径执行。各路径执行完后在汇合点 reconverge。</p>
+<p>对 IF-THEN-ELSE 且两条路径长度相近的情况，平均 SIMD 利用率可能接近
+50%。</p>
+<blockquote>
+<p>分支发散不一定导致错误，但会降低吞吐率。</p>
+<p>优化 GPU 程序时，应尽量让同一 warp 中线程走相同控制流。</p>
+</blockquote>
+<h2 id="动态-warp-形成与存储发散">8.4 动态 Warp 形成与存储发散</h2>
+<p>每个 warp
+中可能有些线程现在执行，有些线程待会执行，效率有点低下。动态 warp
+的思想是，分支发散后，<strong>把来自不同
+warp、但即将执行相同指令路径的线程重新组合成新 warp。</strong>从而提高
+SIMD lane 利用率。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141322748.png" alt="image-20260523141322622" style="zoom:33%;" /></p>
+<blockquote>
+<p>Warp X 和 Warp Y 可以合并成 Warp Z</p>
+<p>三个 Warp 也可以合并成两个 Warp</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260523141436004.png" alt="image-20260523141435855" style="zoom:33%;" /></p>
+<p>动态 Warp 的局限在于：</p>
+<ul>
+<li><p>硬件寄存器和 lane 映射并非完全自由。</p></li>
+<li><p>动态组合可能破坏原本规则的内存访问模式。</p></li>
+<li><p>存储发散问题。理想情况是 warp
+中线程访存都命中，且访问能合并。若部分命中、部分未命中，或访问地址随机，一个线程的
+stall 可能影响整个 warp。现代 GPU
+使用缓存、访存合并等技术缓解，但不规则访问仍是性能风险。</p></li>
+</ul>
+<h1 id="检测与增强循环级并行">9. 检测与增强循环级并行</h1>
+<h2 id="循环级并行与循环间相关">9.1 循环级并行与循环间相关</h2>
+<ul>
+<li><strong>循环级并行</strong>通常在源代码级别分析。</li>
+<li><strong>循环间相关（loop-carried
+dependence）：</strong>后续迭代的数据访问是否依赖前面迭代生成的值。</li>
+</ul>
+<h2 id="例题分析">9.2 例题分析</h2>
+<p>例 1： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">999</span>; i &gt;= <span class="number">0</span>; i--)</span><br><span class="line">    x[i] = x[i] + s;</span><br></pre></td></tr></table></figure> 每次迭代访问不同
+<code>x[i]</code>，通常可并行。</p>
+<p>例 2： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">    A[i+<span class="number">1</span>] = A[i] + C[i];</span><br><span class="line">    B[i+<span class="number">1</span>] = B[i] + A[i+<span class="number">1</span>];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> <code>A[i+1]</code> 依赖上一迭代的
+<code>A[i]</code>；<code>B[i+1]</code> 依赖上一迭代的
+<code>B[i]</code>；<code>B[i+1]</code> 使用同一迭代中刚算出的
+<code>A[i+1]</code>，这是循环内相关，不是循环间相关。</p>
+<p>例 3： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">    A[i] = A[i] + B[i];</span><br><span class="line">    B[i+<span class="number">1</span>] = C[i] + D[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> <code>A[i]</code> 可能使用上一迭代生成的
+<code>B[i]</code>，存在循环间相关。可通过调整语句顺序和边界处理，把相关变成循环内相关，从而并行化主体循环。</p>
+<p>例 4： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">    A[i] = B[i] + C[i];</span><br><span class="line">    D[i] = A[i] * E[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> <code>D[i]</code> 依赖同一迭代中的
+<code>A[i]</code>，不是循环间相关。</p>
+<p>例 5： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; <span class="number">100</span>; i++)</span><br><span class="line">    Y[i] = Y[i<span class="number">-1</span>] + Y[i];</span><br></pre></td></tr></table></figure> 典型递归形式，存在循环间相关。</p>
+<h2 id="查找相关仿射下标与-gcd-测试">9.3 查找相关：仿射下标与 GCD
+测试</h2>
+<p>相关分析常假设数组索引是仿射形式：<code>a × i + b</code>。若在索引
+<code>a × j + b</code> 存储数组元素，又在索引 <code>c × k + d</code>
+读取同一数组元素，并且 <code>j</code>、<code>k</code>
+都在循环范围内，则可能存在相关。<strong>如果存在循环间相关，那么
+<code>GCD(a,c)</code> 必须能整除 <code>d-b</code>。</strong></p>
+<p>示例： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++)</span><br><span class="line">    X[<span class="number">2</span>*i+<span class="number">3</span>] = X[<span class="number">2</span>*i] * <span class="number">5.0</span>;</span><br></pre></td></tr></table></figure> - 存储下标 <code>2i+3</code>，读取下标
+<code>2i</code>。 - <code>a=2, b=3, c=2, d=0</code>。 -
+<code>GCD(2,2)=2</code>，<code>d-b=-3</code>。 - 2 不能整除
+-3，因此不存在循环间相关。</p>
+<p>注意：GCD
+测试通常是保守测试，能排除一些不可能相关的情况，但不能解决所有复杂情况。</p>
+<h2 id="消除相关计算约简">9.4 消除相关计算：约简</h2>
+<p>递归/累加是最常见的相关计算之一： <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sum = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">for</span> (i = <span class="number">9999</span>; i &gt;= <span class="number">0</span>; i--)</span><br><span class="line">    sum = sum + x[i] * y[i];</span><br></pre></td></tr></table></figure> <code>sum</code>
+每次迭代都依赖上次迭代结果，存在循环间相关。改进思路是，先并行计算各元素乘积：<code>sum[i] = x[i] * y[i]</code>。再进行约简（reduction）求最终和：<code>finalsum = finalsum + sum[i]</code>。</p>
+<p>在向量机、SIMD 和 GPU
+中，约简常由特殊指令、库函数或并行树形归约实现。</p>
+<h1 id="交叉问题能耗显存与虚拟存储">10.
+交叉问题：能耗、显存与虚拟存储</h1>
+<h2 id="能耗与-dlp">10.1 能耗与 DLP</h2>
+<p>如果将
+DLP（数据级并行）体系结构的时钟频率减半，同时执行资源加倍，理论吞吐量可保持相近。此外，降低频率往往可以配合降低电压，从而显著降低功耗。因此，DLP
+处理器通常以较低频率、更多并行资源获得高能效。这也是 GPU 和 SIMD
+在高性能计算、移动计算中重要的原因。</p>
+<h2 id="图形存储器与高带宽">10.2 图形存储器与高带宽</h2>
+<p>GPU 需要极高存储器带宽。典型显存技术有 HBM/HBM2、GDDR 等。其中 HBM
+的数据线非常宽，常见数量级为 1024 到 4096 条，能提供极高带宽。</p>
+<p>面对大量不相关请求，控制器可能等待足够通信量后再打开一行并传输数据。这样带宽利用率高，但单次访问延迟可能增加。GPU
+依靠大量线程隐藏延迟，避免执行单元等待数据。 ## 10.3 步幅访问与 TLB
+缺失</p>
+<p>向量机和 GPU
+都可能支持虚拟存储。大步幅访问可能导致每次访问落在不同页面上，从而频繁触发
+TLB
+缺失。这对性能造成了影响，即使存储带宽很高，地址转换开销也可能成为瓶颈。而且多维数组和稀疏数据结构尤其容易出现此问题。</p>
+<p>优化方向有三：改善数据布局、使用分块/tiling 提高局部性、尽量让 warp
+或向量访问连续地址。 # 11. 补充资料来源</p>
+<ul>
+<li><a
+target="_blank" rel="noopener" href="https://docs.nvidia.com/cuda/cuda-c-programming-guide/">NVIDIA
+CUDA C++ Programming Guide</a>：用于补充 CUDA
+grid/block/thread、SIMT、shared memory、global memory 等概念。</li>
+<li><a
+target="_blank" rel="noopener" href="https://developer.nvidia.com/blog/unlock-gpu-performance-global-memory-access-in-cuda/">NVIDIA
+Technical Blog: Global Memory Access in CUDA</a>：用于补充 CUDA
+全局内存访问、warp 大小和访存合并背景。</li>
+<li><a
+target="_blank" rel="noopener" href="https://docs.xiangshan.cc/projects/user-guide/en/latest/vector/">RISC-V
+Vector Extension 说明</a>：用于补充 RISC-V 向量寄存器
+<code>v0-v31</code>、<code>vl</code> 和动态向量长度思想。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BA%A7%E5%B9%B6%E8%A1%8C/" rel="tag"># 数据级并行</a>
+              <a href="/tags/%E5%90%91%E9%87%8F%E5%A4%84%E7%90%86%E5%99%A8/" rel="tag"># 向量处理器</a>
+              <a href="/tags/SIMD/" rel="tag"># SIMD</a>
+              <a href="/tags/GPU/" rel="tag"># GPU</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/computer_organization/%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C-%E9%87%8F%E5%8C%96%E7%AC%AC3%E7%AB%A0/" rel="prev" title="指令级并行-量化第3章">
+                  <i class="fa fa-angle-left"></i> 指令级并行-量化第3章
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/computer_organization/%E7%BA%BF%E7%A8%8B%E7%BA%A7%E5%B9%B6%E8%A1%8C/" rel="next" title="线程级并行">
+                  线程级并行 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

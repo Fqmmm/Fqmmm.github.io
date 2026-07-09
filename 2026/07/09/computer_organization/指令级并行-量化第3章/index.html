@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  ILP的基本概念与“拦路虎” 软件的智慧：基本流水线调度与循环展开 预测未来的魔法：高级分支预测 硬件的智慧：Tomasulo动态调度算法 硬件推测执行（ROB）与多发射（超标量&#x2F;VLIW） 指令提取带宽与BTB技术 压榨CPU的极限：多线程技术与真实CPU案例  1 ILP的基本概念与“拦路虎” 1.1 什么是指令级并行 程序里的指令原本是一条一条排队执行的。但是">
+<meta property="og:type" content="article">
+<meta property="og:title" content="指令级并行-量化第3章">
+<meta property="og:url" content="http://example.com/2026/07/09/computer_organization/%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C-%E9%87%8F%E5%8C%96%E7%AC%AC3%E7%AB%A0/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  ILP的基本概念与“拦路虎” 软件的智慧：基本流水线调度与循环展开 预测未来的魔法：高级分支预测 硬件的智慧：Tomasulo动态调度算法 硬件推测执行（ROB）与多发射（超标量&#x2F;VLIW） 指令提取带宽与BTB技术 压榨CPU的极限：多线程技术与真实CPU案例  1 ILP的基本概念与“拦路虎” 1.1 什么是指令级并行 程序里的指令原本是一条一条排队执行的。但是">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260414223218221.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260414223852341.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415164437753.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415165605214.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260419200053530.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260419200503768.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260419194439241.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260419194645628.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415171326785.png">
+<meta property="article:published_time" content="2026-07-09T06:51:22.588Z">
+<meta property="article:modified_time" content="2026-07-09T06:57:16.544Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="Tomasulo">
+<meta property="article:tag" content="分支预测">
+<meta property="article:tag" content="指令级并行">
+<meta property="article:tag" content="超标量">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260414223218221.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/computer_organization/%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C-%E9%87%8F%E5%8C%96%E7%AC%AC3%E7%AB%A0/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/computer_organization/%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C-%E9%87%8F%E5%8C%96%E7%AC%AC3%E7%AB%A0/","path":"2026/07/09/computer_organization/指令级并行-量化第3章/","title":"指令级并行-量化第3章"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>指令级并行-量化第3章 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ilp%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E4%B8%8E%E6%8B%A6%E8%B7%AF%E8%99%8E"><span class="nav-number">2.</span> <span class="nav-text">1 ILP的基本概念与“拦路虎”</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 什么是指令级并行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B0%81%E5%9C%A8%E9%98%BB%E6%8C%A1%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 谁在阻挡指令级并行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%86%92%E9%99%A9"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 数据冒险</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">2.4.</span> <span class="nav-text">1.4 例子</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E7%9A%84%E6%99%BA%E6%85%A7%E5%9F%BA%E6%9C%AC%E6%B5%81%E6%B0%B4%E7%BA%BF%E8%B0%83%E5%BA%A6%E4%B8%8E%E5%BE%AA%E7%8E%AF%E5%B1%95%E5%BC%80"><span class="nav-number">3.</span> <span class="nav-text">2
+软件的智慧：基本流水线调度与循环展开</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%A7%8B%E4%BB%A3%E7%A0%81"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 原始代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E7%BA%A7%E4%BC%98%E5%8C%96%E6%8C%87%E4%BB%A4%E8%B0%83%E5%BA%A6"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 初级优化：指令调度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E7%BA%A7%E4%BC%98%E5%8C%96%E5%BE%AA%E7%8E%AF%E5%B1%95%E5%BC%80"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 中级优化：循环展开</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%88%E6%9E%81%E4%BC%98%E5%8C%96%E5%BE%AA%E7%8E%AF%E5%B1%95%E5%BC%80%E6%8C%87%E4%BB%A4%E8%B0%83%E5%BA%A6"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 终极优化：循环展开+指令调度</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B%E6%9C%AA%E6%9D%A5%E7%9A%84%E9%AD%94%E6%B3%95%E9%AB%98%E7%BA%A7%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B"><span class="nav-number">4.</span> <span class="nav-text">3 预测未来的魔法：高级分支预测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E9%A2%84%E6%B5%8B%E7%9A%84%E5%B1%80%E9%99%90"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 传统预测的局限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 常用的分支预测器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="nav-number">4.2.1.</span> <span class="nav-text">3.2.1 局部预测器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">4.2.1.1.</span> <span class="nav-text">硬件结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E5%B1%80%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="nav-number">4.2.2.</span> <span class="nav-text">3.2.2 全局预测器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%E7%BB%93%E6%9E%84-1"><span class="nav-number">4.2.2.1.</span> <span class="nav-text">硬件结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%9E%E8%B5%9B%E9%A2%84%E6%B5%8B%E5%99%A8"><span class="nav-number">4.2.3.</span> <span class="nav-text">3.2.3 竞赛预测器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%E7%BB%93%E6%9E%84-2"><span class="nav-number">4.2.3.1.</span> <span class="nav-text">硬件结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%80%E9%99%90%E6%80%A7"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 局限性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#intel-core-i7-%E4%BD%BF%E7%94%A8%E7%9A%84%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B%E6%8A%80%E6%9C%AF"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 Intel Core i7
+使用的分支预测技术</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%E7%9A%84%E6%99%BA%E6%85%A7tomasulo%E5%8A%A8%E6%80%81%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">4
+硬件的智慧：Tomasulo动态调度算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E8%B0%83%E5%BA%A6%E7%9A%84%E6%80%9D%E6%83%B3%E4%B8%8E%E5%9B%B0%E9%9A%BE"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 动态调度的思想与困难</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tomasulo-%E7%AE%97%E6%B3%95"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 Tomasulo 算法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%E6%8E%A8%E6%B5%8B%E6%89%A7%E8%A1%8Crob%E4%B8%8E%E5%A4%9A%E5%8F%91%E5%B0%84%E8%B6%85%E6%A0%87%E9%87%8Fvliw"><span class="nav-number">6.</span> <span class="nav-text">5
+硬件推测执行（ROB）与多发射（超标量&#x2F;VLIW）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#rob%E9%87%8D%E6%8E%92%E5%BA%8F%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 ROB：重排序缓冲区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5rob%E5%90%8E%E7%9A%84tomasulo%E7%AE%97%E6%B3%95"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 加入ROB后的Tomasulo算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E6%AD%A5%E9%AA%A4"><span class="nav-number">6.2.1.</span> <span class="nav-text">5.2.1 算法步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="nav-number">6.2.2.</span> <span class="nav-text">5.2.2 例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%8F%91%E5%B0%84%E6%8A%80%E6%9C%AF"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 多发射技术</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B6%85%E6%A0%87%E9%87%8F%E6%9E%B6%E6%9E%84"><span class="nav-number">6.3.1.</span> <span class="nav-text">5.3.1 超标量架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B6%85%E9%95%BF%E6%8C%87%E4%BB%A4%E5%AD%97vliw"><span class="nav-number">6.3.2.</span> <span class="nav-text">5.3.2 超长指令字（VLIW）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E8%B0%83%E5%BA%A6%E5%A4%9A%E5%8F%91%E5%B0%84%E6%8E%A8%E6%B5%8B"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 动态调度+多发射+推测</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%89%8D%E6%8F%90%E6%9D%A1%E4%BB%B6"><span class="nav-number">6.4.1.</span> <span class="nav-text">5.4.1 前提条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A6%81%E6%89%A7%E8%A1%8C%E7%9A%84%E6%8C%87%E4%BB%A4"><span class="nav-number">6.4.2.</span> <span class="nav-text">5.4.2 要执行的指令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E6%8E%A8%E6%B5%8Bvs%E6%9C%89%E6%8E%A8%E6%B5%8B"><span class="nav-number">6.4.3.</span> <span class="nav-text">5.4.3 无推测VS有推测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%A0%E6%8E%A8%E6%B5%8B"><span class="nav-number">6.4.3.1.</span> <span class="nav-text">无推测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%89%E6%8E%A8%E6%B5%8B"><span class="nav-number">6.4.3.2.</span> <span class="nav-text">有推测</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%87%E4%BB%A4%E6%8F%90%E5%8F%96%E5%B8%A6%E5%AE%BD%E4%B8%8Ebtb%E6%8A%80%E6%9C%AF"><span class="nav-number">7.</span> <span class="nav-text">6 指令提取带宽与BTB技术</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%97%9B%E7%82%B9"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 痛点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#btb%E5%88%86%E6%94%AF%E7%9B%AE%E6%A0%87%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 BTB：分支目标缓冲区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#btb-%E7%9A%84%E7%89%A9%E7%90%86%E7%BB%93%E6%9E%84"><span class="nav-number">7.2.1.</span> <span class="nav-text">6.2.1 BTB 的物理结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#btb-%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6"><span class="nav-number">7.2.2.</span> <span class="nav-text">6.2.2 BTB 的工作机制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#btb-%E5%9C%A8%E4%BA%94%E7%BA%A7%E6%B5%81%E6%B0%B4%E7%BA%BF%E4%B8%AD%E7%9A%84%E6%B5%81%E8%BD%AC"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 BTB 在五级流水线中的流转</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8E%8B%E6%A6%A8cpu%E7%9A%84%E6%9E%81%E9%99%90%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%8A%80%E6%9C%AF%E4%B8%8E%E7%9C%9F%E5%AE%9Ecpu%E6%A1%88%E4%BE%8B"><span class="nav-number">8.</span> <span class="nav-text">7
+压榨CPU的极限：多线程技术与真实CPU案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%A5%BD%E5%A4%84"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 线程的好处</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%9A%84%E4%B8%89%E7%A7%8D%E4%B8%BB%E8%A6%81%E7%A1%AC%E4%BB%B6%E6%96%B9%E6%B3%95"><span class="nav-number">8.2.</span> <span class="nav-text">7.2
+实现多线程的三种主要硬件方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%86%E7%B2%92%E5%BA%A6%E5%A4%9A%E7%BA%BF%E7%A8%8Bfine-grained-multithreading"><span class="nav-number">8.2.1.</span> <span class="nav-text">7.2.1
+细粒度多线程（Fine-Grained Multithreading）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B2%97%E7%B2%92%E5%BA%A6%E5%A4%9A%E7%BA%BF%E7%A8%8Bcoarse-grained-multithreading"><span class="nav-number">8.2.2.</span> <span class="nav-text">7.2.2
+粗粒度多线程（Coarse-Grained Multithreading）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%8C%E6%97%B6%E5%A4%9A%E7%BA%BF%E7%A8%8Bsimultaneous-multithreading-smt"><span class="nav-number">8.2.3.</span> <span class="nav-text">7.2.3
+同时多线程（Simultaneous Multithreading, SMT）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E5%B0%84%E6%A7%BD%E5%88%A9%E7%94%A8%E7%8E%87%E5%AF%B9%E6%AF%94"><span class="nav-number">8.2.4.</span> <span class="nav-text">7.2.4 发射槽利用率对比</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E6%9C%AA%E6%9D%A5"><span class="nav-number">9.</span> <span class="nav-text">8 总结与未来</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/computer_organization/%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C-%E9%87%8F%E5%8C%96%E7%AC%AC3%E7%AB%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="指令级并行-量化第3章 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          指令级并行-量化第3章
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 14:57:16" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ul>
+<li>ILP的基本概念与“拦路虎”</li>
+<li>软件的智慧：基本流水线调度与循环展开</li>
+<li>预测未来的魔法：高级分支预测</li>
+<li>硬件的智慧：Tomasulo动态调度算法</li>
+<li>硬件推测执行（ROB）与多发射（超标量/VLIW）</li>
+<li>指令提取带宽与BTB技术</li>
+<li>压榨CPU的极限：多线程技术与真实CPU案例</li>
+</ul>
+<h1 id="ilp的基本概念与拦路虎">1 ILP的基本概念与“拦路虎”</h1>
+<h2 id="什么是指令级并行">1.1 什么是指令级并行</h2>
+<p>程序里的指令原本是一条一条排队执行的。但是CPU觉得这样太慢了，指令级并行（ILP）就是让多条指令在流水线中“重叠”执行。实现ILP宏观上有两种方式：</p>
+<ul>
+<li><strong>软件派（编译器）：</strong>
+在程序运行前（静态），把代码重新排版，让指令更好并行。</li>
+<li><strong>硬件派（CPU硬件）：</strong>
+在程序运行中（动态），CPU自己发现哪些指令可以一起执行。</li>
+</ul>
+<h2 id="谁在阻挡指令级并行">1.2 谁在阻挡指令级并行</h2>
+<p>要想让指令并行，最大的阻碍就是指令之间有“关系”。相关可以分为三种：</p>
+<ul>
+<li><strong>数据相关（真相关）。</strong>例如指令 <span
+class="math inline"><em>i</em></span> 计算出一个结果，但指令 <span
+class="math inline"><em>i</em> + 1</span> 要用到这个结果。</li>
+<li><strong>名称相关（假相关）。</strong>它是指两条指令其实没有任何数据交流，只是碰巧用到了同一个寄存器。名称相关又可细分为以下两种：
+<ul>
+<li><strong>反相关。</strong>例如指令 <span
+class="math inline"><em>i</em> + 1</span> 写了一个寄存器，而指令 <span
+class="math inline"><em>i</em></span> 正好要读它。（先读再写）</li>
+<li><strong>输出相关。</strong>例如指令 <span
+class="math inline"><em>i</em></span> 和指令 <span
+class="math inline"><em>i</em> + 1</span> 都要写同一个寄存器。</li>
+</ul></li>
+<li><strong>控制相关。</strong>这由分支指令（比如
+if-else）引起。在判断条件没出来之前，CPU不知道接下来该执行哪条指令。</li>
+</ul>
+<h2 id="数据冒险">1.3 数据冒险</h2>
+<p>如果一段汇编代码发生了相关，就会在流水线中引发<strong>冲突</strong>，导致流水线停顿，这就是冒险。针对数据流（数据相关+名称相关），有三种冒险：</p>
+<ul>
+<li><strong>RAW（写后读）：</strong> 对应数据真相关。</li>
+<li><strong>WAW（写后写）：</strong> 对应输出相关。</li>
+<li><strong>WAR（读后写）：</strong> 对应反相关。</li>
+</ul>
+<p>在最基础的5级流水线中，只有RAW会发生；但是当我们允许指令“乱序执行”来提高性能时，就会出现WAW和WAR。</p>
+<h2 id="例子">1.4 例子</h2>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. ADD.D  F2, F4, F6   // 把F4和F6相加，结果写入F2</span><br><span class="line">2. SUB.D  F8, F2, F10  // 把F2减去F10，结果写入F8</span><br><span class="line">3. MUL.D  F2, F12, F14 // 把F12和F14相乘，结果写入F2</span><br></pre></td></tr></table></figure>
+<ul>
+<li>指令1和指令2之间是数据相关，对应写后读；</li>
+<li>指令1和指令3之间是输出相关，对应写后写；</li>
+<li>指令2和指令3之间是反相关，对应读后写。</li>
+</ul>
+<p>如果要消除指令2和指令3之间的冲突，可以使用<strong>寄存器换名</strong>的策略。例如，把指令3的F2换成F20，它和指令2就不存在任何冲突了。</p>
+<h1 id="软件的智慧基本流水线调度与循环展开">2
+软件的智慧：基本流水线调度与循环展开</h1>
+<p>这一节要解决的问题是，编译器如何在软件层面（静态）实现指令级并行？</p>
+<p>本节将会以一个浮点数计算的循环体为例，介绍基本流水线调度与循环展开。规定处理器的浮点延迟如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">产生结果的指令</th>
+<th style="text-align: left;">使用结果的指令</th>
+<th style="text-align: left;">延迟（时钟周期数）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">浮点计算</td>
+<td style="text-align: left;">浮点计算</td>
+<td style="text-align: left;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;">浮点计算</td>
+<td style="text-align: left;">浮点store</td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">浮点load</td>
+<td style="text-align: left;">浮点计算</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">浮点load</td>
+<td style="text-align: left;">浮点store</td>
+<td style="text-align: left;">0</td>
+</tr>
+</tbody>
+</table>
+<h2 id="原始代码">2.1 原始代码</h2>
+<p>下面是一段经典的循环代码，把数组元素加上标量 s：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Loop: L.D    F0, 0(R1)      // 取数组元素到F0</span><br><span class="line">      ADD.D  F4, F0, F2     // F0 + F2 -&gt; F4。注意：这里距离上一条L.D需要1个停顿</span><br><span class="line">      S.D    F4, 0(R1)      // 存回内存。注意：这里距离上一条ADD.D需要2个停顿</span><br><span class="line">      DADDIU R1, R1, -8     // 数组指针递减8字节</span><br><span class="line">      BNE    R1, R2, Loop   // 循环分支。注意：由于RAW冒险，这里距离上一条DADDIU需要1个停顿</span><br></pre></td></tr></table></figure>
+<p>由于上述的流水线延迟，在 L.D 和 ADD.D 之间会产生1个 Stall，在 ADD.D
+和 S.D 之间会产生2个
+Stall。加上两条循环控制指令，<strong>处理1个数组元素总共需要 9
+个时钟周期</strong>，性能极其低下。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Loop:  	L.D     F0, 0(R1)      ; 指令流出时钟 1</span><br><span class="line">        stall   (停顿)          ; 指令流出时钟 2</span><br><span class="line">        ADD.D   F4, F0, F2     ; 指令流出时钟 3</span><br><span class="line">        stall   (停顿)          ; 指令流出时钟 4</span><br><span class="line">        stall   (停顿)          ; 指令流出时钟 5</span><br><span class="line">        S.D     F4, 0(R1)       ; 指令流出时钟 6</span><br><span class="line">        DADDIU  R1, R1, #-8     ; 指令流出时钟 7</span><br><span class="line">        stall                   ; 指令流出时钟 8（RAW冒险）</span><br><span class="line">        BNE     R1, R2, Loop    ; 指令流出时钟 9</span><br></pre></td></tr></table></figure>
+<h2 id="初级优化指令调度">2.2 初级优化：指令调度</h2>
+<p>编译器的第一步优化，是把毫无关联的指令“塞”进这些停顿（Stall）中。例如，编译器发现
+DADDIU R1, R1, -8
+和浮点计算完全没有数据相关，可以把它<strong>提前</strong>到 L.D 和 ADD.D
+之间。但是因为 R1 提前减去了8，后面的 S.D 如果还是用 0(R1)
+就会存错地址。所以编译器必须同时<strong>补偿偏移量</strong>，将 S.D
+修改为 S.D F4, 8(R1)。最终得到的汇编代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Loop:  	L.D     F0, 0(R1)</span><br><span class="line">        DADDIU  R1, R1, #-8</span><br><span class="line">        ADD.D   F4, F0, F2</span><br><span class="line">        stall</span><br><span class="line">        stall</span><br><span class="line">        S.D     F4, 8(R1)</span><br><span class="line">        BNE     R1, R2, Loop</span><br></pre></td></tr></table></figure>
+<p>此时周期数从9降到了7个周期，但依然存在2个停顿周期无法消除。</p>
+<h2 id="中级优化循环展开">2.3 中级优化：循环展开</h2>
+<p>单次循环内的指令太少，调度空间见底了。怎么办？</p>
+<p>编译器采用循环展开技术，直接把循环体复制多次。这里展开了4次，即把4次小的迭代合并成1次大的迭代。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260414223218221.png" alt="image-20260414223211143" style="zoom: 33%;" /></p>
+<ul>
+<li><p>把【L.D, ADD.D, S.D】的组合复制4次。原本需要4次 DADDIU 和4次
+BNE，现在只需要在最末尾保留1次即可，极大地消除了循环控制开销。</p></li>
+<li><p>如果4个循环体中的寄存器全用 F0 和
+F4，会产生严重的写后写（WAW）和读后写（WAR）冒险。因此编译器给第1个元素用
+F0/F4，第2个用 F6/F8，第3个用 F10/F12，第4个用 F14/F16。</p></li>
+<li><p>现在我们有了4条 L.D，4条 ADD.D，4条
+S.D，且它们之间<strong>完全没有数据相关</strong>。编译器把所有的 L.D
+排在一起，接着排所有的 ADD.D，最后排所有的 S.D。</p></li>
+<li><p>这个循环每遍共使用了27个时钟周期，平均每个元素使用27/4=6.75个时钟周期，小于原来的9个时钟周期。</p></li>
+</ul>
+<blockquote>
+<p>Q：循环展开把 L.D, ADD.D, S.D
+的组合复制4次，但如果循环次数不是四的倍数怎么办？</p>
+<p>A：在编译器优化中，通常使用<strong>条带开采（Strip
+Mining）</strong>技术解决这一问题。假设我们要循环 <span
+class="math inline"><em>N</em></span> 次，展开因子是 <span
+class="math inline"><em>K</em></span>（比如 <span
+class="math inline"><em>K</em> = 4</span>）。编译器会把代码分成两个循环来生成：</p>
+<ol type="1">
+<li><strong>主体展开循环：</strong> 每次处理 <span
+class="math inline"><em>K</em></span> 个元素，总共执行 <span
+class="math inline">⌊<em>N</em>/<em>K</em>⌋</span> 次。</li>
+<li><strong>尾部清理循环：</strong>
+这是一个<strong>没有展开</strong>的普通循环，用来处理剩下除不尽的 <span
+class="math inline"><em>N</em> mod  <em>K</em></span> 个元素。</li>
+</ol>
+</blockquote>
+<h2 id="终极优化循环展开指令调度">2.4 终极优化：循环展开+指令调度</h2>
+<p>对循环展开后的指令序列还可以进行优化调度，以减少空转周期：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260414223852341.png" alt="image-20260414223852270" style="zoom:33%;" /></p>
+<p>整个循环仅仅使用了14个时钟周期，平均每个循环仅使用14/4=3.5个时钟周期。</p>
+<h1 id="预测未来的魔法高级分支预测">3 预测未来的魔法：高级分支预测</h1>
+<p>控制相关会阻碍流水线。为了不让流水线等，CPU只能“猜”分支往哪走。</p>
+<h2 id="传统预测的局限">3.1 传统预测的局限</h2>
+<p>传统的2位预测器只看单个分支自身的历史记录。比如一个 for
+循环的条件判断，它自己跳了99次，第100次大概率还是跳。但这有局限性：有些分支的结果，根本不是由它自己决定的，而是由它前面的其他分支决定的。</p>
+<p>例如以下代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 分支 b1 */</span>  <span class="keyword">if</span> (aa == <span class="number">2</span>)  aa = <span class="number">0</span>;</span><br><span class="line"><span class="comment">/* 分支 b2 */</span>  <span class="keyword">if</span> (bb == <span class="number">2</span>)  bb = <span class="number">0</span>;</span><br><span class="line"><span class="comment">/* 分支 b3 */</span>  <span class="keyword">if</span> (aa != bb) &#123; ... &#125;</span><br></pre></td></tr></table></figure>
+<p>如果分支b1和b2的条件都成立，那么此时 aa 必然等于0，bb
+也必然等于0。这就意味着，到达第三个分支（b3）时，aa != bb
+这个条件绝对不可能成立。</p>
+<ul>
+<li><p>如果使用基础的局部预测器，b3
+只会傻傻地看自己过去的记录。</p></li>
+<li><p>如果使用<strong>相关预测（也叫全局历史预测）</strong>，硬件会记录一条<strong>全局历史移位寄存器（Global
+History Register,
+GHR）</strong>。当CPU看到全局历史是“b1成立，b2成立”时，它能直接推断出“b3绝对不成立”。</p></li>
+</ul>
+<h2 id="常用的分支预测器">3.2 常用的分支预测器</h2>
+<h3 id="局部预测器">3.2.1 局部预测器</h3>
+<p>在局部预测器中，每一条分支指令都有自己的历史记录，记录该分支最近几次是跳转还是不跳转，从而用这个历史去预测下一次是否跳转。</p>
+<p>例如，有一个分支指令 if (i % 2 == 0)，这个分支过去几次的跳转情况为 T,
+T, T, N, T, T …，那么下一次大概率跳转。</p>
+<h4 id="硬件结构">硬件结构</h4>
+<p><strong>第一级：局部历史表（Local History Table, LHT）</strong></p>
+<ul>
+<li>key：一条分支指令（用 PC 地址的低位索引）</li>
+<li>value：一个 k 位移位寄存器，记录该指令最近 k 次的结果，例如
+<code>110</code> 表示最近三次：跳、跳、不跳</li>
+</ul>
+<p><strong>第二级：模式历史表（Pattern History Table, PHT）</strong></p>
+<ul>
+<li><p>key：第一级输出的局部历史记录（k 位）</p></li>
+<li><p>value：一个饱和计数器数组（通常是 2-bit），共 <span
+class="math inline">2<sup><em>k</em></sup></span>
+个条目。计数器计的“数”的含义是，<code>00</code>=强不跳，<code>01</code>=弱不跳，<code>10</code>=弱跳，<code>11</code>=强跳，相当于一个状态机</p></li>
+</ul>
+<p><strong>预测流程：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">    PC低位</span><br><span class="line">      │</span><br><span class="line">      ▼</span><br><span class="line">┌─────────┐</span><br><span class="line">│   LHT   │  (存储每条指令的最近k次历史)</span><br><span class="line">└────┬────┘</span><br><span class="line">     │ k位历史 (例如: 110 表示 跳,跳,不跳)</span><br><span class="line">     ▼</span><br><span class="line">┌─────────┐</span><br><span class="line">│   PHT   │  (2^k个条目，每个是2-bit饱和计数器)</span><br><span class="line">└────┬────┘</span><br><span class="line">     │ 2-bit计数值 (00/01=不跳, 10/11=跳)</span><br><span class="line">     ▼</span><br><span class="line">  预测结果</span><br></pre></td></tr></table></figure>
+<p>这种结构擅长捕捉有规律的局部模式，比如循环内”T T T T
+N”的规律跳转。</p>
+<h3 id="全局预测器">3.2.2 全局预测器</h3>
+<p>全局预测器使用一个<strong>全局历史寄存器（GHR, Global History
+Register）</strong>记录最近 N
+条分支的结果（例如：TNTTNT…），用这串历史去预测当前分支指令是否需要跳转。</p>
+<h4 id="硬件结构-1">硬件结构</h4>
+<p><strong>第一级：全局历史寄存器（Global History Register,
+GHR）</strong></p>
+<ul>
+<li>一个 k 位移位寄存器，记录最近 k 条分支（不管是哪条指令）的结果</li>
+<li>每执行一条分支，就将结果移入 GHR，最旧的移出</li>
+</ul>
+<p><strong>第二级：模式历史表（PHT）</strong></p>
+<ul>
+<li>key：第一级输出的全局历史记录（k位）</li>
+<li>value：一个饱和计数器数组（通常是 2-bit），共 <span
+class="math inline">2<sup><em>k</em></sup></span>
+个条目。计数器计的“数”的含义是，<code>00</code>=强不跳，<code>01</code>=弱不跳，<code>10</code>=弱跳，<code>11</code>=强跳，相当于一个状态机</li>
+</ul>
+<p><strong>预测流程：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">┌─────────┐</span><br><span class="line">│   GHR   │  (全局的最近k次历史)</span><br><span class="line">└────┬────┘</span><br><span class="line">     │ k位历史 (例如: 110 表示 跳,跳,不跳)</span><br><span class="line">     ▼</span><br><span class="line">┌─────────┐</span><br><span class="line">│   PHT   │  (2^k个条目，每个是2-bit饱和计数器)</span><br><span class="line">└────┬────┘</span><br><span class="line">     │ 2-bit计数值 (00/01=不跳, 10/11=跳)</span><br><span class="line">     ▼</span><br><span class="line">  预测结果</span><br></pre></td></tr></table></figure>
+<p>全局预测器擅长捕捉跨分支的相关性，例如”如果前面的 if 条件成立，后面的
+if 也很可能成立”。</p>
+<h3 id="竞赛预测器">3.2.3 竞赛预测器</h3>
+<p>局部预测器对某些分支有效，全局预测器对另一些分支有效。既然各有千秋，硬件设计师决定把这两个东西结合起来，就变成了<strong>竞赛预测器</strong>。</p>
+<h4 id="硬件结构-2">硬件结构</h4>
+<ul>
+<li><p><strong>部件 A：</strong> 局部预测器（Local
+Predictor），同上</p></li>
+<li><p><strong>部件 B：</strong> 全局预测器（Global
+Predictor），同上</p></li>
+<li><p><strong>部件 C：</strong> 选择器（Selector / Choice
+Predictor）</p>
+<ul>
+<li>key：分支指令的地址</li>
+<li>value：2位计数器，具体含义见下面</li>
+</ul></li>
+</ul>
+<p>选择器不是用来预测分支跳还是不跳，而是用来预测<strong>“这次我该信A还是信B”</strong>。对于每一条分支指令，选择器里都有一个专用的
+<strong>2位饱和计数器（2-bit Saturating
+Counter）</strong>。它的状态机如下：</p>
+<ul>
+<li><strong>状态 00 (0)：</strong> 强烈倾向使用 A（局部预测器）。</li>
+<li><strong>状态 01 (1)：</strong> 较弱倾向使用 A（局部预测器）。</li>
+<li><strong>状态 10 (2)：</strong> 较弱倾向使用 B（全局预测器）。</li>
+<li><strong>状态 11 (3)：</strong> 强烈倾向使用 B（全局预测器）。</li>
+</ul>
+<p>也就是说，数值越小越相信 A，数值越大越相信 B：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">相信A							相信B</span><br><span class="line">    &lt;------------------------&gt;</span><br><span class="line">    00		01		10		11</span><br></pre></td></tr></table></figure>
+<p>当一条分支指令实际执行完毕，</p>
+<ul>
+<li>如果 <strong>A猜对了，B猜错了</strong>：选择器的计数器减1（状态向 0
+移动，变得更信任 A）。</li>
+<li>如果 <strong>B猜对了，A猜错了</strong>：选择器的计数器加1（状态向 3
+移动，变得更信任 B）。</li>
+<li>如果
+<strong>A和B都猜对，或者都猜错</strong>：没分出胜负，计数器状态<strong>保持不变</strong>。</li>
+</ul>
+<p>例如，对于一条给定的分支指令，如果在最近的运行中，全局预测（B）总是比局部预测（A）准，选择器就会被训练到状态
+3。下次遇到这条指令，无论 A 怎么说，CPU都直接采纳 B 的预测结果。</p>
+<h2 id="局限性">3.3 局限性</h2>
+<p>假设程序里有一个<strong>非常随机</strong>的数据序列（比如伪随机数生成器产生的一千万个0和1），然后代码是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (random_array[i] == <span class="number">1</span>) &#123; </span><br><span class="line">    <span class="comment">// 执行操作 </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>无论是局部预测器、全局预测器还是竞赛预测器，面对这段代码时，它们的预测准确率大概是50%。</p>
+<ul>
+<li><strong>对局部预测器而言：</strong> 它通过 PC 地址查到了这条 if
+指令专属的 2
+位计数器。但是数据是随机的，导致上一次跳了，这一次可能不跳。计数器的值在
+0、1、2、3 之间毫无规律地随机震荡（专业术语叫 <strong>Thrashing
+颠簸</strong>）。预测结果完全是随机瞎蒙（50%）。</li>
+<li><strong>对全局预测器而言：</strong> GHR
+里记录的历史（比如最近5次分支的结果
+01101）也是由随机数据产生的<strong>随机噪声</strong>。用一个随机噪声去查表，查出来的计数器状态同样是噪音，预测率依然是
+50%。</li>
+<li><strong>对竞赛选择器而言：</strong> A 和 B 都在瞎蒙，所以 A 和 B
+猜对的概率都是 50%。选择器的计数器也失去了方向，在 A 和 B
+之间随机横跳。</li>
+</ul>
+<p>这揭示了分支预测的根本局限性：分支预测的本质是利用程序运行中的“数据相关性规律”和“代码结构模式规律”。如果输入数据具有极高的<strong>信息熵（Entropy，即纯随机）</strong>，硬件预测逻辑将彻底失效。</p>
+<p>在真实的工业界开发中，如果程序员写出了这种针对高频随机数据的分支，会导致
+CPU 流水线因为疯狂预测错误而反复清空，性能极速下降。这也是为什么资深的
+C++ 工程师在处理这种核心代码时，会刻意使用
+<strong>无分支编程（Branchless Programming）</strong> 或者
+<strong>条件传送指令（如 x86 的 CMOV，ARM 的 CSEL）</strong>
+来消除分支指令，从而避开分支预测器的软肋。</p>
+<h2 id="intel-core-i7-使用的分支预测技术">3.4 Intel Core i7
+使用的分支预测技术</h2>
+<p>Intel Core i7 将竞赛预测器的思想发扬光大。它的分支预测器包含：</p>
+<ol type="1">
+<li>局部预测器</li>
+<li>全局预测器</li>
+<li>循环退出预测器（专门针对for/while循环结束的那一次跳跃进行特化识别）</li>
+</ol>
+<p>然后通过复杂的选择器网络（融合了竞赛机制），把这三个预测器的结果进行整合决策。这就使得
+Core i7 能够将分支预测准确率推高到 95% 以上。</p>
+<h1 id="硬件的智慧tomasulo动态调度算法">4
+硬件的智慧：Tomasulo动态调度算法</h1>
+<h2 id="动态调度的思想与困难">4.1 动态调度的思想与困难</h2>
+<p>经典的5级流水线是按序发射、按序执行的。一旦某条指令因为数据没准备好（数据冒险）而停顿（Stall），它后面的所有指令，哪怕是不相关的指令，也全都被堵在后面。</p>
+<p>为了实现<strong>乱序执行（Out-of-Order
+Execution）</strong>，可以把经典的译码段（ID）拆成两半：</p>
+<ol type="1">
+<li><strong>发射（Issue, IS）：</strong>
+这一步依然是<strong>按序</strong>的。指令在这里译码，并检查有没有结构冒险（比如加法器够不够用）。</li>
+<li><strong>读操作数（Read Operands, RO）：</strong>
+这一步开始<strong>乱序</strong>！如果指令需要的数据还没算出来（数据冒险），它就在这儿等。但关键是，它等它的，<strong>不妨碍后面的指令先去读操作数并执行</strong>。</li>
+</ol>
+<p>但一旦允许<strong>乱序执行</strong>，就会出现WAR冒险和WAW冒险。例如</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">DIV.D F0, F2, F4</span><br><span class="line">ADD.D F6, F0, F8</span><br><span class="line">SUB.D F8, F10, F14  &lt;-- 注意这条</span><br></pre></td></tr></table></figure>
+<p>如果 SUB.D 跑得比 ADD.D 快，它先去把 F8 给写了，那后面 ADD.D 读到的
+F8 就是错的！这就是<strong>反相关引起的 WAR 冒险</strong>。</p>
+<p>而动态调度还有一大麻烦：<strong>不精确异常</strong>。<strong>精确异常</strong>是指，假设程序按顺序跑，在指令
+<span class="math inline"><em>i</em></span>
+发生除零错误（异常）时，前面的指令全执行完了，<span
+class="math inline"><em>i</em></span>​
+后面的指令都没产生任何影响。现场保护得清清楚楚。而因为乱序，当指令 <span
+class="math inline"><em>i</em></span> 发生异常时，它后面的指令 <span
+class="math inline"><em>i</em> + 1</span>
+可能已经跑完了并且把结果写进了寄存器。这时候你再去捕捉异常状态，现场已经被破坏了，这叫<strong>不精确异常</strong>。</p>
+<h2 id="tomasulo-算法">4.2 Tomasulo 算法</h2>
+<p>见【Tomasulo-原始例子-来自b站】</p>
+<h1 id="硬件推测执行rob与多发射超标量vliw">5
+硬件推测执行（ROB）与多发射（超标量/VLIW）</h1>
+<p>在原始的 Tomasulo
+算法中，虽然实现了乱序执行，但存在一个致命的体系结构缺陷：<strong>指令乱序完成（Out-of-order
+Completion）</strong>。当功能部件计算完毕后，结果通过 CDB
+直接写入了物理寄存器或存储器。</p>
+<p>如果发生<strong>分支预测错误</strong>或<strong>异常（Exception）</strong>，由于后续的指令可能已经提前算完并修改了寄存器，处理器的真实状态（体系结构状态）已经被破坏，无法回滚到异常发生或分支跳转前的精确状态（即<strong>不精确异常</strong>）。</p>
+<p>为了解决这个问题并支持推测执行，现代体系结构在Tomasulo算法的基础上引入了<strong>重排序缓冲区（Reorder
+Buffer, ROB）</strong>。</p>
+<h2 id="rob重排序缓冲区">5.1 ROB：重排序缓冲区</h2>
+<p>ROB是一个先进先出（FIFO）的环形队列，用于临时存放乱序执行产生的结果。引入ROB后，处理器的执行逻辑被严格定义为：<strong>乱序执行，按序提交（Out-of-order
+Execution, In-order Commit）</strong>。</p>
+<p>在引入ROB的架构中，原有的硬件机制发生了重要改变：</p>
+<ol type="1">
+<li><strong>寄存器重命名主体的转移：</strong>
+在原始Tomasulo中，寄存器重命名（消除WAR/WAW冒险）是通过保留站（RS）的站号完成的。在推测架构中，<strong>寄存器换名由ROB的编号（Tag）来完成</strong>。</li>
+<li><strong>寄存器状态表（Qi）的改变：</strong>
+状态表不再记录保留站的编号，而是记录即将写入该寄存器的指令在<strong>ROB中的项号</strong>。</li>
+</ol>
+<h2 id="加入rob后的tomasulo算法">5.2 加入ROB后的Tomasulo算法</h2>
+<h3 id="算法步骤">5.2.1 算法步骤</h3>
+<blockquote>
+<p>两个关键点：</p>
+<p>写回之后就可以广播</p>
+<p>提交之后才可以修改寄存器状态</p>
+</blockquote>
+<p>引入ROB后，指令的执行周期从原始Tomasulo的3步扩展为4步：</p>
+<p><strong>1.发射/流出</strong>：从浮点指令队列的头部取一条指令。如果有空闲的保留站（设为r）且有空闲的ROB项（设为b），就流出该指令，并把相应的信息放入保留站r和ROB项b。如果保留站或ROB全满，便停止流出指令，直到它们都有空闲的项。</p>
+<p><strong>2.执行</strong>：如果有操作数尚未就绪，就等待，并不断地监测CDB。（这一步检测RAW冒险）当两个操作数都已在保留站中就绪后，就可以执行该指令的操作。</p>
+<p><strong>3.写结果</strong>：当结果产生后，将该结果连同本指令在流出段所分配到的ROB项的编号放到CDB上，经CDB写到ROB以及所有等待该结果的保留站。<strong>（广播）</strong>然后释放产生该结果的保留站。</p>
+<blockquote>
+<p>store指令在本阶段执行的操作为：</p>
+<ul>
+<li><p>如果要写入存储器的数据已经就绪，就把该数据写入分配给该store指令的ROB项（value字段）。</p></li>
+<li><p>否则，就监测CDB，直到那个数据在CDB上播送出来，这时才将之写入分配给该store指令的ROB项（value字段）。</p></li>
+</ul>
+</blockquote>
+<p><strong>4.提交</strong></p>
+<p>对分支指令、 store指令以及其他指令的处理不同：</p>
+<ul>
+<li><p>其他指令（除分支指令和store指令）：当该指令到达 ROB
+队列的头部而且其结果已经就绪时，就把该结果写入该指令的目标寄存器，并从ROB中删除该指令。</p></li>
+<li><p>store指令：处理与上面类似，只是它把结果写入存储器。</p></li>
+<li><p>分支指令：</p>
+<ul>
+<li>当预测错误的分支指令到达ROB队列的头部时，清空ROB，并从分支指令的另一个分支重新开始执行。（错误的推测执行）</li>
+<li>当预测正确的分支指令到达ROB队列的头部时，该指令执行完毕。</li>
+</ul></li>
+</ul>
+<h3 id="例子-1">5.2.2 例子</h3>
+<p>见【加入ROB的Tomasulo例子-来自cc】</p>
+<p>总之，加入ROB后的Tomasulo算法<strong>通过ROB将“执行”与“提交”解耦</strong>。Tomasulo算法负责在前端和中端最大化乱序执行的吞吐量，而ROB负责在后端把关，确保体系结构状态的更新严格遵循程序原本的串行语义。这是现代高性能处理器（如Intel
+Core、ARM Cortex-A系列）实现精确异常和高效分支推测的核心基石。</p>
+<h2 id="多发射技术">5.3 多发射技术</h2>
+<p>在前面的学习中，无论是基础的5级流水线，还是Tomasulo动态调度，处理器的发射宽度始终是
+<strong>1</strong>（即每个时钟周期最多只能从指令队列中提取并发射一条指令）。因此，其理想
+CPI（每指令周期数）的极限只能趋近于 1。</p>
+<p>为了打破这个理论极限，实现 <strong>CPI &lt; 1</strong>（或者说
+IPC，每周期指令数 &gt;
+1），体系结构引入了<strong>多发射技术</strong>，即在一个时钟周期内向执行部件发射多条指令。根据依赖检测是由硬件动态完成还是编译器静态完成，多发射技术主要分为两大流派：<strong>超标量（Superscalar）</strong>
+和 <strong>超长指令字（VLIW）</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415164437753.png" alt="image-20260415164437639" style="zoom:33%;" /></p>
+<h3 id="超标量架构">5.3.1 超标量架构</h3>
+<p>超标量处理器的核心特征是：<strong>硬件在每个时钟周期内动态地决定能发射多少条指令</strong>。发射的指令条数是不固定的（受限于硬件的最大发射宽度，如4发射或8发射），具体取决于当前的指令序列是否存在冒险。下面介绍静态的超标量架构。</p>
+<p>以一个4发射的静态调度超标量处理器为例，其发射逻辑极其复杂。在取指阶段，流水线一次性提取1~4条指令，构成一个<strong>发射包（Issue
+Packet）</strong>。为了确保按序发射且无数据/结构冒险，发射部件必须在一个时钟周期内完成<strong>两阶段的冒险检测逻辑</strong>：</p>
+<ul>
+<li><strong>第一阶段（包内冒险检测 / Intra-packet Detection）：</strong>
+检查发射包内部的这几条指令之间是否存在数据依赖。例如，包内第2条指令是否使用了包内第1条指令的结果；同时还要检查包内的指令是否请求了相同的物理功能单元（结构冒险）。</li>
+<li><strong>第二阶段（包间冒险检测 / Inter-packet Detection）：</strong>
+将当前发射包中初步判定无内部冲突的指令，与流水线中正在执行的指令进行比对，检查是否存在
+RAW 等数据冒险。</li>
+</ul>
+<p>只有同时通过这两阶段检测的指令才能在当前周期被真正发射。如果包中第
+<span class="math inline"><em>n</em></span> 条指令存在冒险，则只能发射前
+<span class="math inline"><em>n</em> − 1</span>
+条指令，剩余指令必须停顿到下一个周期重新尝试。</p>
+<h3 id="超长指令字vliw">5.3.2 超长指令字（VLIW）</h3>
+<p>超标量架构的硬件冒险检测逻辑极其复杂，随着发射宽度的增加，硬件开销和功耗呈指数级上升。为了降低硬件复杂度，<strong>VLIW
+架构将寻找指令级并行性（ILP）的重任完全交给了编译器（软件）。</strong></p>
+<p><strong>1.VLIW的指令结构</strong></p>
+<p>在传统的MIPS架构中，一条指令是 32
+位，只包含一个操作（比如一次加法）。在 VLIW 架构中，一条指令可能长达
+<strong>128 位甚至 256 位以上。</strong></p>
+<p>这条极长的指令字并不是漫无目的的比特流，它在物理上被严格划分为多个固定的<strong>“操作槽（Operation
+Slots）”</strong>。假设一个处理器有 5
+个物理功能部件（2个访存部件、2个浮点部件、1个整数部件），那么它的 VLIW
+指令结构就严格包含 5 个对应的槽位：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[ 访存槽1 | 访存槽2 | 浮点槽1 | 浮点槽2 | 整数/分支槽 ]</span><br></pre></td></tr></table></figure>
+<p>当处理器取到这一条 VLIW
+长指令时，硬件<strong>不做任何冒险检测</strong>，直接进行物理线路的“硬连线”分发——把访存槽1的控制信号直接送给访存部件1，把浮点槽1的控制信号直接送给浮点部件1。这就强制这
+5 个部件在<strong>同一个时钟周期内严格并行执行</strong>。</p>
+<p><strong>2.如何生成VLIW指令</strong></p>
+<p>因为硬件不负责检测冲突，如果放在同一个 VLIW
+指令里的操作有数据依赖（比如访存槽1要 Load 数据，浮点槽1就要 Add
+这个数据），程序直接算错。因此，编译器的任务是：<strong>在编译代码时，找到完全没有依赖关系的指令，把它们硬塞进同一个
+VLIW 指令的各个槽位中。</strong></p>
+<p>例如，对于目标循环 <code>x[i] = x[i] + s</code>，可以将其展开为</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415165605214.png" alt="image-20260415165605104" style="zoom:33%;" /></p>
+<p>经过编译器的精妙编排，这 9 行代码（9 个时钟周期）完成了 7
+次原始循环的工作，总共发射了 23
+个有效子指令，期间没有发生任何数据冲突，极其高效地压榨了硬件的并发能力。</p>
+<p><strong>3.VLIW的缺陷</strong></p>
+<p>看起来 VLIW 既省了复杂的 Tomasulo
+硬件调度电路，又能达到极高的并行度，为什么现在除了部分
+DSP（数字信号处理器），主流的 CPU 都不用纯 VLIW 了呢？</p>
+<ol type="1">
+<li><strong>代码长度暴增：</strong>正如刚才的例子，为了让 VLIW
+的槽填满，编译器必须做大规模的循环展开。原本几行代码的循环，展开后变成了几十行。这导致编译出来的二进制文件体积巨大，极易耗尽指令
+Cache 的容量，引发频繁的 Cache Miss，反而拉低了性能。</li>
+<li><strong>多余的位浪费：</strong>并不是所有代码都像科学计算那样有规律。如果某段代码中，无论编译器怎么努力，当前周期只能找到
+1 个加法可以执行，那么 VLIW 的其他 4 个槽位就必须填入全 0
+的无用编码（NOP，空操作）。这不仅浪费了宝贵的内存和缓存空间，还增加了取指令的带宽压力。一个现代的解决办法是：在内存中压缩存储，剔除
+NOP，取到 CPU 译码阶段时再由硬件展开恢复。</li>
+<li><strong>死板的锁步机制：</strong>VLIW 强调同生共死。在一条 VLIW
+指令中，如果“访存槽1”的 Load 操作遭遇了 Cache
+Miss，需要去主存拿数据（可能要停顿 100
+个周期），那么即便是完全不依赖该数据的“浮点槽1”的指令，也<strong>必须陪着一起停顿</strong>。整个处理器会完全冻结。它没有动态调度那种“你卡住我先执行别人”的灵活性。</li>
+<li><strong>机器代码的向下/向上不兼容（最致命）：</strong>假设第一代芯片
+A 有 5 个槽。它的 VLIW 代码是按照 5
+个槽的格式编译的。过了两年，芯片公司升级了架构，推出了有 8 个槽的芯片
+B。此时，旧芯片 A 的二进制程序<strong>完全无法在芯片 B
+上运行</strong>。因为机器码的物理位宽和字段定义彻底变了。所有的软件生态必须由开发者使用新编译器重新编译一次。这在通用计算机市场（如
+Windows/PC 生态）是绝对无法被容忍的。</li>
+</ol>
+<h2 id="动态调度多发射推测">5.4 动态调度+多发射+推测</h2>
+<p>可以把动态调度、多发射和推测的思想结合起来，实现 ILP。</p>
+<h3 id="前提条件">5.4.1 前提条件</h3>
+<p>假设处理器的硬件规则如下：</p>
+<ul>
+<li><p>每个时钟周期，处理器最多只能从队列提取并<strong>发射（Issue）2条指令</strong>进入保留站。</p></li>
+<li><p>必须严格按照代码写的顺序发射。</p></li>
+<li><p>所有的计算（地址计算、加法、分支比较）都有独立的硬件，不会发生结构冲突。</p></li>
+</ul>
+<h3 id="要执行的指令">5.4.2 要执行的指令</h3>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Loop: LD    R2, 0(R1)</span><br><span class="line">    DADDIU R2, R2, #1	// 必须等 LD R2 算完（RAW依赖）</span><br><span class="line">    SD    R2, 0(R1)		// 必须等 DADDIU R2 算完才能把数据写进内存（RAW依赖）</span><br><span class="line">    DADDIU R1, R1, #8</span><br><span class="line">    BNE R2, R3, Loop</span><br></pre></td></tr></table></figure>
+<h3 id="无推测vs有推测">5.4.3 无推测VS有推测</h3>
+<h4 id="无推测">无推测</h4>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260419200053530.png" style="zoom: 33%;" /></p>
+<p>周期 4，第2次迭代的 LD 被发射进入保留站，但是直到周期 8
+才能进入执行阶段。这是因为在没有推测的架构下，<strong>跨基本块的控制依赖是绝对的物理隔离墙</strong>。第
+1 次迭代的 BNE 在 <strong>周期 7</strong>
+才执行完毕，得出到底跳不跳转的结论（这里是需要跳转的），因此第 2
+次迭代的 LD 才开始执行，即使所需的数据（R1）早就准备好了。</p>
+<p>在没有推测的机器上，控制依赖导致了严重的流水线气泡。在周期 5、6、7
+这三个周期里，后端的功能部件几乎都在闲置等待。</p>
+<h4 id="有推测">有推测</h4>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260419200503768.png" style="zoom: 33%;" /></p>
+<p>引入ROB后，</p>
+<ul>
+<li><strong>周期 4：</strong> 第2次迭代的 LD 被发射进入保留站和
+ROB。</li>
+<li><strong>周期 5：</strong> 第2次迭代的 LD
+直接开始执行，因为硬件启动了<strong>分支预测</strong>，假设 BNE
+会跳转。它所需的操作数是 R1；第 1 遍的 DADDIU R1 在<strong>周期
+4</strong> 已经把新 R1 写到了 CDB 上。所以，它在周期 5 立刻抓取 R1
+开始计算内存地址，周期 6 访存，周期 7 写 CDB。</li>
+<li><strong>周期 5：</strong> 第2次迭代的 DADDIU R1 被发射。</li>
+<li><strong>周期 6：</strong> 第2次迭代的 DADDIU R1
+<strong>直接开始执行！</strong>（因为上一次的 R1 在周期 4
+就好了）。</li>
+</ul>
+<p>不过，虽然第 2 次迭代在周期 5、6
+就乱序执行完了，但推测可能是错的，所以结果只暂存在 ROB
+中，<strong>绝对不写入真实寄存器</strong>。此时，流水线必须遵循<strong>按序提交</strong>规则。在表格的“提交”列中，</p>
+<ul>
+<li><p><strong>周期 5-7：</strong> 第 1 次迭代的 LD、DADDIU R2
+依次安全提交。</p></li>
+<li><p><strong>周期 8：</strong> 第 1 次迭代的 DADDIU R1 和 BNE
+提交。<strong>在这一刻，硬件最终确认分支预测是正确的！</strong></p></li>
+<li><p><strong>周期 9：</strong> 既然周期 8 确认了预测正确，那么一直在
+ROB 里憋着、早在周期 7 就已经算完并把结果放在 CDB 上的第 2 次迭代的
+LD，终于在<strong>周期 9
+被允许提交</strong>（将其临时结果正式写入物理寄存器 R2）。</p></li>
+</ul>
+<h1 id="指令提取带宽与btb技术">6 指令提取带宽与BTB技术</h1>
+<h2 id="痛点">6.1 痛点</h2>
+<p>在多发射超标量架构中，处理器每周期需要从指令Cache中提取4到8条指令。由于基本块（Basic
+Block）的平均长度通常只有5到6条指令，这意味着<strong>在每一个取指周期内，处理器几乎必然会遇到至少一条分支指令</strong>。</p>
+<p>只要遇到分支指令，下一条该取什么指令就成了未知数。如果等待分支方向和目标地址在后续流水级（如EX段或ID段）计算出来，取指阶段将出现严重的阻塞（Fetch
+Stall），导致后端强大的多发射功能部件无指令可执行（Starvation）。</p>
+<p>因此，必须在取指（IF）的同一周期，不仅预测出分支是否跳转，还要<strong>直接提供跳转的目标PC值</strong>，实现“零周期延迟”的指令流拼接。</p>
+<h2 id="btb分支目标缓冲区">6.2 BTB：分支目标缓冲区</h2>
+<p>为了实现“零周期延迟”的跳转，体系结构引入了专门的硬件结构——<strong>分支目标缓冲区（Branch-Target
+Buffer, BTB 或 Branch-Target Cache）</strong>。</p>
+<h3 id="btb-的物理结构">6.2.1 BTB 的物理结构</h3>
+<p>BTB
+本质上是一个采用硬件关联查找的高速缓存表，其每一项至少包含两个关键字段：</p>
+<ul>
+<li><strong>地址标识（Tag）：</strong>
+记录曾经执行过且<strong>发生过跳转（Taken）</strong>的分支指令的PC地址。</li>
+<li><strong>预测的分支目标地址（Target PC）：</strong>
+记录该分支指令上一次跳转的目标地址。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260419194439241.png" style="zoom: 33%;" /></p>
+<h3 id="btb-的工作机制">6.2.2 BTB 的工作机制</h3>
+<ul>
+<li>在IF（取指）阶段，处理器用当前的PC值去取指令Cache的同时，<strong>并行地将该PC值送入BTB进行匹配</strong>。</li>
+<li><strong>如果匹配命中（Hit）：</strong>
+硬件假定当前正在提取的这条指令是一条分支指令，且预测它会跳转。BTB直接将其记录的“预测目标地址”送入PC寄存器。这样，在下一个时钟周期，处理器就可以直接从目标地址继续取指。</li>
+<li><strong>如果未命中（Miss）：</strong>
+硬件将其视为普通顺序指令（或预测不跳转的分支），PC正常递增（PC +
+4），按顺序提取下一条指令。</li>
+</ul>
+<h2 id="btb-在五级流水线中的流转">6.3 BTB 在五级流水线中的流转</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260419194645628.png" style="zoom: 50%;" /></p>
+<p>因为BTB的预测是在 IF
+段极早期进行的，此时处理器甚至还没对指令进行译码（不知道它到底是不是分支指令），所以必须在后续流水级进行<strong>验证与修正</strong>。</p>
+<ol type="1">
+<li><strong>IF 段（推测发起）：</strong>
+PC送入BTB。若命中，更新PC为目标地址；若未命中，PC正常递增。</li>
+<li><strong>ID 段（指令验证）：</strong> 对取到的指令进行译码。
+<ul>
+<li>如果此前BTB命中了，但译码发现这根本<strong>不是一条分支指令</strong>（只是普通指令的PC碰巧和BTB里的残留Tag撞车了），硬件将取消推测，恢复PC，并正常执行。</li>
+</ul></li>
+<li><strong>EX 段（结果决议与BTB更新）：</strong>
+实际计算分支条件和目标地址。
+<ul>
+<li><strong>预测正确：</strong> 流水线无缝继续执行，零周期停顿。</li>
+<li><strong>预测错误：</strong>
+清除由于错误预测而提前提取入流水线的指令。将正确的PC送入取指段重新取指。同时，<strong>更新BTB</strong>（修改目标地址，或从BTB中删除该项）。</li>
+<li><strong>未命中但实际发生跳转：</strong>
+说明遇到了一个新的跳转分支，硬件会将其PC和计算出的目标地址<strong>作为一个新项写入BTB</strong>。</li>
+</ul></li>
+</ol>
+<h1 id="压榨cpu的极限多线程技术与真实cpu案例">7
+压榨CPU的极限：多线程技术与真实CPU案例</h1>
+<p>在此之前，我们所有的努力（流水线、分支预测、动态调度、多发射）都是为了最大程度地让指令并行。但到了2000年左右（如Pentium
+4时代），ILP的开发遭遇了瓶颈。为了进一步提升性能，体系结构引入了<strong>线程级并行（TLP,
+Thread-Level Parallelism）</strong>技术。</p>
+<h2 id="线程的好处">7.1 线程的好处</h2>
+<p>进程切换需要陷入操作系统内核，保存大量的内存管理单元（MMU）状态，通常消耗成百上千个处理器周期。而硬件线程仅包含少量的处理器状态（程序计数器PC、一组物理寄存器集、栈指针等）。在处理器内部实现硬件级别的线程切换，只需要切换PC和对应的寄存器映射关系，开销可以降低到几个甚至零个时钟周期。</p>
+<h2 id="实现多线程的三种主要硬件方法">7.2
+实现多线程的三种主要硬件方法</h2>
+<h3 id="细粒度多线程fine-grained-multithreading">7.2.1
+细粒度多线程（Fine-Grained Multithreading）</h3>
+<ul>
+<li><strong>机制：</strong>
+处理器在<strong>每个时钟周期</strong>强制进行线程切换（通常基于时间片轮转调度算法）。如果某个线程遇到停顿（如Cache
+Miss或数据依赖），硬件调度器会直接跳过该线程。</li>
+<li><strong>优点：</strong>
+能够彻底掩盖长周期停顿（访存延迟）和短周期停顿（指令间数据冒险）导致的吞吐率损失。</li>
+<li><strong>缺点：</strong>
+严重牺牲了<strong>单线程的执行延迟（Latency）</strong>。因为即便某个线程完全没有停顿，它也必须等待其他线程轮转完毕后才能再次获得发射权，导致单个线程的完成时间被大幅拉长。</li>
+</ul>
+<h3 id="粗粒度多线程coarse-grained-multithreading">7.2.2
+粗粒度多线程（Coarse-Grained Multithreading）</h3>
+<ul>
+<li><strong>机制：</strong>
+处理器默认连续执行同一个线程，<strong>只有当当前线程遭遇长延迟事件（如L2
+Cache Miss）时，才会触发线程切换</strong>。</li>
+<li><strong>优点：</strong>
+不会降低单线程在无停顿状态下的执行速度。</li>
+<li><strong>缺点：</strong>
+无法掩盖短周期的流水线停顿。更致命的是<strong>流水线排空开销（Pipeline
+Drain
+Overhead）</strong>：当发生线程切换时，处理器必须排空或暂停当前流水线中残留的旧线程指令，新线程需要重新填充流水线建立执行流，这会导致若干个完全空闲的时钟周期。</li>
+</ul>
+<h3 id="同时多线程simultaneous-multithreading-smt">7.2.3
+同时多线程（Simultaneous Multithreading, SMT）</h3>
+<ul>
+<li><strong>机制：</strong>
+这是多发射超标量架构与多线程技术的终极融合（Intel称之为超线程
+Hyper-Threading）。它允许在<strong>同一个时钟周期内，将来自多个不同线程的指令同时发射到处理器的流出槽（Issue
+Slots）中</strong>。</li>
+<li><strong>底层支撑：</strong> SMT
+强依赖于我们之前学习的<strong>寄存器重命名</strong>和<strong>动态调度（Tomasulo）</strong>机制。硬件通过为不同线程分配独立的逻辑寄存器堆，并映射到共享的庞大物理寄存器池中，使得多线程指令可以混合进入保留站，由动态调度硬件统一进行无冲突的数据流分发。</li>
+</ul>
+<h3 id="发射槽利用率对比">7.2.4 发射槽利用率对比</h3>
+<p>我们可以用<strong>垂直浪费（Vertical
+Waste）</strong>和<strong>水平浪费（Horizontal
+Waste）</strong>来严谨地评估发射槽的使用效率。</p>
+<ul>
+<li>垂直浪费： 若干个时钟周期没有任何指令发射</li>
+<li>水平浪费： 在一个时钟周期内，多发射能力（如4发射）没有被填满</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260415171326785.png" alt="image-20260415171326679" style="zoom:33%;" /></p>
+<h1 id="总结与未来">8 总结与未来</h1>
+<p>理想情况下的研究表明，如果有无限的寄存器、完美的预测和缓存，ILP可以达到单周期发射18-150条指令。但在真实的受限硬件模型（有限ROB、物理寄存器和有限预测率）下，大幅增加发射宽度（如超过4发射或8发射），硬件的<strong>复杂度、功耗和时钟周期延迟</strong>将呈现非线性爆炸式增长，而性能的提升幅度却微乎其微。</p>
+<p>在开发ILP的道路走到尽头后（以高功耗、低能效的 Pentium 4
+为标志结束），从 2005
+年开始，主流处理器制造商全面转向了<strong>多核架构（Multicore）</strong>，将设计重点从“压榨单线程指令级并行（ILP）”彻底转向了“开发多线程/任务级并行（TLP）”。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%8C%87%E4%BB%A4%E7%BA%A7%E5%B9%B6%E8%A1%8C/" rel="tag"># 指令级并行</a>
+              <a href="/tags/Tomasulo/" rel="tag"># Tomasulo</a>
+              <a href="/tags/%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B/" rel="tag"># 分支预测</a>
+              <a href="/tags/%E8%B6%85%E6%A0%87%E9%87%8F/" rel="tag"># 超标量</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/01/16/AIMath/%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B%E4%B8%8EEM%E7%AE%97%E6%B3%95/" rel="prev" title="6 混合模型与EM算法">
+                  <i class="fa fa-angle-left"></i> 6 混合模型与EM算法
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/computer_organization/%E5%90%91%E9%87%8F%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" rel="next" title="向量体系结构">
+                  向量体系结构 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

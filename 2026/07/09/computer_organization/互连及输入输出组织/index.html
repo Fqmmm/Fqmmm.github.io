@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  I&#x2F;O 系统概述：性能、功能与操作系统角色 I&#x2F;O 设备模型与磁盘存储器 磁盘性能、DMA 读盘流程与 RAID 总线、系统互连与 I&#x2F;O 接口 I&#x2F;O 端口与设备寻址 I&#x2F;O 传输方式：轮询、中断、DMA I&#x2F;O 子系统的软件层次与驱动程序 重点梳理  1 I&#x2F;O 系统概述 1.1 I&#x2F;O 系统的性能指标 I&#x2F;O 系统讨论的是计算机怎样与外部世界交换信息。这里">
+<meta property="og:type" content="article">
+<meta property="og:title" content="互连及输入输出组织">
+<meta property="og:url" content="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  I&#x2F;O 系统概述：性能、功能与操作系统角色 I&#x2F;O 设备模型与磁盘存储器 磁盘性能、DMA 读盘流程与 RAID 总线、系统互连与 I&#x2F;O 接口 I&#x2F;O 端口与设备寻址 I&#x2F;O 传输方式：轮询、中断、DMA I&#x2F;O 子系统的软件层次与驱动程序 重点梳理  1 I&#x2F;O 系统概述 1.1 I&#x2F;O 系统的性能指标 I&#x2F;O 系统讨论的是计算机怎样与外部世界交换信息。这里">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141406253.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141604772.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141707097.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615143203730.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144027592.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144233124.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144314765.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144554094.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615145524578.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615145704691.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155923859.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615150257438.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615150419492.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615151348183.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615151615210.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615153623971.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615153755820.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615154431634.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615154854647.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155332588.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155447502.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155559542.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155642682.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155832335.png">
+<meta property="article:published_time" content="2026-07-09T06:51:22.599Z">
+<meta property="article:modified_time" content="2026-07-09T06:57:48.147Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="DMA">
+<meta property="article:tag" content="RAID">
+<meta property="article:tag" content="中断">
+<meta property="article:tag" content="总线">
+<meta property="article:tag" content="输入输出系统">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141406253.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/","path":"2026/07/09/computer_organization/互连及输入输出组织/","title":"互连及输入输出组织"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>互连及输入输出组织 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#io-%E7%B3%BB%E7%BB%9F%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">1 I&#x2F;O 系统概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#io-%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 I&#x2F;O 系统的性能指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#io-%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 I&#x2F;O 系统的功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%9C%A8-io-%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E8%A7%92%E8%89%B2"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 操作系统在 I&#x2F;O 系统中的角色</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#io-%E8%AE%BE%E5%A4%87%E6%A8%A1%E5%9E%8B%E4%B8%8E%E7%A3%81%E7%9B%98%E5%AD%98%E5%82%A8%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">2 I&#x2F;O 设备模型与磁盘存储器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E8%AE%BE%E5%88%86%E7%B1%BB"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 外设分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E8%AE%BE%E5%A4%87%E7%9A%84%E9%80%9A%E7%94%A8%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 外部设备的通用模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%9A%84%E4%BF%A1%E6%81%AF%E5%AD%98%E5%82%A8%E5%8E%9F%E7%90%86"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 磁盘的信息存储原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%8F%90%E9%AB%98%E7%A3%81%E7%9B%98%E5%AE%B9%E9%87%8F"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 如何提高磁盘容量</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E6%80%A7%E8%83%BDdma-%E8%AF%BB%E7%9B%98%E6%B5%81%E7%A8%8B%E4%B8%8E-raid"><span class="nav-number">4.</span> <span class="nav-text">3 磁盘性能、DMA 读盘流程与
+RAID</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E5%B9%B3%E5%9D%87%E5%AD%98%E5%8F%96%E6%97%B6%E9%97%B4"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 磁盘平均存取时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A1%AC%E7%9B%98%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E7%BB%84%E6%88%90"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 硬盘存储器的组成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BB%E4%B8%80%E4%B8%AA%E7%A3%81%E7%9B%98%E6%89%87%E5%8C%BA%E7%9A%84%E4%B8%89%E6%AD%A5%E8%BF%87%E7%A8%8B"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 读一个磁盘扇区的三步过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#raid-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 RAID 的基本思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#raid-%E7%BA%A7%E5%88%AB%E5%AF%B9%E6%AF%94"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 RAID 级别对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#raid-4-%E7%9A%84%E5%B0%91%E9%87%8F%E5%86%99%E6%8D%9F%E5%A4%B1"><span class="nav-number">4.5.1.</span> <span class="nav-text">3.5.1 RAID 4 的少量写损失</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BA%E6%80%81%E7%A1%AC%E7%9B%98-ssd"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 固态硬盘 SSD</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BA%BF%E7%B3%BB%E7%BB%9F%E4%BA%92%E8%BF%9E%E4%B8%8E-io-%E6%8E%A5%E5%8F%A3"><span class="nav-number">5.</span> <span class="nav-text">4 总线、系统互连与 I&#x2F;O 接口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BA%BF%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 总线的分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%80%BB%E7%BA%BF%E7%9A%84%E7%BB%84%E6%88%90"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 系统总线的组成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BA%BF%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 总线的基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BA%BF%E6%80%A7%E8%83%BD%E6%8C%87%E6%A0%87"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 总线性能指标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%99%A8%E6%80%BB%E7%BA%BF%E5%AD%98%E5%82%A8%E5%99%A8%E6%80%BB%E7%BA%BF%E4%B8%8E-io-%E6%80%BB%E7%BA%BF"><span class="nav-number">5.5.</span> <span class="nav-text">4.5 处理器总线、存储器总线与 I&#x2F;O
+总线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#io-%E6%80%BB%E7%BA%BFio-%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8E-io-%E8%AE%BE%E5%A4%87%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">5.6.</span> <span class="nav-text">4.6 I&#x2F;O 总线、I&#x2F;O 控制器与 I&#x2F;O
+设备的关系</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#io-%E6%8E%A5%E5%8F%A3%E7%AB%AF%E5%8F%A3%E4%B8%8E%E8%AE%BE%E5%A4%87%E5%AF%BB%E5%9D%80"><span class="nav-number">6.</span> <span class="nav-text">5 I&#x2F;O 接口、端口与设备寻址</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#io-%E6%8E%A5%E5%8F%A3%E7%9A%84%E5%90%AB%E4%B9%89%E4%B8%8E%E5%88%86%E7%B1%BB"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 I&#x2F;O 接口的含义与分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#io-%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E8%81%8C%E8%83%BD"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 I&#x2F;O 控制器的职能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#io-%E7%AB%AF%E5%8F%A3%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 I&#x2F;O 端口的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#io-%E8%AE%BE%E5%A4%87%E5%AF%BB%E5%9D%80%E6%96%B9%E5%BC%8F"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 I&#x2F;O 设备寻址方式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#io-%E4%BC%A0%E8%BE%93%E6%96%B9%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">6 I&#x2F;O 传输方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E4%BA%A4%E6%8D%A2%E6%96%B9%E5%BC%8F"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 三种基本数据交换方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A8%8B%E5%BA%8F%E7%9B%B4%E6%8E%A5%E6%8E%A7%E5%88%B6%E6%88%96%E8%BD%AE%E8%AF%A2%E6%96%B9%E5%BC%8F"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 程序直接控制或轮询方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%8D%B0%E8%BE%93%E5%87%BA%E6%A0%87%E5%87%86%E5%AD%90%E7%A8%8B%E5%BA%8F%E4%BE%8B%E5%AD%90"><span class="nav-number">7.2.1.</span> <span class="nav-text">6.2.1 打印输出标准子程序例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD-io-%E6%96%B9%E5%BC%8F"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 中断 I&#x2F;O 方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E5%93%8D%E5%BA%94%E6%9D%A1%E4%BB%B6"><span class="nav-number">7.3.1.</span> <span class="nav-text">6.3.1 中断响应条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E5%93%8D%E5%BA%94%E8%BF%87%E7%A8%8B"><span class="nav-number">7.3.2.</span> <span class="nav-text">6.3.2 中断响应过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%8E-8259a"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 中断控制器与 8259A</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E8%BF%87%E7%A8%8B%E4%B8%8E%E5%A4%9A%E9%87%8D%E4%B8%AD%E6%96%AD"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 中断处理过程与多重中断</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%E4%B8%AD%E6%96%AD%E4%BC%98%E5%85%88%E6%9D%83%E7%9A%84%E5%8A%A8%E6%80%81%E5%88%86%E9%85%8D"><span class="nav-number">7.6.</span> <span class="nav-text">6.6 例题：中断优先权的动态分配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E4%BC%98%E5%85%88%E7%BA%A7%E4%B8%BA-1234"><span class="nav-number">7.6.1.</span> <span class="nav-text">6.6.1 处理优先级为 1 &gt; 2 &gt; 3 &gt; 4</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E4%BC%98%E5%85%88%E7%BA%A7%E4%B8%BA-1432"><span class="nav-number">7.6.2.</span> <span class="nav-text">6.6.2 处理优先级为 1 &gt; 4 &gt; 3 &gt; 2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AE%E8%AF%A2%E6%96%B9%E5%BC%8F%E4%B8%8E%E4%B8%AD%E6%96%AD%E6%96%B9%E5%BC%8F%E6%AF%94%E8%BE%83"><span class="nav-number">7.7.</span> <span class="nav-text">6.7 轮询方式与中断方式比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dma-%E6%96%B9%E5%BC%8F"><span class="nav-number">8.</span> <span class="nav-text">7 DMA 方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BC%95%E5%85%A5-dma"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 为什么引入 DMA</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dma-%E4%B8%8E%E4%B8%AD%E6%96%AD%E7%9A%84%E9%85%8D%E5%90%88"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 DMA 与中断的配合</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dma-%E6%95%B0%E6%8D%AE%E4%BC%A0%E9%80%81%E7%9A%84%E4%B8%89%E7%A7%8D%E6%8E%A7%E5%88%B6%E6%96%B9%E5%BC%8F"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 DMA 数据传送的三种控制方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#cpu-%E5%81%9C%E6%AD%A2%E6%B3%95%E4%B8%80%E6%AC%A1%E8%AE%A9%E5%87%BA%E4%B8%80%E6%95%B4%E5%9D%97%E4%BC%A0%E8%BE%93%E6%97%B6%E9%97%B4"><span class="nav-number">8.3.1.</span> <span class="nav-text">7.3.1 CPU
+停止法：一次让出一整块传输时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%A8%E6%9C%9F%E6%8C%AA%E7%94%A8%E6%B3%95%E4%B8%80%E6%AC%A1%E5%8F%AA%E6%8A%A2%E4%B8%80%E4%B8%AA%E4%B8%BB%E5%AD%98%E5%91%A8%E6%9C%9F"><span class="nav-number">8.3.2.</span> <span class="nav-text">7.3.2
+周期挪用法：一次只抢一个主存周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E6%9B%BF%E5%88%86%E6%97%B6%E8%AE%BF%E9%97%AE%E6%B3%95%E6%8A%8A%E6%AF%8F%E4%B8%AA%E5%AD%98%E5%82%A8%E5%91%A8%E6%9C%9F%E5%88%86%E6%88%90%E4%B8%A4%E4%BB%BD"><span class="nav-number">8.3.3.</span> <span class="nav-text">7.3.3
+交替分时访问法：把每个存储周期分成两份</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F%E7%9A%84%E6%A2%B3%E7%90%86%E5%AF%B9%E6%AF%94"><span class="nav-number">8.3.4.</span> <span class="nav-text">7.3.4 三种方式的梳理对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dma-%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 DMA 控制器的功能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dma-%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 DMA 操作步骤</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dma-%E6%8E%A7%E5%88%B6%E5%99%A8%E5%88%9D%E5%A7%8B%E5%8C%96%E7%9A%84%E8%AF%A6%E7%BB%86%E6%AD%A5%E9%AA%A4"><span class="nav-number">8.5.1.</span> <span class="nav-text">7.5.1 DMA
+控制器初始化的详细步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dma-%E4%BC%A0%E8%BE%93%E8%BF%87%E7%A8%8B%E7%BB%86%E5%8C%96"><span class="nav-number">8.6.</span> <span class="nav-text">7.6 DMA 传输过程细化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dma-%E4%B8%8E%E4%B8%AD%E6%96%AD%E6%96%B9%E5%BC%8F%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">8.7.</span> <span class="nav-text">7.7 DMA 与中断方式的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E4%B8%8E-dma-%E7%9A%84-cpu-%E5%BC%80%E9%94%80%E4%BE%8B%E9%A2%98"><span class="nav-number">8.8.</span> <span class="nav-text">7.8 中断与 DMA 的 CPU 开销例题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E6%96%B9%E5%BC%8F"><span class="nav-number">8.8.1.</span> <span class="nav-text">7.8.1 中断方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dma-%E6%96%B9%E5%BC%8F-1"><span class="nav-number">8.8.2.</span> <span class="nav-text">7.8.2 DMA 方式</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#io-%E5%AD%90%E7%B3%BB%E7%BB%9F%E7%9A%84%E8%BD%AF%E4%BB%B6%E5%B1%82%E6%AC%A1%E4%B8%8E%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">9.</span> <span class="nav-text">8 I&#x2F;O
+子系统的软件层次与驱动程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#io-%E5%AD%90%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 I&#x2F;O 子系统的层次结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E6%96%B9%E5%BC%8F%E5%9C%A8%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E4%B8%AD%E7%9A%84%E4%BD%93%E7%8E%B0"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 三种方式在驱动程序中的体现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E6%9C%8D%E5%8A%A1%E7%A8%8B%E5%BA%8F%E5%9C%A8%E4%B8%8D%E5%90%8C%E6%96%B9%E5%BC%8F%E4%B8%AD%E7%9A%84%E4%BB%BB%E5%8A%A1"><span class="nav-number">9.3.</span> <span class="nav-text">8.3
+中断服务程序在不同方式中的任务</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%A2%B3%E7%90%86"><span class="nav-number">10.</span> <span class="nav-text">9 重点梳理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 本章核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%93%E6%B7%B7%E7%82%B9%E5%AF%B9%E6%AF%94"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 易混点对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%80%83%E5%85%AC%E5%BC%8F%E4%B8%8E%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 常考公式与计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 学习建议</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="互连及输入输出组织 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          互连及输入输出组织
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 14:57:48" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ul>
+<li>I/O 系统概述：性能、功能与操作系统角色</li>
+<li>I/O 设备模型与磁盘存储器</li>
+<li>磁盘性能、DMA 读盘流程与 RAID</li>
+<li>总线、系统互连与 I/O 接口</li>
+<li>I/O 端口与设备寻址</li>
+<li>I/O 传输方式：轮询、中断、DMA</li>
+<li>I/O 子系统的软件层次与驱动程序</li>
+<li>重点梳理</li>
+</ul>
+<h1 id="io-系统概述">1 I/O 系统概述</h1>
+<h2 id="io-系统的性能指标">1.1 I/O 系统的性能指标</h2>
+<p>I/O
+系统讨论的是计算机怎样与外部世界交换信息。这里的“外部世界”既包括键盘、鼠标、显示器、打印机等人机交互设备，也包括磁盘、网卡、声卡、A/D、D/A
+等机器可读设备。衡量 I/O
+系统时，需要关注两个核心性能指标：<strong>吞吐率</strong>和<strong>响应时间</strong>。</p>
+<p><strong>吞吐率（Throughput, I/O
+bandwidth）</strong>表示单位时间内系统完成了多少数据传输，或单位时间内完成了多少次
+I/O 操作。视频播放、文件服务器、Web
+服务器等场景很重视吞吐率，因为系统要持续不断地搬运大量数据。</p>
+<p><strong>响应时间（Response time, latency）</strong>表示一次 I/O
+请求从发出到完成所经历的时间。事务处理系统、交互式终端、银行存取款等更关心响应时间，因为用户感受到的是“等了多久”。</p>
+<p>这两个指标不是完全独立的。某些设计提高吞吐率时，可能会牺牲单个请求的等待时间；而过分追求短延迟，也可能降低批量传输效率。需要能根据应用场景判断主要矛盾：多媒体连续流更看重带宽，交互事务更看重延迟，服务器通常两者都要兼顾。</p>
+<h2 id="io-系统的功能">1.2 I/O 系统的功能</h2>
+<p>输入/输出系统的基本功能是：<strong>解决各种形式信息在主机与外设之间的输入和输出问题</strong>。用户输入文字、图像、声音、视频，计算机处理后再输出显示、打印、声音或网络数据，这些都要依靠
+I/O 系统完成。</p>
+<p>为了实现这个功能，计算机系统必须解决一组具体问题：</p>
+<ul>
+<li>怎样在
+<strong>CPU、主存和外设</strong>之间建立高效的信息传输通路。</li>
+<li>怎样把用户或程序提出的 I/O 请求转换成设备能够理解的命令。</li>
+<li>怎样给外设或 I/O 端口编址，使 CPU 能找到要访问的设备。</li>
+<li>怎样读取设备状态，判断设备是否就绪、是否出错。</li>
+<li>I/O 硬件和操作系统如何协同完成数据传送。</li>
+</ul>
+<p>因此，本章不是单纯讲“外设有哪些”，而是围绕三条主线展开：<strong>设备如何连接、设备如何寻址、数据如何传输</strong>。</p>
+<h2 id="操作系统在-io-系统中的角色">1.3 操作系统在 I/O 系统中的角色</h2>
+<p>需要强调：I/O 系统不能只靠用户程序直接控制，操作系统（Operating
+System, OS）在其中非常关键。原因主要有三个。</p>
+<p>第一，I/O
+设备具有<strong>共享性</strong>。多个进程可能同时请求同一块磁盘、同一台打印机或同一个网络接口，必须由
+OS 统一调度和管理，否则会造成冲突。</p>
+<p>第二，I/O
+设备具有<strong>复杂性</strong>。不同设备的控制寄存器、状态位、命令格式、错误处理方式各不相同。用户程序不应该直接面对这些细节，而应通过
+OS 提供的设备驱动程序访问设备。</p>
+<p>第三，I/O
+常常依赖<strong>中断机制</strong>。外设完成任务或发生异常时，会通过外部中断请求
+CPU
+处理。中断会导致处理器进入内核态，因此必须由操作系统中的中断服务程序处理。</p>
+<p>OS 在 I/O 中的职责可以概括为：<strong>权限管理、设备驱动、I/O
+中断处理、共享资源调度</strong>。从用户程序角度看，调用
+<code>printf()</code>、<code>scanf()</code>、<code>read()</code>、<code>write()</code>
+等函数似乎很简单；但底层会经历用户态到内核态的切换、设备驱动程序执行、中断或
+DMA 配合等一系列过程。</p>
+<h1 id="io-设备模型与磁盘存储器">2 I/O 设备模型与磁盘存储器</h1>
+<h2 id="外设分类">2.1 外设分类</h2>
+<p>从交互方式看，外设可分为两类。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">分类</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">人机交互设备</td>
+<td style="text-align: left;">输入/输出信息是人可直接理解的</td>
+<td style="text-align: left;">键盘、鼠标、扫描仪、显示器、打印机</td>
+</tr>
+<tr>
+<td style="text-align: left;">机器可读设备</td>
+<td style="text-align: left;">信息主要供机器处理，人不能直接读取</td>
+<td
+style="text-align: left;">网络接口、Modem、D/A、A/D、磁盘、声音输入设备</td>
+</tr>
+</tbody>
+</table>
+<p>从功能行为看，也可分为两类。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">分类</th>
+<th style="text-align: left;">主要作用</th>
+<th style="text-align: left;">典型特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">输入/输出设备</td>
+<td style="text-align: left;">完成信息输入或输出</td>
+<td style="text-align: left;">多数是字符型设备，如键盘、打印机</td>
+</tr>
+<tr>
+<td style="text-align: left;">外部存储设备</td>
+<td style="text-align: left;">保存大量信息</td>
+<td style="text-align: left;">多数按块传送，如磁盘、磁带、光盘</td>
+</tr>
+</tbody>
+</table>
+<p>字符型设备通常一次传输一个字符或少量数据，速度较慢，适合轮询或中断方式。块设备通常一次传输一个扇区或一批数据，速度较快，适合
+DMA 方式。</p>
+<h2 id="外部设备的通用模型">2.2 外部设备的通用模型</h2>
+<p>虽然外设种类很多，但
+可以用一个统一抽象模型来描述。一个外设通常包含以下部分：</p>
+<ul>
+<li><strong>I/O
+接口或电缆</strong>：在设备和主机之间传送控制、状态、数据信号。</li>
+<li><strong>控制逻辑</strong>：根据主机给出的控制信息驱动设备动作，并检测设备状态。</li>
+<li><strong>缓冲器</strong>：暂存主机与设备之间交换的数据，用来缓和速度不匹配。</li>
+<li><strong>变换器</strong>：在计算机内部电信号与设备实际信号之间转换，例如磁盘中的磁-电、电-磁转换。</li>
+<li><strong>设备本体与环境</strong>：真正执行输入、输出或存储动作的物理设备。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141406253.png" alt="image-20260615141406098" style="zoom: 33%;" /></p>
+<p>所有设备传输的信息都可以抽象为三类：<strong>控制信息、状态信息、数据信息</strong>。CPU
+向设备发控制命令，设备向 CPU
+返回状态，双方再通过数据缓冲完成数据交换。后面讲 I/O 控制器、I/O
+端口、轮询、中断和 DMA 时，本质上都围绕这三类信息展开。</p>
+<h2 id="磁盘的信息存储原理">2.3 磁盘的信息存储原理</h2>
+<p>磁盘是一种典型的外部存储设备。磁盘片表面被划分为许多同心圆，每个同心圆称为<strong>磁道</strong>；每个磁道又被划分为若干段，每段称为<strong>扇区</strong>。传统扇区大小长期为
+512 字节，后来逐渐迁移到 4096 字节的高级格式化扇区。</p>
+<p>磁盘读写依赖磁头与盘片表面的磁化状态。写入时，线圈通以不同方向的电流，使磁介质呈现不同磁化状态，用来表示二进制
+<span class="math inline">0</span> 和 <span
+class="math inline">1</span>。读取时，盘片旋转，磁化单元经过磁头，在磁头线圈中产生不同极性的感应电压，从而判断读出的比特。</p>
+<p>磁盘地址通常由三部分组成：<strong>柱面号或磁道号、磁头号或盘面号、扇区号</strong>。读写一个扇区时，硬盘的大致流程是：</p>
+<ol type="1">
+<li>所有磁头同步寻道，移动到指定柱面。</li>
+<li>选择目标磁头，即确定盘面。</li>
+<li>等待目标扇区旋转到磁头下方。</li>
+<li>对该扇区进行读或写。</li>
+</ol>
+<p>这也解释了为什么磁盘访问比主存访问慢得多：磁盘不仅要传输数据，还要等待机械寻道和盘片旋转。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141604772.png" alt="image-20260615141604611" style="zoom: 33%;" /></p>
+<h2 id="如何提高磁盘容量">2.4 如何提高磁盘容量</h2>
+<p>提高磁盘片容量的核心是提高信息记录密度。主要有两个方向：</p>
+<ul>
+<li><strong>增加磁道数目</strong>，即提高磁道密度。</li>
+<li><strong>增加扇区数目</strong>，即提高位密度，并采用可变扇区数。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141707097.png" alt="image-20260615141706931" style="zoom: 33%;" /></p>
+<p>早期磁盘所有磁道扇区数相同，这会导致内圈与外圈记录密度不均。现代磁盘通常使不同磁道上的位密度更接近一致，因此外圈磁道可以放更多扇区，从而提高整个盘片容量。</p>
+<h1 id="磁盘性能dma-读盘流程与-raid">3 磁盘性能、DMA 读盘流程与
+RAID</h1>
+<h2 id="磁盘平均存取时间">3.1 磁盘平均存取时间</h2>
+<p>磁盘以扇区为单位读写。平均存取时间通常写为：</p>
+<p><span
+class="math display"><em>T</em> = 平均寻道时间 + 平均旋转等待时间 + 数据传输时间</span></p>
+<p>其中，<strong>平均寻道时间</strong>是磁头移动到指定磁道所需的平均时间，典型数量级约为
+<span class="math inline">5
+ms</span>。<strong>平均旋转等待时间</strong>是目标扇区转到磁头下方所需的平均时间，典型值约为
+<span class="math inline">4 ∼ 6
+ms</span>。<strong>数据传输时间</strong>通常远小于前两项，例如每扇区约
+<span class="math inline">0.01
+ms</span>，所以很多估算中可以近似忽略。</p>
+<p>如果转速为 <span class="math inline">5400
+RPM</span>，则每秒转数为：</p>
+<p><span class="math display">5400/60 = 90 RPS</span></p>
+<p>平均旋转等待时间约为半圈时间：</p>
+<p><span class="math display">$$
+\frac{0.5}{90}\text{ s} \approx 5.5\text{ ms}
+$$</span></p>
+<p>在一个例题中，若寻道时间为 <span class="math inline">12
+ms</span>，数据传输率为 <span class="math inline">4
+MB/s</span>，扇区大小为 <span class="math inline">512
+B</span>，控制器开销为 <span class="math inline">1
+ms</span>，不考虑排队时间，则：</p>
+<p><span class="math display">$$
+\begin{aligned}
+T &amp;= 12\text{ ms} + 5.5\text{ ms} + 0.1\text{ ms} + 1\text{ ms} \\
+  &amp;= 18.6\text{ ms}
+\end{aligned}
+$$</span></p>
+<p>如果实际寻道时间因访问局部性降为 <span class="math inline">12/3 = 4
+ms</span>，总时间约为 <span class="math inline">10.6
+ms</span>，此时旋转等待占比接近一半。因此，<strong>磁盘转速对机械硬盘性能非常重要</strong>。</p>
+<h2 id="硬盘存储器的组成">3.2 硬盘存储器的组成</h2>
+<p>硬盘存储器主要由三部分组成：</p>
+<ul>
+<li><strong>磁记录介质</strong>：保存信息的盘片表面。</li>
+<li><strong>磁盘驱动器</strong>：包含读写电路、读写转换开关、读写磁头、磁头定位伺服系统等。</li>
+<li><strong>磁盘控制器</strong>：连接主机与磁盘驱动器，包含控制逻辑、时序电路、并串/串并转换、数据缓存器、控制寄存器和状态寄存器等。</li>
+</ul>
+<p>磁盘控制器通常连接在 I/O 总线上，I/O
+总线再通过桥接器与系统总线、存储器总线相连。由于磁盘按扇区成批读写，且数据量较大，所以磁盘通常采用
+<strong>DMA（Direct Memory
+Access，直接存储器访问）</strong>方式在外设与主存之间传输数据。</p>
+<h2 id="读一个磁盘扇区的三步过程">3.3 读一个磁盘扇区的三步过程</h2>
+<p>读一个磁盘扇区的典型流程可以概括为：</p>
+<ol type="1">
+<li><strong>CPU 初始化磁盘控制器</strong>：CPU
+向磁盘控制器写入读命令、磁盘逻辑块号、主存起始地址等参数，然后启动磁盘驱动器工作。</li>
+<li><strong>磁盘控制器读取扇区并 DMA
+送主存</strong>：磁盘控制器找到相应扇区后，按 DMA
+方式把数据直接送入主存，数据不经过 CPU 寄存器搬运。</li>
+<li><strong>DMA 结束中断</strong>：传输完成后，磁盘控制器向 CPU 发出 DMA
+结束中断请求，CPU
+再执行后处理，例如检查状态、校验数据、唤醒等待进程。</li>
+</ol>
+<p>这里要抓住一个关键点：<strong>CPU
+负责发起和收尾，真正的大批量数据搬运由 DMA 控制器完成</strong>。</p>
+<h2 id="raid-的基本思想">3.4 RAID 的基本思想</h2>
+<p>RAID（Redundant Arrays of Inexpensive
+Disk，冗余磁盘阵列）的背景是：处理器和主存性能提升很快，而单个磁盘性能提升较慢，成为系统瓶颈。RAID
+的基本思想是把多个独立磁盘组织成一个磁盘阵列，在操作系统看来像一个逻辑磁盘。</p>
+<p>RAID 通过三种方式改善系统：</p>
+<ul>
+<li><strong>提高容量</strong>：多个物理磁盘组合成更大的逻辑存储空间。</li>
+<li><strong>提高性能</strong>：把数据分布在多个磁盘上，多盘并行读写，类似主存多体交叉。</li>
+<li><strong>提高可靠性</strong>：用冗余校验或镜像技术，在磁盘损坏时恢复数据。</li>
+</ul>
+<p>RAID 的共同特性是：一组物理磁盘在 OS
+下被视为一个逻辑驱动器；数据分布在多个物理盘上；部分 RAID
+级别使用冗余信息恢复故障数据。注意 RAID 0
+不具备冗余，不满足第三个特性。</p>
+<h2 id="raid-级别对比">3.5 RAID 级别对比</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">RAID 级别</th>
+<th style="text-align: left;">组织方式</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">缺点或适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RAID 0</td>
+<td style="text-align: left;">数据条带化，无冗余</td>
+<td style="text-align: left;">容量利用率高，读写性能好</td>
+<td
+style="text-align: left;">无容错能力，适合非关键高速数据，如视频编辑</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 1</td>
+<td style="text-align: left;">镜像盘，一对一冗余</td>
+<td style="text-align: left;">可靠性高，恢复简单；读可选更快磁盘</td>
+<td style="text-align: left;">成本高，写性能受较慢盘限制</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 2</td>
+<td style="text-align: left;">小条区交叉，海明码校验</td>
+<td style="text-align: left;">多盘并行，读性能高</td>
+<td
+style="text-align: left;">校验盘数量与数据盘成比例，开销大，已基本不用</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 3</td>
+<td style="text-align: left;">小条区交叉，单独奇偶校验盘</td>
+<td style="text-align: left;">大容量连续 I/O 传输率高</td>
+<td style="text-align: left;">小请求响应差，校验盘参与频繁</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 4</td>
+<td style="text-align: left;">块级交叉，独立访问，单独校验盘</td>
+<td style="text-align: left;">可同时响应多个读请求</td>
+<td style="text-align: left;">写操作会使校验盘成为瓶颈</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 5</td>
+<td style="text-align: left;">块级交叉，校验块分布在各盘</td>
+<td
+style="text-align: left;">避免单校验盘瓶颈，成本和性能平衡，应用广</td>
+<td style="text-align: left;">小写仍有校验更新开销</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 6</td>
+<td style="text-align: left;">类似 RAID 5，但有两种冗余校验</td>
+<td style="text-align: left;">可容忍双盘故障，可靠性更高</td>
+<td style="text-align: left;">控制器复杂，写入速度较慢</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 7</td>
+<td style="text-align: left;">在 RAID 基础上结合 Cache</td>
+<td style="text-align: left;">传输率和响应速度提高</td>
+<td style="text-align: left;">依赖缓存与控制器设计</td>
+</tr>
+</tbody>
+</table>
+<h3 id="raid-4-的少量写损失">3.5.1 RAID 4 的少量写损失</h3>
+<p>RAID 4 的典型要点是少量写的校验更新。设四个数据盘上的对应位为 <span
+class="math inline"><em>X</em><sub>0</sub>(<em>i</em>), <em>X</em><sub>1</sub>(<em>i</em>), <em>X</em><sub>2</sub>(<em>i</em>), <em>X</em><sub>3</sub>(<em>i</em>)</span>，校验位为：</p>
+<p><span
+class="math display"><em>p</em>(<em>i</em>) = <em>X</em><sub>3</sub>(<em>i</em>) ⊕ <em>X</em><sub>2</sub>(<em>i</em>) ⊕ <em>X</em><sub>1</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub>(<em>i</em>)</span></p>
+<p>如果只把 <span
+class="math inline"><em>X</em><sub>0</sub>(<em>i</em>)</span> 改成 <span
+class="math inline"><em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span>，新校验位为：</p>
+<p><span
+class="math display"><em>p</em><sup>′</sup>(<em>i</em>) = <em>X</em><sub>3</sub>(<em>i</em>) ⊕ <em>X</em><sub>2</sub>(<em>i</em>) ⊕ <em>X</em><sub>1</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span></p>
+<p>由于 <span
+class="math inline"><em>X</em><sub>0</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub>(<em>i</em>) = 0</span>，可化简为：</p>
+<p><span
+class="math display"><em>p</em><sup>′</sup>(<em>i</em>) = <em>p</em>(<em>i</em>) ⊕ <em>X</em><sub>0</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span></p>
+<p>因此，更新一个小数据块时必须先读旧校验 <span
+class="math inline"><em>p</em>(<em>i</em>)</span> 和旧数据 <span
+class="math inline"><em>X</em><sub>0</sub>(<em>i</em>)</span>，再写新数据
+<span
+class="math inline"><em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span>
+和新校验 <span
+class="math inline"><em>p</em><sup>′</sup>(<em>i</em>)</span>。也就是<strong>一次少量写包含两次读和两次写</strong>，这就是写损失。</p>
+<h2 id="固态硬盘-ssd">3.6 固态硬盘 SSD</h2>
+<p>SSD（Solid State Disk，固态硬盘）不是磁表面存储器，而是基于 NAND
+闪存的外部存储系统。它与 U 盘在原理上类似，但容量更大、性能更好。SSD
+使用区块写入和擦除方式，读操作通常快于写操作；由于没有机械寻道和旋转等待，其内部传输速率远高于传统机械硬盘。</p>
+<p>SSD 在接口规范和使用方法上与传统硬盘类似，可通过 USB、SATA、IDE
+等标准磁盘接口与 I/O 总线互连。SSD 内部有<strong>闪存翻译层</strong>，把
+CPU
+发出的逻辑块读写请求转换为底层闪存物理操作。这个翻译层在功能上相当于磁盘控制器。</p>
+<p>需要注意的是，闪存擦写次数有限，频繁写入会影响使用寿命。</p>
+<h1 id="总线系统互连与-io-接口">4 总线、系统互连与 I/O 接口</h1>
+<h2 id="总线的分类">4.1 总线的分类</h2>
+<p><strong>总线</strong>是在计算机系统不同层次上提供部件连接和信息交换的通路。总线可分为三类：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">总线类型</th>
+<th style="text-align: left;">连接对象</th>
+<th style="text-align: left;">特点与例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">芯片内总线</td>
+<td style="text-align: left;">CPU 芯片内部部件</td>
+<td style="text-align: left;">连接寄存器、ALU、指令部件等</td>
+</tr>
+<tr>
+<td style="text-align: left;">系统总线</td>
+<td style="text-align: left;">CPU、主存、I/O 控制器等主要部件</td>
+<td style="text-align: left;">可为单总线或多总线结构</td>
+</tr>
+<tr>
+<td style="text-align: left;">通信总线</td>
+<td style="text-align: left;">主机与 I/O 设备之间，或计算机系统之间</td>
+<td style="text-align: left;">多为电缆式总线，如
+SCSI、RS-232、USB、PS/2</td>
+</tr>
+</tbody>
+</table>
+<p>系统总线中，又可以区分处理器-存储器总线和 I/O
+总线。处理器-存储器总线通常短而快，只需匹配 CPU 与内存；I/O
+总线通常长而慢，要适应多种设备和标准接口。</p>
+<h2 id="系统总线的组成">4.2 系统总线的组成</h2>
+<p>系统总线通常由三组信号线构成：</p>
+<ul>
+<li><strong>数据线（Data
+Bus）</strong>：承载源部件与目的部件之间传送的信息，宽度决定一次能传送多少位。</li>
+<li><strong>地址线（Address Bus）</strong>：给出主存单元或 I/O
+端口地址，宽度决定最大寻址空间。</li>
+<li><strong>控制线（Control
+Bus）</strong>：传递定时信号和命令信息，控制数据线和地址线的使用。</li>
+</ul>
+<p>典型控制信号包括时钟、复位、总线请求、总线允许、中断请求、中断回答、存储器读写、I/O
+读写、传输确认等。</p>
+<p>有些总线没有单独地址线，而是让地址和数据共享同一组线，这称为<strong>地址/数据复用</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615143203730.png" alt="image-20260615143203551" style="zoom: 33%;" /></p>
+<h2 id="总线的基本概念">4.3 总线的基本概念</h2>
+<p><strong>总线裁决</strong>解决的是多个设备同时想使用共享总线时，谁先使用的问题。早期共享总线需要裁决；现代高速互连多采用点对点传输，裁决问题相对弱化。</p>
+<p><strong>总线定时</strong>定义总线事务中每一步何时开始、何时结束。同步总线用统一时钟控制；异步总线用握手信号控制；半同步总线结合二者。</p>
+<p><strong>并行传输</strong>一次在多个数据线上传多位，但位与位之间要保持同步，高速时困难较大。<strong>串行传输</strong>一次只传一位，不需要多位之间同步，现代高速总线反而常采用串行方式。发展趋势是：<strong>点对点、异步、串行</strong>。</p>
+<h2 id="总线性能指标">4.4 总线性能指标</h2>
+<p>总线性能主要看三个指标：</p>
+<ul>
+<li><strong>总线宽度</strong>：数据线条数，决定每次传输的信息位数。</li>
+<li><strong>总线工作频率</strong>：单位时间内完成数据传送的次数。现代总线可能一个时钟周期传送
+2 次或 4 次数据。</li>
+<li><strong>总线带宽</strong>：最大数据传输率。</li>
+</ul>
+<p>对于同步总线，带宽公式为：</p>
+<p><span
+class="math display"><em>B</em> = <em>W</em> × <em>F</em>/<em>N</em></span></p>
+<p>其中 <span class="math inline"><em>W</em></span> 是总线宽度，<span
+class="math inline"><em>F</em></span> 是总线时钟频率，<span
+class="math inline"><em>N</em></span>
+是完成一次数据传送所需的时钟周期数。<span
+class="math inline"><em>F</em>/<em>N</em></span>
+实际上就是总线工作频率。</p>
+<p>总线传送方式分为<strong>非突发传送</strong>和<strong>突发传送</strong>。非突发传送每个事务都传地址，一个地址对应一次数据传送；突发传送先传一个地址，之后连续传多个数据，后续地址默认自动递增，适合成块数据传输。</p>
+<h2 id="处理器总线存储器总线与-io-总线">4.5 处理器总线、存储器总线与 I/O
+总线</h2>
+<p>早期 Intel 架构中，前端总线（Front Side Bus, FSB）位于 CPU
+与北桥芯片之间，采用并行、同步传输。从 Pentium Pro 起，FSB 使用 quad
+pumped 技术，即一个总线时钟周期传送 4 次数据。例如工作频率 <span
+class="math inline">1333 MT/s</span>、宽度 64 位时，带宽为：</p>
+<p><span class="math display">1333 MT/s × 8 B ≈ 10.5 GB/s</span></p>
+<p>QPI（Quick Path
+Interconnect）是高速点对点串行互连。它基于包交换，可用于 CPU 核之间、CPU
+芯片之间、CPU 与 I/O Hub 之间互连。若 QPI 速度为 <span
+class="math inline">4.8 GT/s</span>，每次有效数据宽度约 <span
+class="math inline">2 B</span>，双向传输，则带宽为：</p>
+<p><span class="math display">4.8 G × 2 B × 2 = 19.2 GB/s</span></p>
+<p>I/O 总线为系统中各种 I/O 设备提供输入输出通道。主板扩展槽可看作 I/O
+总线的物理形式。I/O 总线的发展大致为：</p>
+<ul>
+<li>第一代：ISA/EISA、VESA，已淘汰。</li>
+<li>第二代：PCI、AGP、PCI-X，逐渐淘汰。</li>
+<li>第三代：PCI-Express，串行总线，主流。</li>
+</ul>
+<p>PCI-Express
+使用链路（link）连接设备，每个链路含多条通路（lane）。PCIe <span
+class="math inline">×<em>n</em></span> 表示有 <span
+class="math inline"><em>n</em></span> 条通路。以 PCIe 1.0
+为例，每条通路发送和接收速率均为 <span class="math inline">2.5
+Gb/s</span>，每个数据字节编码为 10 位传输，因此带宽为：</p>
+<p><span class="math display">2.5 Gb/s × 2 × <em>n</em>/10 = 0.5
+GB/s × <em>n</em></span></p>
+<p>所以 PCIe <span class="math inline">×16</span> 的双向总带宽可达 <span
+class="math inline">8 GB/s</span>。</p>
+<h2 id="io-总线io-控制器与-io-设备的关系">4.6 I/O 总线、I/O 控制器与 I/O
+设备的关系</h2>
+<p>这些关系可以概括为：</p>
+<ul>
+<li>I/O 设备通常通过<strong>通信总线或电缆</strong>连接到 I/O
+控制器。</li>
+<li>I/O 控制器，也称 I/O 接口，可通过扩展卡或南桥芯片连接到 I/O
+总线。</li>
+<li>I/O 总线再通过桥接芯片与 CPU、内存所在的更高速互连结构相连。</li>
+</ul>
+<p>因此要区分两个“连接层次”：主板内部的 PCIe 等是 I/O 总线；设备外部的
+USB、SATA、PS/2、网线等常体现为设备侧通信总线或连接接口。</p>
+<h1 id="io-接口端口与设备寻址">5 I/O 接口、端口与设备寻址</h1>
+<h2 id="io-接口的含义与分类">5.1 I/O 接口的含义与分类</h2>
+<p>本课程把 <strong>I/O 控制器和插座合起来称为 I/O
+接口</strong>。例如网卡、显卡、键盘适配器、磁盘控制器，以及它们对应的连接器，都可视为
+I/O 接口的一部分。I/O
+接口包括插头/插座形式、通信规程、电气特性和控制逻辑。</p>
+<p>I/O 接口可按多个角度分类：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">分类角度</th>
+<th style="text-align: left;">类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">数据传输方式</td>
+<td
+style="text-align: left;">串行接口（一次只传输1位）、并行接口（多位一起进行传输）</td>
+</tr>
+<tr>
+<td style="text-align: left;">是否能连接多个设备</td>
+<td
+style="text-align: left;">总线式接口（可连接多个设备）、独占式接口（只能连接1个设备）</td>
+</tr>
+<tr>
+<td style="text-align: left;">是否符合标准</td>
+<td style="text-align: left;">标准接口、专用接口</td>
+</tr>
+<tr>
+<td style="text-align: left;">功能是否可灵活选择</td>
+<td style="text-align: left;">可编程接口、不可编程接口</td>
+</tr>
+</tbody>
+</table>
+<h2 id="io-控制器的职能">5.2 I/O 控制器的职能</h2>
+<p>I/O
+控制器承担主机与设备之间的转换、缓冲和控制工作。它的主要职能包括：</p>
+<ul>
+<li><strong>数据缓冲</strong>：用数据缓冲寄存器匹配主机和外设速度。</li>
+<li><strong>状态或错误检测</strong>：用状态寄存器保存就绪、忙、出错等信息。</li>
+<li><strong>控制和定时</strong>：接受系统总线来的控制定时信号，并按设备要求产生控制动作。</li>
+<li><strong>数据格式转换</strong>：例如串并转换、并串转换、电平或编码转换。</li>
+<li><strong>主机与设备通信</strong>：在主机侧接收 CPU
+命令，在设备侧驱动外设动作。</li>
+</ul>
+<p>CPU
+通过写控制寄存器向设备发命令，通过读状态寄存器了解设备状态，通过读写数据寄存器交换数据。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144027592.png" alt="image-20260615144027420" style="zoom: 50%;" /></p>
+<h2 id="io-端口的概念">5.3 I/O 端口的概念</h2>
+<p>I/O 控制器中 CPU 能够访问的各类寄存器称为 <strong>I/O
+端口</strong>。常见端口包括：</p>
+<ul>
+<li>数据端口：用于读写设备数据。</li>
+<li>状态端口：用于读取设备状态和错误标志。</li>
+<li>控制端口：用于写入命令或控制字。</li>
+</ul>
+<p>对外设的访问，本质上就是对这些 I/O
+端口进行读写：向端口发命令、读状态、读数据或写数据。一个 I/O
+控制器可能占有多个端口地址，因此必须给 I/O 端口编号，CPU
+才能访问它们。</p>
+<h2 id="io-设备寻址方式">5.4 I/O 设备寻址方式</h2>
+<p>I/O 设备寻址方式就是 I/O
+端口的编号方式。有两种基本方案：<strong>统一编址</strong>和<strong>独立编址</strong>。</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方式</th>
+<th style="text-align: left;">又称</th>
+<th style="text-align: left;">地址空间</th>
+<th style="text-align: left;">指令特点</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">统一编址</td>
+<td style="text-align: left;">内存映射 I/O</td>
+<td style="text-align: left;">I/O 端口与主存统一编址</td>
+<td style="text-align: left;">用普通访存指令访问 I/O 端口</td>
+<td style="text-align: left;">RISC 机器、Motorola 处理器等</td>
+</tr>
+<tr>
+<td style="text-align: left;">独立编址</td>
+<td style="text-align: left;">特殊 I/O 指令方式</td>
+<td style="text-align: left;">I/O 端口有独立地址空间</td>
+<td style="text-align: left;">需要专门 I/O 指令，如
+<code>IN</code>、<code>OUT</code></td>
+<td style="text-align: left;">Intel、Zilog 处理器</td>
+</tr>
+</tbody>
+</table>
+<p>统一编址方式下，I/O 端口被映射到主存地址空间的一部分。CPU 不需要专门
+I/O 指令，只要用普通读写内存指令访问特定地址范围，就能读写 I/O
+端口。它的优点是指令系统简单，访存机制统一；缺点是会占用部分主存地址空间，且需要通过地址范围区分访问对象。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144233124.png" alt="image-20260615144232953" style="zoom:50%;" /></p>
+<p>独立编址方式下，I/O 地址空间与主存地址空间分开。CPU
+通过不同控制信号区分 I/O 读写和存储器读写，例如 IOR、IOW 与
+MEMR、MEMW。由于 I/O
+端口数量通常远少于存储器单元，端口寻址只需较少地址线。缺点是指令系统必须提供专门
+I/O 指令。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144314765.png" alt="image-20260615144314614" style="zoom:50%;" /></p>
+<p>奔腾机采用独立编址方式，I/O 地址空间由 <span
+class="math inline">2<sup>16</sup></span> 个 8 位端口组成，即 64K
+个端口。两个连续 8 位端口可组成 16 位端口，四个连续 8 位端口可组成 32
+位端口。</p>
+<h1 id="io-传输方式">6 I/O 传输方式</h1>
+<h2 id="三种基本数据交换方式">6.1 三种基本数据交换方式</h2>
+<p>I/O 设备与主机之间的数据交换有三种基本方式：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方式</th>
+<th style="text-align: left;">核心机制</th>
+<th style="text-align: left;">CPU 参与程度</th>
+<th style="text-align: left;">适用设备</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">程序直接控制方式</td>
+<td style="text-align: left;">CPU 主动查询或按时序传送</td>
+<td style="text-align: left;">很高，CPU 常处于等待状态</td>
+<td style="text-align: left;">简单慢速设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">中断 I/O 方式</td>
+<td style="text-align: left;">外设完成或需要服务时主动中断 CPU</td>
+<td style="text-align: left;">中等，CPU 执行中断服务程序传数据</td>
+<td style="text-align: left;">低速或中速设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">DMA 方式</td>
+<td style="text-align: left;">DMA
+控制器控制总线，外设与主存直接传送</td>
+<td style="text-align: left;">很低，CPU 主要负责初始化和结束处理</td>
+<td style="text-align: left;">磁盘等高速块设备</td>
+</tr>
+</tbody>
+</table>
+<p>这三种方式的根本区别是：<strong>数据传送由谁完成，以及 CPU
+是否需要持续等待</strong>。</p>
+<h2 id="程序直接控制或轮询方式">6.2 程序直接控制或轮询方式</h2>
+<p>程序直接控制方式是最简单的 I/O
+方式。它可以是无条件传送，也可以是条件传送。条件传送又称
+<strong>轮询（Polling）</strong>或程序查询方式。</p>
+<p>轮询的基本思想是：I/O 设备把自己的状态放到状态寄存器中，OS
+或驱动程序反复读取状态寄存器，检查特定位是否表示“就绪”。如果未就绪，就继续查询；如果就绪，就进行下一步数据传送或发送控制命令。</p>
+<p>以打印机为例，“就绪”通常表示打印控制器的数据缓冲区已经空，可以接受新的打印字符。CPU
+执行 I/O 指令把字符送到数据端口，再检查状态位、发送启动信号。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144554094.png" alt="image-20260615144553935" style="zoom: 33%;" /></p>
+<h3 id="打印输出标准子程序例子">6.2.1 打印输出标准子程序例子</h3>
+<p>下面这个采用程序查询方式打印 <code>AL</code> 寄存器中字符的 8086
+风格子程序，很好地说明了轮询 I/O
+的三个动作：<strong>写数据端口、读状态端口、写控制端口启动设备</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">PRINT PROC NEAR</span><br><span class="line">      PUSH AX        ; 保护 AX，避免子程序破坏调用者现场</span><br><span class="line">      PUSH DX        ; 保护 DX，因为后面要用 DX 保存 I/O 端口地址</span><br><span class="line">      MOV  DX, 378H  ; 378H 是打印机数据锁存器端口地址</span><br><span class="line">      OUT  DX, AL    ; 将 AL 中待打印字符输出到数据端口</span><br><span class="line">      MOV  DX, 379H  ; 379H 是打印机状态寄存器端口地址</span><br><span class="line">WAIT: IN   AL, DX    ; 从状态端口读入打印机状态字</span><br><span class="line">      TEST AL, 80H   ; 检查状态字中的忙碌位</span><br><span class="line">      JE   WAIT      ; 若打印机仍忙，则继续轮询等待</span><br><span class="line">      MOV  DX, 37AH  ; 37AH 是打印机控制寄存器端口地址</span><br><span class="line">      MOV  AL, 0DH   ; 准备控制字：置选通位为 1</span><br><span class="line">      OUT  DX, AL    ; 输出控制字，使选通位置 1</span><br><span class="line">      MOV  AL, 0CH   ; 准备控制字：置选通位为 0</span><br><span class="line">      OUT  DX, AL    ; 输出控制字，使选通位置 0，形成一次选通信号</span><br><span class="line">      POP  DX        ; 恢复 DX</span><br><span class="line">      POP  AX        ; 恢复 AX</span><br><span class="line">      RET            ; 返回调用程序</span><br><span class="line">PRINT ENDP</span><br></pre></td></tr></table></figure>
+<p>这段程序开始用 <code>PUSH AX</code> 和 <code>PUSH DX</code>
+保护现场，因为子程序会改写 <code>AX</code> 和 <code>DX</code>。随后
+<code>MOV DX, 378H</code>
+把打印机<strong>数据锁存器端口地址</strong>送入
+<code>DX</code>，<code>OUT DX, AL</code>
+将待打印字符写入数据端口。这里的 <code>OUT</code> 就是访问 I/O
+端口的输出指令。</p>
+<p>接着程序把 <code>DX</code> 改为
+<code>379H</code>，这是打印机<strong>状态寄存器端口地址</strong>。标号
+<code>WAIT</code> 处反复执行 <code>IN AL, DX</code> 和
+<code>TEST AL, 80H</code>：前者从状态端口读入打印机状态，后者检查状态字中的忙碌位。如果检测结果表示打印机仍忙，<code>JE WAIT</code>
+就跳回继续查询；只有状态满足要求时，程序才退出等待循环。因此，这几条指令正体现了程序查询方式的“踏步”特征：CPU
+没有停机，但它一直在执行读状态、测试、条件跳转。</p>
+<p>最后程序把 <code>DX</code> 改为
+<code>37AH</code>，即<strong>控制寄存器端口地址</strong>，先输出
+<code>0DH</code> 使选通位置 1，再输出 <code>0CH</code> 使选通位置
+0。这个 1 到 0
+的变化相当于向打印控制器发出一次启动或选通信号，通知设备开始处理刚才写入的数据。末尾用
+<code>POP DX</code>、<code>POP AX</code> 恢复现场并返回。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615145524578.png" alt="image-20260615145524426" style="zoom:50%;" /></p>
+<p>程序直接控制方式的优点是<strong>简单、控制容易、接口硬件少</strong>。缺点也很明显：CPU
+与外设串行工作，效率低；查询期间 CPU
+不停执行类似“读状态、测试、跳转”的指令，形成所谓的<strong>踏步现象</strong>。如果一直独占查询，CPU
+几乎 100% 时间都在为 I/O 服务。</p>
+<h2 id="中断-io-方式">6.3 中断 I/O 方式</h2>
+<p>中断 I/O 的基本思想是：CPU
+启动外设后，不必一直等待。外设完成任务或需要 CPU 干预时，主动向 CPU
+发中断请求。CPU
+响应后暂停当前程序，转入操作系统中的中断服务程序；处理结束后，再返回被中断程序继续执行。</p>
+<p>中断方式下，外设工作期间 CPU 可以执行其他程序，所以 CPU
+与外设具有一定并行性。与轮询相比，它显著降低了 CPU
+无意义等待的时间。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615145704691.png" alt="image-20260615145704524" style="zoom:50%;" /></p>
+<h3 id="中断响应条件">6.3.1 中断响应条件</h3>
+<p>中断响应是硬件过程，指 CPU
+发现外部中断请求、中止现行程序并调出中断服务程序。需要满足三个条件：</p>
+<ol type="1">
+<li>CPU 处于开中断状态。</li>
+<li>当前指令执行完毕。</li>
+<li>至少存在一个未被屏蔽的中断请求。</li>
+</ol>
+<p>外部中断通常在指令执行结束时响应；而内部异常发生在指令执行过程中，不能简单等到指令结束后再处理。这是中断与异常处理时点的重要区别。</p>
+<h3 id="中断响应过程">6.3.2 中断响应过程</h3>
+<p>中断响应由处理器硬件完成，可看作执行一条“中断隐指令”。它主要完成三件事：</p>
+<ul>
+<li><strong>关中断</strong>：清除中断允许标志，防止响应过程本身被打断。</li>
+<li><strong>保护断点和程序状态</strong>：保存 PC 和
+PSW，常保存到堆栈或特殊寄存器，如 EPC、EPSWR。</li>
+<li><strong>识别中断源并转入服务程序</strong>：获得中断服务程序入口地址和初始状态，装入
+PC 和 PSW。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155923859.png" alt="image-20260615155923684" style="zoom: 33%;" /></p>
+<p>识别中断源有两种方法：</p>
+<ul>
+<li><strong>软件识别</strong>：进入统一异常/中断处理入口后，由 OS
+查询异常原因寄存器或中断请求状态。例如 MIPS 可通过 Cause
+寄存器识别异常原因。</li>
+<li><strong>硬件识别或向量中断</strong>：中断控制器通过优先级电路得到中断类型号，CPU
+根据中断类型号查中断向量表，取得服务程序入口地址。例如 8086/8088
+的中断向量表有 256 项，每项 4 字节，向量地址为“中断类型号 <span
+class="math inline">×4</span>”。</li>
+</ul>
+<p>以 8086/8088
+为例，中断向量表也称<strong>中断入口地址表</strong>或<strong>异常表</strong>，位于物理地址
+<code>0000H~03FFH</code>。这段空间一共 <span
+class="math inline">1024</span> 字节，被划分为 <span
+class="math inline">256</span> 组，每组占 <span
+class="math inline">4</span>
+字节，用来保存一个中断服务程序的入口地址。8086/8088 的程序入口地址由
+<code>CS:IP</code> 表示，因此每个中断向量表项保存的就是对应服务程序的
+<code>CS:IP</code>。</p>
+<p>中断类型号和中断向量表地址之间的关系非常直接：</p>
+<p><span class="math display">向量地址 = 中断类型号 × 4</span></p>
+<p>例如，除法错的中断类型号为 <span
+class="math inline">0</span>，所以它的向量地址为 <span
+class="math inline">0 × 4 = 0</span>，对应中断向量表的
+<code>00H~03H</code>。单步中断类型号为 <span
+class="math inline">1</span>，对应 <code>04H~07H</code>。NMI
+的中断类型号为 <span class="math inline">2</span>，所以向量地址为 <span
+class="math inline">2 × 4 = 8</span>，对应 <code>08H~0BH</code>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615150257438.png" alt="image-20260615150257277" style="zoom:50%;" /></p>
+<p>因此，向量中断的完整思路是：<strong>硬件先得到中断类型号，再用“类型号
+<span class="math inline">×4</span>”查中断向量表，取出
+<code>CS:IP</code>，最后转到相应中断服务程序执行</strong>。进一步的问题是“中断类型号怎么得到”。这正好引出后面的中断控制器：中断控制器通过请求锁存、屏蔽和优先级编码，向
+CPU 提供中断类型号。</p>
+<h2 id="中断控制器与-8259a">6.4 中断控制器与 8259A</h2>
+<p>中断控制器负责接收多个外设的中断请求，进行屏蔽和优先级判断，并向 CPU
+提供最高优先级中断的信息。其基本部件包括：</p>
+<ul>
+<li>中断请求寄存器：记录来自不同外设的请求。</li>
+<li>屏蔽寄存器：由 CPU 通过 I/O 指令设置，用来屏蔽部分中断。</li>
+<li>判优线路：从未屏蔽请求中选择优先级最高者。</li>
+<li>中断类型号形成线路：生成中断类型号并送到数据线上。</li>
+</ul>
+<p>8259A
+是典型可编程中断控制器。它支持中断请求锁存、中断屏蔽、优先级排队、中断优先权编码；既支持程序查询式中断，也支持向量式中断；单片支持
+8 级中断，多片级联最多可构成 64 级中断。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615150419492.png" alt="image-20260615150419300" style="zoom:50%;" /></p>
+<h2 id="中断处理过程与多重中断">6.5 中断处理过程与多重中断</h2>
+<p>中断全过程可分为<strong>中断响应</strong>和<strong>中断处理</strong>。中断响应由硬件完成；中断处理是执行中断服务程序，由软件完成。</p>
+<p>典型多重中断服务程序可分为三段：</p>
+<ul>
+<li><strong>先行段或准备阶段</strong>：保护现场和旧屏蔽字，查明原因，设置新屏蔽字，开中断。该阶段通常禁止被打断。</li>
+<li><strong>本体段</strong>：进行具体 I/O
+处理。此时可允许更高处理优先级的中断打断。</li>
+<li><strong>结束段或恢复阶段</strong>：关中断，恢复现场和旧屏蔽字，清除中断请求，开中断并中断返回。该阶段也不允许被打断。</li>
+</ul>
+<p><strong>多重中断</strong>指在处理某个中断时，又发生新的更高优先级中断请求，CPU
+暂停当前中断服务程序，转去处理新中断，处理完后再返回原中断服务程序。</p>
+<p>这里要区分两个优先级：</p>
+<ul>
+<li><strong>中断响应优先级</strong>：多个中断同时请求时，硬件或查询程序先响应谁。</li>
+<li><strong>中断处理优先级</strong>：通过中断屏蔽字动态设定，决定一个中断服务程序执行期间允许哪些中断打断它。</li>
+</ul>
+<p>响应优先级是“同时来时先接谁”，处理优先级是“正在处理时谁能插队”。</p>
+<h2 id="例题中断优先权的动态分配">6.6 例题：中断优先权的动态分配</h2>
+<p>一道典型例题可以用来说明<strong>响应优先级</strong>和<strong>处理优先级</strong>不是同一件事。</p>
+<p>题设如下：某中断系统有四个中断源，响应优先级固定为：</p>
+<p><span class="math display">1 &gt; 2 &gt; 3 &gt; 4</span></p>
+<p>在用户程序执行时，<span class="math inline">1</span>、<span
+class="math inline">3</span>、<span class="math inline">4</span>
+级中断请求同时发生；当 CPU 正在执行 <span class="math inline">3</span>
+级中断服务程序时，又发生 <span class="math inline">2</span>
+级中断请求。要求分别写出处理优先级为 <span
+class="math inline">1 &gt; 2 &gt; 3 &gt; 4</span> 和 <span
+class="math inline">1 &gt; 4 &gt; 3 &gt; 2</span> 时，各中断的屏蔽字以及
+CPU 完成中断处理的过程。</p>
+<p>这里约定：<strong>屏蔽字中 1 表示屏蔽，0
+表示开放</strong>。某一级中断服务程序开始执行后，会设置本级对应的屏蔽字；若某个新中断源对应位为
+0，并且系统处于开中断状态，它就可能打断当前中断服务程序。</p>
+<h3 id="处理优先级为-1234">6.6.1 处理优先级为 <span
+class="math inline">1 &gt; 2 &gt; 3 &gt; 4</span></h3>
+<p>当处理优先级与响应优先级相同，即：</p>
+<p><span class="math display">1 &gt; 2 &gt; 3 &gt; 4</span></p>
+<p>屏蔽字可写为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">正在执行的中断服务程序级别</th>
+<th style="text-align: left;">1 级</th>
+<th style="text-align: left;">2 级</th>
+<th style="text-align: left;">3 级</th>
+<th style="text-align: left;">4 级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">第 1 级</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 2 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 3 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 4 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+</tr>
+</tbody>
+</table>
+<p>这张表的含义是：正在处理某一级中断时，比它<strong>优先级更高</strong>的中断开放，比它<strong>优先级相同或更低</strong>的中断屏蔽。例如执行
+3 级中断服务程序时，1 级和 2 级开放，3 级和 4 级屏蔽，所以 2
+级中断可以打断 3 级中断。</p>
+<p>CPU 的处理过程如下：</p>
+<ol type="1">
+<li>用户程序执行时，1、3、4 级中断同时请求。由于响应优先级为 <span
+class="math inline">1 &gt; 2 &gt; 3 &gt; 4</span>，CPU 首先响应 1
+级中断。</li>
+<li>1 级中断服务程序的屏蔽字为
+<code>1111</code>，执行期间屏蔽所有中断，故 3、4 级只能等待。</li>
+<li>1 级中断处理结束后，待处理请求中还有 3、4 级。按响应优先级，CPU 响应
+3 级中断。</li>
+<li>执行 3 级中断服务程序时，屏蔽字为 <code>0011</code>，即 1、2
+级开放，3、4 级屏蔽。此时发生 2 级中断请求，由于 2
+级开放且处理优先级高于 3 级，所以 2 级中断打断 3 级中断。</li>
+<li>2 级中断服务程序执行完后，CPU 返回被打断的 3
+级中断服务程序继续执行。</li>
+<li>3 级中断结束后，最后处理等待中的 4 级中断。</li>
+</ol>
+<p>因此，这种情况下的主要处理顺序可概括为：</p>
+<p><span
+class="math display">主程序 → 1 → 3 → 2 → 3 → 4 → 主程序</span></p>
+<p>如果只看各级中断完成的先后顺序，则是：</p>
+<p><span class="math display">1, 2, 3, 4</span></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615151348183.png" alt="image-20260615151347997" style="zoom:50%;" /></p>
+<h3 id="处理优先级为-1432">6.6.2 处理优先级为 <span
+class="math inline">1 &gt; 4 &gt; 3 &gt; 2</span></h3>
+<p>第二种情况中，响应优先级仍然是：</p>
+<p><span class="math display">1 &gt; 2 &gt; 3 &gt; 4</span></p>
+<p>但处理优先级被动态设置为：</p>
+<p><span class="math display">1 &gt; 4 &gt; 3 &gt; 2</span></p>
+<p>此时屏蔽字变为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">正在执行的中断服务程序级别</th>
+<th style="text-align: left;">1 级</th>
+<th style="text-align: left;">2 级</th>
+<th style="text-align: left;">3 级</th>
+<th style="text-align: left;">4 级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">第 1 级</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 2 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 3 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 4 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+</tbody>
+</table>
+<p>这张表要按<strong>处理优先级</strong>来读。例如执行 3
+级中断服务程序时，1 级和 4 级比 3 级处理优先级高，所以开放；2 级比 3
+级处理优先级低，所以屏蔽。这正是动态分配中断处理优先权的意义：响应优先级决定先响应谁，但进入某个服务程序后，能不能被打断由屏蔽字决定。</p>
+<p>CPU 的处理过程如下：</p>
+<ol type="1">
+<li>用户程序执行时，1、3、4
+级中断同时请求。由于<strong>响应优先级</strong>固定为 <span
+class="math inline">1 &gt; 2 &gt; 3 &gt; 4</span>，CPU 仍然首先响应 1
+级中断。</li>
+<li>1 级中断服务程序屏蔽所有中断，处理结束后返回。</li>
+<li>待处理请求中还有 3、4 级。虽然处理优先级中 4 高于 3，但此时 CPU
+选择响应哪个未处理请求仍按响应优先级，所以先响应 3 级中断。</li>
+<li>进入 3 级中断服务程序后，屏蔽字为 <code>0110</code>，即 1、4
+级开放，2、3 级屏蔽。因此原本等待的 4 级中断可以打断 3 级中断。</li>
+<li>CPU 转去执行 4 级中断服务程序。4 级的屏蔽字为
+<code>0111</code>，只开放 1 级，屏蔽 2、3、4 级。</li>
+<li>4 级中断结束后，CPU 返回 3 级中断服务程序继续执行。执行 3
+级服务程序期间发生的 2 级中断因被屏蔽，不能打断 3 级，只能等待。</li>
+<li>3 级中断结束后，CPU 再处理等待中的 2 级中断。</li>
+</ol>
+<p>因此，这种情况下的主要处理顺序可概括为：</p>
+<p><span
+class="math display">主程序 → 1 → 3 → 4 → 3 → 2 → 主程序</span></p>
+<p>如果只看各级中断完成的先后顺序，则是：</p>
+<p><span class="math display">1, 4, 3, 2</span></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615151615210.png" alt="image-20260615151615022" style="zoom:50%;" /></p>
+<p>这道题的分析关键是：<strong>响应优先级决定“多个请求同时出现时先响应谁”，处理优先级通过屏蔽字决定“服务程序执行过程中谁能打断谁”</strong>。所以第二种情况下，3
+级会先于 4 级被响应，但 4 级又会在 3 级执行期间打断 3 级；2
+级虽然响应优先级高于 3、4，但处理优先级最低，若在 3
+级服务程序中出现，会被屏蔽到后面再处理。</p>
+<h2 id="轮询方式与中断方式比较">6.7 轮询方式与中断方式比较</h2>
+<p>设某设备输出一批数据：主机把一个数据送到接口输出缓冲 OBR 需 <span
+class="math inline">1<em>μ</em><em>s</em></span>，OBR 输出到设备需 <span
+class="math inline">1 ms</span>，每条指令 <span
+class="math inline">1<em>μ</em><em>s</em></span>。</p>
+<p>程序直接控制方式中，若查询程序有 10 条，第 5
+条为启动设备指令，则每个数据周期约：</p>
+<p><span
+class="math display">1000<em>μ</em><em>s</em> + 5<em>μ</em><em>s</em> = 1005<em>μ</em><em>s</em></span></p>
+<p>数据传输率约为：</p>
+<p><span class="math display">$$
+\frac{1}{1005\mu s}\approx 995\text{ 个数据/秒}
+$$</span></p>
+<p>但 CPU 一直查询，主机占用率为 <span
+class="math inline">100%</span>。</p>
+<p>中断方式中，若中断服务程序有 30 条，第 20
+条启动设备，则数据传输率约为：</p>
+<p><span class="math display">$$
+\frac{1}{1000+1+20}\mu s \approx 979\text{ 个数据/秒}
+$$</span></p>
+<p>主机占用率为：</p>
+<p><span class="math display">$$
+\frac{1+30}{1000+1+20}\approx 3\%
+$$</span></p>
+<p>所以中断方式的传输率可能略低，因为中断服务程序有保存现场、设置屏蔽字等额外开销；但
+CPU 占用率大幅下降，系统整体效率更高。</p>
+<h1 id="dma-方式">7 DMA 方式</h1>
+<h2 id="为什么引入-dma">7.1 为什么引入 DMA</h2>
+<p>DMA（Direct Memory
+Access，直接存储器访问）用于解决高速设备与主存之间的大批量数据传送问题。</p>
+<p>程序直接控制方式受踏步现象限制，CPU
+等待严重，不适合高速设备。中断方式虽然让 CPU
+与外设部分并行，但每传一个数据都可能需要一次中断，存在中断响应、保护现场、恢复现场等开销，且数据传送由
+CPU 执行软件完成，速度仍然不够。</p>
+<p>DMA 的基本思想是：<strong>高速外设和主存之间直接传送数据，由专门硬件
+DMA 控制器控制总线，CPU 不参与逐字节或逐字的数据搬运</strong>。</p>
+<p>DMA
+适合高速设备和成批数据交换，例如磁盘、光盘等。一旦启动，数据会连续读写，数据间隔时间短，必须及时传送，否则可能丢失。</p>
+<h2 id="dma-与中断的配合">7.2 DMA 与中断的配合</h2>
+<p>DMA 并不是完全不需要中断，而是与中断配合使用。以磁盘为例：</p>
+<ul>
+<li>寻道阶段：可用中断通知 CPU 操作完成。</li>
+<li>旋转查找扇区阶段：可用中断通知 CPU。</li>
+<li>连续读写阶段：使用 DMA 方式传送数据。</li>
+<li>结束和校验阶段：用 DMA 结束中断通知 CPU 后处理。</li>
+</ul>
+<p>因此，DMA 的含义不是“没有中断”，而是<strong>大批量数据传送期间 CPU
+不搬运数据</strong>。</p>
+<h2 id="dma-数据传送的三种控制方式">7.3 DMA 数据传送的三种控制方式</h2>
+<p>DMA 传送时，真正搬运数据的是 DMA
+控制器，但数据最终要进出主存。问题在于：<strong>CPU
+执行程序也要访问主存，DMA
+控制器传数据也要访问主存</strong>。两者共享主存和系统总线，就可能出现争用。三种控制方式本质上是在回答同一个问题：当
+DMA 要访问主存时，CPU 应该怎样让出主存和总线。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方式</th>
+<th style="text-align: left;">做法</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">缺点或适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">CPU 停止法</td>
+<td style="text-align: left;">DMA 传输一块数据期间，CPU
+脱离总线，停止访问主存</td>
+<td style="text-align: left;">控制简单，适合很高速外设成组传送</td>
+<td style="text-align: left;">CPU 基本停止，主存周期利用不充分</td>
+</tr>
+<tr>
+<td style="text-align: left;">周期挪用法</td>
+<td style="text-align: left;">DMA
+每次只窃取一个总线或存储周期，传一个数据后释放总线</td>
+<td style="text-align: left;">能及时响应 I/O，又较好发挥 CPU
+和主存效率</td>
+<td
+style="text-align: left;">每次传送都要申请和释放总线，控制开销较大</td>
+</tr>
+<tr>
+<td style="text-align: left;">交替分时访问法</td>
+<td style="text-align: left;">每个存储周期分成两个时间片，一个给
+CPU，一个给 DMA</td>
+<td style="text-align: left;">CPU 与 DMA 可规则交替访问</td>
+<td style="text-align: left;">需要存储系统支持固定分时</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cpu-停止法一次让出一整块传输时间">7.3.1 CPU
+停止法：一次让出一整块传输时间</h3>
+<p><strong>CPU 停止法</strong>也叫<strong>成组传送方式</strong>。当 DMA
+开始传输一块数据时，CPU 脱离总线，停止访问主存；DMA
+控制器独占总线和主存，把这一整块数据传完后，CPU
+才重新取得总线控制权。</p>
+<p>可以把它理解成：CPU 对 DMA
+说“这一段时间总线都归你，你把这一块数据一次搬完”。因此它的控制逻辑最简单，DMA
+不需要每传一个字都重新申请总线。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615153623971.png" alt="image-20260615153623791" style="zoom:50%;" /></p>
+<p>这种方式的优点是<strong>控制简单，适合传输率很高的外设进行成组数据传送</strong>。缺点是
+CPU 受影响很大：DMA 访存期间 CPU
+基本不能访问主存，很多情况下只能等待。更细一点说，即使 I/O
+设备已经算“高速”，两个数据准备好之间通常仍会有间隔，而这个间隔往往大于一个主存周期；如果
+CPU 被整块暂停，就会导致一些主存周期空闲，主存没有被充分利用。</p>
+<p>有两种弥补 CPU 停止法缺点的思路：</p>
+<ul>
+<li><strong>在 DMA 接口中引入缓冲器</strong>：让外设先和 DMA
+接口里的小容量半导体缓冲器交换数据，再由缓冲器与主存成批交换。这样 DMA
+真正占用系统总线的时间变短，CPU 等待时间也会减少。</li>
+<li><strong>改用周期挪用法</strong>：DMA
+不再一次占住总线直到一整块传完，而是每次只挪用一个存储周期，传完一个数据就释放总线。</li>
+</ul>
+<h3 id="周期挪用法一次只抢一个主存周期">7.3.2
+周期挪用法：一次只抢一个主存周期</h3>
+<p><strong>周期挪用法</strong>也叫<strong>周期窃取法</strong>或<strong>单字传送方式</strong>。当外设准备好一个数据时，DMA
+控制器向 CPU 请求总线；CPU 让出一个总线事务周期，由 DMA
+控制器访问主存，传送一个字或一个数据单位。传完后，DMA 立即释放总线，CPU
+可以继续访存。等外设准备好下一个数据时，DMA 再发起下一次请求。</p>
+<p>它的关键思想是：<strong>不让 DMA 长时间霸占总线，而是在 CPU
+执行过程中“插空”拿走一个主存周期</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615153755820.png" alt="image-20260615153755641" style="zoom:50%;" /></p>
+<p>周期挪用法的优点是：既能及时响应 I/O 请求，又能较好发挥 CPU
+和主存效率。外设准备下一个数据时，CPU
+可以继续使用主存；只有真正要传送一个数据时，DMA
+才短暂占用一个周期。因此，它适合 <strong>I/O
+设备读写周期大于主存周期</strong>的情况。换句话说，外设并不是每个主存周期都能给出数据，CPU
+可以利用外设准备数据的空隙继续执行程序。</p>
+<p>它的缺点是控制开销比 CPU 停止法大。因为每传一个数据，DMA
+都要经历申请总线、获得总线、传送数据、释放总线这一小轮流程。如果数据量很大、每个数据都这么申请，控制过程本身也会消耗时间。</p>
+<p>周期挪用法需要区分三种可能情况：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">DMA 请求发生时的 CPU 状态</th>
+<th style="text-align: left;">是否冲突</th>
+<th style="text-align: left;">处理方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">CPU 暂时不需要访问主存</td>
+<td style="text-align: left;">不冲突</td>
+<td style="text-align: left;">DMA 可直接访问主存，两者在功能上并行</td>
+</tr>
+<tr>
+<td style="text-align: left;">CPU 正在访问主存</td>
+<td style="text-align: left;">暂时冲突</td>
+<td style="text-align: left;">等当前存储周期结束后，CPU 让出总线，DMA
+再访存</td>
+</tr>
+<tr>
+<td style="text-align: left;">CPU 也正准备访问主存</td>
+<td style="text-align: left;">发生访存竞争</td>
+<td style="text-align: left;">DMA 优先，先窃取一个主存周期，CPU
+延迟访存</td>
+</tr>
+</tbody>
+</table>
+<p>第三种情况最能体现“周期挪用”的名字：DMA 像是从 CPU
+手里临时借走一个主存周期。为什么 DMA
+优先？因为高速外设的数据缓冲可能很小，如果不及时传送，后续数据到来时可能覆盖旧数据，造成数据丢失；CPU
+延迟一个主存周期通常只是性能下降，不会直接丢数据。</p>
+<h3 id="交替分时访问法把每个存储周期分成两份">7.3.3
+交替分时访问法：把每个存储周期分成两份</h3>
+<p><strong>交替分时访问法</strong>的思想更规则：把每个存储周期划分成两个时间片，一个固定给
+CPU，一个固定给 DMA。这样在每个存储周期内，CPU 和 DMA
+都有自己的访问机会，不需要每次都临时争抢。</p>
+<p>可以理解成：CPU 和 DMA
+不是“谁急谁抢”，而是事先约定好轮流使用主存。例如一个周期的前半段 CPU
+访问主存，后半段 DMA 访问主存；或者按硬件规定的节拍交替进行。这样 CPU
+不会像 CPU 停止法中那样长时间被停住，DMA
+也不必像周期挪用法那样每次都重新申请总线。</p>
+<p>它的优点是访问节奏稳定，CPU 和 DMA
+都能规律地使用主存；缺点是对硬件时序要求较高，需要存储系统支持这种固定分时安排。如果某一方暂时不需要访存，它分到的时间片可能浪费；如果某一方特别急，也不能随意多占时间片。</p>
+<h3 id="三种方式的梳理对比">7.3.4 三种方式的梳理对比</h3>
+<p>可以按“DMA 一次占用主存多久”来记：</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">控制方式</th>
+<th style="text-align: left;">DMA 一次占用粒度</th>
+<th style="text-align: left;">CPU 受影响程度</th>
+<th style="text-align: left;">总线控制开销</th>
+<th style="text-align: left;">适合场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">CPU 停止法</td>
+<td style="text-align: left;">一整块数据传送期间</td>
+<td style="text-align: left;">最大，CPU 基本停止访存</td>
+<td style="text-align: left;">最小</td>
+<td style="text-align: left;">传输率很高、适合成组传送，且允许 CPU
+短暂停顿</td>
+</tr>
+<tr>
+<td style="text-align: left;">周期挪用法</td>
+<td style="text-align: left;">一个主存周期或一个数据单位</td>
+<td style="text-align: left;">中等，只延迟部分访存周期</td>
+<td style="text-align: left;">较大</td>
+<td style="text-align: left;">外设读写周期大于主存周期，常见 DMA
+方式</td>
+</tr>
+<tr>
+<td style="text-align: left;">交替分时访问法</td>
+<td style="text-align: left;">固定时间片</td>
+<td style="text-align: left;">较稳定，不长时间阻塞</td>
+<td style="text-align: left;">中等，依赖硬件时序</td>
+<td style="text-align: left;">CPU 与 DMA
+都需要规律访存、硬件支持分时</td>
+</tr>
+</tbody>
+</table>
+<p>一句话总结：<strong>CPU
+停止法是“整块让路”，周期挪用法是“临时借一个周期”，交替分时访问法是“预先排班轮流用”。</strong></p>
+<h2 id="dma-控制器的功能">7.4 DMA 控制器的功能</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615154431634.png" alt="image-20260615154431432" style="zoom: 33%;" /></p>
+<p>DMA 接口也称 DMA 控制器。它要能完成以下功能：</p>
+<ul>
+<li>接收外设发来的 DMA 请求，并向 CPU 发总线请求。</li>
+<li>在 CPU 发出总线响应后，接管总线控制权。</li>
+<li>在地址线上给出主存地址，并自动修改主存地址。</li>
+<li>根据传送方向在控制线上给出正确读写控制信号。</li>
+<li>记录和判断传送数据个数。</li>
+<li>传送结束时发出 DMA 结束信号，引起 DMA 中断，进入后处理。</li>
+</ul>
+<p>典型 DMA
+控制器中会有地址寄存器、字计数器、设备地址寄存器、控制寄存器、状态逻辑和总线控制逻辑等。</p>
+<h2 id="dma-操作步骤">7.5 DMA 操作步骤</h2>
+<p>DMA 操作可分为三个阶段：</p>
+<ol type="1">
+<li><strong>DMA 控制器初始化，由软件实现</strong><br />
+OS
+或设备驱动准备内存缓冲区，设置内存首址、字计数值、传送方向、设备地址等参数，并启动外设。</li>
+<li><strong>DMA 数据传送，由硬件实现</strong><br />
+外设准备好数据或准备好接收数据后发出 DMA 请求；DMA 控制器向 CPU
+申请总线；CPU 完成当前机器周期后让出总线；DMA
+控制器控制总线完成读写，自动修改地址并递减计数。</li>
+<li><strong>DMA 结束处理，由软件实现</strong><br />
+当计数值为 0 时，DMA 控制器发出 DMA 结束信号，引起中断。CPU
+执行中断服务程序，完成数据校验、状态检查、唤醒进程等后处理。</li>
+</ol>
+<h3 id="dma-控制器初始化的详细步骤">7.5.1 DMA
+控制器初始化的详细步骤</h3>
+<p>DMA 初始化也叫 <strong>DMA
+控制器预置</strong>，由软件完成，通常是操作系统中的设备驱动程序执行。它的目的不是传数据本身，而是先把
+DMA 控制器“配置好”，让它后面能独立完成硬件传输。</p>
+<p>第一步是<strong>准备内存区</strong>。如果是输入操作，例如从磁盘读数据到主存，驱动程序要先在主存中准备好接收数据的缓冲区；如果是输出操作，例如把主存中的一块数据写到外设，驱动程序要先把待输出数据放到内存缓冲区中。也就是说，DMA
+传输前必须先明确：数据要从哪里来、要到哪里去。</p>
+<p>第二步是<strong>设置传送参数</strong>。驱动程序通过 I/O 指令访问 DMA
+控制器的端口，先测试外设状态，再把关键参数写入 DMA
+控制器内部寄存器：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">写入位置</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">内存首址</td>
+<td style="text-align: left;">地址寄存器</td>
+<td style="text-align: left;">指出 DMA 传输在主存中的起始地址</td>
+</tr>
+<tr>
+<td style="text-align: left;">字计数值</td>
+<td style="text-align: left;">字计数器</td>
+<td
+style="text-align: left;">指出本次要传送多少个字、字节或数据单位</td>
+</tr>
+<tr>
+<td style="text-align: left;">传送方向</td>
+<td style="text-align: left;">控制寄存器</td>
+<td style="text-align: left;">指出是外设到主存，还是主存到外设</td>
+</tr>
+<tr>
+<td style="text-align: left;">设备地址</td>
+<td style="text-align: left;">设备地址寄存器</td>
+<td
+style="text-align: left;">指出要与哪个外设或哪个设备端口交换数据</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数对应 DMA
+控制器后续硬件动作：地址寄存器决定每次访问主存的位置，字计数器决定何时结束，控制寄存器决定发读命令还是写命令，设备地址寄存器决定连接哪个外设。</p>
+<p>第三步是<strong>启动外设</strong>。驱动程序向设备或 DMA
+控制器发送启动命令后，CPU
+不再逐字搬运数据，而是可以去执行其他程序。之后等外设准备好数据，DMA
+控制器就会进入“DMA 请求、总线请求、总线响应、DMA 传送”的硬件流程。</p>
+<h2 id="dma-传输过程细化">7.6 DMA 传输过程细化</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615154854647.png" alt="image-20260615154854456" style="zoom:50%;" /></p>
+<p>DMA 传输过程可整理为：</p>
+<ol type="1">
+<li>外设准备好数据或准备好接收数据，发出选通信号，使数据进入数据缓冲寄存器，同时
+DMA 请求触发器置 1。</li>
+<li>DMA 请求触发器向控制/状态端口发 Ready 信号，并向 DMA 控制器发 DMA
+请求。</li>
+<li>DMA 控制器向 CPU 发总线请求。</li>
+<li>CPU 完成当前机器周期后响应 DMA 请求，发出总线响应。DMA 控制器发 DMA
+响应，使请求触发器复位，CPU 浮动总线并让出控制权。</li>
+<li>DMA 控制器给出内存地址和读写命令，在数据总线上完成数据传输。</li>
+<li>DMA 控制器修改主存地址、计数值减 1。若采用 CPU
+停止法，则循环传到计数为
+0；若采用周期挪用法，则传一个数据后释放总线，下一次再重新请求。</li>
+</ol>
+<h2 id="dma-与中断方式的区别">7.7 DMA 与中断方式的区别</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">对比点</th>
+<th style="text-align: left;">中断方式</th>
+<th style="text-align: left;">DMA 方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">数据传送者</td>
+<td style="text-align: left;">CPU 执行中断服务程序，用软件传送</td>
+<td style="text-align: left;">DMA 控制器用硬件传送</td>
+</tr>
+<tr>
+<td style="text-align: left;">请求含义</td>
+<td style="text-align: left;">请求 CPU 暂停当前程序并执行服务程序</td>
+<td style="text-align: left;">请求总线控制权或主存访问权</td>
+</tr>
+<tr>
+<td style="text-align: left;">是否中止现行程序</td>
+<td style="text-align: left;">需要保存断点和现场</td>
+<td style="text-align: left;">数据传送期间通常不需中止程序</td>
+</tr>
+<tr>
+<td style="text-align: left;">能否处理异常</td>
+<td style="text-align: left;">可以处理外设事件和异常情况</td>
+<td style="text-align: left;">不能处理异常，只负责数据搬运</td>
+</tr>
+<tr>
+<td style="text-align: left;">响应时点</td>
+<td style="text-align: left;">一条指令周期结束后</td>
+<td style="text-align: left;">一个总线周期或机器周期后</td>
+</tr>
+<tr>
+<td style="text-align: left;">适用设备</td>
+<td style="text-align: left;">低速、慢速或中速设备</td>
+<td style="text-align: left;">高速块设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">并行度</td>
+<td style="text-align: left;">外设与 CPU 有一定并行性，但数据传送仍由
+CPU 做</td>
+<td style="text-align: left;">外设与 CPU 并行度高，CPU 开销小</td>
+</tr>
+</tbody>
+</table>
+<h2 id="中断与-dma-的-cpu-开销例题">7.8 中断与 DMA 的 CPU 开销例题</h2>
+<p>题设：CPU 频率 <span class="math inline">500
+MHz</span>，硬盘控制器数据缓存 <span class="math inline">16
+B</span>，磁盘传输率 <span class="math inline">4 MB/s</span>，忽略 CPU
+访存和 DMA 访存冲突。</p>
+<h3 id="中断方式">7.8.1 中断方式</h3>
+<p>硬盘每次中断传 <span class="math inline">16 B</span>，若磁盘以 <span
+class="math inline">4 MB/s</span> 传输，则每秒中断次数为：</p>
+<p><span class="math display">4 MB/s/16 B = 250 k 次/s</span></p>
+<p>每次中断开销 500 个时钟周期，则每秒用于中断的时钟周期数为：</p>
+<p><span class="math display">250
+k × 500 = 125 × 10<sup>6</sup></span></p>
+<p>CPU 每秒总时钟周期为：</p>
+<p><span class="math display">500 × 10<sup>6</sup></span></p>
+<p>若硬盘一直传输，则 CPU 用在 I/O 上的比例为：</p>
+<p><span class="math display">$$
+\frac{125\times 10^6}{500\times 10^6}=25\%
+$$</span></p>
+<p>若硬盘只有 5% 时间在传输，则 CPU 用在 I/O 上的比例为：</p>
+<p><span class="math display">25% × 5% = 1.25%</span></p>
+<h3 id="dma-方式-1">7.8.2 DMA 方式</h3>
+<p>每次 DMA 传送 <span class="math inline">8000
+B</span>，传输时间为：</p>
+<p><span class="math display">8000 B/(4 MB/s) ≈ 2 × 10<sup>−3</sup>
+s</span></p>
+<p>所以每秒约有：</p>
+<p><span class="math display">1/(2 × 10<sup>−3</sup>) = 500</span></p>
+<p>次 DMA 传送。每次 DMA 初始化 1000 个时钟，结束中断处理 500
+个时钟，每秒 CPU 开销为：</p>
+<p><span
+class="math display">(1000 + 500) × 500 = 750 × 10<sup>3</sup></span></p>
+<p>CPU 占用率为：</p>
+<p><span class="math display">$$
+\frac{750\times 10^3}{500\times 10^6}=1.5\times 10^{-3}=0.15\%
+$$</span></p>
+<p>这个例子说明：<strong>DMA 的核心优势不是让设备本身变快，而是显著减少
+CPU 为 I/O 付出的时间</strong>。</p>
+<h1 id="io-子系统的软件层次与驱动程序">8 I/O
+子系统的软件层次与驱动程序</h1>
+<h2 id="io-子系统的层次结构">8.1 I/O 子系统的层次结构</h2>
+<p>高级语言运行时通常提供 I/O 函数，例如 C 的
+<code>printf()</code>、<code>scanf()</code>，C++
+的输入输出操作符。用户程序通过这些函数提出 I/O 请求，但真正完成 I/O
+需要多层软件和硬件协同。</p>
+<p>I/O 软件从高到低可分为四层：</p>
+<ol type="1">
+<li><strong>用户层 I/O 软件</strong>：如标准库函数、运行时库。</li>
+<li><strong>与设备无关的操作系统 I/O
+软件</strong>：提供统一文件、缓冲、权限、调度等抽象。</li>
+<li><strong>设备驱动程序</strong>：直接控制具体设备控制器，访问 I/O
+端口。</li>
+<li><strong>I/O 中断处理程序</strong>：响应外设中断或 DMA
+完成中断。</li>
+</ol>
+<p>层次越低，越接近设备，越远离用户程序。大部分 I/O
+软件属于操作系统内核态程序，但最初 I/O 请求来自用户态。</p>
+<p>从用户态切换到内核态的关键机制是<strong>异常机制中的系统调用或自陷</strong>。例如
+Linux 中，<code>printf()</code> 最终会调用
+<code>write()</code>，再通过系统调用入口进入内核，找到
+<code>sys_write()</code>
+服务例程执行。系统调用处理程序根据<strong>系统调用号</strong>决定转向哪个内核服务例程。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155332588.png" alt="image-20260615155332406" style="zoom:50%;" /></p>
+<h2 id="三种方式在驱动程序中的体现">8.2 三种方式在驱动程序中的体现</h2>
+<p>程序查询方式下，驱动程序把用户数据复制到内核缓冲区后，对每个字符循环执行：读状态端口，等待设备
+Ready；写数据端口；写控制端口启动设备。当前进程在内核态“干等”，CPU
+被持续占用。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155447502.png" alt="image-20260615155447325" style="zoom:50%;" /></p>
+<p>中断方式下，驱动程序启动第一次 I/O
+后阻塞当前用户进程，调度其他进程运行。设备完成一个字符或一段任务后发中断，中断服务程序继续送下一个字符或做相应处理。CPU
+与外设可并行工作。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155559542.png" alt="image-20260615155559351" style="zoom:50%;" /></p>
+<p>DMA 方式下，驱动程序初始化 DMA
+控制器，设置缓冲区地址、长度、方向等参数，然后启动 DMA
+传送并阻塞当前进程。DMA 控制器完成全部数据传输后发 DMA
+结束中断，中断服务程序做校验、清除中断、唤醒进程等后处理。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155642682.png" alt="image-20260615155642477" style="zoom:50%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155832335.png" alt="image-20260615155832126" style="zoom:50%;" /></p>
+<h2 id="中断服务程序在不同方式中的任务">8.3
+中断服务程序在不同方式中的任务</h2>
+<p>中断控制方式和 DMA 控制方式都需要中断服务程序，但任务不同：</p>
+<ul>
+<li>在中断 I/O
+中，中断服务程序通常要执行实际数据传送，例如从数据缓冲器取数或把数据写入数据缓冲器，并再次启动外设。</li>
+<li>在 DMA I/O
+中，中断服务程序主要做结束处理，例如数据校验、清除中断请求、唤醒等待进程；实际数据搬运已经由
+DMA 控制器完成。</li>
+</ul>
+<p>I/O
+指令、开中断、关中断等都是特权指令，只能在操作系统内核程序中使用。这也是用户程序不能随意直接控制硬件设备的重要原因。</p>
+<h1 id="重点梳理">9 重点梳理</h1>
+<h2 id="本章核心概念">9.1 本章核心概念</h2>
+<ul>
+<li><strong>I/O
+系统性能</strong>：吞吐率看单位时间传多少，响应时间看一次请求等多久。</li>
+<li><strong>I/O
+系统任务</strong>：建立通路、设备寻址、发送命令、读取状态、传输数据。</li>
+<li><strong>外设通用模型</strong>：控制信息、状态信息、数据信息三类信号。</li>
+<li><strong>磁盘访问时间</strong>：寻道时间 + 旋转等待时间 +
+数据传输时间。</li>
+<li><strong>RAID</strong>：多个物理盘组成一个逻辑盘，通过条带化提高性能，通过冗余提高可靠性。</li>
+<li><strong>总线组成</strong>：数据线、地址线、控制线。</li>
+<li><strong>总线趋势</strong>：点对点、异步、串行。</li>
+<li><strong>I/O
+控制器</strong>：主机与外设之间的缓冲、控制、状态检测、格式转换部件。</li>
+<li><strong>I/O 端口</strong>：I/O 控制器中 CPU 可访问的寄存器。</li>
+<li><strong>I/O 寻址</strong>：统一编址用普通访存指令，独立编址用专门
+I/O 指令。</li>
+<li><strong>三种 I/O 传输方式</strong>：轮询靠 CPU
+查，中断靠外设通知，DMA 靠硬件搬数据。</li>
+</ul>
+<h2 id="易混点对比">9.2 易混点对比</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">易混概念</th>
+<th style="text-align: left;">区别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">I/O 总线 vs 通信总线</td>
+<td style="text-align: left;">I/O 总线通常在主板内部连接 I/O
+控制器；通信总线常连接 I/O 控制器和外部设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">I/O 控制器 vs I/O 接口</td>
+<td style="text-align: left;">本课程常把控制器和插座合称 I/O
+接口；严格说控制器偏逻辑，接口还包括连接器、电气规范等</td>
+</tr>
+<tr>
+<td style="text-align: left;">响应优先级 vs 处理优先级</td>
+<td
+style="text-align: left;">响应优先级决定多个请求同时来时先响应谁；处理优先级由屏蔽字动态决定谁能打断谁</td>
+</tr>
+<tr>
+<td style="text-align: left;">中断方式 vs DMA 方式</td>
+<td style="text-align: left;">中断方式由 CPU 执行服务程序传数据；DMA
+方式由 DMA 控制器硬件传数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">DMA 请求 vs 中断请求</td>
+<td style="text-align: left;">DMA 请求要总线或主存访问权；中断请求要 CPU
+转去执行服务程序</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 4 vs RAID 5</td>
+<td style="text-align: left;">RAID 4 有专门校验盘，写时易成瓶颈；RAID 5
+校验块分布在各盘</td>
+</tr>
+</tbody>
+</table>
+<h2 id="常考公式与计算">9.3 常考公式与计算</h2>
+<p>磁盘平均访问时间：</p>
+<p><span
+class="math display"><em>T</em> = <em>T</em><sub>seek</sub> + <em>T</em><sub>rotation</sub> + <em>T</em><sub>transfer</sub> + <em>T</em><sub>controller</sub> + <em>T</em><sub>queue</sub></span></p>
+<p>平均旋转等待时间：</p>
+<p><span class="math display">$$
+T_{\text{rotation}}=\frac{0.5}{\text{RPS}}
+$$</span></p>
+<p>同步总线带宽：</p>
+<p><span
+class="math display"><em>B</em> = <em>W</em> × <em>F</em>/<em>N</em></span></p>
+<p>PCIe 1.0 <span class="math inline">×<em>n</em></span> 双向带宽：</p>
+<p><span class="math display"><em>B</em> = 2.5
+Gb/s × 2 × <em>n</em>/10 = 0.5 GB/s × <em>n</em></span></p>
+<p>RAID 4 少量写校验更新：</p>
+<p><span
+class="math display"><em>p</em><sup>′</sup>(<em>i</em>) = <em>p</em>(<em>i</em>) ⊕ <em>X</em><sub>0</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span></p>
+<p>CPU 占用率常用思路：</p>
+<p><span class="math display">$$
+\text{CPU 占用率}=\frac{\text{单位时间用于 I/O 的 CPU
+周期数}}{\text{单位时间 CPU 总周期数}}
+$$</span></p>
+<h2 id="学习建议">9.4 学习建议</h2>
+<p>学习本章时，可以按“谁控制数据传输”来串起来：</p>
+<ol type="1">
+<li><strong>轮询</strong>：CPU 一直主动查状态，最简单但最浪费 CPU。</li>
+<li><strong>中断</strong>：外设完成后通知 CPU，CPU
+通过服务程序处理，减少等待。</li>
+<li><strong>DMA</strong>：CPU 设置参数，DMA
+控制器直接在外设和主存间搬数据，CPU 开销最低。</li>
+</ol>
+<p>再按“设备如何被找到”理解 I/O 端口和编址：CPU
+并不是直接“找到打印机”，而是访问打印机控制器中的数据端口、状态端口、控制端口。统一编址把这些端口放进主存地址空间，独立编址则给它们单独的
+I/O 地址空间。</p>
+<p>最后按“通路如何构成”理解总线：CPU、主存、I/O
+控制器通过不同层次的总线和桥接器连接；高速互连越来越倾向于点对点、串行、异步；低层设备还会通过
+USB、SATA、PS/2、网线等通信接口连接到具体外设。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%B3%BB%E7%BB%9F/" rel="tag"># 输入输出系统</a>
+              <a href="/tags/DMA/" rel="tag"># DMA</a>
+              <a href="/tags/RAID/" rel="tag"># RAID</a>
+              <a href="/tags/%E6%80%BB%E7%BA%BF/" rel="tag"># 总线</a>
+              <a href="/tags/%E4%B8%AD%E6%96%AD/" rel="tag"># 中断</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/" rel="prev" title="互连网络">
+                  <i class="fa fa-angle-left"></i> 互连网络
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

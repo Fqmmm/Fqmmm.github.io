@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  互连网络的基本概念 互连函数 互连网络的特性参数 互连网络的结构 重点对比与提示  1 互连网络的基本概念 1.1 什么是互连网络 互连网络是由开关元件按照一定的拓扑结构和控制方式构成的连接网络，用来实现计算机系统中各类结点之间的通信。这里的结点可以是处理器、存储模块，也可以是其他输入输出设备。 从抽象角度看，互连网络完成的是一种从输入结点到输出结点的连接或映射。若某">
+<meta property="og:type" content="article">
+<meta property="og:title" content="互连网络">
+<meta property="og:url" content="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  互连网络的基本概念 互连函数 互连网络的特性参数 互连网络的结构 重点对比与提示  1 互连网络的基本概念 1.1 什么是互连网络 互连网络是由开关元件按照一定的拓扑结构和控制方式构成的连接网络，用来实现计算机系统中各类结点之间的通信。这里的结点可以是处理器、存储模块，也可以是其他输入输出设备。 从抽象角度看，互连网络完成的是一种从输入结点到输出结点的连接或映射。若某">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135617416.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135707603.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135736457.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135820017.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135959409.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140048810.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140208086.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140310978.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140319984.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140415495.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140525650.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140537140.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140729312.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142045436.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603141936776.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142338790.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142647453.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603143030786.png">
+<meta property="article:published_time" content="2026-07-09T06:51:22.597Z">
+<meta property="article:modified_time" content="2026-07-09T06:57:16.550Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="互连网络">
+<meta property="article:tag" content="多级网络">
+<meta property="article:tag" content="拓扑结构">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135617416.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/","path":"2026/07/09/computer_organization/互连网络/","title":"互连网络"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>互连网络 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">1 互连网络的基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 什么是互连网络</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C%E7%9A%84%E5%9B%9B%E4%B8%AA%E8%A7%92%E5%BA%A6"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 描述互连网络的四个角度</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E5%87%BD%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">2 互连函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E5%87%BD%E6%95%B0%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 互连函数的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%A4%E6%8D%A2%E5%87%BD%E6%95%B0"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 交换函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9D%87%E5%8C%80%E6%B4%97%E7%89%8C%E5%87%BD%E6%95%B0%E4%B8%8E%E9%80%86%E5%9D%87%E5%8C%80%E6%B4%97%E7%89%8C%E5%87%BD%E6%95%B0"><span class="nav-number">3.3.</span> <span class="nav-text">2.3
+均匀洗牌函数与逆均匀洗牌函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A2%9F%E5%BC%8F%E5%87%BD%E6%95%B0"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 碟式函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E4%BD%8D%E5%BA%8F%E5%87%BD%E6%95%B0"><span class="nav-number">3.5.</span> <span class="nav-text">2.5 反位序函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pm2i-%E5%87%BD%E6%95%B0"><span class="nav-number">3.6.</span> <span class="nav-text">2.6 PM2I 函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C%E7%9A%84%E7%89%B9%E6%80%A7%E5%8F%82%E6%95%B0"><span class="nav-number">4.</span> <span class="nav-text">3 互连网络的特性参数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E8%A7%84%E6%A8%A1"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 网络规模</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E7%82%B9%E5%BA%A6"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 结点度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%9D%E7%A6%BB%E4%B8%8E%E7%BD%91%E7%BB%9C%E7%9B%B4%E5%BE%84"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 距离与网络直径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E9%95%BF"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 线长</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%89%E5%88%86%E5%AE%BD%E5%BA%A6"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 等分宽度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E7%A7%B0%E6%80%A7"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 对称性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">5.</span> <span class="nav-text">4 互连网络的结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 静态互连网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7%E9%98%B5%E5%88%97"><span class="nav-number">5.1.1.</span> <span class="nav-text">4.1.1 线性阵列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%92%8C%E5%B8%A6%E5%BC%A6%E7%8E%AF"><span class="nav-number">5.1.2.</span> <span class="nav-text">4.1.2 环和带弦环</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E8%BF%9E%E6%8E%A5%E7%BD%91%E7%BB%9C"><span class="nav-number">5.1.3.</span> <span class="nav-text">4.1.3 全连接网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E7%A7%BB%E6%95%B0%E7%BD%91%E7%BB%9C"><span class="nav-number">5.1.4.</span> <span class="nav-text">4.1.4 循环移数网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%91%E5%BD%A2%E4%B8%8E%E6%98%9F%E5%BD%A2"><span class="nav-number">5.1.5.</span> <span class="nav-text">4.1.5 树形与星形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%83%96%E6%A0%91%E5%BD%A2"><span class="nav-number">5.1.6.</span> <span class="nav-text">4.1.6 胖树形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E6%A0%BC%E5%BD%A2%E4%B8%8E%E7%8E%AF%E7%BD%91%E5%BD%A2"><span class="nav-number">5.1.7.</span> <span class="nav-text">4.1.7 网格形与环网形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B6%85%E7%AB%8B%E6%96%B9%E4%BD%93"><span class="nav-number">5.1.8.</span> <span class="nav-text">4.1.8 超立方体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 动态互连网络</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BA%BF"><span class="nav-number">5.2.1.</span> <span class="nav-text">4.2.1 总线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%A7%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.2.</span> <span class="nav-text">4.2.2 多级互连网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#omega-%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.3.</span> <span class="nav-text">4.2.3 Omega 网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%BA%A7%E7%AB%8B%E6%96%B9%E4%BD%93%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.4.</span> <span class="nav-text">4.2.4 多级立方体网络</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E5%BC%80%E5%85%B3%E7%BD%91%E7%BB%9C"><span class="nav-number">5.2.5.</span> <span class="nav-text">4.2.5 交叉开关网络</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E5%AF%B9%E6%AF%94%E4%B8%8E%E6%8F%90%E7%A4%BA"><span class="nav-number">6.</span> <span class="nav-text">5 重点对比与提示</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E7%BD%91%E7%BB%9C%E5%8F%82%E6%95%B0%E5%AF%B9%E6%AF%94"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 静态网络参数对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E7%BD%91%E7%BB%9C%E5%AF%B9%E6%AF%94"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 动态网络对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%93%E6%B7%B7%E6%A6%82%E5%BF%B5%E8%BE%A8%E6%9E%90"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 易混概念辨析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E6%8E%8C%E6%8F%A1%E7%9A%84%E8%AE%A1%E7%AE%97"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 需要掌握的计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E6%A0%B8%E5%BF%83%E7%BA%BF%E7%B4%A2"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 本章核心线索</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="互连网络 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          互连网络
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 14:57:16" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ol type="1">
+<li>互连网络的基本概念</li>
+<li>互连函数</li>
+<li>互连网络的特性参数</li>
+<li>互连网络的结构</li>
+<li>重点对比与提示</li>
+</ol>
+<h1 id="互连网络的基本概念">1 互连网络的基本概念</h1>
+<h2 id="什么是互连网络">1.1 什么是互连网络</h2>
+<p><strong>互连网络</strong>是由开关元件按照一定的<strong>拓扑结构</strong>和<strong>控制方式</strong>构成的连接网络，用来实现计算机系统中各类结点之间的通信。这里的结点可以是处理器、存储模块，也可以是其他输入输出设备。</p>
+<p>从抽象角度看，互连网络完成的是一种从输入结点到输出结点的连接或映射。若某个处理器需要访问某个存储模块，或一个处理单元需要把数据发送给另一个处理单元，互连网络就负责建立相应的通信路径。</p>
+<p>互连网络可以理解为计算机系统中“部件之间怎么连、数据怎么走”的机制。它直接影响系统的并行通信能力、扩展能力、带宽、延迟、成本和可靠性。</p>
+<h2 id="描述互连网络的四个角度">1.2 描述互连网络的四个角度</h2>
+<p>可以从<strong>定时方式、交换方法、控制策略、拓扑结构</strong>四个方面描述互连网络。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">描述角度</th>
+<th style="text-align: left;">分类</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">典型特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">定时方式</td>
+<td style="text-align: left;">同步</td>
+<td style="text-align: left;">全系统使用统一时钟</td>
+<td style="text-align: left;">控制简单，典型如 SIMD 阵列处理机</td>
+</tr>
+<tr>
+<td style="text-align: left;">定时方式</td>
+<td style="text-align: left;">异步</td>
+<td style="text-align: left;">各处理机独立工作，无统一全局时钟</td>
+<td style="text-align: left;">更灵活，但同步和通信控制更复杂</td>
+</tr>
+<tr>
+<td style="text-align: left;">交换方法</td>
+<td style="text-align: left;">线路交换</td>
+<td
+style="text-align: left;">通信期间源结点到目的结点的物理通路一直保持连接</td>
+<td style="text-align: left;">延迟稳定，资源占用时间长</td>
+</tr>
+<tr>
+<td style="text-align: left;">交换方法</td>
+<td style="text-align: left;">分组交换</td>
+<td
+style="text-align: left;">信息被分成多个包分别传输，到达目的端后再重组</td>
+<td style="text-align: left;">链路利用率高，适合共享网络</td>
+</tr>
+<tr>
+<td style="text-align: left;">控制策略</td>
+<td style="text-align: left;">集中控制</td>
+<td style="text-align: left;">一个全局控制器接收通信请求并设置开关</td>
+<td style="text-align: left;">易于统一调度，但控制器可能成为瓶颈</td>
+</tr>
+<tr>
+<td style="text-align: left;">控制策略</td>
+<td style="text-align: left;">分散控制</td>
+<td
+style="text-align: left;">无全局控制器，网络内部局部处理请求和设置开关</td>
+<td style="text-align: left;">扩展性较好，但控制逻辑更复杂</td>
+</tr>
+<tr>
+<td style="text-align: left;">拓扑结构</td>
+<td style="text-align: left;">静态拓扑</td>
+<td style="text-align: left;">结点之间有固定专用通路，运行中不改变</td>
+<td style="text-align: left;">结构固定，适合规则通信</td>
+</tr>
+<tr>
+<td style="text-align: left;">拓扑结构</td>
+<td style="text-align: left;">动态拓扑</td>
+<td style="text-align: left;">可根据需要设置开关，重新组合连接路径</td>
+<td style="text-align: left;">灵活，适合多种通信模式</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键辨析</strong>：静态互连网络强调“固定连接”，动态互连网络强调“通过开关动态改变连接状态”。线路交换强调“通信期间占用整条物理通路”，分组交换强调“包独立进入网络”。</p>
+<h1 id="互连函数">2 互连函数</h1>
+<h2 id="互连函数的作用">2.1 互连函数的作用</h2>
+<p>每一种互连网络都可以用一组<strong>互连函数</strong>来描述。设网络共有
+<span class="math inline"><em>N</em></span> 个输入和 <span
+class="math inline"><em>N</em></span> 个输出，输入端编号为</p>
+<p><span
+class="math display"><em>x</em> = 0, 1, ⋯, <em>N</em> − 1</span></p>
+<p>互连函数 <span class="math inline"><em>f</em>(<em>x</em>)</span>
+表示输入端 <span class="math inline"><em>x</em></span> 连接到输出端
+<span
+class="math inline"><em>f</em>(<em>x</em>)</span>。因此，互连函数本质上描述的是一个<strong>输入编号到输出编号的映射关系</strong>。</p>
+<p>有些互连函数可以用<strong>循环表示法</strong>表示：</p>
+<p><span
+class="math display">(<em>x</em><sub>0</sub> <em>x</em><sub>1</sub> <em>x</em><sub>2</sub> ⋯ <em>x</em><sub><em>j</em> − 1</sub>)</span></p>
+<p>其含义是：</p>
+<p><span
+class="math display"><em>f</em>(<em>x</em><sub>0</sub>) = <em>x</em><sub>1</sub>,  <em>f</em>(<em>x</em><sub>1</sub>) = <em>x</em><sub>2</sub>,  ⋯,  <em>f</em>(<em>x</em><sub><em>j</em> − 1</sub>) = <em>x</em><sub>0</sub></span></p>
+<p>其中 <span class="math inline"><em>j</em></span>
+称为该循环的长度。例如循环 <span class="math inline">(0 2 4 6)</span>
+表示 <span class="math inline">0 → 2, 2 → 4, 4 → 6, 6 → 0</span>。</p>
+<p>下面介绍五个常用的互联函数。</p>
+<h2 id="交换函数">2.2 交换函数</h2>
+<p><strong>交换函数</strong>实现的是：把输入端二进制地址编码中的第 <span
+class="math inline"><em>k</em></span>
+位取反，其余各位保持不变。若输入编号写成</p>
+<p><span
+class="math display"><em>x</em> = <em>x</em><sub><em>n</em> − 1</sub><em>x</em><sub><em>n</em> − 2</sub>⋯<em>x</em><sub><em>k</em> + 1</sub><em>x</em><sub><em>k</em></sub><em>x</em><sub><em>k</em> − 1</sub>⋯<em>x</em><sub>1</sub><em>x</em><sub>0</sub></span></p>
+<p>则交换函数可写为：</p>
+<p><span class="math display">$$
+E_k(x)=x_{n-1}x_{n-2}\cdots x_{k+1}\overline{x_k}x_{k-1}\cdots x_1x_0
+$$</span></p>
+<p>当 <span class="math inline"><em>N</em></span> 为结点数，<span
+class="math inline"><em>n</em> = log<sub>2</sub><em>N</em></span>
+时，共有 <span class="math inline"><em>n</em></span>
+种交换函数。交换函数主要用于构造<strong>立方体互连网络</strong>和各种<strong>超立方体互连网络</strong>。</p>
+<p>以 <span class="math inline"><em>N</em> = 8</span>
+为例，结点编号用三位二进制表示，即 <span
+class="math inline"><em>x</em> = <em>x</em><sub>2</sub><em>x</em><sub>1</sub><em>x</em><sub>0</sub></span>，则有三个常用立方体互连函数：</p>
+<p><span class="math display">$$
+C_0(x_2x_1x_0)=x_2x_1\overline{x_0}
+$$</span></p>
+<p><span class="math display">$$
+C_1(x_2x_1x_0)=x_2\overline{x_1}x_0
+$$</span></p>
+<p><span class="math display">$$
+C_2(x_2x_1x_0)=\overline{x_2}x_1x_0
+$$</span></p>
+<p>也就是说，<span class="math inline"><em>C</em><sub>0</sub></span>
+翻转最低位，<span class="math inline"><em>C</em><sub>1</sub></span>
+翻转中间位，<span class="math inline"><em>C</em><sub>2</sub></span>
+翻转最高位。立方体网络中的一条边通常连接两个只相差一位的结点，因此交换函数天然对应立方体的不同维度。</p>
+<p><strong>例子</strong>：输入结点 <span class="math inline">3</span>
+的二进制编号是 <span class="math inline">011</span>。若使用 <span
+class="math inline"><em>C</em><sub>1</sub></span>，翻转中间位，得到
+<span class="math inline">001</span>，所以 <span
+class="math inline"><em>C</em><sub>1</sub>(3) = 1</span>。</p>
+<h2 id="均匀洗牌函数与逆均匀洗牌函数">2.3
+均匀洗牌函数与逆均匀洗牌函数</h2>
+<p><strong>均匀洗牌函数</strong>把输入端分成数目相等的两半，然后像均匀混洗扑克牌那样交叉连接到输出端。从二进制编号角度看，它等价于把输入编号<strong>循环左移一位</strong>：</p>
+<p><span
+class="math display"><em>S</em>(<em>x</em><sub><em>n</em> − 1</sub><em>x</em><sub><em>n</em> − 2</sub>⋯<em>x</em><sub>1</sub><em>x</em><sub>0</sub>) = <em>x</em><sub><em>n</em> − 2</sub><em>x</em><sub><em>n</em> − 3</sub>⋯<em>x</em><sub>1</sub><em>x</em><sub>0</sub><em>x</em><sub><em>n</em> − 1</sub></span></p>
+<p><strong>逆均匀洗牌函数</strong>是均匀洗牌函数的逆函数，等价于把输入编号<strong>循环右移一位</strong>：</p>
+<p><span
+class="math display"><em>S</em><sup>−1</sup>(<em>x</em><sub><em>n</em> − 1</sub><em>x</em><sub><em>n</em> − 2</sub>⋯<em>x</em><sub>1</sub><em>x</em><sub>0</sub>) = <em>x</em><sub>0</sub><em>x</em><sub><em>n</em> − 1</sub><em>x</em><sub><em>n</em> − 2</sub>⋯<em>x</em><sub>1</sub></span></p>
+<p>在多级互连网络中，均匀洗牌常作为级间互连模式。例如 <span
+class="math inline">8 × 8</span> Omega
+网络中，每一级之间采用均匀洗牌模式。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135617416.png" style="zoom:33%;" /></p>
+<p><strong>例子</strong>：<span
+class="math inline"><em>N</em> = 8</span> 时，输入 <span
+class="math inline">5</span> 的二进制是 <span
+class="math inline">101</span>。均匀洗牌左移一位后得到 <span
+class="math inline">011</span>，即十进制 <span
+class="math inline">3</span>，所以 <span
+class="math inline"><em>S</em>(5) = 3</span>。</p>
+<h2 id="碟式函数">2.4 碟式函数</h2>
+<p><strong>碟式函数</strong>把输入端二进制编号的最高位与最低位互换，中间各位保持原顺序。其表达式为：</p>
+<p><span
+class="math display"><em>B</em>(<em>x</em><sub><em>n</em> − 1</sub><em>x</em><sub><em>n</em> − 2</sub>⋯<em>x</em><sub>1</sub><em>x</em><sub>0</sub>) = <em>x</em><sub>0</sub><em>x</em><sub><em>n</em> − 2</sub>⋯<em>x</em><sub>1</sub><em>x</em><sub><em>n</em> − 1</sub></span></p>
+<p>它与反位序函数不同：碟式函数只交换最高位和最低位，而不是完全倒置所有位。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135707603.png" style="zoom:33%;" /></p>
+<p><strong>例子</strong>：<span
+class="math inline"><em>N</em> = 8</span> 时，输入 <span
+class="math inline">3</span> 为 <span
+class="math inline">011</span>。最高位 <span
+class="math inline">0</span> 和最低位 <span class="math inline">1</span>
+互换，得到 <span class="math inline">110</span>，即 <span
+class="math inline">6</span>，所以 <span
+class="math inline"><em>B</em>(3) = 6</span>。</p>
+<h2 id="反位序函数">2.5 反位序函数</h2>
+<p><strong>反位序函数</strong>把输入端二进制编号的位序完全颠倒：</p>
+<p><span
+class="math display"><em>R</em>(<em>x</em><sub><em>n</em> − 1</sub><em>x</em><sub><em>n</em> − 2</sub>⋯<em>x</em><sub>1</sub><em>x</em><sub>0</sub>) = <em>x</em><sub>0</sub><em>x</em><sub>1</sub>⋯<em>x</em><sub><em>n</em> − 2</sub><em>x</em><sub><em>n</em> − 1</sub></span></p>
+<p>反位序常出现在需要按位倒序访问数据的场景中。例如某些并行算法或快速傅里叶变换相关的数据重排会使用类似思想。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135736457.png" style="zoom:33%;" /></p>
+<p><strong>例子</strong>：<span
+class="math inline"><em>N</em> = 8</span> 时，输入 <span
+class="math inline">3</span> 为 <span
+class="math inline">011</span>，反位序后为 <span
+class="math inline">110</span>，即 <span
+class="math inline">6</span>。输入 <span class="math inline">5</span> 为
+<span class="math inline">101</span>，反位序仍为 <span
+class="math inline">101</span>，所以 <span
+class="math inline"><em>R</em>(5) = 5</span>。</p>
+<h2 id="pm2i-函数">2.6 PM2I 函数</h2>
+<p><strong>PM2I
+函数</strong>是一类循环移数函数，其含义是把输入端编号循环移动 <span
+class="math inline">2<sup><em>i</em></sup></span>
+个位置。它分为正向和反向两类： <span
+class="math display"><em>P</em><em>M</em>2<sub>+<em>i</em></sub>(<em>x</em>) = <em>x</em> + 2<sup><em>i</em></sup> (mod  <em>N</em>)</span></p>
+<p><span
+class="math display"><em>P</em><em>M</em>2<sub>−<em>i</em></sub>(<em>x</em>) = <em>x</em> − 2<sup><em>i</em></sup> (mod  <em>N</em>)</span></p>
+<p>其中：</p>
+<p><span
+class="math display">0 ≤ <em>x</em> ≤ <em>N</em> − 1,  0 ≤ <em>i</em> ≤ <em>n</em> − 1,  <em>n</em> = log<sub>2</sub><em>N</em></span></p>
+<p>因此，PM2I 互连网络共有 <span class="math inline">2<em>n</em></span>​
+个互连函数。比如：<span
+class="math inline"><em>P</em><em>M</em>2<sub>+1</sub>(<em>x</em>) = <em>x</em> + 2<sup>1</sup> (mod  8) = <em>x</em> + 2 (mod  8)</span>，意思就是：每个结点都连到“往后数
+2 个位置”的结点。</p>
+<p>当 <span class="math inline"><em>N</em> = 8</span> 时，<span
+class="math inline"><em>n</em> = 3</span>，所以共有 <span
+class="math inline">6</span> 个函数。循环表示如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">函数</th>
+<th style="text-align: left;">循环表示</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em><em>M</em>2<sub>+0</sub></span></td>
+<td style="text-align: left;"><span
+class="math inline">(0 1 2 3 4 5 6 7)</span></td>
+<td style="text-align: left;">每次加 <span
+class="math inline">1</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em><em>M</em>2<sub>−0</sub></span></td>
+<td style="text-align: left;"><span
+class="math inline">(7 6 5 4 3 2 1 0)</span></td>
+<td style="text-align: left;">每次减 <span
+class="math inline">1</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em><em>M</em>2<sub>+1</sub></span></td>
+<td style="text-align: left;"><span
+class="math inline">(0 2 4 6)(1 3 5 7)</span></td>
+<td style="text-align: left;">每次加 <span
+class="math inline">2</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em><em>M</em>2<sub>−1</sub></span></td>
+<td style="text-align: left;"><span
+class="math inline">(6 4 2 0)(7 5 3 1)</span></td>
+<td style="text-align: left;">每次减 <span
+class="math inline">2</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>P</em><em>M</em>2<sub>±2</sub></span></td>
+<td style="text-align: left;"><span
+class="math inline">(0 4)(1 5)(2 6)(3 7)</span></td>
+<td style="text-align: left;">加或减 <span class="math inline">4</span>
+结果相同</td>
+</tr>
+</tbody>
+</table>
+<p><strong>例子</strong>：</p>
+<p><span
+class="math display"><em>P</em><em>M</em>2<sub>+1</sub>(2) = 2 + 2<sup>1</sup> (mod  8) = 4</span></p>
+<p>ILLIAC IV 阵列计算机是一个典型例子。它采用 <span
+class="math inline"><em>P</em><em>M</em>2<sub>±0</sub></span> 和 <span
+class="math inline"><em>P</em><em>M</em>2<sub>±<em>n</em>/2</sub></span>
+构成互连网络，用于实现处理单元之间的上下左右连接。可以把它理解为：用不同步长的循环移位连接，把一维编号组织成二维阵列上的邻接关系。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135820017.png" style="zoom:33%;" /></p>
+<h1 id="互连网络的特性参数">3 互连网络的特性参数</h1>
+<p>互连网络通常可以用图表示：结点代表处理器、存储模块或交换部件，边代表通信链路。评价一个互连网络时，不能只看“能否连接”，还要看通信距离、带宽、成本、扩展性和对称性等指标。</p>
+<h2 id="网络规模">3.1 网络规模</h2>
+<p><strong>网络规模</strong>指网络中结点的个数，表示该网络可以连接多少个部件。规模越大，系统可扩展性越好，但布线、控制和成本也通常更高。</p>
+<h2 id="结点度">3.2 结点度</h2>
+<p><strong>结点度</strong>是与某个结点相连的边数。对于有向网络，还可分为：</p>
+<ul>
+<li><strong>入度</strong>：进入该结点的边数。</li>
+<li><strong>出度</strong>：从该结点发出的边数。</li>
+</ul>
+<p>结点度越大，说明一个结点可以直接连接更多邻居，通信选择更多，平均距离可能更短。但结点度增大也意味着端口数量和硬件复杂度增加。</p>
+<h2 id="距离与网络直径">3.3 距离与网络直径</h2>
+<p>两个结点之间的<strong>距离</strong>是从一个结点到另一个结点所需跨越边数的最小值。</p>
+<p><strong>网络直径</strong>是任意两个结点之间距离的最大值。网络直径越小，最坏情况下通信经过的中间结点越少，延迟通常越低。因此需要强调：<strong>网络直径应当尽可能小</strong>。</p>
+<h2 id="线长">3.4 线长</h2>
+<p><strong>结点之间的线长</strong>指两个结点之间连线的实际物理长度。线长不仅影响布线成本，也影响信号传播延迟和可靠性。理论拓扑中边数相同的网络，在实际硬件实现时可能因为线长差异而表现不同。</p>
+<h2 id="等分宽度">3.5 等分宽度</h2>
+<p><strong>等分宽度</strong>是把网络切成相等两半时，沿切口需要切断的边数或通道数的最小值，通常记为
+<span
+class="math inline"><em>b</em></span>。它主要反映网络的最大流量能力。</p>
+<p>如果等分宽度很小，说明网络中存在容易拥塞的“窄口”。例如线性阵列的等分宽度为
+<span
+class="math inline">1</span>，一旦两半之间大量通信，唯一跨越切口的链路就容易成为瓶颈。</p>
+<h2 id="对称性">3.6 对称性</h2>
+<p>如果从任意结点看出去，网络拓扑结构都是相同的（比如 <span
+class="math inline"><em>K</em><sub>5</sub></span>，Peterson图），则称为<strong>对称网络</strong>。对称网络的优点是结构规则、实现较容易、编程也更容易，因为每个结点面对的局部通信环境一致。</p>
+<h1 id="互连网络的结构">4 互连网络的结构</h1>
+<p>互连网络通常分为两大类：<strong>静态互连网络</strong>和<strong>动态互连网络</strong>。</p>
+<p><strong>静态互连网络</strong>中，各结点之间有固定连接通路，运行过程中不能改变。它更像是“把线提前接好”。<strong>动态互连网络</strong>由交换开关构成，可以按程序运行需要动态改变连接状态，更像是“运行时通过开关选择路径”。</p>
+<h2 id="静态互连网络">4.1 静态互连网络</h2>
+<h3 id="线性阵列">4.1.1 线性阵列</h3>
+<p><strong>线性阵列</strong>是一种一维网络，<span
+class="math inline"><em>N</em></span> 个结点用 <span
+class="math inline"><em>N</em> − 1</span>
+条链路连成一行。（有点像链表）</p>
+<p>它的参数特点是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">数值或特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">端结点度</td>
+<td style="text-align: left;"><span class="math inline">1</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">中间结点度</td>
+<td style="text-align: left;"><span class="math inline">2</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">网络直径</td>
+<td style="text-align: left;"><span
+class="math inline"><em>N</em> − 1</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">等分宽度</td>
+<td style="text-align: left;"><span
+class="math inline"><em>b</em> = 1</span></td>
+</tr>
+</tbody>
+</table>
+<p>线性阵列结构非常简单、成本低，但网络直径随 <span
+class="math inline"><em>N</em></span>
+线性增长，远距离通信要经过很多中间结点，扩展后性能容易下降。</p>
+<h3 id="环和带弦环">4.1.2 环和带弦环</h3>
+<p><strong>环</strong>是在一维线性阵列的基础上，用一条附加链路把两个端结点连接起来构成的。环可以单向工作，也可以双向工作。（有点像环状链表）</p>
+<p>环的特点是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">类型</th>
+<th style="text-align: left;">结点度</th>
+<th style="text-align: left;">直径</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">单向环</td>
+<td style="text-align: left;"><span class="math inline">2</span>
+或按方向理解为入出各一条</td>
+<td style="text-align: left;"><span
+class="math inline"><em>N</em></span></td>
+<td style="text-align: left;">只能沿一个方向绕行</td>
+</tr>
+<tr>
+<td style="text-align: left;">双向环</td>
+<td style="text-align: left;"><span class="math inline">2</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>N</em>/2</span></td>
+<td style="text-align: left;">可选择较短方向，直径更小</td>
+</tr>
+</tbody>
+</table>
+<p>环是<strong>对称网络</strong>，每个结点看到的局部连接形式相同。</p>
+<p><strong>带弦环</strong>是在环的基础上，每个结点再增加一条或两条额外链路。增加的链路越多，结点度越高，网络直径越小。它体现了一个重要规律：<strong>增加连接可以降低通信距离，但会提高硬件复杂度和成本</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603135959409.png" style="zoom:33%;" /></p>
+<h3 id="全连接网络">4.1.3 全连接网络</h3>
+<p><strong>全连接网络</strong>中，每个结点都与其他所有结点直接相连。对于
+<span class="math inline"><em>N</em></span> 个结点，每个结点度为 <span
+class="math inline"><em>N</em> − 1</span>。（有点像完全图）</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140048810.png" style="zoom:33%;" /></p>
+<p>示例为 <span class="math inline"><em>N</em> = 16</span>，因此结点度为
+<span class="math inline">15</span>，直径为 <span
+class="math inline">1</span>。全连接网络的通信距离最短，任意两个结点都可直接通信，但链路数量极多，硬件成本和布线复杂度非常高，不适合大规模系统。</p>
+<h3 id="循环移数网络">4.1.4 循环移数网络</h3>
+<p><strong>循环移数网络</strong>是在环的基础上增加跨距为 <span
+class="math inline">2</span> 的整数幂的附加链路。一般地，若 <span
+class="math display">|<em>j</em> − <em>i</em>| = 2<sup><em>r</em></sup>,  <em>r</em> = 0, 1, 2, ⋯, <em>n</em> − 1,  <em>n</em> = log<sub>2</sub><em>N</em></span></p>
+<p>则结点 <span class="math inline"><em>i</em></span> 与结点 <span
+class="math inline"><em>j</em></span> 相连。</p>
+<p>对应参数为：</p>
+<p><span class="math display">结点度 = 2<em>n</em> − 1</span></p>
+<p><span class="math display">直径 = <em>n</em>/2</span></p>
+<p>当 <span class="math inline"><em>N</em> = 16</span> 时，<span
+class="math inline"><em>n</em> = 4</span>，所以结点度为 <span
+class="math inline">7</span>，直径为 <span
+class="math inline">2</span>。循环移数网络通过增加不同跨度的连接，让结点可以用较少跳数到达较远位置。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140208086.png" style="zoom:33%;" /></p>
+<h3 id="树形与星形">4.1.5 树形与星形</h3>
+<p><strong>树形网络</strong>具有分层结构。以完全平衡二叉树为例，一棵
+<span class="math inline"><em>k</em></span> 层完全平衡二叉树有： <span
+class="math display"><em>N</em> = 2<sup><em>k</em></sup> − 1</span></p>
+<p>个结点。其参数特点是：</p>
+<p><span class="math display">最大结点度 = 3</span></p>
+<p><span class="math display">直径 = 2(<em>k</em> − 1)</span></p>
+<p>树形网络的优点是层次清晰、扩展自然；缺点是靠近根部的结点和链路可能成为通信瓶颈。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140310978.png" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140319984.png" style="zoom:33%;" /></p>
+<p><strong>星形网络</strong>可以看作一种两层树。所有外围结点都连接到中心结点。其特点是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">中心结点度</td>
+<td style="text-align: left;"><span
+class="math inline"><em>N</em> − 1</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">网络直径</td>
+<td style="text-align: left;"><span class="math inline">2</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">可靠性</td>
+<td style="text-align: left;">较差，中心结点失效会导致整个系统瘫痪</td>
+</tr>
+</tbody>
+</table>
+<p>星形网络用一个中心换取较短通信路径，但中心结点负载大、可靠性风险高。</p>
+<h3 id="胖树形">4.1.6 胖树形</h3>
+<p><strong>胖树形</strong>是在普通树形结构基础上增强上层通信能力的树形网络。普通树越靠近根部，汇聚的通信越多，容易形成瓶颈；胖树则通过在高层使用更宽的链路或更多通道，使靠近根部的带宽更大。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140415495.png" style="zoom:33%;" /></p>
+<p>二叉胖树表现为：越靠近上层，连接通道越“粗”或越多，用来承载来自多个子树的聚合通信。需要抓住它的核心思想：<strong>胖树不是改变树的层次性，而是增强树上层的通信带宽，缓解根部瓶颈</strong>。</p>
+<h3 id="网格形与环网形">4.1.7 网格形与环网形</h3>
+<p><strong>网格形网络</strong>把结点排列成规则的二维或高维网格。以 <span
+class="math inline">3 × 3</span>
+网格为例：角结点、边结点、内部结点的度不同，因此网格形网络一般是<strong>不对称</strong>的。</p>
+<p>对 <span
+class="math inline"><em>N</em> = <em>n</em><sup><em>k</em></sup></span>
+个结点的 <span class="math inline"><em>k</em></span>
+维网格网络，内部结点度为：</p>
+<p><span class="math display">2<em>k</em></span></p>
+<p>网络直径为：</p>
+<p><span class="math display"><em>k</em>(<em>n</em> − 1)</span></p>
+<p>网格结构适合空间邻近通信，例如二维阵列计算或图像处理中的局部邻域操作。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140525650.png" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140537140.png" style="zoom:33%;" /></p>
+<p><strong>环网形网络</strong>把环形和网格形结合起来：沿阵列的每行和每列都有环形连接，并且可以扩展到高维。它相比普通网格更对称，因为边界被“首尾相接”。</p>
+<p>对于一个 <span class="math inline"><em>n</em> × <em>n</em></span>
+的二元环网：</p>
+<p><span class="math display">结点度 = 4</span></p>
+<p><span class="math display">直径 = 2⌊<em>n</em>/2⌋</span></p>
+<p>其中 <span class="math inline">⌊<em>n</em>/2⌋</span> 表示不超过 <span
+class="math inline"><em>n</em>/2</span> 的最大整数。</p>
+<h3 id="超立方体">4.1.8 超立方体</h3>
+<p><strong>超立方体</strong>是一种二元 <span
+class="math inline"><em>n</em></span> 维立方体结构。一个 <span
+class="math inline"><em>n</em></span> 维超立方体由</p>
+<p><span
+class="math display"><em>N</em> = 2<sup><em>n</em></sup></span></p>
+<p>个结点组成。每个结点可以用 <span
+class="math inline"><em>n</em></span>
+位二进制编号表示，两个结点若编号只相差一位，则它们之间有一条链路。（有点像格雷码）</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603140729312.png" style="zoom:33%;" /></p>
+<p>构造 <span class="math inline"><em>n</em></span>
+维立方体的方法是：把两个 <span
+class="math inline">(<em>n</em> − 1)</span>
+维立方体中相对应的结点用链路连接起来。三维立方体以及由两个三维立方体组成四维立方体的方式，可以体现这种递归构造。</p>
+<p>超立方体的关键参数为：</p>
+<p><span class="math display">结点度 = <em>n</em></span></p>
+<p><span class="math display">网络直径 = <em>n</em></span></p>
+<p>因为两个 <span class="math inline"><em>n</em></span>
+位二进制编号最多有 <span class="math inline"><em>n</em></span>
+位不同，每经过一条边可以改变一位，所以最远距离为 <span
+class="math inline"><em>n</em></span>。这也是交换函数与超立方体结构紧密相关的原因。</p>
+<h2 id="动态互连网络">4.2 动态互连网络</h2>
+<h3 id="总线">4.2.1 总线</h3>
+<p><strong>总线</strong>是一组导线和插座，用于连接处理机、存储模块和外围设备等功能模块，完成数据传送。</p>
+<p>总线的基本特点是：每一次只能用于一个源部件到一个或多个目的部件之间的数据传送。多个功能模块需要共享总线，因此会出现争用，通常需要仲裁或时分复用。</p>
+<p>总线的优点是<strong>价格低、结构简单</strong>；缺点是<strong>带宽较窄、共享争用明显</strong>。随着处理器或模块数量增加，总线容易成为系统瓶颈。</p>
+<h3 id="多级互连网络">4.2.2 多级互连网络</h3>
+<p><strong>多级互连网络</strong>（Multistage Interconnection
+Network，MIN）常用于 MIMD 和 SIMD
+计算机。它由多个级联的开关级组成，相邻各级开关之间通过固定的级间连接模式相连。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142045436.png" style="zoom:50%;" /></p>
+<p>一种通用多级互连网络中，每一级有多个 <span
+class="math inline"><em>a</em> × <em>b</em></span> 开关：</p>
+<ul>
+<li><p><span class="math inline"><em>a</em></span>
+表示开关输入端个数。</p></li>
+<li><p><span class="math inline"><em>b</em></span>
+表示开关输出端个数。</p></li>
+<li><p>理论上 <span class="math inline"><em>a</em></span> 与 <span
+class="math inline"><em>b</em></span> 不一定相等，但实际中常取 <span
+class="math inline"><em>a</em> = <em>b</em> = 2<sup><em>k</em></sup>, <em>k</em> ≥ 1</span>。</p></li>
+<li><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输入0 ─┐      ┌─ 输出0</span><br><span class="line">输入1 ─┤      ├─ 输出1</span><br><span class="line">	 ─┤ 开关  ├─ </span><br><span class="line">输入a ─┘      └─ 输出b</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>多级互连网络的差异主要来自三个方面：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">差异来源</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">开关模块</td>
+<td style="text-align: left;">例如 <span
+class="math inline">2 × 2</span> 开关、<span
+class="math inline"><em>a</em> × <em>b</em></span> 开关</td>
+</tr>
+<tr>
+<td style="text-align: left;">控制方式</td>
+<td style="text-align: left;">决定各开关如何被控制</td>
+</tr>
+<tr>
+<td style="text-align: left;">级间互连模式</td>
+<td style="text-align: left;">决定相邻级之间如何连线</td>
+</tr>
+</tbody>
+</table>
+<p>最简单的开关模块是 <strong><span class="math inline">2 × 2</span>
+开关</strong>，有四种连接方式：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方式</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">直送</td>
+<td style="text-align: left;">上输入到上输出，下输入到下输出</td>
+</tr>
+<tr>
+<td style="text-align: left;">交叉</td>
+<td style="text-align: left;">上输入到下输出，下输入到上输出</td>
+</tr>
+<tr>
+<td style="text-align: left;">上播</td>
+<td style="text-align: left;">上输入到上输出+下输出</td>
+</tr>
+<tr>
+<td style="text-align: left;">下播</td>
+<td style="text-align: left;">下输入到上输出+下输出</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603141936776.png" style="zoom:50%;" /></p>
+<p>常见控制方式有三种：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">控制方式</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">级控制</td>
+<td style="text-align: left;">每一级所有开关共用一个控制信号</td>
+<td
+style="text-align: left;">同一级开关只能处于同一种状态，控制简单但灵活性低</td>
+</tr>
+<tr>
+<td style="text-align: left;">单元控制</td>
+<td style="text-align: left;">每个开关都有独立控制信号</td>
+<td style="text-align: left;">最灵活，但控制复杂</td>
+</tr>
+<tr>
+<td style="text-align: left;">部分级控制</td>
+<td style="text-align: left;">第 <span
+class="math inline"><em>i</em></span> 级所有开关分别用 <span
+class="math inline"><em>i</em> + 1</span> 个信号控制</td>
+<td style="text-align: left;">灵活性介于两者之间</td>
+</tr>
+</tbody>
+</table>
+<p>常用级间互连模式包括：<strong>均匀洗牌、蝶式、多路洗牌、纵横交叉、立方体连接</strong>等。</p>
+<h3 id="omega-网络">4.2.3 Omega 网络</h3>
+<p><strong>Omega 网络</strong>是一种典型多级互连网络。以一个 <span
+class="math inline">8 × 8</span> Omega 网络为例：</p>
+<ul>
+<li>共 <span class="math inline">3</span> 级，因为 <span
+class="math inline">log<sub>2</sub>8 = 3</span>。</li>
+<li>每级有 <span class="math inline">4</span> 个 <span
+class="math inline">2 × 2</span> 开关。</li>
+<li>级间互连采用均匀洗牌模式。</li>
+</ul>
+<p>其均匀洗牌函数为：</p>
+<p><span
+class="math display"><em>S</em>(<em>x</em><sub>2</sub><em>x</em><sub>1</sub><em>x</em><sub>0</sub>) = <em>x</em><sub>1</sub><em>x</em><sub>0</sub><em>x</em><sub>2</sub></span></p>
+<p>Omega 网络通过多级 <span class="math inline">2 × 2</span>
+开关逐步决定数据包路径。它结构规则、成本低于全交叉开关，但并非所有连接请求都能同时无冲突完成，因此可能存在阻塞。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142338790.png" style="zoom:50%;" /></p>
+<h3 id="多级立方体网络">4.2.4 多级立方体网络</h3>
+<p><strong>多级立方体网络</strong>采用二功能 <span
+class="math inline">2 × 2</span>
+开关构成，其中二功能指<strong>直送</strong>和<strong>交换</strong>。它与交换函数结合，可以通过设置不同级的开关状态实现不同互连函数。</p>
+<p><span class="math inline">8</span> 输入、<span
+class="math inline">8</span> 输出多级立方体网络由三组开关构成：第一组
+<span
+class="math inline"><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em></span>，第二组
+<span
+class="math inline"><em>E</em>, <em>F</em>, <em>G</em>, <em>H</em></span>，第三组
+<span
+class="math inline"><em>I</em>, <em>J</em>, <em>K</em>, <em>L</em></span>。通过改变开关状态，可以得到：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">开关设置</th>
+<th style="text-align: left;">实现的变换</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">所有开关都直送</td>
+<td style="text-align: left;">恒等变换</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>A</em>, <em>B</em>, <em>C</em>, <em>D</em></span>
+交叉，其余直送</td>
+<td style="text-align: left;"><span
+class="math inline"><em>C</em><sub>0</sub></span> 互连函数</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>E</em>, <em>F</em>, <em>G</em>, <em>H</em></span>
+交叉，其余直送</td>
+<td style="text-align: left;"><span
+class="math inline"><em>C</em><sub>1</sub></span> 互连函数</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>I</em>, <em>J</em>, <em>K</em>, <em>L</em></span>
+交叉，其余直送</td>
+<td style="text-align: left;"><span
+class="math inline"><em>C</em><sub>2</sub></span> 互连函数</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603142647453.png" style="zoom: 50%;" /></p>
+<p>也就是说，不同级对应不同二进制位的交换。控制哪一级开关交叉，就相当于翻转对应位，从而实现立方体交换函数。</p>
+<p>进一步地，通过选择不同控制方式，可以构成不同网络：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">控制方式</th>
+<th style="text-align: left;">构成的网络</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">级控制</td>
+<td style="text-align: left;">交换网</td>
+</tr>
+<tr>
+<td style="text-align: left;">部分级控制</td>
+<td style="text-align: left;">移数网</td>
+</tr>
+<tr>
+<td style="text-align: left;">单元控制</td>
+<td style="text-align: left;">间接二进制 <span
+class="math inline"><em>n</em></span> 方体网</td>
+</tr>
+</tbody>
+</table>
+<h3 id="交叉开关网络">4.2.5 交叉开关网络</h3>
+<p><strong>交叉开关网络</strong>是一种单级开关网络。它通过交叉点开关在源和目的之间形成动态连接，并且可以同时实现多个源-目的对之间的无阻塞连接。</p>
+<p>它的特点是：</p>
+<ul>
+<li>带宽和互连特性最好。</li>
+<li>可以无阻塞地支持多个对偶连接。</li>
+<li>一个 <span class="math inline"><em>n</em> × <em>n</em></span>
+交叉开关网络可以无阻塞地实现 <span
+class="math inline"><em>n</em>!</span> 种置换。</li>
+</ul>
+<p>C.mmp 多处理机互连结构是一种交叉网络。图中处理机 <span
+class="math inline"><em>P</em><sub>1</sub>, <em>P</em><sub>2</sub>, ⋯, <em>P</em><sub>16</sub></span>
+与存储模块 <span
+class="math inline"><em>M</em><sub>1</sub>, <em>M</em><sub>2</sub>, ⋯, <em>M</em><sub>16</sub></span>
+通过交叉点连接，任一处理机理论上可以通过对应交叉点访问任一存储模块。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260603143030786.png" style="zoom:50%;" /></p>
+<p>交叉开关的主要缺点是硬件代价高。对于 <span
+class="math inline"><em>n</em> × <em>n</em></span>
+网络，需要大量交叉点开关，因此规模很大时成本和实现复杂度会迅速上升。</p>
+<h1 id="重点对比与提示">5 重点对比与提示</h1>
+<h2 id="静态网络参数对比">5.1 静态网络参数对比</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">网络结构</th>
+<th style="text-align: left;">结点度</th>
+<th style="text-align: left;">直径</th>
+<th style="text-align: left;">对称性/特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">线性阵列</td>
+<td style="text-align: left;">端点 <span
+class="math inline">1</span>，中间 <span
+class="math inline">2</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>N</em> − 1</span></td>
+<td style="text-align: left;">最简单，但直径大，等分宽度 <span
+class="math inline"><em>b</em> = 1</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">双向环</td>
+<td style="text-align: left;"><span class="math inline">2</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>N</em>/2</span></td>
+<td style="text-align: left;">对称，比线性阵列直径小</td>
+</tr>
+<tr>
+<td style="text-align: left;">带弦环</td>
+<td style="text-align: left;">大于普通环</td>
+<td style="text-align: left;">小于普通环</td>
+<td style="text-align: left;">增加链路降低直径</td>
+</tr>
+<tr>
+<td style="text-align: left;">全连接</td>
+<td style="text-align: left;"><span
+class="math inline"><em>N</em> − 1</span></td>
+<td style="text-align: left;"><span class="math inline">1</span></td>
+<td style="text-align: left;">性能最好但成本最高</td>
+</tr>
+<tr>
+<td style="text-align: left;">循环移数网络</td>
+<td style="text-align: left;"><span
+class="math inline">2<em>n</em> − 1</span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>n</em>/2</span></td>
+<td style="text-align: left;">用 <span
+class="math inline">2<sup><em>r</em></sup></span> 跨距连接降低直径</td>
+</tr>
+<tr>
+<td style="text-align: left;">完全平衡二叉树</td>
+<td style="text-align: left;">最大 <span
+class="math inline">3</span></td>
+<td style="text-align: left;"><span
+class="math inline">2(<em>k</em> − 1)</span></td>
+<td style="text-align: left;">层次清晰，根部可能瓶颈</td>
+</tr>
+<tr>
+<td style="text-align: left;">星形</td>
+<td style="text-align: left;">中心 <span
+class="math inline"><em>N</em> − 1</span></td>
+<td style="text-align: left;"><span class="math inline">2</span></td>
+<td style="text-align: left;">中心结点是可靠性瓶颈</td>
+</tr>
+<tr>
+<td style="text-align: left;">网格</td>
+<td style="text-align: left;">内部 <span
+class="math inline">2<em>k</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>k</em>(<em>n</em> − 1)</span></td>
+<td style="text-align: left;">适合局部通信，一般不对称</td>
+</tr>
+<tr>
+<td style="text-align: left;">环网</td>
+<td style="text-align: left;"><span class="math inline">4</span></td>
+<td style="text-align: left;"><span
+class="math inline">2⌊<em>n</em>/2⌋</span></td>
+<td style="text-align: left;">行列成环，比网格更对称</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>n</em></span> 维超立方体</td>
+<td style="text-align: left;"><span
+class="math inline"><em>n</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>n</em></span></td>
+<td style="text-align: left;">二进制编号差一位相连，结构规则</td>
+</tr>
+</tbody>
+</table>
+<h2 id="动态网络对比">5.2 动态网络对比</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">网络</th>
+<th style="text-align: left;">核心结构</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">总线</td>
+<td style="text-align: left;">所有模块共享一组导线</td>
+<td style="text-align: left;">成本低，结构简单</td>
+<td style="text-align: left;">带宽窄，争用严重</td>
+</tr>
+<tr>
+<td style="text-align: left;">多级互连网络</td>
+<td style="text-align: left;">多级开关加固定级间互连</td>
+<td style="text-align: left;">成本适中，结构规则，可扩展</td>
+<td style="text-align: left;">可能阻塞，控制较复杂</td>
+</tr>
+<tr>
+<td style="text-align: left;">Omega 网络</td>
+<td style="text-align: left;">多级 <span
+class="math inline">2 × 2</span> 开关，级间均匀洗牌</td>
+<td style="text-align: left;">规则，适合实现置换类通信</td>
+<td style="text-align: left;">不是完全无阻塞</td>
+</tr>
+<tr>
+<td style="text-align: left;">多级立方体网络</td>
+<td style="text-align: left;"><span class="math inline">2 × 2</span>
+直送/交换开关加交换函数</td>
+<td style="text-align: left;">可通过控制实现不同立方体互连</td>
+<td style="text-align: left;">控制方式影响网络能力</td>
+</tr>
+<tr>
+<td style="text-align: left;">交叉开关网络</td>
+<td style="text-align: left;">单级交叉点开关矩阵</td>
+<td style="text-align: left;">无阻塞，带宽和互连特性最好</td>
+<td style="text-align: left;">硬件成本高，规模扩展困难</td>
+</tr>
+</tbody>
+</table>
+<h2 id="易混概念辨析">5.3 易混概念辨析</h2>
+<p><strong>线路交换 vs
+分组交换</strong>：线路交换在整个传输期间保持一条物理通路；分组交换把信息拆成包，包可分别进入网络，最后在目的端重组。</p>
+<p><strong>静态拓扑 vs
+动态拓扑</strong>：静态拓扑的连接在运行中不改变；动态拓扑通过开关状态改变通信路径。</p>
+<p><strong>碟式函数 vs
+反位序函数</strong>：碟式函数只交换最高位和最低位；反位序函数把所有位顺序完全颠倒。</p>
+<p><strong>网格 vs
+环网</strong>：网格边界不首尾相接，因此角结点、边结点和内部结点度不同；环网把每行每列都做成环，结构更对称。</p>
+<p><strong>总线 vs
+交叉开关</strong>：总线便宜但同一时刻共享一条通信介质；交叉开关昂贵但可以同时建立多个无阻塞连接。</p>
+<h2 id="需要掌握的计算">5.4 需要掌握的计算</h2>
+<ol type="1">
+<li>给定 <span class="math inline"><em>N</em></span>，计算 <span
+class="math inline"><em>n</em> = log<sub>2</sub><em>N</em></span>。</li>
+<li>对 <span class="math inline"><em>N</em> = 8</span> 或 <span
+class="math inline"><em>N</em> = 16</span>，能写出或判断 <span
+class="math inline"><em>C</em><sub>0</sub>, <em>C</em><sub>1</sub>, <em>C</em><sub>2</sub></span>
+等交换函数的输出。</li>
+<li>能根据二进制编号计算均匀洗牌、逆均匀洗牌、碟式、反位序和 PM2I
+函数。</li>
+<li>能记住并比较典型网络的结点度、直径和等分宽度。</li>
+<li>能解释为什么全连接和交叉开关性能好但成本高，为什么总线便宜但带宽受限。</li>
+</ol>
+<h2 id="本章核心线索">5.5 本章核心线索</h2>
+<p>本章的主线可以概括为：<strong>互连网络用拓扑和控制方式实现结点间通信；互连函数用数学映射描述输入到输出的连接；特性参数用来评价网络好坏；静态网络重在固定拓扑，动态网络重在开关控制。</strong></p>
+<p>如果从内容重点看，应优先掌握互连函数的位操作、典型网络结构的参数、静态/动态网络分类，以及总线、多级网络、交叉开关网络之间的性能与成本差异。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BA%92%E8%BF%9E%E7%BD%91%E7%BB%9C/" rel="tag"># 互连网络</a>
+              <a href="/tags/%E6%8B%93%E6%89%91%E7%BB%93%E6%9E%84/" rel="tag"># 拓扑结构</a>
+              <a href="/tags/%E5%A4%9A%E7%BA%A7%E7%BD%91%E7%BB%9C/" rel="tag"># 多级网络</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/computer_organization/%E7%BA%BF%E7%A8%8B%E7%BA%A7%E5%B9%B6%E8%A1%8C/" rel="prev" title="线程级并行">
+                  <i class="fa fa-angle-left"></i> 线程级并行
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/" rel="next" title="互连及输入输出组织">
+                  互连及输入输出组织 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
