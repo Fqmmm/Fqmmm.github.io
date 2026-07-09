@@ -20,18 +20,18 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="目录  1 索引结构的基本思想 2 索引的 data entry 与基本分类 3 树结构索引：ISAM 4 动态树索引：B+ 树 5 基于 Hash 的索引结构 6 多键索引与特殊数据类型索引 7 总结与重点内容  1 索引结构的基本思想 索引结构（Index Structure）的核心目标是减少查询时需要访问的数据页数量。借助索引，DBMS 不必从头到尾扫描整个数据文件">
+    <meta name="description" content="目录  1 索引结构的基本思想 2 索引的 data entry 与基本分类 3 树结构索引：ISAM 4 动态树索引：B+ 树 5 基于 Hash 的索引结构 6 多键索引与特殊数据类型索引 7 总结与核心内容  1 索引结构的基本思想 索引结构（Index Structure）的核心目标是减少查询时需要访问的数据页数量。借助索引，DBMS 不必从头到尾扫描整个数据文件">
 <meta property="og:type" content="article">
 <meta property="og:title" content="索引结构">
 <meta property="og:url" content="http://example.com/2026/07/09/database_design/%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="目录  1 索引结构的基本思想 2 索引的 data entry 与基本分类 3 树结构索引：ISAM 4 动态树索引：B+ 树 5 基于 Hash 的索引结构 6 多键索引与特殊数据类型索引 7 总结与重点内容  1 索引结构的基本思想 索引结构（Index Structure）的核心目标是减少查询时需要访问的数据页数量。借助索引，DBMS 不必从头到尾扫描整个数据文件">
+<meta property="og:description" content="目录  1 索引结构的基本思想 2 索引的 data entry 与基本分类 3 树结构索引：ISAM 4 动态树索引：B+ 树 5 基于 Hash 的索引结构 6 多键索引与特殊数据类型索引 7 总结与核心内容  1 索引结构的基本思想 索引结构（Index Structure）的核心目标是减少查询时需要访问的数据页数量。借助索引，DBMS 不必从头到尾扫描整个数据文件">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260605110733150.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260605114620411.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260619223736194.png">
 <meta property="article:published_time" content="2026-07-09T07:16:58.859Z">
-<meta property="article:modified_time" content="2026-07-09T07:28:15.610Z">
+<meta property="article:modified_time" content="2026-07-09T08:04:47.141Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="B+树">
 <meta property="article:tag" content="Hash索引">
@@ -155,7 +155,7 @@ Primary、Secondary、Unique 与 Duplicates Index</span></a></li><li class="nav-
 4：叶子过空，向右兄弟借一个 entry</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%83%85%E5%86%B5-5%E5%85%84%E5%BC%9F%E4%B8%8D%E8%83%BD%E5%80%9F%E5%8F%B6%E5%AD%90%E5%90%88%E5%B9%B6%E4%BD%86%E7%88%B6%E7%BB%93%E7%82%B9%E4%BB%8D%E5%90%88%E6%B3%95"><span class="nav-number">5.5.5.</span> <span class="nav-text">删除情况
 5：兄弟不能借，叶子合并，但父结点仍合法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%83%85%E5%86%B5-6%E5%8F%B6%E5%AD%90%E5%90%88%E5%B9%B6%E5%AF%BC%E8%87%B4%E7%88%B6%E7%BB%93%E7%82%B9%E8%BF%87%E7%A9%BA%E7%BB%A7%E7%BB%AD%E5%90%91%E4%B8%8A%E5%90%88%E5%B9%B6%E6%9C%80%E7%BB%88%E6%A0%B9%E6%94%B6%E7%BC%A9"><span class="nav-number">5.5.6.</span> <span class="nav-text">删除情况
 6：叶子合并导致父结点过空，继续向上合并，最终根收缩</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">5.6.</span> <span class="nav-text">4.6 重复数据的处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b-%E6%A0%91%E5%9C%A8%E5%AE%9E%E9%99%85%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">5.7.</span> <span class="nav-text">4.7 B+ 树在实际系统中的优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%80%BC%E5%8E%8B%E7%BC%A9"><span class="nav-number">5.7.1.</span> <span class="nav-text">4.7.1 索引值压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E5%88%A0%E9%99%A4"><span class="nav-number">5.7.2.</span> <span class="nav-text">4.7.2 实际系统中的删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#b-%E6%A0%91%E6%89%B9%E9%87%8F%E5%BB%BA%E7%AB%8B"><span class="nav-number">5.7.3.</span> <span class="nav-text">4.7.3 B+ 树批量建立</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-hash-%E7%9A%84%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84"><span class="nav-number">6.</span> <span class="nav-text">5 基于 Hash 的索引结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hash-%E7%B4%A2%E5%BC%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 Hash 索引的基本思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81-hashing"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 静态 Hashing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E6%89%A9%E5%85%85-hashing"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 可扩充 Hashing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7-hashing"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 线性 Hashing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E6%89%A9%E5%85%85-hashing-%E4%B8%8E%E7%BA%BF%E6%80%A7-hashing-%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 可扩充 Hashing 与线性
-Hashing 的比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E9%94%AE%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%89%B9%E6%AE%8A%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%B4%A2%E5%BC%95"><span class="nav-number">7.</span> <span class="nav-text">6 多键索引与特殊数据类型索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%94%AE%E7%B4%A2%E5%BC%95%E9%97%AE%E9%A2%98"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 多键索引问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E6%A0%BC%E6%96%87%E4%BB%B6"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 网格文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E6%95%A3%E5%88%97%E6%8A%80%E6%9C%AF"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 分区散列技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#r-%E6%A0%91"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 R 树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kd-%E6%A0%91"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 KD 树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E7%B4%A2%E5%BC%95"><span class="nav-number">7.6.</span> <span class="nav-text">6.6 图数据索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">7.6.1.</span> <span class="nav-text">6.6.1 图数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E7%B4%A2%E5%BC%95-1"><span class="nav-number">7.6.2.</span> <span class="nav-text">6.6.2 图数据索引</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%B4%A2%E5%BC%95%E4%B8%8E-isax"><span class="nav-number">7.7.</span> <span class="nav-text">6.7 时间序列索引与 iSAX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gist"><span class="nav-number">7.8.</span> <span class="nav-text">6.8 GiST</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93%E4%B8%8E%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9"><span class="nav-number">8.</span> <span class="nav-text">7 总结与重点内容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E6%8E%8C%E6%8F%A1%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 需要掌握的核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isam-%E4%B8%8E-b-%E6%A0%91%E5%AF%B9%E6%AF%94"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 ISAM 与 B+ 树对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b-%E6%A0%91%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 B+ 树重点内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hash-%E7%B4%A2%E5%BC%95%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 Hash 索引重点内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E6%9E%84%E5%BB%BA%E7%9A%84%E6%80%BB%E4%BD%93%E6%80%9D%E8%B7%AF"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 索引结构构建的总体思路</span></a></li></ol></li></ol></div>
+Hashing 的比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E9%94%AE%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%89%B9%E6%AE%8A%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%B4%A2%E5%BC%95"><span class="nav-number">7.</span> <span class="nav-text">6 多键索引与特殊数据类型索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%94%AE%E7%B4%A2%E5%BC%95%E9%97%AE%E9%A2%98"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 多键索引问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E6%A0%BC%E6%96%87%E4%BB%B6"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 网格文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E6%95%A3%E5%88%97%E6%8A%80%E6%9C%AF"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 分区散列技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#r-%E6%A0%91"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 R 树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kd-%E6%A0%91"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 KD 树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E7%B4%A2%E5%BC%95"><span class="nav-number">7.6.</span> <span class="nav-text">6.6 图数据索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">7.6.1.</span> <span class="nav-text">6.6.1 图数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E7%B4%A2%E5%BC%95-1"><span class="nav-number">7.6.2.</span> <span class="nav-text">6.6.2 图数据索引</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%B4%A2%E5%BC%95%E4%B8%8E-isax"><span class="nav-number">7.7.</span> <span class="nav-text">6.7 时间序列索引与 iSAX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gist"><span class="nav-number">7.8.</span> <span class="nav-text">6.8 GiST</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">7 总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isam-%E4%B8%8E-b-%E6%A0%91%E5%AF%B9%E6%AF%94"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 ISAM 与 B+ 树对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b-%E6%A0%91"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 B+ 树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hash-%E7%B4%A2%E5%BC%95"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 Hash 索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E6%9E%84%E5%BB%BA%E7%9A%84%E6%80%BB%E4%BD%93%E6%80%9D%E8%B7%AF"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 索引结构构建的总体思路</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -236,7 +236,7 @@ Hashing 的比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a c
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 15:16:58 / Modified: 15:28:15" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 15:16:58 / Modified: 16:04:47" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -265,7 +265,7 @@ Hashing 的比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a c
 <li>4 动态树索引：B+ 树</li>
 <li>5 基于 Hash 的索引结构</li>
 <li>6 多键索引与特殊数据类型索引</li>
-<li>7 总结与重点内容</li>
+<li>7 总结与核心内容</li>
 </ul>
 <h1 id="索引结构的基本思想">1 索引结构的基本思想</h1>
 <p><strong>索引结构（Index
@@ -528,7 +528,7 @@ Page 1、Page 2、Page 3
 <code>age BETWEEN 30 AND 44</code> 时，系统可能需要在 Page 3、Page
 1、Page 2 之间跳转访问，随机 I/O 更多。</p>
 <p>因此，<strong>聚集索引与非聚集索引的关键区别不在于索引文件是否有序；索引文件通常都会按键值组织。真正的区别在于数据文件中的记录物理顺序是否也跟着索引键值排列。</strong></p>
-<p><strong>重点内容：一个表通常只能有一个簇聚索引，因为数据文件的物理顺序只能主要按照一种键值组织。</strong>
+<p><strong>核心内容：一个表通常只能有一个簇聚索引，因为数据文件的物理顺序只能主要按照一种键值组织。</strong>
 但可以有多个非簇聚索引，因为它们只是额外的辅助结构。</p>
 <p>实际系统中，即使建立簇聚索引，也不一定始终保持严格排序。因为频繁插入和删除会使严格维护代价很高，系统可能采用溢出链表，并定期重新整理数据。</p>
 <h2 id="dense-与-sparse-index">2.3 Dense 与 Sparse Index</h2>
@@ -2450,11 +2450,11 @@ Berkeley
 提出的通用索引框架。它不是某一种固定索引，而是提供一种构造搜索树索引的抽象方法。</p>
 <p>GiST
 的意义在于：不同数据类型和查询谓词可能需要不同的索引逻辑，例如空间数据、文本、区间、集合等。通过广义搜索树框架，可以把“如何判断进入哪个子树、如何分裂、如何判断匹配”等操作抽象出来，为多种索引结构提供统一实现基础。</p>
-<h1 id="总结与重点内容">7 总结与重点内容</h1>
+<h1 id="总结">7 总结</h1>
 <p>索引结构的主线是：数据库通过组织 data entry
 来快速定位记录；不同索引结构适合不同查询模式和更新场景。树索引强调有序性和范围查询，Hash
 索引强调等值查询，多维和特殊数据索引则进一步结合数据语义设计裁剪方式。</p>
-<h2 id="需要掌握的核心概念">7.1 需要掌握的核心概念</h2>
+<h2 id="核心概念">7.1 核心概念</h2>
 <ul>
 <li><strong>data entry 的三种形式：</strong> <span
 class="math inline"><em>k</em><sup>*</sup></span>、<span
@@ -2514,8 +2514,8 @@ style="text-align: left;">插入删除后通过分裂、合并、重分配保持
 </table>
 <p><strong>重点理解：ISAM 快而稳定，但怕大量更新；B+
 树维护成本更高，但能长期保持平衡，是实际系统中最常见的索引结构。</strong></p>
-<h2 id="b-树重点内容">7.3 B+ 树重点内容</h2>
-<p>B+ 树要重点掌握以下问题：</p>
+<h2 id="b-树">7.3 B+ 树</h2>
+<p>B+ 树需要重点关注以下问题：</p>
 <ul>
 <li>为什么所有叶子结点必须在同一层。</li>
 <li>内部结点中的键值和指针如何引导搜索。</li>
@@ -2525,7 +2525,7 @@ style="text-align: left;">插入删除后通过分裂、合并、重分配保持
 <li>为什么增大 fan-out 可以降低树高和 I/O 代价。</li>
 <li>前缀压缩如何通过缩短键值提高 fan-out。</li>
 </ul>
-<h2 id="hash-索引重点内容">7.4 Hash 索引重点内容</h2>
+<h2 id="hash-索引">7.4 Hash 索引</h2>
 <p>Hash 索引要重点区分三类：</p>
 <table>
 <colgroup>

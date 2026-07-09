@@ -20,15 +20,15 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="目录  存储介质与存储层次 磁盘的数据存储原理 Flash Memory 与第三级存储器 RAID 磁盘系统 DBMS 的磁盘空间管理与缓冲区管理 文件组织方式 文件组织的代价模型 页格式与记录格式 重点内容与易混点  1 存储介质与存储层次 1.1 为什么数据库系统要关心存储结构 数据库管理系统（DBMS）不仅负责逻辑层面的 SQL、关系模型和事务管理，也必须处理">
+    <meta name="description" content="目录  存储介质与存储层次 磁盘的数据存储原理 Flash Memory 与第三级存储器 RAID 磁盘系统 DBMS 的磁盘空间管理与缓冲区管理 文件组织方式 文件组织的代价模型 页格式与记录格式 总结与概念对比  1 存储介质与存储层次 1.1 为什么数据库系统要关心存储结构 数据库管理系统（DBMS）不仅负责逻辑层面的 SQL、关系模型和事务管理，也必须处理底">
 <meta property="og:type" content="article">
 <meta property="og:title" content="数据的存储结构">
 <meta property="og:url" content="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="目录  存储介质与存储层次 磁盘的数据存储原理 Flash Memory 与第三级存储器 RAID 磁盘系统 DBMS 的磁盘空间管理与缓冲区管理 文件组织方式 文件组织的代价模型 页格式与记录格式 重点内容与易混点  1 存储介质与存储层次 1.1 为什么数据库系统要关心存储结构 数据库管理系统（DBMS）不仅负责逻辑层面的 SQL、关系模型和事务管理，也必须处理">
+<meta property="og:description" content="目录  存储介质与存储层次 磁盘的数据存储原理 Flash Memory 与第三级存储器 RAID 磁盘系统 DBMS 的磁盘空间管理与缓冲区管理 文件组织方式 文件组织的代价模型 页格式与记录格式 总结与概念对比  1 存储介质与存储层次 1.1 为什么数据库系统要关心存储结构 数据库管理系统（DBMS）不仅负责逻辑层面的 SQL、关系模型和事务管理，也必须处理底">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-09T07:16:58.857Z">
-<meta property="article:modified_time" content="2026-07-09T07:26:09.050Z">
+<meta property="article:modified_time" content="2026-07-09T08:04:47.442Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="RAID">
 <meta property="article:tag" content="存储结构">
@@ -147,9 +147,9 @@
 范围查询为什么更适合顺序文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E4%B8%BA%E4%BB%80%E4%B9%88%E9%BA%BB%E7%83%A6"><span class="nav-number">7.3.3.</span> <span class="nav-text">6.3.3 插入为什么麻烦</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B9%9F%E8%A6%81%E7%BB%B4%E6%8A%A4%E9%A1%BA%E5%BA%8F%E7%BB%93%E6%9E%84"><span class="nav-number">7.3.4.</span> <span class="nav-text">6.3.4
 删除为什么也要维护顺序结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 聚集文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E5%AD%A6%E7%94%9F%E8%A1%A8%E5%92%8C%E9%80%89%E8%AF%BE%E8%A1%A8%E7%90%86%E8%A7%A3%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6"><span class="nav-number">7.4.1.</span> <span class="nav-text">6.4.1
 从学生表和选课表理解聚集文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6%E4%BC%98%E5%8C%96%E7%9A%84%E6%98%AF%E5%93%AA%E7%B1%BB%E6%9F%A5%E8%AF%A2"><span class="nav-number">7.4.2.</span> <span class="nav-text">6.4.2 聚集文件优化的是哪类查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6%E5%92%8C%E9%A1%BA%E5%BA%8F%E6%96%87%E4%BB%B6%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">7.4.3.</span> <span class="nav-text">6.4.3 聚集文件和顺序文件的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">7.4.4.</span> <span class="nav-text">6.4.4 聚集文件的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">7.4.5.</span> <span class="nav-text">6.4.5 聚集文件的缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 哈希文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E5%AD%A6%E7%94%9F%E8%A1%A8%E7%90%86%E8%A7%A3%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6"><span class="nav-number">7.5.1.</span> <span class="nav-text">6.5.1 用学生表理解哈希文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%80%BC%E6%9F%A5%E8%AF%A2%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%AB"><span class="nav-number">7.5.2.</span> <span class="nav-text">6.5.2 等值查询为什么快</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C"><span class="nav-number">7.5.3.</span> <span class="nav-text">6.5.3 插入如何进行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98"><span class="nav-number">7.5.4.</span> <span class="nav-text">6.5.4 溢出问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%8C%83%E5%9B%B4%E6%9F%A5%E8%AF%A2%E4%B8%8D%E9%80%82%E5%90%88%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6"><span class="nav-number">7.5.5.</span> <span class="nav-text">6.5.5
-为什么范围查询不适合哈希文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%84%E7%BB%87%E7%9A%84%E4%BB%A3%E4%BB%B7%E6%A8%A1%E5%9E%8B"><span class="nav-number">8.</span> <span class="nav-text">7 文件组织的代价模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%AC%A6%E5%8F%B7"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 基本符号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 堆文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 排序文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 哈希文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E6%96%87%E4%BB%B6%E7%BB%84%E7%BB%87%E6%96%B9%E5%BC%8F%E6%80%BB%E8%A1%A8"><span class="nav-number">8.6.</span> <span class="nav-text">7.6 三种文件组织方式总表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%B5%E6%A0%BC%E5%BC%8F%E4%B8%8E%E8%AE%B0%E5%BD%95%E6%A0%BC%E5%BC%8F"><span class="nav-number">9.</span> <span class="nav-text">8 页格式与记录格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E6%A0%BC%E5%BC%8F"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 页格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E9%95%BF%E8%AE%B0%E5%BD%95"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 定长记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#packed-%E4%B8%8E-unpacked"><span class="nav-number">9.2.1.</span> <span class="nav-text">8.2.1 Packed 与 Unpacked</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%95%BF%E8%AE%B0%E5%BD%95"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 变长记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#slot-%E5%AD%97%E5%85%B8"><span class="nav-number">9.4.</span> <span class="nav-text">8.4 Slot 字典</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%95%BF%E5%AD%97%E6%AE%B5%E7%9A%84%E4%B8%A4%E7%A7%8D%E5%AD%98%E6%94%BE%E6%96%B9%E6%B3%95"><span class="nav-number">9.5.</span> <span class="nav-text">8.5 变长字段的两种存放方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E9%9A%94%E7%AC%A6%E5%AD%98%E6%94%BE%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">9.5.1.</span> <span class="nav-text">8.5.1 分隔符存放的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E5%81%8F%E7%A7%BB%E5%AD%98%E6%94%BE%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">9.5.2.</span> <span class="nav-text">8.5.2 指针&#x2F;偏移存放的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%8F%98%E9%95%BF%E5%AD%97%E6%AE%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E9%BA%BB%E7%83%A6"><span class="nav-number">9.5.3.</span> <span class="nav-text">8.5.3 修改变长字段为什么麻烦</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%98%93%E6%B7%B7%E7%82%B9"><span class="nav-number">10.</span> <span class="nav-text">9 重点内容与易混点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E9%A1%BB%E6%8E%8C%E6%8F%A1%E7%9A%84%E4%B8%BB%E7%BA%BF"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 必须掌握的主线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%A6%82%E5%BF%B5%E9%80%9F%E8%AE%B0"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 重点概念速记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%93%E6%B7%B7%E7%82%B9%E8%BE%A8%E6%9E%90"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 易混点辨析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sectorblockpage-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.1.</span> <span class="nav-text">9.3.1 Sector、Block、Page 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lru-%E4%B8%8E-clock-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.2.</span> <span class="nav-text">9.3.2 LRU 与 Clock 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dirty-%E4%B8%8E-pin_count-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.3.</span> <span class="nav-text">9.3.3 Dirty 与 pin_count 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E6%96%87%E4%BB%B6%E6%8E%92%E5%BA%8F%E6%96%87%E4%BB%B6%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">10.3.4.</span> <span class="nav-text">9.3.4
+为什么范围查询不适合哈希文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%84%E7%BB%87%E7%9A%84%E4%BB%A3%E4%BB%B7%E6%A8%A1%E5%9E%8B"><span class="nav-number">8.</span> <span class="nav-text">7 文件组织的代价模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%AC%A6%E5%8F%B7"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 基本符号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 堆文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 排序文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 哈希文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E6%96%87%E4%BB%B6%E7%BB%84%E7%BB%87%E6%96%B9%E5%BC%8F%E6%80%BB%E8%A1%A8"><span class="nav-number">8.6.</span> <span class="nav-text">7.6 三种文件组织方式总表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%B5%E6%A0%BC%E5%BC%8F%E4%B8%8E%E8%AE%B0%E5%BD%95%E6%A0%BC%E5%BC%8F"><span class="nav-number">9.</span> <span class="nav-text">8 页格式与记录格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E6%A0%BC%E5%BC%8F"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 页格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E9%95%BF%E8%AE%B0%E5%BD%95"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 定长记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#packed-%E4%B8%8E-unpacked"><span class="nav-number">9.2.1.</span> <span class="nav-text">8.2.1 Packed 与 Unpacked</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%95%BF%E8%AE%B0%E5%BD%95"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 变长记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#slot-%E5%AD%97%E5%85%B8"><span class="nav-number">9.4.</span> <span class="nav-text">8.4 Slot 字典</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%95%BF%E5%AD%97%E6%AE%B5%E7%9A%84%E4%B8%A4%E7%A7%8D%E5%AD%98%E6%94%BE%E6%96%B9%E6%B3%95"><span class="nav-number">9.5.</span> <span class="nav-text">8.5 变长字段的两种存放方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E9%9A%94%E7%AC%A6%E5%AD%98%E6%94%BE%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">9.5.1.</span> <span class="nav-text">8.5.1 分隔符存放的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E5%81%8F%E7%A7%BB%E5%AD%98%E6%94%BE%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">9.5.2.</span> <span class="nav-text">8.5.2 指针&#x2F;偏移存放的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%8F%98%E9%95%BF%E5%AD%97%E6%AE%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E9%BA%BB%E7%83%A6"><span class="nav-number">9.5.3.</span> <span class="nav-text">8.5.3 修改变长字段为什么麻烦</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">10.</span> <span class="nav-text">9 总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E7%BA%BF"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 主线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E8%BE%A8%E6%9E%90"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 概念辨析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sectorblockpage-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.1.</span> <span class="nav-text">9.3.1 Sector、Block、Page 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lru-%E4%B8%8E-clock-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.2.</span> <span class="nav-text">9.3.2 LRU 与 Clock 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dirty-%E4%B8%8E-pin_count-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.3.</span> <span class="nav-text">9.3.3 Dirty 与 pin_count 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E6%96%87%E4%BB%B6%E6%8E%92%E5%BA%8F%E6%96%87%E4%BB%B6%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">10.3.4.</span> <span class="nav-text">9.3.4
 堆文件、排序文件、哈希文件的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#packed-%E5%88%A0%E9%99%A4%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E5%BD%B1%E5%93%8D-rid"><span class="nav-number">10.3.5.</span> <span class="nav-text">9.3.5 Packed 删除为什么会影响
-rid</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AC%E5%BC%8F%E6%B1%87%E6%80%BB"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 公式汇总</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">10.5.</span> <span class="nav-text">9.5 学习建议</span></a></li></ol></li></ol></div>
+rid</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%85%AC%E5%BC%8F"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 常用公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">10.5.</span> <span class="nav-text">9.5 学习建议</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -230,7 +230,7 @@ rid</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 15:16:58 / Modified: 15:26:09" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 15:16:58 / Modified: 16:04:47" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -261,7 +261,7 @@ rid</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link
 <li>文件组织方式</li>
 <li>文件组织的代价模型</li>
 <li>页格式与记录格式</li>
-<li>重点内容与易混点</li>
+<li>总结与概念对比</li>
 </ol>
 <h1 id="存储介质与存储层次">1 存储介质与存储层次</h1>
 <h2 id="为什么数据库系统要关心存储结构">1.1
@@ -439,7 +439,7 @@ Delay + Transfer Time</span></p>
 <li>处理一条记录或执行 Hash 函数的时间 <span
 class="math inline"><em>C</em>, <em>H</em> ≈ 100</span> 纳秒。</li>
 </ul>
-<p>两者相差多个数量级，所以在数据库内核课程中，估算查询代价时通常优先关注“读写了多少页”。</p>
+<p>两者相差多个数量级，所以在数据库内核的代价模型中，估算查询代价时通常优先关注“读写了多少页”。</p>
 <h2 id="磁盘控制器校验与记录跨块">2.4 磁盘控制器、校验与记录跨块</h2>
 <p>磁盘控制器负责执行底层操作，例如移动磁头、定位块、传输数据等。为了检测数据读写是否正确，磁盘系统会使用
 <strong>Checksum</strong>：写入时计算校验值，读取时重新计算并比较，以发现传输或存储错误。</p>
@@ -762,8 +762,8 @@ style="text-align: left;">操作系统或存储设备一次分配、读写的连
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sector = 512B 或 4KB</span><br><span class="line">block  = 4KB</span><br><span class="line">page   = 8KB</span><br></pre></td></tr></table></figure>
 <p>在这个例子中，一个 DBMS page 可能对应两个 4KB 的 block。实际系统里
 page 和 block
-的大小可能相同，也可能不同。课程中如果说“磁盘以块为单位读写”，偏底层硬件/文件系统；如果说“DBMS
-以页为单位组织数据”，偏数据库内核。</p>
+的大小可能相同，也可能不同。一般来说，“磁盘以块为单位读写”偏底层硬件/文件系统；“DBMS
+以页为单位组织数据”偏数据库内核。</p>
 <h3 id="为什么-dbms-不按单条记录读写">5.2.2 为什么 DBMS
 不按单条记录读写</h3>
 <p>DBMS 使用 page 而不是单条记录作为 I/O
@@ -1840,8 +1840,8 @@ class="math inline">+<em>D</em></span></td>
 </tbody>
 </table>
 <p>这里的表格忽略了 <span class="math inline"><em>C</em></span> 和 <span
-class="math inline"><em>H</em></span> 等 CPU 项，是因为课程重点放在页
-I/O 主导的代价分析上。</p>
+class="math inline"><em>H</em></span> 等 CPU 项，是因为该模型主要关注页
+I/O 主导的代价分析。</p>
 <p>核心记忆：</p>
 <ul>
 <li><strong>Heap</strong>：插入简单，查找差。</li>
@@ -2043,8 +2043,8 @@ rid
 不变，系统可能在原位置保存一个转发信息，指向记录的新位置。对于超大记录，Oracle
 等系统可能不限制记录总长度，而 DB2
 等系统可能限制记录长度，但提供大对象数据类型（LOB）来存放大字段。</p>
-<h1 id="重点内容与易混点">9 重点内容与易混点</h1>
-<h2 id="必须掌握的主线">9.1 必须掌握的主线</h2>
+<h1 id="总结">9 总结</h1>
+<h2 id="主线">9.1 主线</h2>
 <p>本节课的主线可以概括为：</p>
 <ol type="1">
 <li>数据库数据必须持久化，不能只放在内存中。</li>
@@ -2056,7 +2056,7 @@ rid
 <li>页内记录格式决定 rid
 是否稳定、空间利用率如何、变长字段怎样访问。</li>
 </ol>
-<h2 id="重点概念速记">9.2 重点概念速记</h2>
+<h2 id="核心概念">9.2 核心概念</h2>
 <table>
 <thead>
 <tr>
@@ -2144,11 +2144,11 @@ style="text-align: left;">文件系统或存储设备一次分配、读写的连
 </tr>
 </tbody>
 </table>
-<h2 id="易混点辨析">9.3 易混点辨析</h2>
+<h2 id="概念辨析">9.3 概念辨析</h2>
 <h3 id="sectorblockpage-的区别">9.3.1 Sector、Block、Page 的区别</h3>
 <p><strong>Sector</strong> 是硬件层面的最小单位；<strong>Block</strong>
 通常是磁盘传输或文件系统层面的单位；<strong>Page</strong> 是 DBMS
-逻辑管理和缓冲区管理的单位。课程代价模型通常使用 page I/O，是因为 DBMS
+逻辑管理和缓冲区管理的单位。DBMS 代价模型通常使用 page I/O，是因为 DBMS
 的读写请求以页为核心。</p>
 <h3 id="lru-与-clock-的区别">9.3.2 LRU 与 Clock 的区别</h3>
 <p>LRU 尽量精确替换最近最少使用的页；Clock 是近似 LRU，用环形扫描和
@@ -2178,7 +2178,7 @@ slot 或位置可能改变。如果外部索引或上层模块保存了原
 rid，就需要同步更新，否则会定位错误。</p>
 <p>Unpacked 删除不移动其他记录，通过 bitmap 或空闲 slot
 信息标记空位，牺牲部分紧凑性换取 rid 稳定。</p>
-<h2 id="公式汇总">9.4 公式汇总</h2>
+<h2 id="常用公式">9.4 常用公式</h2>
 <p>磁盘容量：</p>
 <p><span class="math display">$$
 \text{容量} =
@@ -2214,13 +2214,13 @@ class="math display"><em>H</em> + <em>D</em> + 0.5<em>R</em><em>C</em></
 <ul>
 <li>先理解磁盘为什么慢，以及为什么页 I/O 是代价核心。</li>
 <li>再理解 RAID 如何用多盘并行和冗余改善性能与可靠性。</li>
-<li>然后掌握 Buffer Pool 如何在内存中管理磁盘页。</li>
+<li>然后理解 Buffer Pool 如何在内存中管理磁盘页。</li>
 <li>最后比较三种文件组织方式，并能根据查询类型判断哪种方式更合适。</li>
 </ul>
-<p>如果题目要求分析代价，优先写出 <span
+<p>分析代价时，优先写出 <span
 class="math inline"><em>B</em>, <em>D</em>, <em>R</em>, <em>C</em>, <em>H</em></span>
 的含义，再说明为什么可以近似忽略 CPU 项，只保留页 I/O
-主项。这样答案会更清楚，也更符合数据库内核课程的分析习惯。</p>
+主项。这样推导会更清楚，也更符合数据库内核代价模型的分析习惯。</p>
 
     </div>
 

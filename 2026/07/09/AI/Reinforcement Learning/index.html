@@ -32,7 +32,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260613134412367.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260613134957146.png">
 <meta property="article:published_time" content="2026-07-09T07:12:29.451Z">
-<meta property="article:modified_time" content="2026-07-09T07:34:23.063Z">
+<meta property="article:modified_time" content="2026-07-09T08:04:48.258Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="Q-Learning">
 <meta property="article:tag" content="TD学习">
@@ -156,7 +156,7 @@ Q-Learning：学习贪心最优目标</span></a></li><li class="nav-item nav-lev
 的直观差异</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#expected-sarsa"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 Expected SARSA</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#model-based-methods"><span class="nav-number">9.</span> <span class="nav-text">8 Model-based Methods</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#model-free-%E4%B8%8E-model-based"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 Model-free 与 Model-based</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#model-based-methods-%E7%9A%84%E6%B5%81%E7%A8%8B"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 Model-based Methods 的流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#model-based-%E7%9A%84%E9%A3%8E%E9%99%A9"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 Model-based 的风险</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#policy-gradient-methods"><span class="nav-number">10.</span> <span class="nav-text">9 Policy Gradient Methods</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%9B%B4%E6%8E%A5%E5%AD%A6%E4%B9%A0%E7%AD%96%E7%95%A5"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 为什么要直接学习策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#softmax-%E7%AD%96%E7%95%A5"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 Softmax 策略</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reinforce-with-baseline"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 REINFORCE with Baseline</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90-1"><span class="nav-number">10.3.1.</span> <span class="nav-text">9.3.1 例子</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#n-step-bootstrapping-%E4%B8%8E-eligibility-traces"><span class="nav-number">11.</span> <span class="nav-text">10 n-step
 Bootstrapping 与 Eligibility Traces</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E-1-step-td-%E5%88%B0-monte-carlo"><span class="nav-number">11.1.</span> <span class="nav-text">10.1 从 1-step TD 到 Monte
 Carlo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#n-%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">11.2.</span> <span class="nav-text">10.2 n 的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lambda-return"><span class="nav-number">11.3.</span> <span class="nav-text">10.3 λ-return</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#forward-view"><span class="nav-number">11.4.</span> <span class="nav-text">10.4 Forward View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#backward-view-%E4%B8%8E%E8%B5%84%E6%A0%BC%E8%BF%B9"><span class="nav-number">11.5.</span> <span class="nav-text">10.5 Backward View 与资格迹</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eligibility-traces-%E7%9A%84%E6%84%8F%E4%B9%89"><span class="nav-number">11.6.</span> <span class="nav-text">10.6 Eligibility Traces 的意义</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E4%B8%8E%E5%A4%9A%E6%99%BA%E8%83%BD%E4%BD%93%E8%87%AA%E8%AF%BE%E7%A8%8B"><span class="nav-number">12.</span> <span class="nav-text">11
-深度强化学习与多智能体自课程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%B7%B1%E5%BA%A6%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0"><span class="nav-number">12.1.</span> <span class="nav-text">11.1 为什么需要深度强化学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#alphago-%E4%BE%8B%E5%AD%90"><span class="nav-number">12.2.</span> <span class="nav-text">11.2 AlphaGo 例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multi-agent-autocurricula"><span class="nav-number">12.3.</span> <span class="nav-text">11.3 Multi-Agent Autocurricula</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%8C%91%E6%88%98%E4%B8%8E%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9"><span class="nav-number">13.</span> <span class="nav-text">12 强化学习的挑战与重点内容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">13.1.</span> <span class="nav-text">12.1 强化学习的挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%91%E8%9E%8D%E6%9C%80%E4%BC%98%E6%89%A7%E8%A1%8C%E4%BE%8B%E5%AD%90"><span class="nav-number">13.2.</span> <span class="nav-text">12.2 金融最优执行例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%AD%A6%E8%80%85%E5%BA%94%E6%8E%8C%E6%8F%A1%E7%9A%84%E6%A0%B8%E5%BF%83%E5%85%B3%E7%B3%BB"><span class="nav-number">13.3.</span> <span class="nav-text">12.3 初学者应掌握的核心关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E8%83%8C%E5%85%AC%E5%BC%8F%E4%B8%8E%E7%90%86%E8%A7%A3"><span class="nav-number">13.4.</span> <span class="nav-text">12.4 必背公式与理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%82%B9"><span class="nav-number">13.5.</span> <span class="nav-text">12.5 容易混淆点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93"><span class="nav-number">13.6.</span> <span class="nav-text">12.6 一句话总结</span></a></li></ol></li></ol></div>
+深度强化学习与多智能体自课程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%B7%B1%E5%BA%A6%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0"><span class="nav-number">12.1.</span> <span class="nav-text">11.1 为什么需要深度强化学习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#alphago-%E4%BE%8B%E5%AD%90"><span class="nav-number">12.2.</span> <span class="nav-text">11.2 AlphaGo 例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#multi-agent-autocurricula"><span class="nav-number">12.3.</span> <span class="nav-text">11.3 Multi-Agent Autocurricula</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%8C%91%E6%88%98%E4%B8%8E%E6%80%BB%E7%BB%93"><span class="nav-number">13.</span> <span class="nav-text">12 强化学习的挑战与总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">13.1.</span> <span class="nav-text">12.1 强化学习的挑战</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%91%E8%9E%8D%E6%9C%80%E4%BC%98%E6%89%A7%E8%A1%8C%E4%BE%8B%E5%AD%90"><span class="nav-number">13.2.</span> <span class="nav-text">12.2 金融最优执行例子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%85%B3%E7%B3%BB"><span class="nav-number">13.3.</span> <span class="nav-text">12.3 核心关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E8%83%8C%E5%85%AC%E5%BC%8F%E4%B8%8E%E7%90%86%E8%A7%A3"><span class="nav-number">13.4.</span> <span class="nav-text">12.4 必背公式与理解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E8%BE%A8%E6%9E%90"><span class="nav-number">13.5.</span> <span class="nav-text">12.5 概念辨析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">13.6.</span> <span class="nav-text">12.6 总结</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -237,7 +237,7 @@ Carlo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 15:12:29 / Modified: 15:34:23" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 15:12:29 / Modified: 16:04:48" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -271,7 +271,7 @@ Carlo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="
 <li>Policy Gradient Methods</li>
 <li>n-step Bootstrapping 与 Eligibility Traces</li>
 <li>深度强化学习与多智能体自课程</li>
-<li>强化学习的挑战与重点内容</li>
+<li>强化学习的挑战与核心内容</li>
 </ol>
 <h1 id="机器学习中的强化学习位置">1 机器学习中的强化学习位置</h1>
 <h2 id="三类机器学习任务">1.1 三类机器学习任务</h2>
@@ -1090,7 +1090,7 @@ style="text-align: left;">相同状态和相同动作不一定得到相同结果
 </tr>
 </tbody>
 </table>
-<p>这个例子的重点不是让我们掌握金融细节，而是说明强化学习适合处理一种问题：<strong>当前每一步动作都会影响后续状态，而且目标不是单步最好，而是整个执行过程总体最好</strong>。</p>
+<p>这个例子的重点不是金融细节，而是说明强化学习适合处理一种问题：<strong>当前每一步动作都会影响后续状态，而且目标不是单步最好，而是整个执行过程总体最好</strong>。</p>
 <p>例如你要在 30 分钟内买入 10000
 股。如果一开始买太快，可能把价格推高，导致后面更贵；如果买太慢，最后时间不够，只能用更差价格强行成交。强化学习可以尝试学习一种策略：在不同市场状态下，动态决定当前应该积极成交还是耐心挂单。</p>
 <p>这是 RL
@@ -2345,7 +2345,7 @@ class="math display"><em>V</em>(<em>s</em>) ≈ <em>V</em>(<em>s</em>; <st
 autocurricula）指多个智能体在互动中自动产生越来越复杂的训练任务。</p>
 <p>在单智能体任务中，环境通常相对固定；在多智能体任务中，其他智能体也是会学习的，因此环境会随对手或队友策略变化而变化。这会产生一种自动课程：一方学会某种技巧后，另一方必须学会应对，从而推动任务难度升级。</p>
 <p>例如一组智能体玩追逐和躲避游戏。追逐者变强后，躲避者需要学会利用障碍；躲避者学会防御后，追逐者又可能学会使用工具。复杂行为不是人工逐条写出来的，而是在竞争或协作中涌现。</p>
-<h1 id="强化学习的挑战与重点内容">12 强化学习的挑战与重点内容</h1>
+<h1 id="强化学习的挑战与总结">12 强化学习的挑战与总结</h1>
 <h2 id="强化学习的挑战">12.1 强化学习的挑战</h2>
 <p>强化学习面临多个挑战。下面按初学者更容易理解的方式展开。</p>
 <table>
@@ -2440,7 +2440,7 @@ style="text-align: left;">成交价格、交易成本、滑点、风险调整收
 </tbody>
 </table>
 <p>这个例子说明强化学习不仅用于游戏，还可用于真实决策系统。但真实系统更强调风险、稳定性和可解释性。</p>
-<h2 id="初学者应掌握的核心关系">12.3 初学者应掌握的核心关系</h2>
+<h2 id="核心关系">12.3 核心关系</h2>
 <p>知识点很多，但可以用一条主线串起来：</p>
 <ol type="1">
 <li>强化学习目标是最大化长期回报 <span
@@ -2498,7 +2498,7 @@ G_t^\lambda
 $$</span></p>
 <p>含义：把不同步数的 n-step return 加权平均，在 TD 和 Monte Carlo
 之间折中。</p>
-<h2 id="容易混淆点">12.5 容易混淆点</h2>
+<h2 id="概念辨析">12.5 概念辨析</h2>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -2550,7 +2550,7 @@ style="text-align: left;">前者估计当前策略价值，后者用价值改进
 </tr>
 </tbody>
 </table>
-<h2 id="一句话总结">12.6 一句话总结</h2>
+<h2 id="总结">12.6 总结</h2>
 <p><strong>强化学习研究的是智能体如何在与环境的连续交互中，通过奖励信号学习最大化长期回报的策略。</strong>
 从 Bandit 的动作价值估计开始，可以逐步引出 Bellman 方程、策略迭代、Monte
 Carlo、TD、SARSA、Q-Learning、模型方法、策略梯度和资格迹。所有这些方法都围绕同一件事展开：如何更准确地估计未来价值，并用这些估计做出更好的动作选择。</p>

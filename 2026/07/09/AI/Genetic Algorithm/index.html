@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="遗传算法（Genetic Algorithm, GA）是一类受生物进化启发的随机搜索与优化方法。本文从一个最大化函数的例子出发，依次介绍遗传算法的基本流程、选择&#x2F;交叉&#x2F;变异等遗传算子、背包问题、CNF 可满足性问题、旅行商问题、PLA 进化硬件应用中的编码方式，以及用于解释遗传算法有效性的 Schema Theorem（模式定理）。 0. 一页速查 核心概念">
+    <meta name="description" content="遗传算法（Genetic Algorithm, GA）是一类受生物进化启发的随机搜索与优化方法。本文从一个最大化函数的例子出发，依次介绍遗传算法的基本流程、选择&#x2F;交叉&#x2F;变异等遗传算子、背包问题、CNF 可满足性问题、旅行商问题、PLA 进化硬件应用中的编码方式，以及用于解释遗传算法有效性的 Schema Theorem（模式定理）。 0. 概念与公式概览 核心概念">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Genetic Algorithm">
 <meta property="og:url" content="http://example.com/2026/07/09/AI/Genetic%20Algorithm/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="遗传算法（Genetic Algorithm, GA）是一类受生物进化启发的随机搜索与优化方法。本文从一个最大化函数的例子出发，依次介绍遗传算法的基本流程、选择&#x2F;交叉&#x2F;变异等遗传算子、背包问题、CNF 可满足性问题、旅行商问题、PLA 进化硬件应用中的编码方式，以及用于解释遗传算法有效性的 Schema Theorem（模式定理）。 0. 一页速查 核心概念">
+<meta property="og:description" content="遗传算法（Genetic Algorithm, GA）是一类受生物进化启发的随机搜索与优化方法。本文从一个最大化函数的例子出发，依次介绍遗传算法的基本流程、选择&#x2F;交叉&#x2F;变异等遗传算子、背包问题、CNF 可满足性问题、旅行商问题、PLA 进化硬件应用中的编码方式，以及用于解释遗传算法有效性的 Schema Theorem（模式定理）。 0. 概念与公式概览 核心概念">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530094923536.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530095148643.png">
@@ -34,7 +34,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530101939846.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260530101954924.png">
 <meta property="article:published_time" content="2026-07-09T07:12:29.437Z">
-<meta property="article:modified_time" content="2026-07-09T07:30:19.575Z">
+<meta property="article:modified_time" content="2026-07-09T08:02:10.394Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="优化">
 <meta property="article:tag" content="进化计算">
@@ -144,7 +144,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E9%A1%B5%E9%80%9F%E6%9F%A5"><span class="nav-number">1.</span> <span class="nav-text">0. 一页速查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E9%A2%91%E5%85%AC%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">高频公式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3%E6%8A%8A%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98%E7%9C%8B%E6%88%90%E8%BF%9B%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">1.
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E4%B8%8E%E5%85%AC%E5%BC%8F%E6%A6%82%E8%A7%88"><span class="nav-number">1.</span> <span class="nav-text">0. 概念与公式概览</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">核心概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%85%AC%E5%BC%8F"><span class="nav-number">1.2.</span> <span class="nav-text">基本公式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3%E6%8A%8A%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98%E7%9C%8B%E6%88%90%E8%BF%9B%E5%8C%96"><span class="nav-number">2.</span> <span class="nav-text">1.
 遗传算法的基本思想：把优化问题看成“进化”</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E-fxx2-%E7%9A%84%E4%BE%8B%E5%AD%90%E7%90%86%E8%A7%A3%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95"><span class="nav-number">3.</span> <span class="nav-text">2. 从 f(x) &#x3D; x2
 的例子理解遗传算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BD%AE%E7%9B%98%E8%B5%8C%E9%80%89%E6%8B%A9%E7%9A%84%E7%9B%B4%E8%A7%82%E7%90%86%E8%A7%A3"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 轮盘赌选择的直观理解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E9%87%8D%E7%BB%84%E5%B7%B2%E6%9C%89%E7%9A%84%E5%A5%BD%E7%BB%93%E6%9E%84"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 交叉：重组已有的好结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E5%BC%82%E7%BB%B4%E6%8C%81%E5%A4%9A%E6%A0%B7%E6%80%A7%E9%81%BF%E5%85%8D%E6%97%A9%E7%86%9F%E6%94%B6%E6%95%9B"><span class="nav-number">3.3.</span> <span class="nav-text">2.3
 变异：维持多样性，避免早熟收敛</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%80%E8%88%AC%E6%B5%81%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">3. 遗传算法的一般流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E4%B8%8E%E9%80%82%E5%BA%94%E5%BA%A6%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E6%88%90%E8%B4%A5%E7%9A%84%E5%85%B3%E9%94%AE"><span class="nav-number">5.</span> <span class="nav-text">4.
@@ -152,9 +152,9 @@
 遗传算法为什么有效：从搜索空间到模式定理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E9%9A%8F%E6%9C%BA%E6%90%9C%E7%B4%A2%E5%88%B0%E6%9C%89%E6%96%B9%E5%90%91%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%90%9C%E7%B4%A2"><span class="nav-number">7.1.</span> <span class="nav-text">6.1
 从“随机搜索”到“有方向的随机搜索”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#schema%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95%E4%B8%AD%E7%9A%84%E6%9C%89%E7%94%A8%E7%BB%93%E6%9E%84"><span class="nav-number">8.</span> <span class="nav-text">7.
 Schema：遗传算法中的“有用结构”</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E9%98%B6%E6%95%B0-os"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 模式阶数 O(s)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E9%95%BF%E5%BA%A6-deltas"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 定义长度 δ(s)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E9%80%82%E5%BA%94%E5%BA%A6-fs"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 模式适应度 f(s)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#schema-theorem%E7%9F%AD%E4%BD%8E%E9%98%B6%E9%AB%98%E9%80%82%E5%BA%94%E5%BA%A6%E6%A8%A1%E5%BC%8F%E4%BC%9A%E5%A2%9E%E9%95%BF"><span class="nav-number">9.</span> <span class="nav-text">8. Schema
-Theorem：短、低阶、高适应度模式会增长</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AA%E8%80%83%E8%99%91%E9%80%89%E6%8B%A9"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 只考虑选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5%E4%BA%A4%E5%8F%89%E5%BD%B1%E5%93%8D"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 加入交叉影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5%E5%8F%98%E5%BC%82%E5%BD%B1%E5%93%8D"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 加入变异影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%97%B6%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84%E7%82%B9"><span class="nav-number">10.</span> <span class="nav-text">9. 学习时容易混淆的点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E5%BA%94%E5%BA%A6%E5%87%BD%E6%95%B0%E4%B8%8D%E4%B8%80%E5%AE%9A%E7%AD%89%E4%BA%8E%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0"><span class="nav-number">10.1.</span> <span class="nav-text">9.1
+Theorem：短、低阶、高适应度模式会增长</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%AA%E8%80%83%E8%99%91%E9%80%89%E6%8B%A9"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 只考虑选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5%E4%BA%A4%E5%8F%89%E5%BD%B1%E5%93%8D"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 加入交叉影响</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5%E5%8F%98%E5%BC%82%E5%BD%B1%E5%93%8D"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 加入变异影响</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E8%BE%A8%E6%9E%90"><span class="nav-number">10.</span> <span class="nav-text">9. 概念辨析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%82%E5%BA%94%E5%BA%A6%E5%87%BD%E6%95%B0%E4%B8%8D%E4%B8%80%E5%AE%9A%E7%AD%89%E4%BA%8E%E7%9B%AE%E6%A0%87%E5%87%BD%E6%95%B0"><span class="nav-number">10.1.</span> <span class="nav-text">9.1
 适应度函数不一定等于目标函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%A4%E5%8F%89%E4%B8%8D%E6%98%AF%E6%80%BB%E8%83%BD%E4%BA%A7%E7%94%9F%E6%9B%B4%E5%A5%BD%E8%A7%A3"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 交叉不是总能产生更好解</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E5%BC%82%E7%8E%87%E4%B8%8D%E6%98%AF%E8%B6%8A%E5%A4%A7%E8%B6%8A%E5%A5%BD"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 变异率不是越大越好</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F%E8%A6%81%E4%BF%9D%E6%8C%81%E5%8F%AF%E8%A1%8C%E6%80%A7"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 编码方式要保持可行性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F%E5%AE%9A%E7%90%86%E8%A7%A3%E9%87%8A%E7%9A%84%E6%98%AF%E8%B6%8B%E5%8A%BF%E4%B8%8D%E6%98%AF%E7%B2%BE%E7%A1%AE%E9%A2%84%E6%B5%8B"><span class="nav-number">10.5.</span> <span class="nav-text">9.5
-模式定理解释的是趋势，不是精确预测</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">10. 重点总结</span></a></li></ol></div>
+模式定理解释的是趋势，不是精确预测</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">10. 总结</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -235,7 +235,7 @@ Theorem：短、低阶、高适应度模式会增长</span></a><ol class="nav-ch
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 15:12:29 / Modified: 15:30:19" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 15:12:29 / Modified: 16:02:10" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -261,7 +261,7 @@ GA）</strong>是一类受生物进化启发的随机搜索与优化方法。本
 可满足性问题、旅行商问题、PLA
 进化硬件应用中的编码方式，以及用于解释遗传算法有效性的 <strong>Schema
 Theorem（模式定理）</strong>。</p>
-<h2 id="一页速查">0. 一页速查</h2>
+<h2 id="概念与公式概览">0. 概念与公式概览</h2>
 <h3 id="核心概念">核心概念</h3>
 <table>
 <colgroup>
@@ -271,7 +271,7 @@ Theorem（模式定理）</strong>。</p>
 <thead>
 <tr>
 <th>概念</th>
-<th>重点内容</th>
+<th>含义</th>
 </tr>
 </thead>
 <tbody>
@@ -327,7 +327,7 @@ class="math inline">(1 * *0 * 1)</span>。</td>
 </tr>
 </tbody>
 </table>
-<h3 id="高频公式">高频公式</h3>
+<h3 id="基本公式">基本公式</h3>
 <p><strong>轮盘赌选择概率</strong></p>
 <p>若个体 <span class="math inline"><em>i</em></span> 的适应度为 <span
 class="math inline"><em>f</em>(<em>i</em>)</span>，种群大小为 <span
@@ -493,7 +493,7 @@ class="math inline"><em>t</em> = <em>t</em> + 1</span>，进入下一代
 <p>对应的逻辑可以写成：</p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">begin</span><br><span class="line">    set time t = 0</span><br><span class="line">    initialize population P(t)</span><br><span class="line">    while termination condition is not met do</span><br><span class="line">        evaluate fitness of each member in P(t)</span><br><span class="line">        select members from P(t) based on fitness</span><br><span class="line">        produce offspring using genetic operators</span><br><span class="line">        replace candidates of P(t) with offspring</span><br><span class="line">        set t = t + 1</span><br><span class="line">    end</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
 <p>这里最重要的是理解“评价、选择、生成、替换”四个环节的闭环。评价决定谁更好，选择决定谁更有繁殖机会，交叉和变异决定下一代会出现什么新解，替换策略决定旧解和新解如何共存。</p>
-<p>常见终止条件包括：达到最大代数、适应度达到预设阈值、连续多代没有明显改进，或者计算时间用尽。课程梳理时要特别注意：遗传算法不是单个解在移动，而是<strong>一群解在演化</strong>，这也是它区别于许多局部搜索算法的重要特征。</p>
+<p>常见终止条件包括：达到最大代数、适应度达到预设阈值、连续多代没有明显改进，或者计算时间用尽。这里需要特别注意：遗传算法不是单个解在移动，而是<strong>一群解在演化</strong>，这也是它区别于许多局部搜索算法的重要特征。</p>
 <h2 id="编码与适应度遗传算法成败的关键">4.
 编码与适应度：遗传算法成败的关键</h2>
 <p>遗传算法本身只提供一种通用搜索框架，真正决定它能否解决问题的是编码方式和适应度函数。如果编码不能正确表达可行解，或者适应度函数不能反映解的质量，那么选择、交叉、变异再精巧也很难得到好结果。</p>
@@ -870,7 +870,7 @@ $$</span></p>
 <p>Schema Theorem 的核心结论是：<strong>short, low-order schemata with
 above-average fitness increase exponentially in successive
 generations</strong>。这句话是理论部分最重要的结论。</p>
-<h2 id="学习时容易混淆的点">9. 学习时容易混淆的点</h2>
+<h2 id="概念辨析">9. 概念辨析</h2>
 <h3 id="适应度函数不一定等于目标函数">9.1
 适应度函数不一定等于目标函数</h3>
 <p>在简单问题中，适应度函数可以直接等于目标函数，例如最大化 <span
@@ -888,7 +888,7 @@ class="math inline"><em>x</em><sup>2</sup></span>。但在实际问题中，适�
 <h3 id="模式定理解释的是趋势不是精确预测">9.5
 模式定理解释的是趋势，不是精确预测</h3>
 <p>模式定理给的是期望意义上的增长趋势，而且依赖一些简化假设。它不能保证某个具体运行一定找到全局最优解，但它解释了遗传算法为什么倾向于保留并组合短的、有用的局部结构。</p>
-<h2 id="重点总结">10. 重点总结</h2>
+<h2 id="总结">10. 总结</h2>
 <p>遗传算法是一种基于种群的随机优化方法，它通过选择、交叉和变异模拟自然进化。一个完整遗传算法必须明确四件事：如何编码候选解，如何初始化种群，如何计算适应度，以及如何通过遗传算子生成下一代。</p>
 <p><span
 class="math inline"><em>f</em>(<em>x</em>) = <em>x</em><sup>2</sup></span>

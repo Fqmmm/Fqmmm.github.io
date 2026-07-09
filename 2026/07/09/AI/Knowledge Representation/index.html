@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="目录  知识表示为什么重要：从专家系统说起 语义网络：把知识组织成概念层级 框架表示法：用对象模板组织常识 概念图：用图结构表达句子的语义 知识图谱：RDF 三元组与 SPARQL 查询 从自然语言到知识表示 其他知识表示方法概览 本章方法对比与重点梳理  1 知识表示为什么重要：从专家系统说起 1.1 普通程序与专家系统的差异 知识表示的核心问题可以先通过两个公式看出">
+    <meta name="description" content="目录  知识表示为什么重要：从专家系统说起 语义网络：把知识组织成概念层级 框架表示法：用对象模板组织常识 概念图：用图结构表达句子的语义 知识图谱：RDF 三元组与 SPARQL 查询 从自然语言到知识表示 其他知识表示方法概览 本章方法对比与总结  1 知识表示为什么重要：从专家系统说起 1.1 普通程序与专家系统的差异 知识表示的核心问题可以先通过两个公式看出来。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Knowledge Representation">
 <meta property="og:url" content="http://example.com/2026/07/09/AI/Knowledge%20Representation/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="目录  知识表示为什么重要：从专家系统说起 语义网络：把知识组织成概念层级 框架表示法：用对象模板组织常识 概念图：用图结构表达句子的语义 知识图谱：RDF 三元组与 SPARQL 查询 从自然语言到知识表示 其他知识表示方法概览 本章方法对比与重点梳理  1 知识表示为什么重要：从专家系统说起 1.1 普通程序与专家系统的差异 知识表示的核心问题可以先通过两个公式看出">
+<meta property="og:description" content="目录  知识表示为什么重要：从专家系统说起 语义网络：把知识组织成概念层级 框架表示法：用对象模板组织常识 概念图：用图结构表达句子的语义 知识图谱：RDF 三元组与 SPARQL 查询 从自然语言到知识表示 其他知识表示方法概览 本章方法对比与总结  1 知识表示为什么重要：从专家系统说起 1.1 普通程序与专家系统的差异 知识表示的核心问题可以先通过两个公式看出来。">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220417781.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522220832438.png">
@@ -45,7 +45,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223436992.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260522223527813.png">
 <meta property="article:published_time" content="2026-07-09T07:12:29.434Z">
-<meta property="article:modified_time" content="2026-07-09T07:37:35.290Z">
+<meta property="article:modified_time" content="2026-07-09T08:04:48.150Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="RDF">
 <meta property="article:tag" content="知识图谱">
@@ -172,7 +172,7 @@ SPARQL 查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><
 语义解释：从语法结构到内部表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E4%B8%8E%E4%B8%96%E7%95%8C%E7%9F%A5%E8%AF%86%E8%A7%A3%E9%87%8A"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 上下文与世界知识解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E6%B8%B8%E5%BA%94%E7%94%A8%E9%97%AE%E7%AD%94%E6%9F%A5%E8%AF%A2%E7%BF%BB%E8%AF%91%E4%B8%8E%E7%94%9F%E6%88%90"><span class="nav-number">7.4.</span> <span class="nav-text">6.4
 下游应用：问答、查询、翻译与生成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%9F%A5%E8%AF%86%E8%A1%A8%E7%A4%BA%E6%96%B9%E6%B3%95%E6%A6%82%E8%A7%88"><span class="nav-number">8.</span> <span class="nav-text">7 其他知识表示方法概览</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E4%BA%A7%E7%94%9F%E5%BC%8F%E8%A7%84%E5%88%99%E4%B8%8E%E5%86%B3%E7%AD%96%E8%A1%A8"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 逻辑、产生式规则与决策表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E8%B4%9D%E5%8F%B6%E6%96%AF%E7%BD%91%E7%BB%9C%E4%B8%8E%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7%E8%A1%A8%E7%A4%BA"><span class="nav-number">8.2.</span> <span class="nav-text">7.2
 神经网络、贝叶斯网络与不确定性表示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scriptpetri-netoav-triples-%E7%AD%89%E6%96%B9%E6%B3%95"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 Script、Petri Net、OAV
-triples 等方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94%E4%B8%8E%E9%87%8D%E7%82%B9%E6%A2%B3%E7%90%86"><span class="nav-number">9.</span> <span class="nav-text">8 本章方法对比与重点梳理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E7%A7%8D%E9%87%8D%E7%82%B9%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 四种重点方法对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E9%AB%98%E9%A2%91%E9%97%AE%E9%A2%98"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 本章高频问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E4%B8%80%E9%81%8D%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 最后一遍学习建议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99%E4%B8%8E%E8%A1%A5%E5%85%85%E6%9D%A5%E6%BA%90"><span class="nav-number">10.</span> <span class="nav-text">9 参考资料与补充来源</span></a></li></ol></div>
+triples 等方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94%E4%B8%8E%E5%AD%A6%E4%B9%A0%E4%B8%BB%E7%BA%BF"><span class="nav-number">9.</span> <span class="nav-text">8 方法对比与学习主线</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E7%A7%8D%E6%96%B9%E6%B3%95%E5%AF%B9%E6%AF%94"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 四种方法对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E4%B8%BB%E7%BA%BF"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 学习主线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99%E4%B8%8E%E8%A1%A5%E5%85%85%E6%9D%A5%E6%BA%90"><span class="nav-number">10.</span> <span class="nav-text">9 参考资料与补充来源</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -253,7 +253,7 @@ triples 等方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a c
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 15:12:29 / Modified: 15:37:35" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 15:12:29 / Modified: 16:04:48" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -283,7 +283,7 @@ triples 等方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a c
 <li>知识图谱：RDF 三元组与 SPARQL 查询</li>
 <li>从自然语言到知识表示</li>
 <li>其他知识表示方法概览</li>
-<li>本章方法对比与重点梳理</li>
+<li>本章方法对比与总结</li>
 </ul>
 <h2 id="知识表示为什么重要从专家系统说起">1
 知识表示为什么重要：从专家系统说起</h2>
@@ -721,8 +721,8 @@ triples 等方法</h3>
 资源及其关系。</p>
 <p><strong>Language field theory，语言场论</strong> 在
 这里只列出名称，可以理解为从语言结构或语义场角度组织知识的一类理论。本章不要求深入展开，学习时知道它属于其他知识表示方向即可。</p>
-<h2 id="本章方法对比与重点梳理">8 本章方法对比与重点梳理</h2>
-<h3 id="四种重点方法对比">8.1 四种重点方法对比</h3>
+<h2 id="方法对比与学习主线">8 方法对比与学习主线</h2>
+<h3 id="四种方法对比">8.1 四种方法对比</h3>
 <table>
 <colgroup>
 <col style="width: 20%" />
@@ -772,35 +772,13 @@ triples 等方法</h3>
 </tbody>
 </table>
 <p>这四种方法不是互相替代的关系，而是面向不同任务。语义网络强调层级和继承，框架强调对象内部结构，概念图强调句子和事件语义，知识图谱强调大规模实体关系数据。练习如果让比较它们，不要只背定义，要说清楚“它们各自把知识组织成什么形式，以及这种形式适合做什么推理”。</p>
-<h3 id="本章高频问题">8.2 本章高频问题</h3>
-<ol type="1">
-<li>为什么专家系统可以概括为 <span
-class="math inline">Knowledge + Inference</span>？</li>
-<li>为什么知识表示是知识获取和知识使用的基础？</li>
-<li>语义网络如何通过 <code>is-a</code> 层级实现属性继承？</li>
-<li>为什么 ostrich 不能飞会挑战简单继承？</li>
-<li>框架中的 slot 有哪些类型？为什么 slot 不只是普通属性字段？</li>
-<li>“John is like a fire engine” 说明了框架推理中的什么问题？</li>
-<li>unique marker 和 generic marker 有什么区别？</li>
-<li>概念图如何表示一元、二元和三元关系？</li>
-<li>为什么 “Tom believes that Jane likes pizza” 需要命题概念？</li>
-<li>restriction、join、simplify 分别在概念图推理中做什么？</li>
-<li>RDF 三元组的 subject、predicate、object 分别是什么？</li>
-<li>Sean Penn 在 RDF 三元组里代表什么？</li>
-<li>SPARQL 查询和普通数据库 SQL 查询有什么相似点和差异？</li>
-<li><code>owl:sameAs</code> 与 <code>owl:equivalentProperty</code>
-分别解决什么问题？</li>
-<li>自然语言理解为什么要从 parsing 进入 semantic interpretation，再进入
-world knowledge interpretation？</li>
-</ol>
-<h3 id="最后一遍学习建议">8.3 最后一遍学习建议</h3>
-<p>学习本章时，不要把每个知识点孤立看待。可以按照“知识如何被组织、如何被推理、适合解决什么问题”这条线串起来。语义网络和框架都关心常识结构，但一个偏图，一个偏对象模板；概念图和自然语言理解联系紧密，因为它能表示动作、角色和命题；RDF
+<h3 id="学习主线">8.2 学习主线</h3>
+<p>理解这些知识表示方法时，不要把每个知识点孤立看待。可以按照“知识如何被组织、如何被推理、适合解决什么问题”这条线串起来。语义网络和框架都关心常识结构，但一个偏图，一个偏对象模板；概念图和自然语言理解联系紧密，因为它能表示动作、角色和命题；RDF
 和 SPARQL
 则把知识表示推进到工程层面，用标准三元组和查询语言支持大规模知识图谱。</p>
-<p>如果时间很紧，至少要掌握四个例子：金丝雀语义网络说明继承，hotel room
+<p>四个例子可以把本章核心思想串起来：金丝雀语义网络说明继承，hotel room
 说明框架和 slot，Tom believes that Jane likes pizza 说明命题概念，Sean
-Penn 说明 RDF
-三元组。把这四个例子讲清楚，本章大部分核心思想就能连起来。</p>
+Penn 说明 RDF 三元组。</p>
 <h2 id="参考资料与补充来源">9 参考资料与补充来源</h2>
 <ul>
 <li>W3C RDF 1.1 Concepts and Abstract Syntax：RDF

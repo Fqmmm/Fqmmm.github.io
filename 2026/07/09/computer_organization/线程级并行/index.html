@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="线程级并行-量化第5章 目录  并行计算机的基本概念与体系结构分类 线程级并行面临的主要挑战 集中式共享存储器与 Cache 一致性 监听一致性协议：写作废、MSI、MESI 与 MOESI 对称共享存储器多处理器的性能与可扩展性 分布式共享存储器与目录式一致性协议 存储连贯性模型：SC、TSO&#x2F;PSO 与弱序模型 同步机制：互斥、信号量、原子操作与锁性能 重点梳理  1">
+    <meta name="description" content="线程级并行-量化第5章 目录  并行计算机的基本概念与体系结构分类 线程级并行面临的主要挑战 集中式共享存储器与 Cache 一致性 监听一致性协议：写作废、MSI、MESI 与 MOESI 对称共享存储器多处理器的性能与可扩展性 分布式共享存储器与目录式一致性协议 存储连贯性模型：SC、TSO&#x2F;PSO 与弱序模型 同步机制：互斥、信号量、原子操作与锁性能 总结与对比">
 <meta property="og:type" content="article">
 <meta property="og:title" content="线程级并行-量化第5章">
 <meta property="og:url" content="http://example.com/2026/07/09/computer_organization/%E7%BA%BF%E7%A8%8B%E7%BA%A7%E5%B9%B6%E8%A1%8C/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="线程级并行-量化第5章 目录  并行计算机的基本概念与体系结构分类 线程级并行面临的主要挑战 集中式共享存储器与 Cache 一致性 监听一致性协议：写作废、MSI、MESI 与 MOESI 对称共享存储器多处理器的性能与可扩展性 分布式共享存储器与目录式一致性协议 存储连贯性模型：SC、TSO&#x2F;PSO 与弱序模型 同步机制：互斥、信号量、原子操作与锁性能 重点梳理  1">
+<meta property="og:description" content="线程级并行-量化第5章 目录  并行计算机的基本概念与体系结构分类 线程级并行面临的主要挑战 集中式共享存储器与 Cache 一致性 监听一致性协议：写作废、MSI、MESI 与 MOESI 对称共享存储器多处理器的性能与可扩展性 分布式共享存储器与目录式一致性协议 存储连贯性模型：SC、TSO&#x2F;PSO 与弱序模型 同步机制：互斥、信号量、原子操作与锁性能 总结与对比">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260529114936897.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260529115035720.png">
@@ -43,7 +43,7 @@
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260608105314638.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260608105356077.png">
 <meta property="article:published_time" content="2026-07-09T06:51:22.596Z">
-<meta property="article:modified_time" content="2026-07-09T07:37:03.677Z">
+<meta property="article:modified_time" content="2026-07-09T08:04:47.043Z">
 <meta property="article:author" content="Fqmmm">
 <meta property="article:tag" content="Cache一致性">
 <meta property="article:tag" content="同步">
@@ -172,7 +172,7 @@ DSM&#x2F;NUMA</span></a></li></ol></li><li class="nav-item nav-level-1"><a class
 实现互斥为什么困难</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%B8%80"><span class="nav-number">10.3.1.</span> <span class="nav-text">8.3.1 方法一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E4%BA%8C"><span class="nav-number">10.3.2.</span> <span class="nav-text">8.3.2 方法二</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dekker-%E5%8D%8F%E8%AE%AE"><span class="nav-number">10.3.3.</span> <span class="nav-text">8.3.3 Dekker 协议</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%87%8F"><span class="nav-number">10.4.</span> <span class="nav-text">8.4 信号量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E5%AD%90%E8%AF%BB-%E6%94%B9-%E5%86%99%E6%8C%87%E4%BB%A4"><span class="nav-number">10.5.</span> <span class="nav-text">8.5 原子读-改-写指令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8-exchange-%E5%AE%9E%E7%8E%B0%E8%87%AA%E6%97%8B%E9%94%81"><span class="nav-number">10.5.1.</span> <span class="nav-text">8.5.1 用 Exchange 实现自旋锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#testsetfetchadd-%E5%92%8C-swap"><span class="nav-number">10.5.2.</span> <span class="nav-text">8.5.2 Test&amp;Set、Fetch&amp;Add 和
 Swap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E7%94%A8-testset-%E4%BF%9D%E6%8A%A4%E5%A4%9A%E6%B6%88%E8%B4%B9%E8%80%85%E9%98%9F%E5%88%97"><span class="nav-number">10.5.3.</span> <span class="nav-text">8.5.3 例子：用 Test&amp;Set
 保护多消费者队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90%E7%94%A8-compareswap-%E5%AE%9E%E7%8E%B0%E9%9D%9E%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97%E5%90%8C%E6%AD%A5"><span class="nav-number">10.5.4.</span> <span class="nav-text">8.5.4 例子：用
-Compare&amp;Swap 实现非阻塞队列同步</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E5%90%8C%E6%AD%A5%E4%B8%8E%E9%9D%9E%E9%98%BB%E5%A1%9E%E5%90%8C%E6%AD%A5%E7%9A%84%E6%80%A7%E8%83%BD"><span class="nav-number">10.6.</span> <span class="nav-text">8.6 阻塞同步与非阻塞同步的性能</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%A2%B3%E7%90%86"><span class="nav-number">11.</span> <span class="nav-text">9 重点梳理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%A6%82%E5%BF%B5%E5%AF%B9%E7%85%A7"><span class="nav-number">11.1.</span> <span class="nav-text">9.1 重点概念对照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%80%83%E9%A2%98%E5%9E%8B%E4%B8%8E%E7%AD%94%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="nav-number">11.2.</span> <span class="nav-text">9.2 常考题型与答题思路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E4%B8%BB%E7%BA%BF%E6%80%BB%E7%BB%93"><span class="nav-number">11.3.</span> <span class="nav-text">9.3 本章主线总结</span></a></li></ol></li></ol></div>
+Compare&amp;Swap 实现非阻塞队列同步</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E5%90%8C%E6%AD%A5%E4%B8%8E%E9%9D%9E%E9%98%BB%E5%A1%9E%E5%90%8C%E6%AD%A5%E7%9A%84%E6%80%A7%E8%83%BD"><span class="nav-number">10.6.</span> <span class="nav-text">8.6 阻塞同步与非阻塞同步的性能</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">11.</span> <span class="nav-text">9 总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5%E5%AF%B9%E7%85%A7"><span class="nav-number">11.1.</span> <span class="nav-text">9.1 核心概念对照</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%88%86%E6%9E%90%E5%9C%BA%E6%99%AF"><span class="nav-number">11.2.</span> <span class="nav-text">9.2 常见分析场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E4%B8%BB%E7%BA%BF%E6%80%BB%E7%BB%93"><span class="nav-number">11.3.</span> <span class="nav-text">9.3 本章主线总结</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -253,7 +253,7 @@ Compare&amp;Swap 实现非阻塞队列同步</span></a></li></ol></li><li class=
       <span class="post-meta-item-text">Posted on</span>
       
 
-      <time title="Created: 2026-07-09 14:51:22 / Modified: 15:37:03" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 16:04:47" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -285,7 +285,7 @@ Compare&amp;Swap 实现非阻塞队列同步</span></a></li></ol></li><li class=
 <li>分布式共享存储器与目录式一致性协议</li>
 <li>存储连贯性模型：SC、TSO/PSO 与弱序模型</li>
 <li>同步机制：互斥、信号量、原子操作与锁性能</li>
-<li>重点梳理</li>
+<li>总结与对比</li>
 </ul>
 <h1 id="并行计算机的基本概念与体系结构分类">1
 并行计算机的基本概念与体系结构分类</h1>
@@ -423,7 +423,7 @@ S=\frac{1}{(1-f)+\frac{f}{N}}
 $$</span></p>
 <p>其中 <span class="math inline">(1 − <em>f</em>)</span>
 是串行部分比例。这个公式的含义很尖锐：只要串行部分不够小，处理器数量再多也会被串行部分限制。</p>
-<p>例如一个例题要求用 <span class="math inline">100</span> 个处理器达到
+<p>例如一个场景要求用 <span class="math inline">100</span> 个处理器达到
 <span class="math inline">80</span> 的加速比：</p>
 <p><span class="math display">$$
 80=\frac{1}{(1-f)+\frac{f}{100}}
@@ -440,7 +440,7 @@ class="math inline">0.25%</span>。这说明当目标加速比非常高时，哪
 class="math inline">100 ∼ 500</span>
 个时钟周期。这个开销取决于通信机制、互连网络类型和多处理器规模。</p>
 <p>通信开销对 CPI 的影响可以用“基本 CPI +
-远程访问惩罚”理解。例题设处理器频率为 <span class="math inline">3.3
+远程访问惩罚”理解。假设处理器频率为 <span class="math inline">3.3
 GHz</span>，时钟周期约为 <span class="math inline">0.3
 ns</span>，远程访问时间为 <span class="math inline">200
 ns</span>，远程访问开销约为</p>
@@ -1664,7 +1664,7 @@ fence。</p>
 提前执行，借助写缓冲隐藏写延迟，但仍保留较多顺序约束。</p></li>
 <li><p>PSO（Partial Store Ordering）比 TSO
 更放松，可以进一步允许不同地址的 Store-Store
-顺序被放松。不同体系结构的精确定义有所不同，重点掌握思想：越放松，硬件越容易优化，程序员越需要显式同步。</p></li>
+顺序被放松。不同体系结构的精确定义有所不同，核心思想是：越放松，硬件越容易优化，程序员越需要显式同步。</p></li>
 <li><p>弱序（Weak
 Ordering）进一步利用同步操作划分程序。同步操作之间的普通读写可以重排，只要保持线程内部真实依赖；但在同步操作前后，必须等待相关内存操作完成。这样程序员用
 lock、unlock、barrier、fence
@@ -2049,8 +2049,8 @@ Compare&amp;Swap 实现非阻塞队列同步</h3>
 的乱序执行能力。可以这样比较：阻塞式锁把竞争集中到锁变量上，容易造成锁变量热点；非阻塞算法把竞争集中到
 CAS 提交点上，失败者会重试；普通 Load/Store
 协议硬件要求低，但正确性设计最困难。</p>
-<h1 id="重点梳理">9 重点梳理</h1>
-<h2 id="重点概念对照">9.1 重点概念对照</h2>
+<h1 id="总结">9 总结</h1>
+<h2 id="核心概念对照">9.1 核心概念对照</h2>
 <table>
 <colgroup>
 <col style="width: 50%" />
@@ -2141,29 +2141,29 @@ style="text-align: left;">不同线程对同一位置的冲突访问之间缺少
 </tr>
 </tbody>
 </table>
-<h2 id="常考题型与答题思路">9.2 常考题型与答题思路</h2>
+<h2 id="常见分析场景">9.2 常见分析场景</h2>
 <p>Amdahl
-定律题通常给出处理器数量和目标加速比，要求求串行比例或并行比例。先写</p>
+定律常用于分析处理器数量、目标加速比和程序并行比例之间的关系。基本公式是：</p>
 <p><span class="math display">$$
 S=\frac{1}{(1-f)+\frac{f}{N}}
 $$</span></p>
-<p>再代入求 <span
-class="math inline"><em>f</em></span>，最后记得回答串行比例是 <span
+<p>代入后可以求出可并行比例 <span
+class="math inline"><em>f</em></span>，串行比例则是 <span
 class="math inline">1 − <em>f</em></span>。</p>
-<p>CPI 与远程访问题通常给出基本
-CPI、远程访问比例、远程访问时间和频率。先用频率求时钟周期，再把远程访问时间换算成周期数，最后使用</p>
+<p>CPI 与远程访问开销分析通常需要基本
+CPI、远程访问比例、远程访问时间和频率。先用频率求时钟周期，再把远程访问时间换算成周期数，最后使用：</p>
 <p><span
 class="math display"><em>C</em><em>P</em><em>I</em><sub>实际</sub> = <em>C</em><em>P</em><em>I</em><sub>基本</sub> + 远程访问率 × 远程访问开销</span></p>
-<p>Cache
-一致性题常要求判断读写序列中的状态变化。做题时先标出初始状态，再逐条看事件：读缺失发
+<p>分析 Cache
+一致性读写序列时，可以先标出初始状态，再逐条看事件：读缺失发
 BusRd，写共享块发 BusRdX 或升级，M 状态被别人读要
 Flush，别人写要作废。不要只看变量值，还要看块状态。</p>
-<p>真共享和假共享题要看访问的是不是同一个变量。如果是同一变量在线程间传递，是真共享；如果不同变量落在同一
+<p>区分真共享和假共享时，要看访问的是不是同一个变量。如果是同一变量在线程间传递，是真共享；如果不同变量落在同一
 Cache line，因块级作废造成缺失，就是假共享。</p>
-<p>存储连贯性题常给两段并行代码，问某个结果是否可能。先按 SC
+<p>分析存储连贯性时，可以先按 SC
 假设列出每个线程程序序，再看这些序能否组成一个无矛盾的全局序。如果在 SC
 下不可能但现实硬件可能出现，通常原因是写缓冲、乱序执行或放松模型允许某些重排。</p>
-<p>同步题要抓住两个问题：互斥是否保证同一时刻只有一个线程进入临界区，顺序是否保证发布的数据先于标志位对其他线程可见。普通
+<p>同步机制要抓住两个问题：互斥是否保证同一时刻只有一个线程进入临界区，顺序是否保证发布的数据先于标志位对其他线程可见。普通
 Load/Store 难以同时解决这两个问题，所以需要原子 read-modify-write 指令和
 fence。</p>
 <h2 id="本章主线总结">9.3 本章主线总结</h2>
