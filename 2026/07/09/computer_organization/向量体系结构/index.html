@@ -504,14 +504,14 @@ forward 思想引入向量执行。</strong></p>
 <p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260525103142859.png" alt="image-20260525103142722" style="zoom:33%;" /></p>
 <p><strong>下面给出三种执行方式的执行时间。</strong></p>
 <ul>
-<li><strong>三条指令完全串行：</strong><span
-class="math inline">[(1 + 6 + 1) + <em>N</em> − 1] + [(1 + 6 + 1) + <em>N</em> − 1] + [(1 + 7 + 1) + <em>N</em> − 1] = 3<em>N</em> + 22</span>
+<li><strong>三条指令完全串行：</strong><span class="math inline">\([(1+
+6+ 1)+ N- 1]+ [(1+ 6+ 1)+N- 1] + [( 1+ 7+ 1)+ N- 1] = 3N + 22\)</span>
 拍。</li>
 <li><strong>前两条并行，第三条串行：</strong><span
-class="math inline">[(1 + 6 + 1) + <em>N</em> − 1] + [(1 + 7 + 1) + <em>N</em> − 1] = 2<em>N</em> + 15</span>
-拍。</li>
+class="math inline">\([(1+ 6+ 1)+ N- 1] + [(1+ 7+ 1)+ N- 1]= 2N +
+15\)</span> 拍。</li>
 <li><strong>前两条并行且第三条链接执行：</strong><span
-class="math inline">[(1 + 6 + 1)] + [(1 + 7 + 1)] + (<em>N</em> − 1) = <em>N</em> + 16</span>​
+class="math inline">\([(1+6+1)] + [(1+7+1)]+(N - 1)=N + 16\)</span>​
 拍。</li>
 </ul>
 <p>链接执行时，第三条乘法不用等 V2 和 V3 的所有元素都算完。只要第一个
@@ -556,30 +556,27 @@ Mining）</strong>将任意长度向量拆成多个长度不超过 MVL
 <p>执行时间计算公式：处理长度为 n
 的向量，总共需要多少时间/时钟周期？</p>
 <ul>
-<li><span class="math inline">$T_n = ceil (\frac{n}{MVL}) × (T_{loop} +
-T_{start}) + n × T_{chime}$</span></li>
+<li><span class="math inline">\(T_n = ceil (\frac{n}{MVL}) × (T_{loop} +
+T_{start}) + n × T_{chime}\)</span></li>
+<li><span class="math inline">\(T_n\)</span>：处理长度为 <span
+class="math inline">\(n\)</span> 的整个向量所需的总时间。</li>
 <li><span
-class="math inline"><em>T</em><sub><em>n</em></sub></span>：处理长度为
-<span class="math inline"><em>n</em></span>
-的整个向量所需的总时间。</li>
+class="math inline">\(MVL\)</span>：最大向量长度，即硬件一次向量操作最多能处理多少个元素。</li>
 <li><span
-class="math inline"><em>M</em><em>V</em><em>L</em></span>：最大向量长度，即硬件一次向量操作最多能处理多少个元素。</li>
+class="math inline">\(T_{loop}\)</span>：每处理一个条带时，循环控制本身带来的开销。</li>
 <li><span
-class="math inline"><em>T</em><sub><em>l</em><em>o</em><em>o</em><em>p</em></sub></span>：每处理一个条带时，循环控制本身带来的开销。</li>
+class="math inline">\(T_{start}\)</span>：每处理一个条带时，向量指令启动开销的总和。</li>
 <li><span
-class="math inline"><em>T</em><sub><em>s</em><em>t</em><em>a</em><em>r</em><em>t</em></sub></span>：每处理一个条带时，向量指令启动开销的总和。</li>
-<li><span
-class="math inline"><em>T</em><sub><em>c</em><em>h</em><em>i</em><em>m</em><em>e</em></sub></span>：每个元素在稳定流水状态下的执行时间。如果一个向量循环需要若干个护航组，每个护航组大致每个元素
-1 拍，那么 <span
-class="math inline"><em>T</em><sub><em>c</em><em>h</em><em>i</em><em>m</em><em>e</em></sub></span>
-= 护航组数量。</li>
+class="math inline">\(T_{chime}\)</span>：每个元素在稳定流水状态下的执行时间。如果一个向量循环需要若干个护航组，每个护航组大致每个元素
+1 拍，那么 <span class="math inline">\(T_{chime}\)</span> =
+护航组数量。</li>
 </ul>
 <p>示例：<code>A = B × s</code> - <code>A</code>、<code>B</code> 长度为
-200，即 <span
-class="math inline"><em>n</em> = 200</span>。<code>s</code> 是标量。</p>
+200，即 <span class="math inline">\(n=200\)</span>。<code>s</code>
+是标量。</p>
 <ul>
 <li><p>向量寄存器长度 64，即 <span
-class="math inline"><em>M</em><em>V</em><em>L</em> = 64</span>。</p></li>
+class="math inline">\(MVL=64\)</span>。</p></li>
 <li><p><code>Tloop = 15</code>。</p></li>
 <li><p><code>Tstart = 12 + 7 + 12 = 31</code>。假设load启动时间=12周期，store启动时间=12周期，惩罚启动时间为7周期。</p></li>
 <li><p><code>Tchime=3</code>。</p>
@@ -622,16 +619,15 @@ bank。此外，大步幅还可能导致 TLB 缺失频繁。</p>
 <h2 id="向量性能指标">4.6 向量性能指标</h2>
 <ul>
 <li><span
-class="math inline"><em>R</em><sub>∞</sub></span>：向量长度趋于无穷大时的最大向量流水线性能。常用于评价峰值性能，单位通常为
+class="math inline">\(R_∞\)</span>：向量长度趋于无穷大时的最大向量流水线性能。常用于评价峰值性能，单位通常为
 MFLOPS。</li>
-<li><span
-class="math inline"><em>R</em><sub><em>n</em></sub></span>：向量长度为
-<span class="math inline"><em>n</em></span> 时的实际性能。</li>
-<li><span class="math inline"><em>N</em><sub>1/2</sub></span>：达到
-<span class="math inline"><em>R</em><sub>∞</sub></span>
+<li><span class="math inline">\(R_n\)</span>：向量长度为 <span
+class="math inline">\(n\)</span> 时的实际性能。</li>
+<li><span class="math inline">\(N_{1/2}\)</span>：达到 <span
+class="math inline">\(R_∞\)</span>
 一半性能所需的向量长度。用于衡量启动时间对性能的影响。</li>
 <li><span
-class="math inline"><em>N</em><sub><em>V</em></sub></span>：向量方式开始快于标量串行方式所需的临界向量长度。反映启动开销和标量/向量速度比。</li>
+class="math inline">\(N_V\)</span>：向量方式开始快于标量串行方式所需的临界向量长度。反映启动开销和标量/向量速度比。</li>
 </ul>
 <h1 id="面向多媒体应用的-simd-指令集扩展">5. 面向多媒体应用的 SIMD
 指令集扩展</h1>

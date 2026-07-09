@@ -317,14 +317,16 @@
 <h2 id="avl树">AVL树</h2>
 <p>BST树有一个重大的问题：不平衡。例如，根据数字序列1，2，3，4，5，6构建一颗BST树，那么2会挂到1右边，3会挂到2右边……依次下去，这棵树本质上是一个链表，查找的时间复杂度退化为
 <span
-class="math inline"><em>O</em>(<em>n</em>)</span>。究其根本，是因为这个树右边太重，左边太轻，不平衡。</p>
+class="math inline">\(O(n)\)</span>。究其根本，是因为这个树右边太重，左边太轻，不平衡。</p>
 <p>于是AVL树应运而生。它在插入后会进行旋转操作，确保这棵树是平衡的。那么究竟什么是”平衡“？怎样量化一棵树的”平衡程度“？</p>
 <h3 id="平衡因子">平衡因子</h3>
 <p>平衡因子就是量化平衡程度的一个指标。它的定义如下： <span
-class="math display"><em>节</em><em>点</em><em>的</em><em>平</em><em>衡</em><em>因</em><em>子</em> = <em>左</em><em>子</em><em>树</em><em>高</em><em>度</em> − <em>右</em><em>子</em><em>树</em><em>高</em><em>度</em></span></p>
+class="math display">\[
+节点的平衡因子=左子树高度-右子树高度
+\]</span></p>
 <blockquote>
 <p>殷人昆的书上定义为<span
-class="math inline"><em>右</em><em>子</em><em>树</em><em>高</em><em>度</em> − <em>左</em><em>子</em><em>树</em><em>高</em><em>度</em></span>，但是无伤大雅。</p>
+class="math inline">\(右子树高度-左子树高度\)</span>，但是无伤大雅。</p>
 </blockquote>
 <p>一棵树中，如果每个节点的平衡因子的绝对值都小于等于1，那么就说这棵树是平衡的；否则，这棵树就是不平衡的。</p>
 <h3 id="查找-1">查找</h3>
@@ -455,10 +457,11 @@ alt="image-20251205155629482" />
 <p>删除操作比较复杂，这里不做讨论。</p>
 <h2 id="b树">B树</h2>
 <p>B树是一种多叉排序树。为了保证查找效率，<span
-class="math inline"><em>m</em></span>
+class="math inline">\(m\)</span>
 叉排序树需保证：<strong>除了根节点之外，任何节点至少要有 <span
-class="math inline">$\lceil \frac{m}{2} \rceil$</span> 个分叉，即至少有
-<span class="math inline">$\lceil \frac{m}{2} \rceil-1$</span>
+class="math inline">\(\lceil \frac{m}{2} \rceil\)</span>
+个分叉，即至少有 <span class="math inline">\(\lceil \frac{m}{2}
+\rceil-1\)</span>
 个关键字。例如，5叉排序树除了根节点外，每个节点至少有3个分叉，2个关键字。</strong></p>
 <p><img src="/assets/image-20251205171215631.png" alt="image-20251205171215631" style="zoom:50%;" /></p>
 <h3 id="插入-4">插入</h3>
@@ -467,8 +470,8 @@ class="math inline">$\lceil \frac{m}{2} \rceil$</span> 个分叉，即至少有
 <ul>
 <li><p>插入25，38，49，60：<img src="/assets/image-20251205171413149.png" alt="image-20251205171413149" style="zoom: 50%;" /></p></li>
 <li><p>插入80，此时超出了一个节点的最大容量。取中间位置（<span
-class="math inline">$\lceil \frac{m}{2}
-\rceil$</span>）处的关键字，将节点<strong>裂变</strong>为两部分。</p></li>
+class="math inline">\(\lceil \frac{m}{2}
+\rceil\)</span>）处的关键字，将节点<strong>裂变</strong>为两部分。</p></li>
 </ul>
 <p><img src="/assets/image-20251205171540853.png" alt="image-20251205171540853" style="zoom:50%;" /><img src="/assets/image-20251205171551075.png" alt="image-20251205171551075" style="zoom:50%;" /></p>
 <ul>
@@ -491,7 +494,7 @@ class="math inline">$\lceil \frac{m}{2}
 <li>若被删数字在叶子节点，则直接删除</li>
 <li>若被删数字在内部节点，则用它的前驱/后继代替</li>
 <li>最后检查是否下溢出（节点元素个数小于<span
-class="math inline">$\lceil \frac{m}{2} \rceil-1$</span>）
+class="math inline">\(\lceil \frac{m}{2} \rceil-1\)</span>）
 <ul>
 <li>兄弟够借，则问兄弟借一个，然后调整</li>
 <li>兄弟不够借，则与兄弟合并，然后调整</li>
@@ -581,8 +584,8 @@ alt="image-20251205174724488" />
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/2026/01/11/DCD/%E6%B1%89%E6%98%8E%E7%A0%81/" rel="prev" title="深入理解汉明码">
-                  <i class="fa fa-angle-left"></i> 深入理解汉明码
+                <a href="/2026/01/11/DCD/%E6%94%B9%E9%80%A0%E6%88%91%E4%BB%AC%E7%9A%84%E8%AE%A1%E6%95%B0%E5%99%A8/" rel="prev" title="改造我们的计数器">
+                  <i class="fa fa-angle-left"></i> 改造我们的计数器
                 </a>
             </div>
             <div class="post-nav-item">

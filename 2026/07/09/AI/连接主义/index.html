@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="神经元 人工神经元  $\sigma &#x3D; \sum \limits_{i&#x3D;1}^n w_i x_i$ y &#x3D; f(σ) 其中 f 是一个阈值函数，大于等于阈值取1，小于阈值取-1。  这里的符号定义比较奇怪，$\sigma&#x3D;\sum \limits_{i&#x3D;1}^n w_i x_i$， f 是激活函数  McCulloch-Pitts模型  这两个神经元分别实现了与逻辑和">
+    <meta name="description" content="神经元 人工神经元  \(\sigma &#x3D; \sum \limits_{i&#x3D;1}^n w_i x_i\) \(y &#x3D; f(\sigma)\) 其中 \(f\) 是一个阈值函数，大于等于阈值取1，小于阈值取-1。  这里的符号定义比较奇怪，\(\sigma&#x3D;\sum \limits_{i&#x3D;1}^n w_i x_i\)， \(f\) 是激活函数  McCulloch-Pitts">
 <meta property="og:type" content="article">
 <meta property="og:title" content="连接主义">
 <meta property="og:url" content="http://example.com/2026/07/09/AI/%E8%BF%9E%E6%8E%A5%E4%B8%BB%E4%B9%89/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="神经元 人工神经元  $\sigma &#x3D; \sum \limits_{i&#x3D;1}^n w_i x_i$ y &#x3D; f(σ) 其中 f 是一个阈值函数，大于等于阈值取1，小于阈值取-1。  这里的符号定义比较奇怪，$\sigma&#x3D;\sum \limits_{i&#x3D;1}^n w_i x_i$， f 是激活函数  McCulloch-Pitts模型  这两个神经元分别实现了与逻辑和">
+<meta property="og:description" content="神经元 人工神经元  \(\sigma &#x3D; \sum \limits_{i&#x3D;1}^n w_i x_i\) \(y &#x3D; f(\sigma)\) 其中 \(f\) 是一个阈值函数，大于等于阈值取1，小于阈值取-1。  这里的符号定义比较奇怪，\(\sigma&#x3D;\sum \limits_{i&#x3D;1}^n w_i x_i\)， \(f\) 是激活函数  McCulloch-Pitts">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260313105806643.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260313105919117.png">
@@ -246,104 +246,102 @@
     <div class="post-body" itemprop="articleBody"><h2 id="神经元">神经元</h2>
 <h3 id="人工神经元">人工神经元</h3>
 <p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260313105806643.png" alt="image-20260313105806568" style="zoom:33%;" /></p>
-<p><span class="math inline">$\sigma = \sum \limits_{i=1}^n w_i
-x_i$</span></p>
-<p><span
-class="math inline"><em>y</em> = <em>f</em>(<em>σ</em>)</span></p>
-<p>其中 <span class="math inline"><em>f</em></span>
+<p><span class="math inline">\(\sigma = \sum \limits_{i=1}^n w_i
+x_i\)</span></p>
+<p><span class="math inline">\(y = f(\sigma)\)</span></p>
+<p>其中 <span class="math inline">\(f\)</span>
 是一个阈值函数，大于等于阈值取1，小于阈值取-1。</p>
 <blockquote>
-<p>这里的符号定义比较奇怪，<span class="math inline">$\sigma=\sum
-\limits_{i=1}^n w_i x_i$</span>， <span
-class="math inline"><em>f</em></span> 是激活函数</p>
+<p>这里的符号定义比较奇怪，<span class="math inline">\(\sigma=\sum
+\limits_{i=1}^n w_i x_i\)</span>， <span
+class="math inline">\(f\)</span> 是激活函数</p>
 </blockquote>
 <h3 id="mcculloch-pitts模型">McCulloch-Pitts模型</h3>
 <p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260313105919117.png" alt="image-20260313105919046" style="zoom:33%;" /></p>
 这两个神经元分别实现了与逻辑和或逻辑。激活函数使用符号函数 <span
-class="math inline">sign</span>： $$ (x) =
+class="math inline">\(\text{sign}\)</span>： $$ (x) =
+<span class="math display">\[\begin{cases}
+1, &amp; x \ge 0 \\
+
+-1, &amp; x &lt; 0
+\end{cases}\]</span>
 <p>$$</p>
 <h2 id="感知机">感知机</h2>
 <p>上面两个神经元的局限性在于，权重都是人工设定的，而无法通过大量的数据学习出来（自动调整）。Rosenblatt感知机解决了权重“自动调整”的问题。</p>
 <h3 id="rosenblatt感知机">Rosenblatt感知机</h3>
-<p>我们有一个训练样本 <span
-class="math inline">(<em>x</em>, <em>d</em>)</span>，其中 <span
-class="math inline"><em>d</em></span> 是期望输出（target），取值 <span
-class="math inline">+1</span> 或 <span class="math inline">−1</span>。
-当前感知机输出是 <span class="math inline"><em>y</em></span>​。如果 <span
-class="math inline"><em>y</em> = <em>d</em></span>，说明分类正确，不需要调整权重；如果
-<span
-class="math inline"><em>y</em> ≠ <em>d</em></span>，说明分类错误，需要调整权重。我们希望调整权重，使得下次遇到同样输入时，<span
-class="math inline"><em>y</em></span> 更接近 <span
-class="math inline"><em>d</em></span>。</p>
-<p>情况 1：<span class="math inline"><em>d</em> = +1</span>，但 <span
-class="math inline"><em>y</em> = −1</span></p>
+<p>我们有一个训练样本 <span class="math inline">\((x, d)\)</span>，其中
+<span class="math inline">\(d\)</span> 是期望输出（target），取值 <span
+class="math inline">\(+1\)</span> 或 <span
+class="math inline">\(-1\)</span>。 当前感知机输出是 <span
+class="math inline">\(y\)</span>​。如果 <span class="math inline">\(y =
+d\)</span>，说明分类正确，不需要调整权重；如果 <span
+class="math inline">\(y \neq
+d\)</span>，说明分类错误，需要调整权重。我们希望调整权重，使得下次遇到同样输入时，<span
+class="math inline">\(y\)</span> 更接近 <span
+class="math inline">\(d\)</span>。</p>
+<p>情况 1：<span class="math inline">\(d = +1\)</span>，但 <span
+class="math inline">\(y = -1\)</span></p>
 <ul>
-<li>当前 <span class="math inline">$\sum \limits_{i=1}^n w_i x_i &lt;
-0$</span>，我们希望它变大，变成 <span
-class="math inline"> ≥ 0</span>。</li>
-<li>增加权重的方向是：如果 <span
-class="math inline"><em>x</em><sub><em>i</em></sub> &gt; 0</span>，就增加
-<span class="math inline"><em>w</em><sub><em>i</em></sub></span>；如果
-<span
-class="math inline"><em>x</em><sub><em>i</em></sub> &lt; 0</span>，就减少
-<span
-class="math inline"><em>w</em><sub><em>i</em></sub></span>（因为负的输入乘负的权重会使总和变小）。</li>
-<li>统一表达：<span
-class="math inline"><em>Δ</em><em>w</em><sub><em>i</em></sub> ∝ (+1) ⋅ <em>x</em><sub><em>i</em></sub></span>，即
-<span
-class="math inline"><em>Δ</em><em>w</em><sub><em>i</em></sub> = <em>η</em> ⋅ <em>x</em><sub><em>i</em></sub></span>。</li>
+<li>当前 <span class="math inline">\(\sum \limits_{i=1}^n w_i x_i &lt;
+0\)</span>，我们希望它变大，变成 <span class="math inline">\(\geq
+0\)</span>。</li>
+<li>增加权重的方向是：如果 <span class="math inline">\(x_i &gt;
+0\)</span>，就增加 <span class="math inline">\(w_i\)</span>；如果 <span
+class="math inline">\(x_i &lt; 0\)</span>，就减少 <span
+class="math inline">\(w_i\)</span>（因为负的输入乘负的权重会使总和变小）。</li>
+<li>统一表达：<span class="math inline">\(\Delta w_i \propto (+1) \cdot
+x_i\)</span>，即 <span class="math inline">\(\Delta w_i = \eta \cdot
+x_i\)</span>。</li>
 </ul>
-<p>情况 2：<span class="math inline"><em>d</em> = −1</span>，但 <span
-class="math inline"><em>y</em> = +1</span></p>
+<p>情况 2：<span class="math inline">\(d = -1\)</span>，但 <span
+class="math inline">\(y = +1\)</span></p>
 <ul>
-<li>当前 <span class="math inline">$\sum \limits_{i=1}^n w_i x_i \geq
-0$</span>，我们希望它变小，变成 <span
-class="math inline"> &lt; 0</span>。</li>
-<li>减少权重的方向是：如果 <span
-class="math inline"><em>x</em><sub><em>i</em></sub> &gt; 0</span>，就减少
-<span class="math inline"><em>w</em><sub><em>i</em></sub></span>；如果
-<span
-class="math inline"><em>x</em><sub><em>i</em></sub> &lt; 0</span>，就增加
-<span class="math inline"><em>w</em><sub><em>i</em></sub></span>。</li>
-<li>统一表达：<span
-class="math inline"><em>Δ</em><em>w</em><sub><em>i</em></sub> ∝ (−1) ⋅ <em>x</em><sub><em>i</em></sub></span>，即
-<span
-class="math inline"><em>Δ</em><em>w</em><sub><em>i</em></sub> = −<em>η</em> ⋅ <em>x</em><sub><em>i</em></sub></span>。</li>
+<li>当前 <span class="math inline">\(\sum \limits_{i=1}^n w_i x_i \geq
+0\)</span>，我们希望它变小，变成 <span class="math inline">\(&lt;
+0\)</span>。</li>
+<li>减少权重的方向是：如果 <span class="math inline">\(x_i &gt;
+0\)</span>，就减少 <span class="math inline">\(w_i\)</span>；如果 <span
+class="math inline">\(x_i &lt; 0\)</span>，就增加 <span
+class="math inline">\(w_i\)</span>。</li>
+<li>统一表达：<span class="math inline">\(\Delta w_i \propto (-1) \cdot
+x_i\)</span>，即 <span class="math inline">\(\Delta w_i = -\eta \cdot
+x_i\)</span>。</li>
 </ul>
 <p>Rosenblatt 用的公式是：</p>
-<p><span class="math display">$$
+<p><span class="math display">\[
 \Delta w_i = r \cdot (d - \text{sign}(\sum \limits_{i=1}^n w_i x_i))
 \cdot x_i
-$$</span> 这里 <span class="math inline"><em>d</em> − <em>y</em></span>
-取值可能是 <span
-class="math inline">−2, 0, +2</span>，所以实际上相当于：</p>
-<p><span class="math display">$$
+\]</span> 这里 <span class="math inline">\(d - y\)</span> 取值可能是
+<span class="math inline">\(-2, 0, +2\)</span>，所以实际上相当于：</p>
+<p><span class="math display">\[
 \Delta w_i =
 \begin{cases}
 0 &amp; \text{if } d = y \\
 +2r x_i &amp; \text{if } d = +1, y = -1 \\
 -2r x_i &amp; \text{if } d = -1, y = +1
 \end{cases}
-$$</span> 常系数 2 可以并入学习率 <span
-class="math inline"><em>r</em></span>，所以通常写作：</p>
-<p><span
-class="math display"><em>Δ</em><em>w</em><sub><em>i</em></sub> = <em>r</em>(<em>d</em> − <em>y</em>)<em>x</em><sub><em>i</em></sub></span>
-其中 <span class="math inline">$y = \text{sign}(\sum \limits_{i=1}^n w_i
-x_i)$</span>。</p>
+\]</span> 常系数 2 可以并入学习率 <span
+class="math inline">\(r\)</span>，所以通常写作：</p>
+<p><span class="math display">\[
+\Delta w_i = r (d - y) x_i
+\]</span> 其中 <span class="math inline">\(y = \text{sign}(\sum
+\limits_{i=1}^n w_i x_i)\)</span>。</p>
 <p>这个更新规则的<strong>直觉</strong>是：</p>
 <ul>
-<li>如果输出太小（应该 <span class="math inline">+1</span> 却得到 <span
-class="math inline">−1</span>），就加大权重，方向与输入相同；</li>
-<li>如果输出太大（应该 <span class="math inline">−1</span> 却得到 <span
-class="math inline">+1</span>），就减小权重，方向与输入相反；</li>
+<li>如果输出太小（应该 <span class="math inline">\(+1\)</span> 却得到
+<span
+class="math inline">\(-1\)</span>），就加大权重，方向与输入相同；</li>
+<li>如果输出太大（应该 <span class="math inline">\(-1\)</span> 却得到
+<span
+class="math inline">\(+1\)</span>），就减小权重，方向与输入相反；</li>
 <li>权重调整的大小与输入值成正比（输入越大，影响越大）。</li>
 </ul>
 <h3 id="感知机的局限性">感知机的局限性</h3>
 <table>
 <thead>
 <tr>
-<th><span class="math inline"><em>x</em><sub>1</sub></span></th>
-<th><span class="math inline"><em>x</em><sub>2</sub></span></th>
+<th><span class="math inline">\(x_1\)</span></th>
+<th><span class="math inline">\(x_2\)</span></th>
 <th>输出</th>
 </tr>
 </thead>
@@ -371,34 +369,34 @@ class="math inline">+1</span>），就减小权重，方向与输入相反；</l
 </tbody>
 </table>
 <p>这是异或逻辑的真值表。如果用感知机来建模，会得到： <span
-class="math display">$$
+class="math display">\[
 w_1 \times0+w_2 \times 0 &lt; t\\
 w_1 \times0+w_2 \times 1 &gt; t\\
 w_1 \times1+w_2 \times 0 &gt; t\\
 w_1 \times1+w_2 \times 1 &lt; t
-$$</span> 其中 <span class="math inline"><em>t</em></span>
+\]</span> 其中 <span class="math inline">\(t\)</span>
 是符号函数的阈值。显然这个不等式组是无解的。</p>
 <p>事实上，单个感知机本质上是一个线性分类器。在二维特征空间中，它的决策边界是一条直线；在
-<span class="math inline"><em>D</em></span> 维特征空间中，则表现为 <span
-class="math inline"><em>D</em> − 1</span>
+<span class="math inline">\(D\)</span> 维特征空间中，则表现为 <span
+class="math inline">\(D - 1\)</span>
 维的线性超平面。单个感知机只能处理线性可分问题，无法解决异或等线性不可分问题。</p>
 <h2 id="多层感知机">多层感知机</h2>
 <p>为了克服线性不可分的限制，引入了sigmoid函数和隐藏层。一般而言，隐藏层神经元个数=输入层神经元个数的
 1.2-1.5 倍</p>
 <h3 id="sigmoid函数">sigmoid函数</h3>
-<p><span class="math display">$$
+<p><span class="math display">\[
 f(x)=\frac{1}{1+e^{-x}}
-$$</span></p>
+\]</span></p>
 <p>性质：<span
-class="math inline"><em>f</em><sup>′</sup>(<em>x</em>) = <em>f</em>(<em>x</em>)(1 − <em>f</em>(<em>x</em>))</span>，便于求导</p>
+class="math inline">\(f&#39;(x)=f(x)(1-f(x))\)</span>，便于求导</p>
 <h3 id="隐藏层的本质">隐藏层的本质</h3>
 <p>在传统的线性模型中，如果你发现数据不是线性的，你必须手动去构建特征（特征工程）。例如想预测房价，但房价和面积是平方关系，你得手动在模型里加一个
-<span class="math inline"><em>x</em><sup>2</sup></span>。这里的 <span
-class="math inline"><em>x</em><sup>2</sup></span> 就是基函数 <span
-class="math inline"><em>ϕ</em></span>。</p>
+<span class="math inline">\(x^2\)</span>。这里的 <span
+class="math inline">\(x^2\)</span> 就是基函数 <span
+class="math inline">\(\phi\)</span>。</p>
 <p>但这种基函数是<strong>人工硬编码</strong>进去的。如果问题很复杂（比如识别人脸），人类根本不知道该写出什么样的数学公式来表达“眼睛”或“鼻子”的特征。</p>
 <p>而神经网络将把隐藏层看作是基函数。每个神经元都在尝试对原始输入进行某种变换。因为权重
-<span class="math inline"><em>w</em></span>
+<span class="math inline">\(w\)</span>
 是可以学习的，神经网络会根据数据自己去调整这些变换方案。它会自己学会：第一层提取线条，第二层组合成形状，第三层组合成五官。</p>
 <h3 id="痛点">痛点</h3>
 <p>数学上可以证明，如果隐藏层的神经元足够多，就可以拟合任何函数（通用近似定理）。但问题在于，“拟合任何函数”当且仅当“学习到最合适的权重”。但“学习到最合适的权重”是一种奢望，因为梯度下降法对初始值敏感，且很容易陷入局部最小值，更会受到鞍点的影响。</p>
@@ -410,32 +408,28 @@ class="math inline"><em>ϕ</em></span>。</p>
 <h3 id="为什么损失函数大都是非凸的">为什么损失函数大都是非凸的</h3>
 <p>这里我们采用反证法，从直觉上说明这一问题。</p>
 <p>设原始神经网络为 <span
-class="math inline"><em>N</em><sub>1</sub></span>，交换中间两个神经元后为
-<span class="math inline"><em>N</em><sub>2</sub></span>。由对称性可知
-<span class="math inline"><em>N</em><sub>1</sub></span> 和 <span
-class="math inline"><em>N</em><sub>2</sub></span> 等价。<span
-class="math inline"><em>N</em><sub>1</sub></span> 和 <span
-class="math inline"><em>N</em><sub>2</sub></span>
-两个网络参数取平均值得到 <span
-class="math inline"><em>N</em><sub>3</sub></span>。</p>
-<p>直观上 <span class="math inline"><em>N</em><sub>3</sub></span>
-的建模能力比 <span class="math inline"><em>N</em><sub>1</sub></span> 和
-<span class="math inline"><em>N</em><sub>2</sub></span> 都差。例如，在
-<span class="math inline"><em>N</em><sub>1</sub></span> 中，神经元 A
-负责识别“横线”，神经元 B 负责识别“竖线”。在 <span
-class="math inline"><em>N</em><sub>2</sub></span> 中，变成 A
-识别“竖线”，B 识别“横线”。在 <span
-class="math inline"><em>N</em><sub>3</sub></span> 中，现在的 A
-变成了“（横线+竖线）/ 2”，B 也变成了“（横线+竖线）/
+class="math inline">\(N_1\)</span>，交换中间两个神经元后为 <span
+class="math inline">\(N_2\)</span>。由对称性可知 <span
+class="math inline">\(N_1\)</span> 和 <span
+class="math inline">\(N_2\)</span> 等价。<span
+class="math inline">\(N_1\)</span> 和 <span
+class="math inline">\(N_2\)</span> 两个网络参数取平均值得到 <span
+class="math inline">\(N_3\)</span>。</p>
+<p>直观上 <span class="math inline">\(N_3\)</span> 的建模能力比 <span
+class="math inline">\(N_1\)</span> 和 <span
+class="math inline">\(N_2\)</span> 都差。例如，在 <span
+class="math inline">\(N_1\)</span> 中，神经元 A 负责识别“横线”，神经元 B
+负责识别“竖线”。在 <span class="math inline">\(N_2\)</span> 中，变成 A
+识别“竖线”，B 识别“横线”。在 <span class="math inline">\(N_3\)</span>
+中，现在的 A 变成了“（横线+竖线）/ 2”，B 也变成了“（横线+竖线）/
 2”。原本两个分工明确的专家（一个看横，一个看竖），变成了两个“平庸”的神经元（两个都看模糊的斜线或十字）。这种由于参数平均化导致的“特征模糊”，会让网络失去原有的判别能力。所以，<strong><span
-class="math inline"><em>N</em><sub>3</sub></span>
+class="math inline">\(N_3\)</span>
 的预测效果大概率会变差，导致它的损失函数 <span
-class="math inline"><em>L</em>(<em>N</em><sub>3</sub>)</span>
-变得很大。</strong></p>
-<p>因此，存在 <span class="math inline"><em>N</em><sub>1</sub></span> 和
-<span class="math inline"><em>N</em><sub>2</sub></span> 的中间点 <span
-class="math inline"><em>N</em><sub>3</sub></span>，使得 <span
-class="math inline"><em>L</em>(<em>N</em><sub>3</sub>) &gt; <em>L</em>(<em>N</em><sub>2</sub>) = <em>L</em>(<em>N</em><sub>1</sub>)</span>，违背凸函数的定义。</p>
+class="math inline">\(L(N_3)\)</span> 变得很大。</strong></p>
+<p>因此，存在 <span class="math inline">\(N_1\)</span> 和 <span
+class="math inline">\(N_2\)</span> 的中间点 <span
+class="math inline">\(N_3\)</span>，使得 <span
+class="math inline">\(L(N_3)&gt;L(N_2)=L(N_1)\)</span>，违背凸函数的定义。</p>
 <h2 id="经典应用">经典应用</h2>
 <h3 id="nettalk">NETtalk</h3>
 <p>每个字母的读音可能随着上下文的变化而变化，例如apple和cake中a的读音不一样。NETtalk
@@ -456,16 +450,17 @@ vs 浊音）</li>
 <h2 id="反向传播算法">反向传播算法</h2>
 <p>见笔记本</p>
 <h2 id="为什么梯度下降法能够下降">为什么梯度下降法能够下降</h2>
-<p>设损失函数为 <span class="math inline"><em>L</em></span>，它在 <span
-class="math inline"><em>θ</em></span> 处的一阶 Taylor 展开为： <span
-class="math display"><em>L</em>(<em>θ</em> + <em>Δ</em><em>θ</em>) = <em>L</em>(<em>θ</em>) + ∇<em>L</em>(<em>θ</em>)<em>Δ</em><em>θ</em> + <em>o</em>(||<em>Δ</em><em>θ</em>||)</span>
-令 <span
-class="math inline"><em>Δ</em><em>θ</em> = −<em>η</em>∇<em>L</em>(<em>θ</em>)</span>，得
-<span
-class="math inline"><em>L</em>(<em>θ</em> + <em>Δ</em><em>θ</em>) = <em>L</em>(<em>θ</em>) − <em>η</em>||∇<em>L</em>(<em>θ</em>)||<sup>2</sup> &lt; <em>L</em>(<em>θ</em>)</span>。当然我们把
-<span class="math inline"><em>o</em>(||<em>Δ</em><em>θ</em>||)</span>
-省略了； 只要步长 <span class="math inline"><em>η</em></span>
-足够小，高阶无穷小项就可以忽略。</p>
+<p>设损失函数为 <span class="math inline">\(L\)</span>，它在 <span
+class="math inline">\(\theta\)</span> 处的一阶 Taylor 展开为： <span
+class="math display">\[
+L(\theta+\Delta \theta)=L(\theta)+\nabla L(\theta) \Delta
+\theta+o(||\Delta \theta||)
+\]</span> 令 <span class="math inline">\(\Delta \theta=- \eta \nabla
+L(\theta)\)</span>，得 <span class="math inline">\(L(\theta+\Delta
+\theta)=L(\theta)-\eta ||\nabla L(\theta)||^2 &lt;
+L(\theta)\)</span>。当然我们把 <span class="math inline">\(o(||\Delta
+\theta||)\)</span> 省略了； 只要步长 <span
+class="math inline">\(η\)</span> 足够小，高阶无穷小项就可以忽略。</p>
 
     </div>
 
@@ -475,8 +470,8 @@ class="math inline"><em>L</em>(<em>θ</em> + <em>Δ</em><em>θ</em>) = <
 
     <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E8%BF%9E%E6%8E%A5%E4%B8%BB%E4%B9%89/" rel="tag"># 连接主义</a>
               <a href="/tags/%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/" rel="tag"># 神经网络</a>
+              <a href="/tags/%E8%BF%9E%E6%8E%A5%E4%B8%BB%E4%B9%89/" rel="tag"># 连接主义</a>
               <a href="/tags/%E6%84%9F%E7%9F%A5%E6%9C%BA/" rel="tag"># 感知机</a>
           </div>
 

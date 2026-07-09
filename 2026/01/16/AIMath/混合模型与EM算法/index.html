@@ -20,12 +20,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
 
-    <meta name="description" content="本节的内容也比较难。我们先通过一个简单的聚类问题了解混合模型与EM算法的基本思想，然后介绍混合模型、EM算法的一般形式，最后通过几个例子，介绍混合模型和EM算法的应用。 6.1 引入：聚类问题 6.1.1 问题提出 所谓聚类，就是把一组数据分成若干类，是一种无监督的机器学习方法。 让我们看一个实际的聚类问题。假设医生通过体检采集了五名学生的身高数据 X &#x3D; {85, 95, 145, 1">
+    <meta name="description" content="本节的内容也比较难。我们先通过一个简单的聚类问题了解混合模型与EM算法的基本思想，然后介绍混合模型、EM算法的一般形式，最后通过几个例子，介绍混合模型和EM算法的应用。 6.1 引入：聚类问题 6.1.1 问题提出 所谓聚类，就是把一组数据分成若干类，是一种无监督的机器学习方法。 让我们看一个实际的聚类问题。假设医生通过体检采集了五名学生的身高数据 \(X&#x3D;\{85,95,145,175">
 <meta property="og:type" content="article">
 <meta property="og:title" content="6 混合模型与EM算法">
 <meta property="og:url" content="http://example.com/2026/01/16/AIMath/%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B%E4%B8%8EEM%E7%AE%97%E6%B3%95/index.html">
 <meta property="og:site_name" content="Fqmmm&#39;s Blog">
-<meta property="og:description" content="本节的内容也比较难。我们先通过一个简单的聚类问题了解混合模型与EM算法的基本思想，然后介绍混合模型、EM算法的一般形式，最后通过几个例子，介绍混合模型和EM算法的应用。 6.1 引入：聚类问题 6.1.1 问题提出 所谓聚类，就是把一组数据分成若干类，是一种无监督的机器学习方法。 让我们看一个实际的聚类问题。假设医生通过体检采集了五名学生的身高数据 X &#x3D; {85, 95, 145, 1">
+<meta property="og:description" content="本节的内容也比较难。我们先通过一个简单的聚类问题了解混合模型与EM算法的基本思想，然后介绍混合模型、EM算法的一般形式，最后通过几个例子，介绍混合模型和EM算法的应用。 6.1 引入：聚类问题 6.1.1 问题提出 所谓聚类，就是把一组数据分成若干类，是一种无监督的机器学习方法。 让我们看一个实际的聚类问题。假设医生通过体检采集了五名学生的身高数据 \(X&#x3D;\{85,95,145,175">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-01-16T07:17:32.497Z">
 <meta property="article:modified_time" content="2026-07-09T08:06:50.172Z">
@@ -138,7 +138,7 @@
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
             <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E5%85%A5%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">6.1 引入：聚类问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E6%8F%90%E5%87%BA"><span class="nav-number">1.1.</span> <span class="nav-text">6.1.1 问题提出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9A%B6%E5%B1%9E%E5%BA%A6"><span class="nav-number">1.2.</span> <span class="nav-text">6.1.2 隶属度</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E5%8F%82%E6%95%B0"><span class="nav-number">1.3.</span> <span class="nav-text">6.1.3 更新参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B%E4%B8%8Eem%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">6.2 混合模型与EM算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">6.2.1 混合模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#em-%E7%AE%97%E6%B3%95%E7%9A%84%E6%95%B0%E5%AD%A6%E6%8E%A8%E5%AF%BC"><span class="nav-number">2.2.</span> <span class="nav-text">6.2.2 EM 算法的数学推导</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E5%AD%90"><span class="nav-number">3.</span> <span class="nav-text">6.3 例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E7%A1%AC%E5%B8%81%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">6.3.1 三硬币模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#e%E6%AD%A5%E8%AE%A1%E7%AE%97%E9%9A%B6%E5%B1%9E%E5%BA%A6%E5%92%8C-q-%E5%87%BD%E6%95%B0"><span class="nav-number">3.1.1.</span> <span class="nav-text">1. E步：计算隶属度和 Q 函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#m%E6%AD%A5%E6%9C%80%E5%A4%A7%E5%8C%96-q-%E5%87%BD%E6%95%B0%E6%9B%B4%E6%96%B0%E5%8F%82%E6%95%B0"><span class="nav-number">3.1.2.</span> <span class="nav-text">2. M步：最大化 Q 函数（更新参数）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.1.3.</span> <span class="nav-text">3. 代码实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E6%96%AF%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">6.3.2 高斯混合模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#e%E6%AD%A5%E8%AE%A1%E7%AE%97%E9%9A%B6%E5%B1%9E%E5%BA%A6%E5%92%8C-q-%E5%87%BD%E6%95%B0-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">1. E步：计算隶属度和 Q 函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#m%E6%AD%A5%E6%9C%80%E5%A4%A7%E5%8C%96-q-%E5%87%BD%E6%95%B0%E6%9B%B4%E6%96%B0%E5%8F%82%E6%95%B0-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">2. M步：最大化 Q
-函数（更新参数）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8E%A8%E5%AF%BC-1%E6%9B%B4%E6%96%B0%E6%B7%B7%E5%90%88%E7%B3%BB%E6%95%B0-w_k"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">推导 1：更新混合系数 wk</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8E%A8%E5%AF%BC-2%E6%9B%B4%E6%96%B0%E5%9D%87%E5%80%BC-mu_k"><span class="nav-number">3.2.2.2.</span> <span class="nav-text">推导 2：更新均值 μk</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8E%A8%E5%AF%BC-3%E6%9B%B4%E6%96%B0%E6%96%B9%E5%B7%AE-sigma_k2"><span class="nav-number">3.2.2.3.</span> <span class="nav-text">推导 3：更新方差 σk2</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="nav-number">3.2.3.</span> <span class="nav-text">3. 算法流程总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="nav-number">3.2.4.</span> <span class="nav-text">4. 代码实现</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%9D%E9%A2%98%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">6.4 话题模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text">6.4.1 问题定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.1.</span> <span class="nav-text">1. 参数定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.1.2.</span> <span class="nav-text">2. 生成模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#em-%E7%AE%97%E6%B3%95%E6%8E%A8%E5%AF%BC"><span class="nav-number">4.2.</span> <span class="nav-text">6.4.2 EM 算法推导</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#e%E6%AD%A5%E8%AE%A1%E7%AE%97%E9%9A%B6%E5%B1%9E%E5%BA%A6%E5%92%8C-q-%E5%87%BD%E6%95%B0-2"><span class="nav-number">4.2.1.</span> <span class="nav-text">1. E步：计算隶属度和 Q 函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#m%E6%AD%A5%E6%9B%B4%E6%96%B0%E5%8F%82%E6%95%B0"><span class="nav-number">4.2.2.</span> <span class="nav-text">2. M步：更新参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-2"><span class="nav-number">4.3.</span> <span class="nav-text">6.4.3 代码实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">6.5 总结</span></a></li></ol></div>
+函数（更新参数）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8E%A8%E5%AF%BC-1%E6%9B%B4%E6%96%B0%E6%B7%B7%E5%90%88%E7%B3%BB%E6%95%B0-w_k"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">推导 1：更新混合系数 \(w_k\)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8E%A8%E5%AF%BC-2%E6%9B%B4%E6%96%B0%E5%9D%87%E5%80%BC-mu_k"><span class="nav-number">3.2.2.2.</span> <span class="nav-text">推导 2：更新均值 \(\mu_k\)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8E%A8%E5%AF%BC-3%E6%9B%B4%E6%96%B0%E6%96%B9%E5%B7%AE-sigma_k2"><span class="nav-number">3.2.2.3.</span> <span class="nav-text">推导 3：更新方差 \(\sigma_k^2\)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="nav-number">3.2.3.</span> <span class="nav-text">3. 算法流程总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-1"><span class="nav-number">3.2.4.</span> <span class="nav-text">4. 代码实现</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%9D%E9%A2%98%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.</span> <span class="nav-text">6.4 话题模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.</span> <span class="nav-text">6.4.1 问题定义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E6%95%B0%E5%AE%9A%E4%B9%89"><span class="nav-number">4.1.1.</span> <span class="nav-text">1. 参数定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E6%88%90%E6%A8%A1%E5%9E%8B"><span class="nav-number">4.1.2.</span> <span class="nav-text">2. 生成模型</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#em-%E7%AE%97%E6%B3%95%E6%8E%A8%E5%AF%BC"><span class="nav-number">4.2.</span> <span class="nav-text">6.4.2 EM 算法推导</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#e%E6%AD%A5%E8%AE%A1%E7%AE%97%E9%9A%B6%E5%B1%9E%E5%BA%A6%E5%92%8C-q-%E5%87%BD%E6%95%B0-2"><span class="nav-number">4.2.1.</span> <span class="nav-text">1. E步：计算隶属度和 Q 函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#m%E6%AD%A5%E6%9B%B4%E6%96%B0%E5%8F%82%E6%95%B0"><span class="nav-number">4.2.2.</span> <span class="nav-text">2. M步：更新参数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0-2"><span class="nav-number">4.3.</span> <span class="nav-text">6.4.3 代码实现</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">5.</span> <span class="nav-text">6.5 总结</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -252,29 +252,29 @@
 <p>所谓聚类，就是把一组数据分成若干类，是一种无监督的机器学习方法。</p>
 <p>让我们看一个实际的聚类问题。假设医生通过体检采集了五名学生的身高数据
 <span
-class="math inline"><em>X</em> = {85, 95, 145, 175, 185}</span>。这五名学生分别来自幼儿组、小学组和大学组这三个类别。如何判断每个样本属于哪一类？</p>
+class="math inline">\(X=\{85,95,145,175,185\}\)</span>。这五名学生分别来自幼儿组、小学组和大学组这三个类别。如何判断每个样本属于哪一类？</p>
 <p>要知道每个样本属于哪一类，需要先知道每个类别的中心值（即均值），这样一来，样本离哪个类别的中心点最近，样本就属于哪一类。</p>
 <p>然而，我们会发现逻辑陷入了一个死循环。</p>
-<p>如果我们知道 <span class="math inline">85, 95</span> 是幼儿，<span
-class="math inline">145</span> 是小学生，<span
-class="math inline">175, 185</span> 是大学生，那么</p>
+<p>如果我们知道 <span class="math inline">\(85, 95\)</span>
+是幼儿，<span class="math inline">\(145\)</span> 是小学生，<span
+class="math inline">\(175, 185\)</span> 是大学生，那么</p>
 <ul>
-<li><p>幼儿平均 <span class="math inline">$\mu_1 = \frac{85+95}{2} =
-90$</span></p></li>
-<li><p>小学平均 <span
-class="math inline"><em>μ</em><sub>2</sub> = 145</span></p></li>
-<li><p>大学平均 <span class="math inline">$\mu_3 = \frac{175+185}{2} =
-180$</span></p></li>
+<li><p>幼儿平均 <span class="math inline">\(\mu_1 = \frac{85+95}{2} =
+90\)</span></p></li>
+<li><p>小学平均 <span class="math inline">\(\mu_2 =
+145\)</span></p></li>
+<li><p>大学平均 <span class="math inline">\(\mu_3 = \frac{175+185}{2} =
+180\)</span></p></li>
 <li><p>这样，如果以后再来一个样本，例如 <span
-class="math inline">180</span>，我们就能立刻判断它属于大学组。</p></li>
+class="math inline">\(180\)</span>，我们就能立刻判断它属于大学组。</p></li>
 </ul>
-<p>如果我们一开始就知道 <span
-class="math inline"><em>μ</em><sub>1</sub> = 90, <em>μ</em><sub>2</sub> = 145, <em>μ</em><sub>3</sub> = 180</span>，那也简单：</p>
+<p>如果我们一开始就知道 <span class="math inline">\(\mu_1=90, \mu_2=145,
+\mu_3=180\)</span>，那也简单：</p>
 <ul>
-<li><span class="math inline">85</span> 离 <span
-class="math inline">90</span> 最近，那它大概率是幼儿。</li>
-<li><span class="math inline">175</span> 离 <span
-class="math inline">180</span> 最近，那它大概率是大学生。</li>
+<li><span class="math inline">\(85\)</span> 离 <span
+class="math inline">\(90\)</span> 最近，那它大概率是幼儿。</li>
+<li><span class="math inline">\(175\)</span> 离 <span
+class="math inline">\(180\)</span> 最近，那它大概率是大学生。</li>
 </ul>
 <p>然而，现在我们既不知道标签（即每个样本属于哪一类），也不知道每个类别的中心（均值）。这就像“鸡生蛋，蛋生鸡”，无法开始。</p>
 <h3 id="隶属度">6.1.2 隶属度</h3>
@@ -282,39 +282,36 @@ class="math inline">180</span> 最近，那它大概率是大学生。</li>
 <p>我们需要先补充两个假设：</p>
 <ol type="1">
 <li>为了简化计算，假设三个组的身高都服从正态分布，且标准差都是 <span
-class="math inline"><em>σ</em> = 10</span>（即方差 <span
-class="math inline"><em>σ</em><sup>2</sup> = 100</span>）。</li>
+class="math inline">\(\sigma = 10\)</span>（即方差 <span
+class="math inline">\(\sigma^2=100\)</span>）。</li>
 <li>假设任选一个学生，属于幼儿、小学、大学的概率相等，即 <span
-class="math inline"><em>π</em><sub>1</sub> = <em>π</em><sub>2</sub> = <em>π</em><sub>3</sub> = 1/3</span>。</li>
+class="math inline">\(\pi_1=\pi_2=\pi_3=1/3\)</span>。</li>
 </ol>
-<p>对于给定的身高 <span
-class="math inline"><em>X</em><sub><em>i</em></sub></span>，它属于第
-<span class="math inline"><em>k</em></span> 个组（中心为 <span
-class="math inline"><em>μ</em><sub><em>k</em></sub></span>）的概率由正态分布的概率密度函数给出：
-<span class="math display">$$ P(Z_i=k, X_i) =
+<p>对于给定的身高 <span class="math inline">\(X_i\)</span>，它属于第
+<span class="math inline">\(k\)</span> 个组（中心为 <span
+class="math inline">\(\mu_k\)</span>）的概率由正态分布的概率密度函数给出：
+<span class="math display">\[ P(Z_i=k, X_i) =
 \frac{1}{\sqrt{2\pi\sigma^2}} e^{ -\frac{(X_i - \mu_k)^2}{2\sigma^2} }
-$$</span> 其中 <span
-class="math inline"><em>Z</em><sub><em>i</em></sub></span> 表示样本
-<span class="math inline"><em>X</em><sub><em>i</em></sub></span>
-的类别，<span
-class="math inline"><em>Z</em><sub><em>i</em></sub> = <em>k</em></span>
-表示第 <span class="math inline"><em>i</em></span> 个样本 <span
-class="math inline"><em>X</em><sub><em>i</em></sub></span> 属于第 <span
-class="math inline"><em>k</em></span> 类。</p>
-<p>下面给出隶属度的定义。 <span class="math display">$$ \gamma_{ik}
+\]</span> 其中 <span class="math inline">\(Z_i\)</span> 表示样本 <span
+class="math inline">\(X_i\)</span> 的类别，<span
+class="math inline">\(Z_i=k\)</span> 表示第 <span
+class="math inline">\(i\)</span> 个样本 <span
+class="math inline">\(X_i\)</span> 属于第 <span
+class="math inline">\(k\)</span> 类。</p>
+<p>下面给出隶属度的定义。 <span class="math display">\[ \gamma_{ik}
 =P(Z_i=k | X_i)= \frac{P(Z_i=k, X_i)}{\sum\limits_{l \in \{1,2,3\}}
-P(Z_i=l, X_i)} $$</span> 其中 <span class="math inline">{1, 2, 3}</span>
+P(Z_i=l, X_i)} \]</span> 其中 <span
+class="math inline">\(\{1,2,3\}\)</span>
 是三个类别的下标，可以人为规定类别1是幼儿组，类别2是小学组，类别3是大学组。隶属度
-<span
-class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub></span>
-代表第 <span class="math inline"><em>i</em></span> 个样本 <span
-class="math inline"><em>X</em><sub><em>i</em></sub></span> 属于第 <span
-class="math inline"><em>k</em></span> 类的可能性，或者样本 <span
-class="math inline"><em>X</em><sub><em>i</em></sub></span> 在第 <span
-class="math inline"><em>k</em></span> 类上的得分。相较 <span
-class="math inline"><em>P</em>(<em>Z</em><sub><em>i</em></sub> = <em>k</em>, <em>X</em><sub><em>i</em></sub>)</span>，隶属度做了归一化处理。</p>
+<span class="math inline">\(\gamma_{ik}\)</span> 代表第 <span
+class="math inline">\(i\)</span> 个样本 <span
+class="math inline">\(X_i\)</span> 属于第 <span
+class="math inline">\(k\)</span> 类的可能性，或者样本 <span
+class="math inline">\(X_i\)</span> 在第 <span
+class="math inline">\(k\)</span> 类上的得分。相较 <span
+class="math inline">\(P(Z_i=k, X_i)\)</span>，隶属度做了归一化处理。</p>
 <p>代入正态分布的概率密度函数可得</p>
-<p><span class="math display">$$
+<p><span class="math display">\[
 \begin{aligned}
 \gamma_{ik} &amp;= \frac{P(Z_i=k, X_i)}{\sum\limits_{l \in \{1,2,3\}}
 P(Z_i=l, X_i)} \\[0.8em]
@@ -328,42 +325,41 @@ P(Z_i=l, X_i)} \\[0.8em]
 -\frac{(x_i - \mu_2)^2}{2\sigma^2} \right) + \exp\left( -\frac{(x_i -
 \mu_3)^2}{2\sigma^2} \right) }
 \end{aligned}
-$$</span></p>
-<p>下面以 <span class="math inline"><em>X</em><sub>3</sub> = 145</span>
-为例，计算三个隶属度 <span
-class="math inline"><em>γ</em><sub>31</sub>, <em>γ</em><sub>32</sub>, <em>γ</em><sub>33</sub></span>。我们不妨猜测
-<span
-class="math inline"><em>μ</em><sub>1</sub> = 100, <em>μ</em><sub>2</sub> = 140, <em>μ</em><sub>3</sub> = 170</span>。</p>
-<p><span class="math display">$$
+\]</span></p>
+<p>下面以 <span class="math inline">\(X_3=145\)</span>
+为例，计算三个隶属度 <span class="math inline">\(\gamma_{31},
+\gamma_{32}, \gamma_{33}\)</span>。我们不妨猜测 <span
+class="math inline">\(\mu_1=100, \mu_2=140, \mu_3=170\)</span>。</p>
+<p><span class="math display">\[
 \text{Score}_1 = \exp\left( -\frac{(145 - 100)^2}{200} \right) =
 \exp\left( -\frac{2025}{200} \right) = e^{-10.125} \approx
 \mathbf{0.00004}
-$$</span></p>
-<p><span class="math display">$$
+\]</span></p>
+<p><span class="math display">\[
 \text{Score}_2 = \exp\left( -\frac{(145 - 140)^2}{200} \right) =
 \exp\left( -\frac{25}{200} \right) = e^{-0.125} \approx \mathbf{0.88250}
-$$</span></p>
-<p><span class="math display">$$
+\]</span></p>
+<p><span class="math display">\[
 \text{Score}_3 = \exp\left( -\frac{(145 - 170)^2}{200} \right) =
 \exp\left( -\frac{625}{200} \right) = e^{-3.125} \approx
 \mathbf{0.04394}
-$$</span></p>
-<p><span class="math display">$$
+\]</span></p>
+<p><span class="math display">\[
 \begin{aligned}
 \text{Sum} &amp;= \text{Score}_1 + \text{Score}_2 + \text{Score}_3 \\
 &amp;= 0.00004 + 0.88250 + 0.04394 \\
 &amp;\approx \mathbf{0.92648}
 \end{aligned}
-$$</span></p>
-<p>于是 <span class="math display">$$
+\]</span></p>
+<p>于是 <span class="math display">\[
 \gamma_{31} = \frac{0.00004}{0.92648} \approx 0.00
-$$</span></p>
-<p><span class="math display">$$
+\]</span></p>
+<p><span class="math display">\[
 \gamma_{32} = \frac{0.88250}{0.92648} \approx 0.95
-$$</span></p>
-<p><span class="math display">$$
+\]</span></p>
+<p><span class="math display">\[
 \gamma_{33} = \frac{0.04394}{0.92648} \approx 0.05
-$$</span></p>
+\]</span></p>
 <p>对所有样本应用上述计算，我们得到全部样本的隶属度：</p>
 <table style="width:100%;">
 <colgroup>
@@ -376,13 +372,13 @@ $$</span></p>
 <thead>
 <tr>
 <th style="text-align: left;">数据 <span
-class="math inline"><em>X</em><sub><em>i</em></sub></span></th>
+class="math inline">\(X_i\)</span></th>
 <th style="text-align: center;"><span
-class="math inline"><em>μ</em><sub>1</sub> = 100</span> (幼儿)</th>
+class="math inline">\(\mu_1=100\)</span> (幼儿)</th>
 <th style="text-align: center;"><span
-class="math inline"><em>μ</em><sub>2</sub> = 140</span> (小学)</th>
+class="math inline">\(\mu_2=140\)</span> (小学)</th>
 <th style="text-align: center;"><span
-class="math inline"><em>μ</em><sub>3</sub> = 170</span> (大学)</th>
+class="math inline">\(\mu_3=170\)</span> (大学)</th>
 <th style="text-align: left;">计算结果解读</th>
 </tr>
 </thead>
@@ -428,13 +424,12 @@ style="text-align: left;">有微小可能是“发育极好的小学生”，主
 </table>
 <h3 id="更新参数">6.1.3 更新参数</h3>
 <p>算了大半天的隶属度有什么用？用来更新参数。</p>
-<p><span class="math display">$$ \mu_k^{new} =
+<p><span class="math display">\[ \mu_k^{new} =
 \frac{\sum\limits_{i=1}^{n} \gamma_{ik} \cdot x_i}{\sum\limits_{i=1}^{n}
-\gamma_{ik}} $$</span></p>
+\gamma_{ik}} \]</span></p>
 <p>这个公式其实比较直观，说的就是“新的中心 = 加权总身高 / 总权重”。</p>
-<p>于是我们可以计算 <span
-class="math inline"><em>μ</em><sub>1</sub><sup><em>n</em><em>e</em><em>w</em></sup>, <em>μ</em><sub>2</sub><sup><em>n</em><em>e</em><em>w</em></sup>, <em>μ</em><sub>3</sub><sup><em>n</em><em>e</em><em>w</em></sup></span>：
-<span class="math display">$$
+<p>于是我们可以计算 <span class="math inline">\(\mu_1^{new},
+\mu_2^{new}, \mu_3^{new}\)</span>： <span class="math display">\[
 \begin{aligned}
 \mu_1^{new} &amp;= \frac{\sum\limits_{i=1}^{5} \gamma_{i1} \cdot
 x_i}{\sum\limits_{i=1}^{5} \gamma_{i1}} \\[1em]
@@ -444,10 +439,10 @@ x_i}{\sum\limits_{i=1}^{5} \gamma_{i1}} \\[1em]
 &amp;= \frac{178.2}{1.98} \\[1em]
 &amp;= 90
 \end{aligned}
-$$</span> 初始猜测是 <span
-class="math inline">100</span>，一轮迭代后迅速修正为 <span
-class="math inline">90</span>，完美符合真实数据。</p>
-<p><span class="math display">$$
+\]</span> 初始猜测是 <span
+class="math inline">\(100\)</span>，一轮迭代后迅速修正为 <span
+class="math inline">\(90\)</span>，完美符合真实数据。</p>
+<p><span class="math display">\[
 \begin{aligned}
 \mu_2^{new} &amp;= \frac{\sum\limits_{i=1}^{5} \gamma_{i2} \cdot
 x_i}{\sum\limits_{i=1}^{5} \gamma_{i2}} \\[1em]
@@ -457,14 +452,14 @@ x_i}{\sum\limits_{i=1}^{5} \gamma_{i2}} \\[1em]
 &amp;= \frac{148.3}{1.02} \\[1em]
 &amp;\approx 145.39
 \end{aligned}
-$$</span> 初始猜测是 <span class="math inline">140</span>，真实值是
-<span class="math inline">145</span>。由于受到右侧 <span
-class="math inline">175</span> cm数据（权重 <span
-class="math inline">0.05</span>）的拉动，新均值略高于 <span
-class="math inline">145</span>，变为 <span
-class="math inline">145.39</span>。随着后续迭代，均值会进一步逼近 <span
-class="math inline">145</span>。</p>
-<p><span class="math display">$$
+\]</span> 初始猜测是 <span class="math inline">\(140\)</span>，真实值是
+<span class="math inline">\(145\)</span>。由于受到右侧 <span
+class="math inline">\(175\)</span> cm数据（权重 <span
+class="math inline">\(0.05\)</span>）的拉动，新均值略高于 <span
+class="math inline">\(145\)</span>，变为 <span
+class="math inline">\(145.39\)</span>。随着后续迭代，均值会进一步逼近
+<span class="math inline">\(145\)</span>。</p>
+<p><span class="math display">\[
 \begin{aligned}
 \mu_3^{new} &amp;= \frac{\sum\limits_{i=1}^{5} \gamma_{i3} \cdot
 x_i}{\sum\limits_{i=1}^{5} \gamma_{i3}} \\[1em]
@@ -474,135 +469,121 @@ x_i}{\sum\limits_{i=1}^{5} \gamma_{i3}} \\[1em]
 &amp;= \frac{358.5}{2.00} \\[1em]
 &amp;= 179.25
 \end{aligned}
-$$</span> 初始猜测是 <span class="math inline">170</span>，真实均值是
-<span class="math inline">$\frac{175+185}{2} = 180$</span>。计算结果
-<span class="math inline">179.25</span> 非常接近真实值。</p>
+\]</span> 初始猜测是 <span
+class="math inline">\(170\)</span>，真实均值是 <span
+class="math inline">\(\frac{175+185}{2} = 180\)</span>。计算结果 <span
+class="math inline">\(179.25\)</span> 非常接近真实值。</p>
 <p>多迭代几轮，三个均值会逐步收敛，收敛的结果即可作为三个类别的均值。以后，如果有新的数据进来，只需要计算它和这三个类别的隶属度（或者score，省得归一化），哪个隶属度最大，这个样本就属于哪一类。</p>
 <p>例如，学校来了一位新同学，测量身高为 <span
-class="math inline"><em>x</em><sub><em>n</em><em>e</em><em>w</em></sub> = 160</span>
+class="math inline">\(x_{new} = 160\)</span>
 cm。我们需要判断他最可能属于哪个类别。</p>
-<p><span
-class="math display">Score<sub>1</sub> ∝ exp (−70<sup>2</sup>/200) = <em>e</em><sup>−24.5</sup> ≈ 0</span></p>
-<p><span
-class="math display">Score<sub>2</sub> ∝ exp (−15<sup>2</sup>/200) = <em>e</em><sup>−1.125</sup> ≈ 0.324</span></p>
-<p><span
-class="math display">Score<sub>3</sub> ∝ exp (−20<sup>2</sup>/200) = <em>e</em><sup>−2.0</sup> ≈ 0.135</span></p>
-<p>虽然 <span class="math inline">160</span> cm 介于小学生(<span
-class="math inline">145</span>)和大学生(<span
-class="math inline">180</span>)之间，但数学告诉我们，它离小学生更近。
+<p><span class="math display">\[ \text{Score}_1 \propto \exp(-70^2 /
+200) = e^{-24.5} \approx 0 \]</span></p>
+<p><span class="math display">\[ \text{Score}_2 \propto \exp(-15^2 /
+200) = e^{-1.125} \approx 0.324 \]</span></p>
+<p><span class="math display">\[ \text{Score}_3 \propto \exp(-20^2 /
+200) = e^{-2.0} \approx 0.135 \]</span></p>
+<p>虽然 <span class="math inline">\(160\)</span> cm 介于小学生(<span
+class="math inline">\(145\)</span>)和大学生(<span
+class="math inline">\(180\)</span>)之间，但数学告诉我们，它离小学生更近。
 因此我们将这位同学归类为小学组。</p>
 <h2 id="混合模型与em算法">6.2 混合模型与EM算法</h2>
 <p>在上一节中，我们通过一个简单的例子，初步了解了混合模型与EM算法的基本思想。本节将通过严格的数学推导，给出混合模型与EM算法的一般形式。</p>
 <h3 id="混合模型">6.2.1 混合模型</h3>
 <p>混合模型的定义源于概率论中的全概率公式。假如我们观察到的数据 <span
-class="math inline"><em>X</em></span>（如身高）看起来很复杂，单用一个分布无法描述（比如身高有90、145、180三个峰值，不能用一个正态分布描述）。但在其内部，数据其实是由
-<span class="math inline"><em>K</em></span>
-个简单的基础分布混合而成的。</p>
-<p>混合模型的数学定义如下： <span class="math display">$$ f_X(x) =
+class="math inline">\(X\)</span>（如身高）看起来很复杂，单用一个分布无法描述（比如身高有90、145、180三个峰值，不能用一个正态分布描述）。但在其内部，数据其实是由
+<span class="math inline">\(K\)</span> 个简单的基础分布混合而成的。</p>
+<p>混合模型的数学定义如下： <span class="math display">\[ f_X(x) =
 \sum_{k=1}^K \underbrace{P(Z=z_k)}_{\text{混合系数}} \cdot
-\underbrace{f_{X|Z}(x|z_k)}_{\text{成分分布}} $$</span></p>
+\underbrace{f_{X|Z}(x|z_k)}_{\text{成分分布}} \]</span></p>
 <p>下面解释一下公式里的参数。</p>
 <ul>
-<li><p>隐变量 <span class="math inline"><em>Z</em></span>
-是一个离散型随机变量，取值为 <span
-class="math inline">{1, 2, ..., <em>K</em>}</span>。它指示观测数据 <span
-class="math inline"><em>x</em></span>
+<li><p>隐变量 <span class="math inline">\(Z\)</span>
+是一个离散型随机变量，取值为 <span class="math inline">\(\{1, 2, ...,
+K\}\)</span>。它指示观测数据 <span class="math inline">\(x\)</span>
 具体来自哪一个成分。因为我们在收集数据时通常不知道它，所以叫“隐”变量。在
 6.1
 的聚类问题中，每个样本的类别（幼儿组、小学组、大学组）就是隐变量，<span
-class="math inline"><em>Z</em></span> 的取值为 <span
-class="math inline">{1, 2, 3}</span>。</p></li>
-<li><p>成分分布 <span
-class="math inline"><em>f</em><sub><em>X</em>|<em>Z</em></sub>(<em>x</em>|<em>z</em><sub><em>k</em></sub>)</span>
-是第 <span class="math inline"><em>k</em></span>
-个成分内部的数据分布规律，在 6.1
+class="math inline">\(Z\)</span> 的取值为 <span
+class="math inline">\(\{1,2,3\}\)</span>。</p></li>
+<li><p>成分分布 <span class="math inline">\(f_{X|Z}(x|z_k)\)</span> 是第
+<span class="math inline">\(k\)</span> 个成分内部的数据分布规律，在 6.1
 中即为每个类别内部的身高分布。通常假设所有子群体服从同一种分布形式（例如都是高斯分布），但参数不同。</p></li>
-<li><p>混合系数/先验概率 <span
-class="math inline"><em>P</em>(<em>Z</em> = <em>z</em><sub><em>k</em></sub>)</span>
-也常记作 <span
-class="math inline"><em>π</em><sub><em>k</em></sub></span> 或 <span
-class="math inline"><em>w</em><sub><em>k</em></sub></span>，表示第 <span
-class="math inline"><em>k</em></span> 个成分在总体中占的比例（权重）。在
-6.1 节中，它对应各类别学生的人数比例。混合系数必须满足非负且和为1，即
-<span class="math inline">$\sum_{k=1}^K P(Z=z_k) = 1$</span>。</p></li>
+<li><p>混合系数/先验概率 <span class="math inline">\(P(Z=z_k)\)</span>
+也常记作 <span class="math inline">\(\pi_k\)</span> 或 <span
+class="math inline">\(w_k\)</span>，表示第 <span
+class="math inline">\(k\)</span> 个成分在总体中占的比例（权重）。在 6.1
+节中，它对应各类别学生的人数比例。混合系数必须满足非负且和为1，即 <span
+class="math inline">\(\sum_{k=1}^K P(Z=z_k) = 1\)</span>。</p></li>
 </ul>
 <h3 id="em-算法的数学推导">6.2.2 EM 算法的数学推导</h3>
 <p>这一部分比较复杂，但考试不考，可以跳过，但建议还是看一看。</p>
-<p>设 <span
-class="math inline"><em>X</em> = {<em>X</em><sub>1</sub>, <em>X</em><sub>2</sub>, ..., <em>X</em><sub><em>n</em></sub>}</span>
-为观测到的独立同分布的样本。<span
-class="math inline"><em>Z</em> = {<em>Z</em><sub>1</sub>, <em>Z</em><sub>2</sub>, ..., <em>Z</em><sub><em>n</em></sub>}</span>
-为隐变量，其中 <span
-class="math inline"><em>Z</em><sub><em>i</em></sub></span> 为 <span
-class="math inline"><em>X</em><sub><em>i</em></sub></span>
-对应的隐变量。<span
-class="math inline"><em>Z</em><sub><em>i</em></sub> ∈ {1, 2, 3, ..., <em>k</em>} = <em>K</em></span>，<span
-class="math inline"><em>K</em></span> 是隐变量的取值范围。 设 <span
-class="math inline"><em>θ</em></span> 为需要估计的参数，它在 <span
-class="math inline"><em>X</em><sub><em>i</em></sub></span>
-的概率密度函数中。</p>
+<p>设 <span class="math inline">\(X=\{X_1, X_2, ..., X_n\}\)</span>
+为观测到的独立同分布的样本。<span class="math inline">\(Z=\{Z_1, Z_2,
+..., Z_n\}\)</span> 为隐变量，其中 <span
+class="math inline">\(Z_i\)</span> 为 <span
+class="math inline">\(X_i\)</span> 对应的隐变量。<span
+class="math inline">\(Z_i \in \{1,2,3,...,k\} = K\)</span>，<span
+class="math inline">\(K\)</span> 是隐变量的取值范围。 设 <span
+class="math inline">\(\theta\)</span> 为需要估计的参数，它在 <span
+class="math inline">\(X_i\)</span> 的概率密度函数中。</p>
 <p>下面通过极大似然估计（MLE）来估计 <span
-class="math inline"><em>θ</em></span>。 设 <span
-class="math display"><em>L</em>(<em>X</em>; <em>θ</em>) = <em>P</em>(<em>X</em><sub>1</sub>; <em>θ</em>)<em>P</em>(<em>X</em><sub>2</sub>; <em>θ</em>)...<em>P</em>(<em>X</em><sub><em>n</em></sub>; <em>θ</em>)</span>
-其中 <span
-class="math inline"><em>P</em>(<em>X</em><sub><em>i</em></sub>; <em>θ</em>)</span>
-为 <span
-class="math inline"><em>X</em><sub><em>i</em></sub></span>的概率密度函数。</p>
-<p>对似然函数取对数 <span class="math display">$$
+class="math inline">\(\theta\)</span>。 设 <span
+class="math display">\[L(X;\theta)=P(X_1;\theta)P(X_2;\theta)...P(X_n;\theta)\]</span>
+其中 <span class="math inline">\(P(X_i; \theta)\)</span> 为 <span
+class="math inline">\(X_i\)</span>的概率密度函数。</p>
+<p>对似然函数取对数 <span class="math display">\[
 LL(X; \theta)=\ln L(X;\theta)=\sum \limits_{i=1}^{n} \ln
 P(X_i;\theta)=\sum \limits_{i=1}^{n}\ln \sum \limits_{Z_i \in K} P(X_i,
 Z_i; \theta)
-$$</span></p>
-<p>设隐变量 <span
-class="math inline"><em>Z</em><sub><em>i</em></sub></span> 满足分布
-<span
-class="math inline"><em>Q</em><sub><em>i</em></sub>(<em>Z</em><sub><em>i</em></sub>)</span>。对上式进行变形，可得
-<span class="math display">$$
+\]</span></p>
+<p>设隐变量 <span class="math inline">\(Z_i\)</span> 满足分布 <span
+class="math inline">\(Q_i(Z_i)\)</span>。对上式进行变形，可得 <span
+class="math display">\[
 LL(X; \theta)=\sum \limits_{i=1}^{n} \ln \sum \limits_{Z_i \in K}
 Q_i(Z_i) \frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}
-$$</span></p>
-<p>式中 <span class="math inline">$\sum \limits_{Z_i \in K} Q_i(Z_i)
-\frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}$</span> 即为 <span
-class="math inline">$\frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}$</span>
+\]</span></p>
+<p>式中 <span class="math inline">\(\sum \limits_{Z_i \in K} Q_i(Z_i)
+\frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}\)</span> 即为 <span
+class="math inline">\(\frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}\)</span>
 的期望。因此</p>
-<p><span class="math display">$$
+<p><span class="math display">\[
 LL(X;\theta)=\sum \limits_{i=1}^{n} \ln E_{Z_i}(\frac{P(X_i, Z_i;
 \theta)}{Q_i(Z_i)})
-$$</span></p>
-<p><span class="math inline"><em>y</em> = ln (<em>x</em>)</span> 在
-<span class="math inline">(0, +inf )</span> 上为凹函数。由 Jensen
-不等式，可知 <span class="math display">$$
+\]</span></p>
+<p><span class="math inline">\(y=\ln(x)\)</span> 在 <span
+class="math inline">\((0, + \inf)\)</span> 上为凹函数。由 Jensen
+不等式，可知 <span class="math display">\[
 LL(X;\theta)=\sum \limits_{i=1}^{n} \ln E_{Z_i}(\frac{P(X_i, Z_i;
 \theta)}{Q_i(Z_i)}) ≥ \sum \limits_{i=1}^{n} E_{Z_i}(\ln\frac{P(X_i,
 Z_i; \theta)}{Q_i(Z_i)})
-$$</span></p>
-<p>将 <span
-class="math inline"><em>E</em><sub><em>Z</em><sub><em>i</em></sub></sub></span>
-展开，可得 <span class="math display">$$
+\]</span></p>
+<p>将 <span class="math inline">\(E_{Z_i}\)</span> 展开，可得 <span
+class="math display">\[
 LL(X;\theta)≥\sum \limits_{i=1}^{n} \sum \limits_{Z_i \in K} Q_i(Z_i)
 \ln \frac{P(X_i, Z_i; \theta)}{Q_i(Z_i)}    ①
-$$</span></p>
-<p>故原始问题转化为：寻找合适的 <span
-class="math inline"><em>Q</em><sub><em>i</em></sub></span>
+\]</span></p>
+<p>故原始问题转化为：寻找合适的 <span class="math inline">\(Q_i\)</span>
 使该下界变紧（等号成立），以及寻找 <span
-class="math inline"><em>θ</em></span> 最大化该下界。</p>
-<p>等号成立条件为 <span class="math display">$$\frac{P(X_i, Z_i;
-\theta)}{Q_i(Z_i)}=C, \forall i=1,2,...,n$$</span> 其中 <span
-class="math inline"><em>C</em></span> 为常数。 于是 <span
-class="math display"><em>P</em>(<em>X</em><sub><em>i</em></sub>, <em>Z</em><sub><em>i</em></sub>; <em>θ</em>) = <em>C</em> ⋅ <em>Q</em><sub><em>i</em></sub>(<em>Z</em><sub><em>i</em></sub>), ∀<em>i</em> = 1, 2, ..., <em>n</em></span>
-两边对 <span class="math inline"><em>Z</em><sub><em>i</em></sub></span>
-求和得 <span class="math display">$$ \sum \limits_{Z_i \in K}P(X_i,
-Z_i;\theta)=C \cdot \sum \limits_{Z_i \in K} Q_i(Z_i)=C
-$$</span></p>
-<p>故 <span class="math display">$$
+class="math inline">\(\theta\)</span> 最大化该下界。</p>
+<p>等号成立条件为 <span class="math display">\[\frac{P(X_i, Z_i;
+\theta)}{Q_i(Z_i)}=C, \forall i=1,2,...,n\]</span> 其中 <span
+class="math inline">\(C\)</span> 为常数。 于是 <span
+class="math display">\[P(X_i, Z_i; \theta)=C \cdot Q_i(Z_i), \forall
+i=1,2,...,n
+\]</span> 两边对 <span class="math inline">\(Z_i\)</span> 求和得 <span
+class="math display">\[ \sum \limits_{Z_i \in K}P(X_i, Z_i;\theta)=C
+\cdot \sum \limits_{Z_i \in K} Q_i(Z_i)=C
+\]</span></p>
+<p>故 <span class="math display">\[
 Q_i(Z_i)=\frac{P(X_i, Z_i; \theta)}{C}=\frac{P(X_i, Z_i; \theta)}{\sum
 \limits_{Z_i \in K}P(X_i, Z_i; \theta)}=\frac{P(X_i, Z_i;
 \theta)}{P(X_i;\theta)}=P(Z_i|X_i;\theta)
-$$</span> 事实上，这就是隶属度 <span
-class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub> = <em>P</em>(<em>Z</em><sub><em>i</em></sub> = <em>k</em>|<em>X</em><sub><em>i</em></sub>; <em>θ</em>)</span>。因此
+\]</span> 事实上，这就是隶属度 <span
+class="math inline">\(\gamma_{ik}=P(Z_i=k|X_i;\theta)\)</span>。因此
 <span
-class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub> = <em>Q</em><sub><em>i</em></sub>(<em>Z</em><sub><em>i</em></sub>)|<sub><em>Z</em><sub><em>i</em></sub> = <em>k</em></sub> = <em>Q</em><sub><em>i</em></sub>(<em>k</em>)</span>。</p>
-<p>把这一结果代回①式，得 <span class="math display">$$
+class="math inline">\(\gamma_{ik}=Q_i(Z_i)|_{Z_i=k}=Q_i(k)\)</span>。</p>
+<p>把这一结果代回①式，得 <span class="math display">\[
 \begin{align*}
 &amp;\sum_{i=1}^{n} \sum_{Z_i \in K} Q_i(Z_i) \ln \frac{P(X_i, Z_i;
 \theta)}{Q_i(Z_i)} \\
@@ -611,91 +592,89 @@ Z_i=k;\theta)}{\gamma_{ik}} \\
 &amp;= \sum_{i=1}^{n} \sum_{k \in K} \left( \gamma_{ik} \ln P(X_i,
 Z_i=k;\theta) - \gamma_{ik} \ln \gamma_{ik} \right)
 \end{align*}
-$$</span></p>
-<p>令 <span class="math display">$$
+\]</span></p>
+<p>令 <span class="math display">\[
 Q(\theta,\theta^{(t)})=\sum_{i=1}^{n} \sum_{k \in K}  \gamma_{ik} \ln
 P(X_i, Z_i=k;\theta)
-$$</span></p>
-<p><span class="math display">$$
+\]</span></p>
+<p><span class="math display">\[
 H(Z|X, \theta^{(t)}) = - \sum_{i=1}^{n} \sum_{k \in K} \gamma_{ik} \ln
 \gamma_{ik}
-$$</span></p>
+\]</span></p>
 <p>则</p>
-<p><span
-class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em>) ≥ <em>Q</em>(<em>θ</em>, <em>θ</em><sup>(<em>t</em>)</sup>) + <em>H</em>(<em>Z</em>|<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>)</span></p>
+<p><span class="math display">\[
+LL(X, \theta) ≥Q(\theta, \theta^{(t)})+H(Z|X, \theta^{(t)})
+\]</span></p>
 <p>而理想状态下</p>
-<p><span
-class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>) = <em>Q</em>(<em>θ</em><sup>(<em>t</em>)</sup>, <em>θ</em><sup>(<em>t</em>)</sup>) + <em>H</em>(<em>Z</em>|<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>)</span></p>
+<p><span class="math display">\[
+LL(X, \theta^{(t)})=Q(\theta^{(t)}, \theta^{(t)})+H(Z|X, \theta^{(t)})
+\]</span></p>
 <p>两式相减得</p>
-<p><span
-class="math display"><em>L</em><em>L</em>(<em>X</em>, <em>θ</em>) − <em>L</em><em>L</em>(<em>X</em>, <em>θ</em><sup>(<em>t</em>)</sup>) ≥ <em>Q</em>(<em>θ</em>, <em>θ</em><sup>(<em>t</em>)</sup>) − <em>Q</em>(<em>θ</em><sup>(<em>t</em>)</sup>, <em>θ</em><sup>(<em>t</em>)</sup>)</span></p>
-<p>也就是说，选择 <span class="math inline"><em>θ</em></span> 使 <span
-class="math inline"><em>Q</em></span> 增大，至少能让 <span
-class="math inline"><em>L</em><em>L</em></span> 增大同样大小。</p>
-<p>因此，最终目标变成了 <span class="math display">$$
+<p><span class="math display">\[
+LL(X, \theta)-LL(X, \theta^{(t)}) ≥ Q(\theta,
+\theta^{(t)})-Q(\theta^{(t)}, \theta^{(t)})
+\]</span></p>
+<p>也就是说，选择 <span class="math inline">\(\theta\)</span> 使 <span
+class="math inline">\(Q\)</span> 增大，至少能让 <span
+class="math inline">\(LL\)</span> 增大同样大小。</p>
+<p>因此，最终目标变成了 <span class="math display">\[
 \mathop{\text{argmax}}\limits_{\theta} Q(\theta, \theta^{(t)})
-$$</span></p>
+\]</span></p>
 <p>最终，EM算法可表达为</p>
 <p>E步：</p>
-<p><span class="math display">$$
+<p><span class="math display">\[
 \gamma_{ik}=P(Z_i=k|X_i;\theta)=\frac{P(Z_i=k,X_i;\theta)}{\sum
 \limits_{l \in K} P(Z_i=l,X_i;\theta)}
-$$</span> <span class="math display">$$Q(\theta, \theta^{(t)})=\sum
+\]</span> <span class="math display">\[Q(\theta, \theta^{(t)})=\sum
 \limits_{i=1}^{n} \sum \limits_{k \in K} \gamma_{ik} \ln P(X_i,
-Z_i=k;\theta)$$</span></p>
+Z_i=k;\theta)\]</span></p>
 <p>M步：</p>
-<p><span class="math display">$$
+<p><span class="math display">\[
 \theta^{(t+1)}=\mathop{\text{argmax}}\limits_{\theta} Q(\theta,
-\theta^{(t)})$$</span></p>
+\theta^{(t)})\]</span></p>
 <h2 id="例子">6.3 例子</h2>
 <p>EM
 算法不仅仅可以用于聚类问题。本节将介绍三硬币模型和高斯混合模型这两个经典模型，解释EM算法的完整流程。</p>
 <h3 id="三硬币模型">6.3.1 三硬币模型</h3>
 <p>三硬币模型由两个不同的伯努利分布混合而成，本质上是一个伯努利混合模型。</p>
-<p>假设有三枚硬币，分别记作 <span
-class="math inline"><em>A</em>, <em>B</em>, <em>C</em></span>。硬币
-<span class="math inline"><em>A</em>, <em>B</em>, <em>C</em></span>
-正面朝上的概率分别为 <span
-class="math inline"><em>π</em>, <em>p</em>, <em>q</em></span>。规则如下：先掷硬币
-<span class="math inline"><em>A</em></span>。若 <span
-class="math inline"><em>A</em></span> 出现正面，则选择硬币 <span
-class="math inline"><em>B</em></span> 掷出；若 <span
-class="math inline"><em>A</em></span> 出现反面，则选择硬币 <span
-class="math inline"><em>C</em></span> 掷出。记录第 2
-次掷出的结果（正面记为 <span class="math inline">1</span>，反面记为
-<span class="math inline">0</span>）。</p>
-<p>在这个问题中，观测数据集合为 <span
-class="math inline"><em>X</em> = {<em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, ..., <em>x</em><sub><em>n</em></sub>}</span>，其中
-<span
-class="math inline"><em>x</em><sub><em>i</em></sub> ∈ {0, 1}</span>。<span
-class="math inline"><em>Z</em> = {<em>z</em><sub>1</sub>, <em>z</em><sub>2</sub>, ..., <em>z</em><sub><em>n</em></sub>}</span>
-是隐变量，指示观测数据来源于哪枚硬币。<span
-class="math inline"><em>z</em><sub><em>i</em></sub> ∈ {0, 1}</span>。我们规定
-<span class="math inline"><em>z</em><sub><em>i</em></sub> = 1</span>
-表示选择了硬币 <span class="math inline"><em>B</em></span>，则硬币 <span
-class="math inline"><em>A</em></span> 是正面；<span
-class="math inline"><em>z</em><sub><em>i</em></sub> = 0</span>
-表示选择了硬币 <span class="math inline"><em>C</em></span>，则硬币 <span
-class="math inline"><em>A</em></span> 是反面。需要估计的参数 <span
-class="math inline"><em>θ</em> = {<em>π</em>, <em>p</em>, <em>q</em>}</span>。</p>
-<p>先做一些准备工作。观测变量 <span
-class="math inline"><em>x</em><sub><em>i</em></sub></span> 的概率分布为
-<span
-class="math display"><em>P</em>(<em>X</em> = <em>x</em><sub><em>i</em></sub>; <em>θ</em>) = ∑<sub><em>z</em><sub><em>i</em></sub> ∈ {0, 1}</sub><em>P</em>(<em>Z</em> = <em>z</em><sub><em>i</em></sub>)<em>P</em>(<em>X</em> = <em>x</em><sub><em>i</em></sub>|<em>Z</em> = <em>z</em><sub><em>i</em></sub>)</span>
-即 <span
-class="math display"><em>P</em>(<em>X</em> = <em>x</em><sub><em>i</em></sub>; <em>θ</em>) = <em>π</em><em>p</em><sup><em>x</em><sub><em>i</em></sub></sup>(1 − <em>p</em>)<sup>1 − <em>x</em><sub><em>i</em></sub></sup> + (1 − <em>π</em>)<em>q</em><sup><em>x</em><sub><em>i</em></sub></sup>(1 − <em>q</em>)<sup>1 − <em>x</em><sub><em>i</em></sub></sup></span></p>
-<p>选取参数的初始值 <span
-class="math inline"><em>θ</em><sup>(0)</sup> = {<em>π</em><sup>(0)</sup>, <em>p</em><sup>(0)</sup>, <em>q</em><sup>(0)</sup>}</span>。</p>
+<p>假设有三枚硬币，分别记作 <span class="math inline">\(A, B,
+C\)</span>。硬币 <span class="math inline">\(A, B, C\)</span>
+正面朝上的概率分别为 <span class="math inline">\(\pi, p,
+q\)</span>。规则如下：先掷硬币 <span
+class="math inline">\(A\)</span>。若 <span
+class="math inline">\(A\)</span> 出现正面，则选择硬币 <span
+class="math inline">\(B\)</span> 掷出；若 <span
+class="math inline">\(A\)</span> 出现反面，则选择硬币 <span
+class="math inline">\(C\)</span> 掷出。记录第 2 次掷出的结果（正面记为
+<span class="math inline">\(1\)</span>，反面记为 <span
+class="math inline">\(0\)</span>）。</p>
+<p>在这个问题中，观测数据集合为 <span class="math inline">\(X = \{x_1,
+x_2, ..., x_n\}\)</span>，其中 <span class="math inline">\(x_i \in \{0,
+1\}\)</span>。<span class="math inline">\(Z = \{z_1, z_2, ...,
+z_n\}\)</span> 是隐变量，指示观测数据来源于哪枚硬币。<span
+class="math inline">\(z_i \in \{0,1\}\)</span>。我们规定 <span
+class="math inline">\(z_i = 1\)</span> 表示选择了硬币 <span
+class="math inline">\(B\)</span>，则硬币 <span
+class="math inline">\(A\)</span> 是正面；<span class="math inline">\(z_i
+= 0\)</span> 表示选择了硬币 <span
+class="math inline">\(C\)</span>，则硬币 <span
+class="math inline">\(A\)</span> 是反面。需要估计的参数 <span
+class="math inline">\(\theta = \{\pi, p, q\}\)</span>。</p>
+<p>先做一些准备工作。观测变量 <span class="math inline">\(x_i\)</span>
+的概率分布为 <span class="math display">\[ P(X=x_i; \theta) = \sum_{z_i
+\in \{0, 1\}} P(Z=z_i)P(X=x_i|Z=z_i) \]</span> 即 <span
+class="math display">\[ P(X=x_i; \theta) = \pi p^{x_i}(1-p)^{1-x_i} +
+(1-\pi) q^{x_i}(1-q)^{1-x_i} \]</span></p>
+<p>选取参数的初始值 <span class="math inline">\(\theta^{(0)} =
+\{\pi^{(0)}, p^{(0)}, q^{(0)}\}\)</span>。</p>
 <h4 id="e步计算隶属度和-q-函数">1. E步：计算隶属度和 Q 函数</h4>
-<p>设观测数据 <span
-class="math inline"><em>x</em><sub><em>i</em></sub></span> 来自硬币
-<span class="math inline"><em>B</em></span>（即 <span
-class="math inline"><em>z</em><sub><em>i</em></sub> = 1</span>）的隶属度为
-<span
-class="math inline"><em>γ</em><sub><em>i</em>1</sub><sup>(<em>t</em>)</sup></span>，上标
-<span class="math inline">(<em>t</em>)</span> 表示第 <span
-class="math inline"><em>t</em></span> 次迭代中隶属度的值，而非次方。</p>
-<p>根据贝叶斯公式 <span class="math display">$$
+<p>设观测数据 <span class="math inline">\(x_i\)</span> 来自硬币 <span
+class="math inline">\(B\)</span>（即 <span
+class="math inline">\(z_i=1\)</span>）的隶属度为 <span
+class="math inline">\(\gamma_{i1}^{(t)}\)</span>，上标 <span
+class="math inline">\((t)\)</span> 表示第 <span
+class="math inline">\(t\)</span> 次迭代中隶属度的值，而非次方。</p>
+<p>根据贝叶斯公式 <span class="math display">\[
 \begin{aligned}
 \gamma_{i1}^{(t)} &amp;= P(z_i=1 | x_i; \theta^{(t)}) \\[1em]
 &amp;= \frac{P(z_i=1; \theta^{(t)}) P(x_i | z_i=1; \theta^{(t)})}{P(x_i;
@@ -704,19 +683,18 @@ class="math inline"><em>t</em></span> 次迭代中隶属度的值，而非次方
 \theta^{(t)})}{P(z_i=1; \theta^{(t)}) P(x_i | z_i=1; \theta^{(t)}) +
 P(z_i=0; \theta^{(t)}) P(x_i | z_i=0; \theta^{(t)})}
 \end{aligned}
-$$</span></p>
-<p>代入具体的概率公式： <span class="math display">$$ \gamma_{i1}^{(t)}
+\]</span></p>
+<p>代入具体的概率公式： <span class="math display">\[ \gamma_{i1}^{(t)}
 = \frac{\pi^{(t)} (p^{(t)})^{x_i} (1-p^{(t)})^{1-x_i}}{\pi^{(t)}
 (p^{(t)})^{x_i} (1-p^{(t)})^{1-x_i} + (1-\pi^{(t)}) (q^{(t)})^{x_i}
-(1-q^{(t)})^{1-x_i}} $$</span></p>
-<p>同理可得 <span class="math display">$$ \gamma_{i0}^{(t)} =
+(1-q^{(t)})^{1-x_i}} \]</span></p>
+<p>同理可得 <span class="math display">\[ \gamma_{i0}^{(t)} =
 \frac{(1-\pi^{(t)}) (q^{(t)})^{x_i} (1-q^{(t)})^{1-x_i}}{\pi^{(t)}
 (p^{(t)})^{x_i} (1-p^{(t)})^{1-x_i} + (1-\pi^{(t)}) (q^{(t)})^{x_i}
-(1-q^{(t)})^{1-x_i}} $$</span></p>
+(1-q^{(t)})^{1-x_i}} \]</span></p>
 <p>根据上面两条公式，或根据隶属度的定义可知 <span
-class="math inline"><em>γ</em><sub><em>i</em>0</sub> + <em>γ</em><sub><em>i</em>1</sub> = 1</span>。
-于是 <span class="math inline"><em>Q</em></span> 函数为 <span
-class="math display">$$
+class="math inline">\(\gamma_{i0} + \gamma_{i1}=1\)</span>。 于是 <span
+class="math inline">\(Q\)</span> 函数为 <span class="math display">\[
 \begin{aligned}
 Q(\theta, \theta^{(t)})
 &amp;= \sum_{i=1}^n \sum_{k \in \{0,1\}} \gamma_{ik}^{(t)} \ln P(x_i,
@@ -727,34 +705,32 @@ z_i=k; \theta) \\
 (1-x_i) \ln(1-p) \big] + (1-\gamma_{i1}^{(t)}) \big[ \ln (1-\pi) + x_i
 \ln q + (1-x_i) \ln(1-q) \big] \Big\}
 \end{aligned}
-$$</span></p>
+\]</span></p>
 <h4 id="m步最大化-q-函数更新参数">2. M步：最大化 Q 函数（更新参数）</h4>
-<p>我们需要分别对 <span
-class="math inline"><em>π</em>, <em>p</em>, <em>q</em></span>
+<p>我们需要分别对 <span class="math inline">\(\pi, p, q\)</span>
 求偏导并令其为 0。</p>
-<p><span class="math display">$$ \frac{\partial Q}{\partial \pi} =
+<p><span class="math display">\[ \frac{\partial Q}{\partial \pi} =
 \sum_{i=1}^n \left[ \frac{\gamma_{i1}^{(t)}}{\pi} -
-\frac{1-\gamma_{i1}^{(t)}}{1-\pi} \right] = 0 $$</span> 解得： <span
-class="math display">$$ \pi^{(t+1)} = \frac{1}{n} \sum_{i=1}^n
-\gamma_{i1}^{(t)} $$</span> 即新的 <span
-class="math inline"><em>π</em></span> 是所有样本属于硬币 <span
-class="math inline"><em>B</em></span> 的概率的平均值。</p>
-<p><span class="math display">$$ \frac{\partial Q}{\partial p} =
+\frac{1-\gamma_{i1}^{(t)}}{1-\pi} \right] = 0 \]</span> 解得： <span
+class="math display">\[ \pi^{(t+1)} = \frac{1}{n} \sum_{i=1}^n
+\gamma_{i1}^{(t)} \]</span> 即新的 <span
+class="math inline">\(\pi\)</span> 是所有样本属于硬币 <span
+class="math inline">\(B\)</span> 的概率的平均值。</p>
+<p><span class="math display">\[ \frac{\partial Q}{\partial p} =
 \sum_{i=1}^n \gamma_{i1}^{(t)} \left[ \frac{x_i}{p} - \frac{1-x_i}{1-p}
-\right] = 0 $$</span> 解得： <span class="math display">$$ p^{(t+1)} =
+\right] = 0 \]</span> 解得： <span class="math display">\[ p^{(t+1)} =
 \frac{\sum \limits_{i=1}^n \gamma_{i1}^{(t)} x_i}{\sum \limits_{i=1}^n
-\gamma_{i1}^{(t)}} $$</span> 即新的 <span
-class="math inline"><em>p</em></span> 是硬币 <span
-class="math inline"><em>B</em></span> 产生正面的加权比例，权重为样本属于
-<span class="math inline"><em>B</em></span> 的概率。</p>
-<p><span class="math display">$$ \frac{\partial Q}{\partial q} = \sum
+\gamma_{i1}^{(t)}} \]</span> 即新的 <span
+class="math inline">\(p\)</span> 是硬币 <span
+class="math inline">\(B\)</span> 产生正面的加权比例，权重为样本属于
+<span class="math inline">\(B\)</span> 的概率。</p>
+<p><span class="math display">\[ \frac{\partial Q}{\partial q} = \sum
 \limits_{i=1}^n (1-\gamma_{i1}^{(t)}) \left[ \frac{x_i}{q} -
-\frac{1-x_i}{1-q} \right] = 0 $$</span> 解得： <span
-class="math display">$$ q^{(t+1)} = \frac{\sum \limits_{i=1}^n
+\frac{1-x_i}{1-q} \right] = 0 \]</span> 解得： <span
+class="math display">\[ q^{(t+1)} = \frac{\sum \limits_{i=1}^n
 (1-\gamma_{i1}^{(t)}) x_i}{\sum \limits_{i=1}^n (1-\gamma_{i1}^{(t)})}
-$$</span></p>
-<p>其实际意义同 <span
-class="math inline"><em>p</em><sup>(<em>t</em> + 1)</sup></span>。</p>
+\]</span></p>
+<p>其实际意义同 <span class="math inline">\(p^{(t+1)}\)</span>。</p>
 <h4 id="代码实现">3. 代码实现</h4>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置绘图风格</span></span><br><span class="line">sns.set_style(<span class="string">&quot;whitegrid&quot;</span>)</span><br><span class="line">%matplotlib inline</span><br></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 数据生成函数与生成过程</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_data</span>(<span class="params">n_samples, pi_true, p_true, q_true</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    生成三硬币模型的模拟数据</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    X = []</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(n_samples):</span><br><span class="line">        <span class="comment"># 1. 掷硬币 A (z)</span></span><br><span class="line">        z = <span class="number">1</span> <span class="keyword">if</span> np.random.rand() &lt; pi_true <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 2. 根据 A 的结果选择掷 B 还是 C</span></span><br><span class="line">        <span class="keyword">if</span> z == <span class="number">1</span>:</span><br><span class="line">            x = <span class="number">1</span> <span class="keyword">if</span> np.random.rand() &lt; p_true <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            x = <span class="number">1</span> <span class="keyword">if</span> np.random.rand() &lt; q_true <span class="keyword">else</span> <span class="number">0</span></span><br><span class="line">        X.append(x)</span><br><span class="line">    <span class="keyword">return</span> np.array(X)</span><br><span class="line"></span><br><span class="line"><span class="comment"># --- 执行数据生成 ---</span></span><br><span class="line">np.random.seed(<span class="number">42</span>) <span class="comment"># 固定随机种子</span></span><br><span class="line">N = <span class="number">1000</span></span><br><span class="line">true_pi, true_p, true_q = <span class="number">0.4</span>, <span class="number">0.8</span>, <span class="number">0.2</span></span><br><span class="line"></span><br><span class="line">X = generate_data(N, true_pi, true_p, true_q)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;生成样本数量: <span class="subst">&#123;N&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;观测数据均值 (正面频率): <span class="subst">&#123;np.mean(X):<span class="number">.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;理论均值 (pi*p + (1-pi)*q): <span class="subst">&#123;true_pi*true_p + (<span class="number">1</span>-true_pi)*true_q:<span class="number">.4</span>f&#125;</span>&quot;</span>)</span><br></pre></td></tr></table></figure>
@@ -791,9 +767,9 @@ init_params = [0.5, 0.3,
 算法本身无能，而是数据类型限制了算法的发挥。在三硬币模型中，观测数据是离散的
 0 或
 1。一个“正面（1）”，除此之外没有更多信息，它无法告诉我们它是“很强的正面”还是“勉强的正面”。此外，当
-<span class="math inline"><em>π</em>, <em>p</em>, <em>q</em></span>
-的参数设置得稍有不慎（比如 <span class="math inline"><em>p</em></span>
-和 <span class="math inline"><em>q</em></span>
+<span class="math inline">\(\pi, p, q\)</span>
+的参数设置得稍有不慎（比如 <span class="math inline">\(p\)</span> 和
+<span class="math inline">\(q\)</span>
 接近），算法很难区分一个“1”到底更像来自于硬币 B 还是硬币
 C。在算法眼中，B 和 C 的分布重叠度太高，难以剥离。</p>
 <p>相比之下，高斯混合模型 (GMM)
@@ -806,52 +782,45 @@ EM 算法能迅速把混在一起的数据拉开。</p>
 算法真正大展拳脚的舞台。接下来，我们将推导 GMM
 的参数更新公式。虽然数学推导变复杂了（引入了高斯公式），但算法的收敛稳定性却变强了。</p>
 <h3 id="高斯混合模型">6.3.2 高斯混合模型</h3>
-<p>设观测变量 <span
-class="math inline"><em>X</em> = {<em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, ..., <em>x</em><sub><em>n</em></sub>}</span>，其中
-<span class="math inline"><em>x</em><sub><em>i</em></sub> ∈ ℝ</span>
-为连续值（例如身高）。隐变量 <span
-class="math inline"><em>Z</em> = {<em>z</em><sub>1</sub>, <em>z</em><sub>2</sub>, ..., <em>z</em><sub><em>n</em></sub>}</span>。<span
-class="math inline"><em>z</em><sub><em>i</em></sub> ∈ {1, 2, ..., <em>K</em>}</span>。<span
-class="math inline"><em>z</em><sub><em>i</em></sub> = <em>k</em></span>，表示第
-<span class="math inline"><em>i</em></span> 个样本来自第 <span
-class="math inline"><em>k</em></span> 个高斯成分。</p>
-<p>模型参数为 <span class="math inline"><em>K</em></span>
-个三元组：<span
-class="math inline"><em>θ</em> = {<em>w</em><sub><em>k</em></sub>, <em>μ</em><sub><em>k</em></sub>, <em>σ</em><sub><em>k</em></sub><sup>2</sup>}<sub><em>k</em> = 1</sub><sup><em>K</em></sup></span>。</p>
+<p>设观测变量 <span class="math inline">\(X = \{x_1, x_2, ...,
+x_n\}\)</span>，其中 <span class="math inline">\(x_i \in
+\mathbb{R}\)</span> 为连续值（例如身高）。隐变量 <span
+class="math inline">\(Z=\{z_1, z_2, ..., z_n\}\)</span>。<span
+class="math inline">\(z_i \in \{1, 2, ..., K\}\)</span>。<span
+class="math inline">\(z_i = k\)</span>，表示第 <span
+class="math inline">\(i\)</span> 个样本来自第 <span
+class="math inline">\(k\)</span> 个高斯成分。</p>
+<p>模型参数为 <span class="math inline">\(K\)</span> 个三元组：<span
+class="math inline">\(\theta = \{ w_k, \mu_k, \sigma_k^2
+\}_{k=1}^K\)</span>。</p>
 <ul>
-<li><p><span
-class="math inline"><em>w</em><sub><em>k</em></sub></span>：第 <span
-class="math inline"><em>k</em></span>
-个成分的混合系数（权重），即先验概率 <span
-class="math inline"><em>P</em>(<em>z</em><sub><em>i</em></sub> = <em>k</em>)</span>。满足
-<span class="math inline">$\sum \limits_{k=1}^K w_k =
-1$</span>。</p></li>
-<li><p><span
-class="math inline"><em>μ</em><sub><em>k</em></sub></span>：第 <span
-class="math inline"><em>k</em></span> 个成分的均值。</p></li>
-<li><p><span
-class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>：第
-<span class="math inline"><em>k</em></span> 个成分的方差。</p></li>
+<li><p><span class="math inline">\(w_k\)</span>：第 <span
+class="math inline">\(k\)</span> 个成分的混合系数（权重），即先验概率
+<span class="math inline">\(P(z_i=k)\)</span>。满足 <span
+class="math inline">\(\sum \limits_{k=1}^K w_k = 1\)</span>。</p></li>
+<li><p><span class="math inline">\(\mu_k\)</span>：第 <span
+class="math inline">\(k\)</span> 个成分的均值。</p></li>
+<li><p><span class="math inline">\(\sigma_k^2\)</span>：第 <span
+class="math inline">\(k\)</span> 个成分的方差。</p></li>
 </ul>
-<p>下面做一些准备工作。观测数据 <span
-class="math inline"><em>x</em><sub><em>i</em></sub></span>
-的概率密度函数为： <span class="math display">$$ P(x_i ; \theta) =
+<p>下面做一些准备工作。观测数据 <span class="math inline">\(x_i\)</span>
+的概率密度函数为： <span class="math display">\[ P(x_i ; \theta) =
 \sum_{k=1}^K P(z_i=k) P(x_i | z_i=k) = \sum_{k=1}^K w_k \cdot
-\mathcal{N}(x_i; \mu_k, \sigma_k^2) $$</span></p>
-<p>其中高斯分布的概率密度函数为： <span class="math display">$$
+\mathcal{N}(x_i; \mu_k, \sigma_k^2) \]</span></p>
+<p>其中高斯分布的概率密度函数为： <span class="math display">\[
 \mathcal{N}(x_i; \mu_k, \sigma_k^2) = \frac{1}{\sqrt{2\pi}\sigma_k}
-\exp\left( -\frac{(x_i - \mu_k)^2}{2\sigma_k^2} \right) $$</span></p>
+\exp\left( -\frac{(x_i - \mu_k)^2}{2\sigma_k^2} \right) \]</span></p>
 <h4 id="e步计算隶属度和-q-函数-1">1. E步：计算隶属度和 Q 函数</h4>
-<p>根据贝叶斯公式 <span class="math display">$$
+<p>根据贝叶斯公式 <span class="math display">\[
 \begin{aligned}
 \gamma_{ik}^{(t)} &amp;= P(z_i=k | x_i; \theta^{(t)}) \\[1em]
 &amp;= \frac{w_k^{(t)} \cdot \mathcal{N}(x_i; \mu_k^{(t)},
 (\sigma_k^2)^{(t)})}{\sum \limits_{j=1}^K w_j^{(t)} \cdot
 \mathcal{N}(x_i; \mu_j^{(t)}, (\sigma_j^2)^{(t)})}
 \end{aligned}
-$$</span></p>
-<p><span class="math inline"><em>Q</em></span> 函数为 <span
-class="math display">$$
+\]</span></p>
+<p><span class="math inline">\(Q\)</span> 函数为 <span
+class="math display">\[
 \begin{aligned}
 Q(\theta, \theta^{(t)}) &amp;= \sum_{i=1}^n E_{z_i} [\ln P(x_i, z_i;
 \theta)] \\
@@ -860,125 +829,119 @@ Q(\theta, \theta^{(t)}) &amp;= \sum_{i=1}^n E_{z_i} [\ln P(x_i, z_i;
 &amp;= \sum_{i=1}^n \sum_{k=1}^K \gamma_{ik}^{(t)} \big( \ln w_k + \ln
 \mathcal{N}(x_i; \mu_k, \sigma_k^2) \big)
 \end{aligned}
-$$</span></p>
+\]</span></p>
 <h4 id="m步最大化-q-函数更新参数-1">2. M步：最大化 Q
 函数（更新参数）</h4>
 <p>我们将 Q 函数拆解为两部分，分别优化。</p>
 <ol type="1">
-<li><p>包含 <span
-class="math inline"><em>w</em><sub><em>k</em></sub></span> 的项：<span
-class="math inline">$\sum \limits_{i=1}^n \sum \limits_{k=1}^K
-\gamma_{ik}^{(t)} \ln w_k$</span></p></li>
-<li><p>包含高斯参数（均值 <span
-class="math inline"><em>μ</em><sub><em>k</em></sub></span> 和方差 <span
-class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>）的项：<span
-class="math inline">$\sum \limits_{i=1}^n \sum \limits_{k=1}^K
+<li><p>包含 <span class="math inline">\(w_k\)</span> 的项：<span
+class="math inline">\(\sum \limits_{i=1}^n \sum \limits_{k=1}^K
+\gamma_{ik}^{(t)} \ln w_k\)</span></p></li>
+<li><p>包含高斯参数（均值 <span class="math inline">\(\mu_k\)</span>
+和方差 <span class="math inline">\(\sigma_k^2\)</span>）的项：<span
+class="math inline">\(\sum \limits_{i=1}^n \sum \limits_{k=1}^K
 \gamma_{ik}^{(t)} \left[ -\ln(\sqrt{2\pi}\sigma_k) - \frac{(x_i -
-\mu_k)^2}{2\sigma_k^2} \right]$</span></p></li>
+\mu_k)^2}{2\sigma_k^2} \right]\)</span></p></li>
 </ol>
 <hr />
 <h5 id="推导-1更新混合系数-w_k">推导 1：更新混合系数 <span
-class="math inline"><em>w</em><sub><em>k</em></sub></span></h5>
-<p>这是一个带约束的优化问题，约束条件为 <span class="math inline">$\sum
-\limits_{k=1}^K w_k = 1$</span>。我们需要使用 Lagrange 乘子法。</p>
-<p>构造拉格朗日函数： <span class="math display">$$ \mathcal{L}(w,
+class="math inline">\(w_k\)</span></h5>
+<p>这是一个带约束的优化问题，约束条件为 <span class="math inline">\(\sum
+\limits_{k=1}^K w_k = 1\)</span>。我们需要使用 Lagrange 乘子法。</p>
+<p>构造拉格朗日函数： <span class="math display">\[ \mathcal{L}(w,
 \lambda) = \sum_{i=1}^n \sum_{k=1}^K \gamma_{ik}^{(t)} \ln w_k + \lambda
-\left( \sum_{k=1}^K w_k - 1 \right) $$</span></p>
-<p>对 <span class="math inline"><em>w</em><sub><em>k</em></sub></span>
-求偏导并令其为 0： <span class="math display">$$ \frac{\partial
-\mathcal{L}}{\partial w_k} = \sum_{i=1}^n \frac{\gamma_{ik}^{(t)}}{w_k}
-+ \lambda = 0 \quad \Longrightarrow \quad w_k = -\frac{\sum
-\limits_{i=1}^n \gamma_{ik}^{(t)}}{\lambda} $$</span></p>
-<p>为了求 <span class="math inline"><em>λ</em></span>，对上式两边关于
-<span class="math inline"><em>k</em></span> 求和： <span
-class="math display">$$ \sum_{k=1}^K w_k = \sum_{k=1}^K \left(
+\left( \sum_{k=1}^K w_k - 1 \right) \]</span></p>
+<p>对 <span class="math inline">\(w_k\)</span> 求偏导并令其为 0： <span
+class="math display">\[ \frac{\partial \mathcal{L}}{\partial w_k} =
+\sum_{i=1}^n \frac{\gamma_{ik}^{(t)}}{w_k} + \lambda = 0 \quad
+\Longrightarrow \quad w_k = -\frac{\sum \limits_{i=1}^n
+\gamma_{ik}^{(t)}}{\lambda} \]</span></p>
+<p>为了求 <span class="math inline">\(\lambda\)</span>，对上式两边关于
+<span class="math inline">\(k\)</span> 求和： <span
+class="math display">\[ \sum_{k=1}^K w_k = \sum_{k=1}^K \left(
 -\frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)}}{\lambda} \right)
-$$</span> 利用 <span class="math inline">$\sum \limits_{k=1}^K w_k =
-1$</span> 和 <span class="math inline">$\sum \limits_{k=1}^K
-\gamma_{ik}^{(t)} = 1$</span>： <span class="math display">$$ 1 =
+\]</span> 利用 <span class="math inline">\(\sum \limits_{k=1}^K w_k =
+1\)</span> 和 <span class="math inline">\(\sum \limits_{k=1}^K
+\gamma_{ik}^{(t)} = 1\)</span>： <span class="math display">\[ 1 =
 -\frac{1}{\lambda} \sum_{i=1}^n \underbrace{\sum \limits_{k=1}^K
 \gamma_{ik}^{(t)}}_{1} = -\frac{n}{\lambda} \quad \Longrightarrow \quad
-\lambda = -n $$</span></p>
-<p>代回原式，得到更新公式： <span class="math display">$$ w_k^{(t+1)} =
-\frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)}}{n} $$</span> 实际意义：第
-<span class="math inline"><em>k</em></span> 个成分的权重 =
+\lambda = -n \]</span></p>
+<p>代回原式，得到更新公式： <span class="math display">\[ w_k^{(t+1)} =
+\frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)}}{n} \]</span> 实际意义：第
+<span class="math inline">\(k\)</span> 个成分的权重 =
 该成分所有隶属度之和 / 样本总数。即“属于该类的平均人数比例”。</p>
 <hr />
 <h5 id="推导-2更新均值-mu_k">推导 2：更新均值 <span
-class="math inline"><em>μ</em><sub><em>k</em></sub></span></h5>
-<p>我们只关注 <span class="math inline"><em>Q</em></span> 函数中包含
-<span class="math inline"><em>μ</em><sub><em>k</em></sub></span> 的项：
-<span class="math display">$$ \mathcal{J}(\mu_k) = \sum_{i=1}^n
+class="math inline">\(\mu_k\)</span></h5>
+<p>我们只关注 <span class="math inline">\(Q\)</span> 函数中包含 <span
+class="math inline">\(\mu_k\)</span> 的项： <span
+class="math display">\[ \mathcal{J}(\mu_k) = \sum_{i=1}^n
 \gamma_{ik}^{(t)} \left( -\frac{(x_i - \mu_k)^2}{2\sigma_k^2} \right)
-$$</span></p>
-<p>对 <span class="math inline"><em>μ</em><sub><em>k</em></sub></span>
-求偏导并令其为 0： <span class="math display">$$ \frac{\partial
-\mathcal{J}}{\partial \mu_k} = \sum_{i=1}^n \gamma_{ik}^{(t)}
-\frac{2(x_i - \mu_k)}{2\sigma_k^2} = 0 $$</span> 消去常数 <span
-class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>，整理方程：
-<span class="math display">$$ \sum_{i=1}^n \gamma_{ik}^{(t)} x_i -
-\sum_{i=1}^n \gamma_{ik}^{(t)} \mu_k = 0 $$</span> <span
-class="math display">$$ \mu_k \sum_{i=1}^n \gamma_{ik}^{(t)} =
-\sum_{i=1}^n \gamma_{ik}^{(t)} x_i $$</span></p>
-<p>得到更新公式： <span class="math display">$$ \mu_k^{(t+1)} =
+\]</span></p>
+<p>对 <span class="math inline">\(\mu_k\)</span> 求偏导并令其为 0：
+<span class="math display">\[ \frac{\partial \mathcal{J}}{\partial
+\mu_k} = \sum_{i=1}^n \gamma_{ik}^{(t)} \frac{2(x_i -
+\mu_k)}{2\sigma_k^2} = 0 \]</span> 消去常数 <span
+class="math inline">\(\sigma_k^2\)</span>，整理方程： <span
+class="math display">\[ \sum_{i=1}^n \gamma_{ik}^{(t)} x_i -
+\sum_{i=1}^n \gamma_{ik}^{(t)} \mu_k = 0 \]</span> <span
+class="math display">\[ \mu_k \sum_{i=1}^n \gamma_{ik}^{(t)} =
+\sum_{i=1}^n \gamma_{ik}^{(t)} x_i \]</span></p>
+<p>得到更新公式： <span class="math display">\[ \mu_k^{(t+1)} =
 \frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)} x_i}{\sum \limits_{i=1}^n
-\gamma_{ik}^{(t)}} $$</span> 实际意义：第 <span
-class="math inline"><em>k</em></span>
+\gamma_{ik}^{(t)}} \]</span> 实际意义：第 <span
+class="math inline">\(k\)</span>
 个成分的均值等于所有样本的加权平均值，每个样本的权重就是它属于该类的隶属度。这与
 6.1 节中给出的更新公式完全一致。</p>
 <hr />
 <h5 id="推导-3更新方差-sigma_k2"><strong>推导 3：更新方差 <span
-class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span></strong></h5>
+class="math inline">\(\sigma_k^2\)</span></strong></h5>
 <p>我们只关注 Q 函数中包含 <span
-class="math inline"><em>σ</em><sub><em>k</em></sub><sup>2</sup></span>
-的项（注意 <span class="math inline">$\ln(\sqrt{2\pi}\sigma_k) =
-\frac{1}{2}\ln(2\pi) + \frac{1}{2}\ln(\sigma_k^2)$</span>）： <span
-class="math display">$$ \mathcal{J}(\sigma_k^2) = \sum_{i=1}^n
-\gamma_{ik}^{(t)} \left( -\frac{1}{2}\ln(\sigma_k^2) - \frac{(x_i -
-\mu_k)^2}{2\sigma_k^2} \right) $$</span></p>
-<p>令 <span
-class="math inline"><em>V</em> = <em>σ</em><sub><em>k</em></sub><sup>2</sup></span>，对
-<span class="math inline"><em>V</em></span> 求偏导并令其为 0： <span
-class="math display">$$ \frac{\partial \mathcal{J}}{\partial V} =
+class="math inline">\(\sigma_k^2\)</span> 的项（注意 <span
+class="math inline">\(\ln(\sqrt{2\pi}\sigma_k) = \frac{1}{2}\ln(2\pi) +
+\frac{1}{2}\ln(\sigma_k^2)\)</span>）： <span class="math display">\[
+\mathcal{J}(\sigma_k^2) = \sum_{i=1}^n \gamma_{ik}^{(t)} \left(
+-\frac{1}{2}\ln(\sigma_k^2) - \frac{(x_i - \mu_k)^2}{2\sigma_k^2}
+\right) \]</span></p>
+<p>令 <span class="math inline">\(V = \sigma_k^2\)</span>，对 <span
+class="math inline">\(V\)</span> 求偏导并令其为 0： <span
+class="math display">\[ \frac{\partial \mathcal{J}}{\partial V} =
 \sum_{i=1}^n \gamma_{ik}^{(t)} \left( -\frac{1}{2V} + \frac{(x_i -
-\mu_k)^2}{2V^2} \right) = 0 $$</span> 两边同乘 <span
-class="math inline">2<em>V</em><sup>2</sup></span>： <span
-class="math display">$$ \sum_{i=1}^n \gamma_{ik}^{(t)} \left( -V + (x_i
-- \mu_k)^2 \right) = 0 $$</span> <span class="math display">$$ -V
-\sum_{i=1}^n \gamma_{ik}^{(t)} + \sum_{i=1}^n \gamma_{ik}^{(t)} (x_i -
-\mu_k)^2 = 0 $$</span></p>
-<p>得到更新公式： <span class="math display">$$ (\sigma_k^2)^{(t+1)} =
+\mu_k)^2}{2V^2} \right) = 0 \]</span> 两边同乘 <span
+class="math inline">\(2V^2\)</span>： <span class="math display">\[
+\sum_{i=1}^n \gamma_{ik}^{(t)} \left( -V + (x_i - \mu_k)^2 \right) = 0
+\]</span> <span class="math display">\[ -V \sum_{i=1}^n
+\gamma_{ik}^{(t)} + \sum_{i=1}^n \gamma_{ik}^{(t)} (x_i - \mu_k)^2 = 0
+\]</span></p>
+<p>得到更新公式： <span class="math display">\[ (\sigma_k^2)^{(t+1)} =
 \frac{\sum \limits_{i=1}^n \gamma_{ik}^{(t)} (x_i -
-\mu_k^{(t+1)})^2}{\sum \limits_{i=1}^n \gamma_{ik}^{(t)}} $$</span>
-物理意义：第 <span class="math inline"><em>k</em></span>
+\mu_k^{(t+1)})^2}{\sum \limits_{i=1}^n \gamma_{ik}^{(t)}} \]</span>
+物理意义：第 <span class="math inline">\(k\)</span>
 个成分的方差等于每个样本偏离中心距离的加权平方和，权重还是隶属度。</p>
-<p>注意公式里的均值是 <span
-class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em> + 1)</sup></span>
+<p>注意公式里的均值是 <span class="math inline">\(\mu_k^{(t+1)}\)</span>
 而不是 <span
-class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em>)</sup></span>。方差的定义是数据偏离中心的距离平方的期望；对于第
-<span class="math inline"><em>t</em> + 1</span>
+class="math inline">\(\mu_k^{(t)}\)</span>。方差的定义是数据偏离中心的距离平方的期望；对于第
+<span class="math inline">\(t+1\)</span>
 轮迭代，最能代表这组数据中心的，显然是刚刚求出来的最新均值 <span
-class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em> + 1)</sup></span>，而不是上一轮的旧均值
-<span
-class="math inline"><em>μ</em><sub><em>k</em></sub><sup>(<em>t</em>)</sup></span>。</p>
+class="math inline">\(\mu_k^{(t+1)}\)</span>，而不是上一轮的旧均值 <span
+class="math inline">\(\mu_k^{(t)}\)</span>。</p>
 <h4 id="算法流程总结">3. 算法流程总结</h4>
 <p>高斯混合模型的参数估计流程如下：</p>
 <ol type="1">
-<li><p>初始化：随机选取 <span
-class="math inline"><em>w</em><sub><em>k</em></sub>, <em>μ</em><sub><em>k</em></sub>, <em>σ</em><sub><em>k</em></sub><sup>2</sup></span>
-的初值。</p></li>
+<li><p>初始化：随机选取 <span class="math inline">\(w_k, \mu_k,
+\sigma_k^2\)</span> 的初值。</p></li>
 <li><p>E步：根据公式计算隶属度 <span
-class="math inline"><em>γ</em><sub><em>i</em><em>k</em></sub><sup>(<em>t</em>)</sup></span>。</p></li>
+class="math inline">\(\gamma_{ik}^{(t)}\)</span>。</p></li>
 <li><p>M步：</p>
 <ul>
-<li><p><span class="math inline">$w_k^{(t+1)} = \frac{\sum
-\limits_{i=1}^n \gamma_{ik}^{(t)}}{n}$</span></p></li>
-<li><p><span class="math inline">$\mu_k^{(t+1)} = \frac{\sum
+<li><p><span class="math inline">\(w_k^{(t+1)} = \frac{\sum
+\limits_{i=1}^n \gamma_{ik}^{(t)}}{n}\)</span></p></li>
+<li><p><span class="math inline">\(\mu_k^{(t+1)} = \frac{\sum
 \limits_{i=1}^n \gamma_{ik}^{(t)} x_i}{\sum \limits_{i=1}^n
-\gamma_{ik}^{(t)}}$</span></p></li>
-<li><p><span class="math inline">$(\sigma_k^2)^{(t+1)} = \frac{\sum
+\gamma_{ik}^{(t)}}\)</span></p></li>
+<li><p><span class="math inline">\((\sigma_k^2)^{(t+1)} = \frac{\sum
 \limits_{i=1}^n \gamma_{ik}^{(t)} (x_i - \mu_k^{(t+1)})^2}{\sum
-\limits_{i=1}^n \gamma_{ik}^{(t)}}$</span></p></li>
+\limits_{i=1}^n \gamma_{ik}^{(t)}}\)</span></p></li>
 </ul></li>
 <li><p>循环，直至收敛。</p></li>
 </ol>
@@ -1047,95 +1010,82 @@ target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E4%B8%BB%E9%
 <h3 id="问题定义">6.4.1 问题定义</h3>
 <h4 id="参数定义">1. 参数定义</h4>
 <ul>
-<li><span
-class="math inline"><em>D</em> = {<em>d</em><sub>1</sub>, ..., <em>d</em><sub><em>M</em></sub>}</span>：文档集合（<span
-class="math inline"><em>M</em></span> 篇文档）。</li>
-<li><span
-class="math inline"><em>W</em> = {<em>w</em><sub>1</sub>, ..., <em>w</em><sub><em>N</em></sub>}</span>：词表集合（<span
-class="math inline"><em>N</em></span> 个单词）。</li>
-<li><span
-class="math inline"><em>Z</em> = {<em>z</em><sub>1</sub>, ..., <em>z</em><sub><em>K</em></sub>}</span>：话题集合（<span
-class="math inline"><em>K</em></span> 个话题，隐变量）。</li>
-<li><span
-class="math inline">#(<em>d</em><sub><em>m</em></sub>, <em>w</em><sub><em>n</em></sub>)</span>：观测数据。单词
-<span class="math inline"><em>w</em><sub><em>n</em></sub></span> 在文档
-<span class="math inline"><em>d</em><sub><em>m</em></sub></span>
-中出现的次数。</li>
-<li><span
-class="math inline"><em>P</em>(<em>z</em><sub><em>k</em></sub>|<em>d</em><sub><em>m</em></sub>)</span>：文档-话题分布，即文档
-<span class="math inline"><em>d</em><sub><em>m</em></sub></span>
-中包含话题 <span
-class="math inline"><em>z</em><sub><em>k</em></sub></span>
-的概率，也记作 <span
-class="math inline"><em>q</em><sub><em>m</em>, <em>k</em></sub></span>。</li>
-<li><span
-class="math inline"><em>P</em>(<em>w</em><sub><em>n</em></sub>|<em>z</em><sub><em>k</em></sub>)</span>：话题-单词分布，即给定话题
-<span
-class="math inline"><em>z</em><sub><em>k</em></sub></span>，生成单词
-<span class="math inline"><em>w</em><sub><em>n</em></sub></span>
-的概率，也记作 <span
-class="math inline"><em>p</em><sub><em>k</em>, <em>n</em></sub></span>。</li>
-<li><span
-class="math inline"><em>γ</em><sub><em>m</em>, <em>n</em>, <em>k</em></sub></span>：单词
-<span class="math inline"><em>w</em><sub><em>n</em></sub></span>
-出现在文档 <span
-class="math inline"><em>d</em><sub><em>m</em></sub></span>
-中时，它是由话题 <span
-class="math inline"><em>z</em><sub><em>k</em></sub></span>
-生成的概率，也就是隶属度。</li>
+<li><span class="math inline">\(D = \{d_1, ...,
+d_M\}\)</span>：文档集合（<span class="math inline">\(M\)</span>
+篇文档）。</li>
+<li><span class="math inline">\(W = \{w_1, ...,
+w_N\}\)</span>：词表集合（<span class="math inline">\(N\)</span>
+个单词）。</li>
+<li><span class="math inline">\(Z = \{z_1, ...,
+z_K\}\)</span>：话题集合（<span class="math inline">\(K\)</span>
+个话题，隐变量）。</li>
+<li><span class="math inline">\(\#(d_m, w_n)\)</span>：观测数据。单词
+<span class="math inline">\(w_n\)</span> 在文档 <span
+class="math inline">\(d_m\)</span> 中出现的次数。</li>
+<li><span class="math inline">\(P(z_k |
+d_m)\)</span>：文档-话题分布，即文档 <span
+class="math inline">\(d_m\)</span> 中包含话题 <span
+class="math inline">\(z_k\)</span> 的概率，也记作 <span
+class="math inline">\(q_{m,k}\)</span>。</li>
+<li><span class="math inline">\(P(w_n |
+z_k)\)</span>：话题-单词分布，即给定话题 <span
+class="math inline">\(z_k\)</span>，生成单词 <span
+class="math inline">\(w_n\)</span> 的概率，也记作 <span
+class="math inline">\(p_{k,n}\)</span>。</li>
+<li><span class="math inline">\(\gamma_{m,n,k}\)</span>：单词 <span
+class="math inline">\(w_n\)</span> 出现在文档 <span
+class="math inline">\(d_m\)</span> 中时，它是由话题 <span
+class="math inline">\(z_k\)</span> 生成的概率，也就是隶属度。</li>
 </ul>
 <h4 id="生成模型">2. 生成模型</h4>
-<p>我们观测到的样本是共现矩阵 <span
-class="math inline"><strong>X</strong> ∈ ℕ<sup><em>M</em> × <em>N</em></sup></span>，其中
-<span
-class="math inline"><em>x</em><sub><em>m</em><em>n</em></sub> = #(<em>d</em><sub><em>m</em></sub>, <em>w</em><sub><em>n</em></sub>)</span>。
-PLSA 假设文档和单词的生成过程如下（本质上还是全概率公式）： <span
-class="math display">$$ P(d, w) = P(d) \sum_{k=1}^K P(w|z_k) P(z_k|d)
-$$</span></p>
+<p>我们观测到的样本是共现矩阵 <span class="math inline">\(\mathbf{X} \in
+\mathbb{N}^{M \times N}\)</span>，其中 <span
+class="math inline">\(x_{mn} = \#(d_m, w_n)\)</span>。 PLSA
+假设文档和单词的生成过程如下（本质上还是全概率公式）： <span
+class="math display">\[ P(d, w) = P(d) \sum_{k=1}^K P(w|z_k) P(z_k|d)
+\]</span></p>
 <h3 id="em-算法推导">6.4.2 EM 算法推导</h3>
 <h4 id="e步计算隶属度和-q-函数-2">1. E步：计算隶属度和 Q 函数</h4>
 <p>根据贝叶斯公式<br />
-<span class="math display">$$ \gamma_{m,n,k} = P(z_k | d_m, w_n) =
+<span class="math display">\[ \gamma_{m,n,k} = P(z_k | d_m, w_n) =
 \frac{P(w_n | z_k) P(z_k | d_m)}{\sum \limits_{j=1}^K P(w_n | z_j) P(z_j
-| d_m)} $$</span></p>
-<p>即 <span class="math display">$$ \gamma_{m,n,k}^{(t)} =
+| d_m)} \]</span></p>
+<p>即 <span class="math display">\[ \gamma_{m,n,k}^{(t)} =
 \frac{p_{k,n}^{(t)} q_{m,k}^{(t)}}{\sum \limits_{j=1}^K p_{j,n}^{(t)}
-q_{m,j}^{(t)}} $$</span></p>
-<p>我们的目标是最大化 Q 函数 <span class="math display">$$
+q_{m,j}^{(t)}} \]</span></p>
+<p>我们的目标是最大化 Q 函数 <span class="math display">\[
 \begin{aligned}
 Q &amp;= \sum_{m=1}^M \sum_{n=1}^N \#(d_m, w_n) \sum_{k=1}^K
 \gamma_{m,n,k} \ln ( P(w_n|z_k) P(z_k|d_m)) \\
 &amp;= \sum_{m=1}^M \sum_{n=1}^N \#(d_m, w_n) \sum_{k=1}^K
 \gamma_{m,n,k} \ln (p_{k,n} \cdot q_{m,k} \big)
 \end{aligned}
-$$</span> 这里之所以要乘上 <span
-class="math inline">#(<em>d</em><sub><em>m</em></sub>, <em>w</em><sub><em>n</em></sub>)</span>，是因为极大似然估计本质上是对每一个观测到的样本求积（取
-<span class="math inline">ln </span>
+\]</span> 这里之所以要乘上 <span class="math inline">\(\#(d_m,
+w_n)\)</span>，是因为极大似然估计本质上是对每一个观测到的样本求积（取
+<span class="math inline">\(\ln\)</span>
 后变成求和）。而为了计算方便，我们把相同的样本合并了。</p>
 <h4 id="m步更新参数">2. M步：更新参数</h4>
 <p>这一步和 GMM 的 M 步类似，需要利用 $<em>{n=1}^{N} p</em>{k,n}=1 和 $
 构造 Lagrange 函数，然后求偏导。这里不再给出具体过程，直接给出结论。</p>
-<p><span class="math display">$$ p_{k,n}^{(t+1)} = \frac{\sum
+<p><span class="math display">\[ p_{k,n}^{(t+1)} = \frac{\sum
 \limits_{m=1}^M \#(d_m, w_n) \cdot \gamma_{m,n,k}^{(t)}}{\sum
-\limits_{n'=1}^N \sum \limits_{m=1}^M \#(d_m, w_{n'}) \cdot
-\gamma_{m,n',k}^{(t)}} $$</span></p>
+\limits_{n&#39;=1}^N \sum \limits_{m=1}^M \#(d_m, w_{n&#39;}) \cdot
+\gamma_{m,n&#39;,k}^{(t)}} \]</span></p>
 <ul>
 <li><p><strong>分子</strong>：所有文档中，被判定为属于话题 <span
-class="math inline"><em>k</em></span> 的单词 <span
-class="math inline"><em>n</em></span> 的“期望频次”。</p></li>
+class="math inline">\(k\)</span> 的单词 <span
+class="math inline">\(n\)</span> 的“期望频次”。</p></li>
 <li><p><strong>分母</strong>：话题 <span
-class="math inline"><em>k</em></span>
+class="math inline">\(k\)</span>
 下所有单词的总期望频次（归一化）。</p></li>
 </ul>
-<p><span class="math display">$$ q_{m,k}^{(t+1)} = \frac{\sum
+<p><span class="math display">\[ q_{m,k}^{(t+1)} = \frac{\sum
 \limits_{n=1}^N \#(d_m, w_n) \cdot \gamma_{m,n,k}^{(t)}}{\sum
-\limits_{n=1}^N \#(d_m, w_n)} $$</span> * <strong>分子</strong>：文档
-<span class="math inline"><em>d</em><sub><em>m</em></sub></span>
-中，被判定为属于话题 <span class="math inline"><em>k</em></span>
-的所有单词的总份量。</p>
+\limits_{n=1}^N \#(d_m, w_n)} \]</span> * <strong>分子</strong>：文档
+<span class="math inline">\(d_m\)</span> 中，被判定为属于话题 <span
+class="math inline">\(k\)</span> 的所有单词的总份量。</p>
 <ul>
-<li><strong>分母</strong>：文档 <span
-class="math inline"><em>d</em><sub><em>m</em></sub></span>
+<li><strong>分母</strong>：文档 <span class="math inline">\(d_m\)</span>
 的总词数（归一化）。</li>
 </ul>
 <h3 id="代码实现-2">6.4.3 代码实现</h3>
@@ -1163,16 +1113,14 @@ alt="混合模型与EM算法_41_0" />
 </figure>
 <p>运行这段代码，你会看到非常漂亮的结果：</p>
 <ol type="1">
-<li>左边的蓝图 <span
-class="math inline">(<em>P</em>(<em>z</em>|<em>d</em>))</span>：
+<li>左边的蓝图 <span class="math inline">\((P(z|d))\)</span>：
 <ul>
 <li>矩阵呈现出明显的分块结构。</li>
 <li>Doc 0-4 在某一列（比如 Topic 0）数值接近 1.0。</li>
 <li>Doc 5-9 在另一列（比如 Topic 1）数值接近 1.0。</li>
 <li>结论：模型成功发现了前5篇是一类，后5篇是另一类。</li>
 </ul></li>
-<li>右边的红图 <span
-class="math inline">(<em>P</em>(<em>w</em>|<em>z</em>))</span>：
+<li>右边的红图 <span class="math inline">\((P(w|z))\)</span>：
 <ul>
 <li>Topic 0 对应的行，在“苹果、香蕉…”等食物词上颜色很深。</li>
 <li>Topic 1 对应的行，在“电脑、芯片…”等科技词上颜色很深。</li>
@@ -1189,8 +1137,8 @@ class="math inline">(<em>P</em>(<em>w</em>|<em>z</em>))</span>：
 EM
 算法给出的答案是：不要试图一步到位，而是交替迭代。E步进行软性猜测，在当前参数下，计算隐变量的后验概率（隶属度
 <span
-class="math inline"><em>γ</em></span>）。M步进行加权更新，基于这些软性猜测，用加权极大似然估计来更新模型参数。这种“软分类
-<span class="math inline">↔︎</span>
+class="math inline">\(\gamma\)</span>）。M步进行加权更新，基于这些软性猜测，用加权极大似然估计来更新模型参数。这种“软分类
+<span class="math inline">\(\leftrightarrow\)</span>
 重估参数”的循环，将一个无法求解的非凸优化问题，拆解成了两个易于求解的子问题。</p>
 <p>我们通过三个经典案例展示了 EM 算法的通用性。三硬币模型是 EM 的“Hello
 World”，揭示了离散数据的混合估计逻辑。高斯混合模型
