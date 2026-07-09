@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  存储层次结构 Moore 定律与数据库 I&#x2F;O 瓶颈 磁盘结构与块访问机制 磁盘访问时间模型 DBMS 的 I&#x2F;O 计算模型 磁盘上的排序：两阶段多路归并排序 更大关系的多阶段归并排序 二级存储访问优化方法 重点内容与易混点  1 存储层次结构 1.1 为什么要学习数据存储 数据库系统处理的数据通常远大于主存，且必须长期保存。因此，DBMS 不可能只依赖 CP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据存储">
+<meta property="og:url" content="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  存储层次结构 Moore 定律与数据库 I&#x2F;O 瓶颈 磁盘结构与块访问机制 磁盘访问时间模型 DBMS 的 I&#x2F;O 计算模型 磁盘上的排序：两阶段多路归并排序 更大关系的多阶段归并排序 二级存储访问优化方法 重点内容与易混点  1 存储层次结构 1.1 为什么要学习数据存储 数据库系统处理的数据通常远大于主存，且必须长期保存。因此，DBMS 不可能只依赖 CP">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260628135135798.jpg">
+<meta property="article:published_time" content="2026-07-09T07:16:58.855Z">
+<meta property="article:modified_time" content="2026-07-09T07:16:58.855Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="TPMMS">
+<meta property="article:tag" content="外部排序">
+<meta property="article:tag" content="数据存储">
+<meta property="article:tag" content="磁盘I&#x2F;O">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260628135135798.jpg">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/","path":"2026/07/09/database_design/数据存储/","title":"数据存储"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据存储 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="nav-number">2.</span> <span class="nav-text">1 存储层次结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%AD%A6%E4%B9%A0%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 为什么要学习数据存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cache%E5%A4%84%E7%90%86%E5%99%A8%E9%99%84%E8%BF%91%E7%9A%84%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 Cache：处理器附近的高速缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#main-memory%E4%B8%BB%E5%AD%98"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 Main Memory：主存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#virtual-memory%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98"><span class="nav-number">2.4.</span> <span class="nav-text">1.4 Virtual Memory：虚拟内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#secondary-storage%E4%BA%8C%E7%BA%A7%E5%AD%98%E5%82%A8"><span class="nav-number">2.5.</span> <span class="nav-text">1.5 Secondary Storage：二级存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tertiary-storage%E4%B8%89%E7%BA%A7%E5%AD%98%E5%82%A8"><span class="nav-number">2.6.</span> <span class="nav-text">1.6 Tertiary Storage：三级存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%93%E5%A4%B1%E6%80%A7%E4%B8%8E%E9%9D%9E%E6%98%93%E5%A4%B1%E6%80%A7"><span class="nav-number">2.7.</span> <span class="nav-text">1.7 易失性与非易失性</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#moore-%E5%AE%9A%E5%BE%8B%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%BA%93-io-%E7%93%B6%E9%A2%88"><span class="nav-number">3.</span> <span class="nav-text">2 Moore 定律与数据库 I&#x2F;O 瓶颈</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#moore-%E5%AE%9A%E5%BE%8B%E7%9A%84%E5%9F%BA%E6%9C%AC%E5%90%AB%E4%B9%89"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 Moore 定律的基本含义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E8%AE%BF%E9%97%AE%E7%9B%B8%E5%AF%B9%E5%8F%98%E6%85%A2"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 存储访问相对变慢</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#data-flood%E6%95%B0%E6%8D%AE%E6%B4%AA%E6%B5%81"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 Data Flood：数据洪流</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%BB%93%E6%9E%84%E4%B8%8E%E5%9D%97%E8%AE%BF%E9%97%AE%E6%9C%BA%E5%88%B6"><span class="nav-number">4.</span> <span class="nav-text">3 磁盘结构与块访问机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%9A%84%E6%9C%BA%E6%A2%B0%E7%BB%84%E6%88%90"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 磁盘的机械组成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E6%8E%A7%E5%88%B6%E5%99%A8"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 磁盘控制器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E5%AD%98%E5%82%A8%E5%8F%82%E6%95%B0"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 磁盘存储参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E4%B8%80%E4%B8%AA%E7%A3%81%E7%9B%98%E5%9D%97%E7%9A%84%E4%B8%89%E4%B8%AA%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 访问一个磁盘块的三个步骤</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4%E6%A8%A1%E5%9E%8B"><span class="nav-number">5.</span> <span class="nav-text">4 磁盘访问时间模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#seek-time%E5%AF%BB%E9%81%93%E6%97%B6%E9%97%B4"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 Seek Time：寻道时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rotational-delay%E6%97%8B%E8%BD%AC%E5%BB%B6%E8%BF%9F"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 Rotational Delay：旋转延迟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#transfer-time%E4%BC%A0%E8%BE%93%E6%97%B6%E9%97%B4"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 Transfer Time：传输时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#other-delays%E5%85%B6%E4%BB%96%E5%BB%B6%E8%BF%9F"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 Other Delays：其他延迟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%8F%E6%9C%BA-io-%E4%B8%8E%E9%A1%BA%E5%BA%8F-io"><span class="nav-number">5.5.</span> <span class="nav-text">4.5 随机 I&#x2F;O 与顺序 I&#x2F;O</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%99%E6%93%8D%E4%BD%9C%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%9D%97"><span class="nav-number">5.6.</span> <span class="nav-text">4.6 写操作与修改块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dbms-%E7%9A%84-io-%E8%AE%A1%E7%AE%97%E6%A8%A1%E5%9E%8B"><span class="nav-number">6.</span> <span class="nav-text">5 DBMS 的 I&#x2F;O 计算模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ram-%E6%A8%A1%E5%9E%8B%E7%9A%84%E5%B1%80%E9%99%90"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 RAM 模型的局限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#io-model-of-computation"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 I&#x2F;O Model of Computation</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E4%B8%8A%E7%9A%84%E6%8E%92%E5%BA%8F%E4%B8%A4%E9%98%B6%E6%AE%B5%E5%A4%9A%E8%B7%AF%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F"><span class="nav-number">7.</span> <span class="nav-text">6
+磁盘上的排序：两阶段多路归并排序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%86%85%E5%AD%98%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%9B%9E%E9%A1%BE"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 内存归并排序回顾</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%A3%81%E7%9B%98%E6%8E%92%E5%BA%8F%E4%B8%8D%E8%83%BD%E7%9B%B4%E6%8E%A5%E5%A5%97%E7%94%A8%E5%86%85%E5%AD%98%E6%8E%92%E5%BA%8F"><span class="nav-number">7.2.</span> <span class="nav-text">6.2
+为什么磁盘排序不能直接套用内存排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tpmms-%E7%9A%84%E4%B8%A4%E4%B8%AA%E9%98%B6%E6%AE%B5"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 TPMMS 的两个阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#phase-1%E7%94%9F%E6%88%90%E6%9C%89%E5%BA%8F%E5%AD%90%E5%88%97%E8%A1%A8"><span class="nav-number">7.3.1.</span> <span class="nav-text">6.3.1 Phase 1：生成有序子列表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#phase-2%E5%A4%9A%E8%B7%AF%E5%BD%92%E5%B9%B6"><span class="nav-number">7.3.2.</span> <span class="nav-text">6.3.2 Phase 2：多路归并</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tpmms-%E7%9A%84-io-%E4%BB%A3%E4%BB%B7"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 TPMMS 的 I&#x2F;O 代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tpmms-%E5%8F%AF%E6%8E%92%E5%BA%8F%E6%95%B0%E6%8D%AE%E8%A7%84%E6%A8%A1%E4%B8%8A%E7%95%8C"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 TPMMS 可排序数据规模上界</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9B%B4%E5%A4%A7%E5%85%B3%E7%B3%BB%E7%9A%84%E5%A4%9A%E9%98%B6%E6%AE%B5%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F"><span class="nav-number">8.</span> <span class="nav-text">7 更大关系的多阶段归并排序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E7%AC%AC%E4%B8%89%E9%98%B6%E6%AE%B5"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 为什么需要第三阶段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E9%98%B6%E6%AE%B5%E8%83%BD%E5%8A%9B%E4%B8%8A%E7%95%8C"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 三阶段能力上界</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%8C%E7%BA%A7%E5%AD%98%E5%82%A8%E8%AE%BF%E9%97%AE%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95"><span class="nav-number">9.</span> <span class="nav-text">8 二级存储访问优化方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E7%9B%AE%E6%A0%87"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 优化目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E6%9F%B1%E9%9D%A2%E7%BB%84%E7%BB%87%E6%95%B0%E6%8D%AE"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 按柱面组织数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%A4%9A%E4%B8%AA%E7%A3%81%E7%9B%98%E4%B8%8E%E6%9D%A1%E5%B8%A6%E5%8C%96"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 使用多个磁盘与条带化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E9%95%9C%E5%83%8F"><span class="nav-number">9.4.</span> <span class="nav-text">8.4 磁盘镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%B0%83%E5%BA%A6%E7%94%B5%E6%A2%AF%E7%AE%97%E6%B3%95"><span class="nav-number">9.5.</span> <span class="nav-text">8.5 磁盘调度：电梯算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%84%E5%8F%96%E4%B8%8E%E5%A4%A7%E8%A7%84%E6%A8%A1%E7%BC%93%E5%86%B2"><span class="nav-number">9.6.</span> <span class="nav-text">8.6 预取与大规模缓冲</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E7%BC%93%E5%86%B2%E4%B8%8E%E5%8F%8C%E7%BC%93%E5%86%B2"><span class="nav-number">9.7.</span> <span class="nav-text">8.7 单缓冲与双缓冲</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E7%BC%93%E5%86%B2"><span class="nav-number">9.7.1.</span> <span class="nav-text">8.7.1 单缓冲</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E7%BC%93%E5%86%B2"><span class="nav-number">9.7.2.</span> <span class="nav-text">8.7.2 双缓冲</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%98%93%E6%B7%B7%E7%82%B9"><span class="nav-number">10.</span> <span class="nav-text">9 重点内容与易混点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E9%A1%BB%E6%8E%8C%E6%8F%A1%E7%9A%84%E6%A0%B8%E5%BF%83%E7%BB%93%E8%AE%BA"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 必须掌握的核心结论</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E6%A6%82%E5%BF%B5%E5%AF%B9%E6%AF%94"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 常见概念对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E8%AE%A1%E7%AE%97%E9%A2%98%E6%80%9D%E8%B7%AF"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 典型计算题思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.1.</span> <span class="nav-text">9.3.1 磁盘访问时间计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tpmms-%E4%BB%A3%E4%BB%B7%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.2.</span> <span class="nav-text">9.3.2 TPMMS 代价计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tpmms-%E4%B8%8A%E7%95%8C%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.3.</span> <span class="nav-text">9.3.3 TPMMS 上界计算</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%93%E5%86%B2%E6%97%B6%E9%97%B4%E8%AE%A1%E7%AE%97"><span class="nav-number">10.3.4.</span> <span class="nav-text">9.3.4 缓冲时间计算</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E7%AB%A0%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 本章学习建议</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据存储 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据存储
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:16:58" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">数据库设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ol type="1">
+<li>存储层次结构</li>
+<li>Moore 定律与数据库 I/O 瓶颈</li>
+<li>磁盘结构与块访问机制</li>
+<li>磁盘访问时间模型</li>
+<li>DBMS 的 I/O 计算模型</li>
+<li>磁盘上的排序：两阶段多路归并排序</li>
+<li>更大关系的多阶段归并排序</li>
+<li>二级存储访问优化方法</li>
+<li>重点内容与易混点</li>
+</ol>
+<h1 id="存储层次结构">1 存储层次结构</h1>
+<h2 id="为什么要学习数据存储">1.1 为什么要学习数据存储</h2>
+<p>数据库系统处理的数据通常远大于主存，且必须长期保存。因此，DBMS
+不可能只依赖 CPU
+和内存模型来分析性能，而必须理解数据在不同存储层次之间移动的代价。材料从一个基本问题出发：<strong>数据在计算机系统中存放在哪里？</strong>回答这个问题时，需要同时考虑三个维度：</p>
+<ul>
+<li><strong>容量（capacity）</strong>：能存多少数据。</li>
+<li><strong>速度（speed）</strong>：读写数据需要多久。</li>
+<li><strong>成本（cost）</strong>：每单位数据的价格是多少。</li>
+</ul>
+<p>这三个指标通常互相制约：越快的存储越贵、容量越小；越便宜且容量大的存储通常越慢。数据库系统的很多设计，本质上就是在这些存储层次之间安排数据移动，使常用数据尽可能靠近
+CPU，而大量持久数据仍保存在便宜、可靠的大容量设备中。</p>
+<h2 id="cache处理器附近的高速缓存">1.2 Cache：处理器附近的高速缓存</h2>
+<p><strong>缓存（Cache）</strong>
+位于微处理器同一芯片或非常接近处理器的位置。它容量较小，通常以 MB
+为单位，但访问速度极快。</p>
+<p>这里给出的典型时间尺度是：</p>
+<ul>
+<li>cache I/O 约为纳秒级，即 <span
+class="math inline">10<sup>−9</sup></span> 秒，速度接近 CPU
+运算速度。</li>
+<li>cache 与主存之间交换数据大约需要 <span
+class="math inline">100</span> 纳秒。</li>
+</ul>
+<p>从数据库角度看，cache 通常不是 DBMS
+直接管理的主要对象，而是由硬件和操作系统透明使用。但它提醒我们：<strong>不同层次之间的数据移动时间差异非常大</strong>。CPU
+计算很快，如果数据不在靠近 CPU 的层次中，等待数据会成为主要代价。</p>
+<h2 id="main-memory主存">1.3 Main Memory：主存</h2>
+<p><strong>主存（Main Memory / RAM）</strong> 的容量通常从几百 MB 到数十
+GB 甚至更多。它支持快速随机访问，访问时间大约为 <span
+class="math inline">10</span> 到 <span class="math inline">100</span>
+纳秒。</p>
+<p>主存的特点是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">特性</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">快速随机访问</td>
+<td style="text-align: left;">访问任意地址的时间大致相近</td>
+</tr>
+<tr>
+<td style="text-align: left;">容量有限</td>
+<td style="text-align: left;">相比磁盘，主存容量仍然小得多</td>
+</tr>
+<tr>
+<td style="text-align: left;">易失性</td>
+<td style="text-align: left;">断电后数据丢失</td>
+</tr>
+<tr>
+<td style="text-align: left;">价格较高</td>
+<td style="text-align: left;">每字节成本高于磁盘和磁带</td>
+</tr>
+</tbody>
+</table>
+<p>因此，传统 DBMS 通常把主存作为
+<strong>缓冲区（buffer）</strong>：把磁盘中的块读入内存，在内存中处理，再按需要写回磁盘。</p>
+<h2 id="virtual-memory虚拟内存">1.4 Virtual Memory：虚拟内存</h2>
+<p><strong>虚拟内存（Virtual Memory）</strong>
+为程序提供一个看似连续、较大的地址空间。材料特别提到，在 32
+位机器上，总地址空间约为：</p>
+<p><span class="math display">2<sup>32</sup> = 4GB</span></p>
+<p>当程序需要的空间超过实际主存时，操作系统会把暂时不用的数据页放到磁盘上，并通过
+<strong>分页机制（paging mechanism）</strong>
+在主存和磁盘之间换入、换出。</p>
+<p>有些 <strong>主存数据库系统（Main-memory Database Systems）</strong>
+依赖虚拟内存来管理数据，看起来程序可以访问很大的内存空间，但实际上一旦发生频繁分页，性能会急剧下降。原因是磁盘
+I/O 比内存访问慢很多，若系统不断把页从磁盘换入内存，就会出现严重的 I/O
+瓶颈。</p>
+<h2 id="secondary-storage二级存储">1.5 Secondary Storage：二级存储</h2>
+<p><strong>二级存储（Secondary Storage）</strong>
+主要指磁盘、SSD、光盘等非易失存储设备。这里重点讨论传统磁盘。与主存相比，磁盘具有以下特点：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">与主存相比的特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">速度</td>
+<td style="text-align: left;">慢很多，这里给出量级约慢 <span
+class="math inline">10<sup>5</sup></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">容量</td>
+<td style="text-align: left;">大很多，这里给出量级约大 <span
+class="math inline">10<sup>2</sup></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">成本</td>
+<td style="text-align: left;">每字节更便宜</td>
+</tr>
+<tr>
+<td style="text-align: left;">持久性</td>
+<td style="text-align: left;">非易失，适合保存数据库文件</td>
+</tr>
+</tbody>
+</table>
+<p>磁盘支持两种访问方式：</p>
+<ul>
+<li><strong>顺序访问（Sequential
+Access）</strong>：连续读取相邻块，速度较快。</li>
+<li><strong>随机访问（Random
+Access）</strong>：读取位置分散的块，速度较慢。</li>
+</ul>
+<p>数据库系统中的基本 I/O 操作可以理解为：</p>
+<ul>
+<li><strong>Disk read</strong>：把一个块从磁盘移动到主存。</li>
+<li><strong>Disk write</strong>：把一个块从主存写回磁盘。</li>
+</ul>
+<p>这里的 <strong>块（block）</strong>
+是磁盘与主存之间数据传输的逻辑单位。后面所有 I/O
+代价模型都围绕“访问了多少个块”展开。</p>
+<h2 id="tertiary-storage三级存储">1.6 Tertiary Storage：三级存储</h2>
+<p><strong>三级存储（Tertiary Storage）</strong>
+例如磁带、光盘库等，主要用于归档、备份和冷数据保存。它的容量可以达到 TB
+甚至更高，单位成本更低，但访问时间远高于磁盘。</p>
+<p>这里强调，三级存储通常只支持或更适合
+<strong>顺序访问</strong>。这意味着如果要读取中间某个数据，可能必须先经过前面的许多数据，因此不适合频繁随机查询，但适合长期归档、备份恢复、历史数据保存等场景。</p>
+<h2 id="易失性与非易失性">1.7 易失性与非易失性</h2>
+<p>存储介质还可以按断电后数据是否保留来分类：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">类型</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">易失性（Volatile）</td>
+<td style="text-align: left;">断电后数据丢失</td>
+<td style="text-align: left;">cache、main memory</td>
+</tr>
+<tr>
+<td style="text-align: left;">非易失性（Non-volatile）</td>
+<td style="text-align: left;">断电后数据仍保留</td>
+<td style="text-align: left;">magnetic disks、tapes、CD-ROM</td>
+</tr>
+</tbody>
+</table>
+<p>数据库必须依赖非易失性存储来保证持久化，但又必须使用易失性存储来获得高性能。这正是数据库缓冲区管理、日志、检查点和恢复机制存在的背景。</p>
+<h1 id="moore-定律与数据库-io-瓶颈">2 Moore 定律与数据库 I/O 瓶颈</h1>
+<h2 id="moore-定律的基本含义">2.1 Moore 定律的基本含义</h2>
+<p>这里的 Moore 定律被概括为：大约每 <span class="math inline">18</span>
+个月翻倍，或者大约每 <span class="math inline">10</span> 年增长 <span
+class="math inline">100</span> 倍。这里翻倍的对象包括：</p>
+<ul>
+<li>处理器速度。</li>
+<li>存储每 bit 成本的下降速度。</li>
+</ul>
+<p>形式上可以近似理解为：</p>
+<p><span class="math display">$$
+2^{\frac{10\times 12}{18}} \approx 100
+$$</span></p>
+<p>也就是说，十年尺度上硬件能力会发生数量级变化。对数据库系统来说，重要的不是“所有东西都变快”，而是
+<strong>不同部件变快的速度不一样</strong>。</p>
+<h2 id="存储访问相对变慢">2.2 存储访问相对变慢</h2>
+<p>这里提出的第一个后果是：<strong>Storage access becomes
+slower</strong>。这句话不是说磁盘的绝对访问时间一定变慢，而是说相对于
+CPU 运算速度，数据访问延迟越来越显著。</p>
+<p>CPU
+速度提升很快，但把数据从磁盘、主存等较低层次移动到较高层次的时间改善较慢。于是：</p>
+<ul>
+<li>CPU 每秒能做更多计算。</li>
+<li>但等待数据从低层存储移动上来的时间没有同比例缩短。</li>
+<li>结果是系统越来越容易被 I/O 卡住，而不是被 CPU 算力卡住。</li>
+</ul>
+<p>因此，数据库性能优化经常不是优化单条指令，而是减少 I/O
+次数、增加顺序访问、减少随机访问、提高缓存命中率。</p>
+<h2 id="data-flood数据洪流">2.3 Data Flood：数据洪流</h2>
+<p>这里提出的第二个后果是 <strong>Data
+Flood</strong>。随着单位存储价格下降，社会和应用产生、保存的数据量快速增长。例如数据仓库、互联网日志、Web
+归档、天文观测等场景都会持续产生大量数据。</p>
+<p>这里的核心矛盾是：存储容量增长很快，但数据需求增长得也很快，甚至更快。数据库系统面对的不是“数据终于可以全部放进内存”的世界，而是“能保存的数据越来越多，需要处理的数据也越来越大”的世界。</p>
+<p>所以 DBMS
+必须把大规模数据处理建立在外存模型上，不能只假设数据都在内存里。</p>
+<h1 id="磁盘结构与块访问机制">3 磁盘结构与块访问机制</h1>
+<h2 id="磁盘的机械组成">3.1 磁盘的机械组成</h2>
+<p>传统机械磁盘由多个盘片、盘面、磁道、扇区、磁头和磁盘控制器组成。这里的图主要说明：磁盘访问不是单纯的电子寻址，而包含机械运动。</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">盘片（platter）</td>
+<td style="text-align: left;">存储数据的圆形磁性介质</td>
+</tr>
+<tr>
+<td style="text-align: left;">盘面（surface）</td>
+<td style="text-align: left;">盘片的一个可读写表面</td>
+</tr>
+<tr>
+<td style="text-align: left;">磁道（track）</td>
+<td style="text-align: left;">盘面上的同心圆轨道</td>
+</tr>
+<tr>
+<td style="text-align: left;">柱面（cylinder）</td>
+<td style="text-align: left;">多个盘面上半径相同的一组磁道</td>
+</tr>
+<tr>
+<td style="text-align: left;">扇区（sector）</td>
+<td style="text-align: left;">磁盘上的物理存储单位</td>
+</tr>
+<tr>
+<td style="text-align: left;">块（block）</td>
+<td
+style="text-align: left;">磁盘与主存之间传输数据的逻辑单位，一个块可包含一个或多个扇区</td>
+</tr>
+<tr>
+<td style="text-align: left;">磁头（head）</td>
+<td style="text-align: left;">负责读写某个盘面的部件</td>
+</tr>
+<tr>
+<td style="text-align: left;">磁盘控制器（disk controller）</td>
+<td
+style="text-align: left;">控制磁头移动、选择盘面与扇区、传输数据</td>
+</tr>
+</tbody>
+</table>
+<p>数据库系统一般不直接以扇区为单位思考，而更常以 block/page
+为单位管理数据。这里强调：<strong>block
+是磁盘和主存之间传输的逻辑单位</strong>，后续 I/O 代价分析也以 block
+access 为基本单位。</p>
+<h2 id="磁盘控制器">3.2 磁盘控制器</h2>
+<p><strong>磁盘控制器（Disk Controller）</strong>
+负责协调底层磁盘操作，包括：</p>
+<ul>
+<li>控制磁头组件移动。</li>
+<li>选择具体盘面和扇区。</li>
+<li>在磁盘和主存之间传输数据。</li>
+<li>一个控制器可以控制多个磁盘。</li>
+</ul>
+<p>这说明磁盘访问时间不仅取决于磁盘本身，也可能受控制器、总线、内存带宽等资源影响。在理论代价模型中，这些因素常被简化；但在真实系统中，它们会影响并行磁盘、预取和大规模缓冲的效果。</p>
+<h2 id="磁盘存储参数">3.3 磁盘存储参数</h2>
+<p>这里列出了一组影响磁盘容量和性能的典型参数：</p>
+<ul>
+<li>磁盘转速，例如 <span class="math inline">5400</span> RPM。</li>
+<li>每个磁盘单元中的盘片数量，例如 <span class="math inline">5</span>
+个盘片、<span class="math inline">10</span> 个盘面。</li>
+<li>每个盘面的磁道数，例如 <span class="math inline">20000</span>
+条磁道。</li>
+<li>每条磁道的字节数，例如 <span class="math inline">1</span> MB。</li>
+</ul>
+<p>这些参数共同决定磁盘容量和访问性能。粗略地说，容量可以从“盘面数、每盘面磁道数、每磁道字节数”等指标相乘得到；而性能则与磁头移动、旋转速度、传输速率等因素相关。</p>
+<h2 id="访问一个磁盘块的三个步骤">3.4 访问一个磁盘块的三个步骤</h2>
+<p>材料把访问一个磁盘块分成三步：</p>
+<ol type="1">
+<li><strong>移动磁头到正确柱面</strong>：产生 seek time。</li>
+<li><strong>等待磁盘旋转到目标扇区</strong>：产生 rotational
+delay。</li>
+<li><strong>传输数据</strong>：产生 transfer time。</li>
+</ol>
+<p>这三个步骤对应磁盘访问时间模型：</p>
+<p><span class="math display">Time = Seek Time + Rotational
+Delay + Transfer Time + Other</span></p>
+<p>理解这个模型非常重要，因为它解释了为什么随机 I/O
+昂贵。随机访问每次都可能需要重新寻道和等待旋转，而顺序访问可以摊薄这些机械代价。</p>
+<h1 id="磁盘访问时间模型">4 磁盘访问时间模型</h1>
+<h2 id="seek-time寻道时间">4.1 Seek Time：寻道时间</h2>
+<p><strong>寻道时间（Seek Time）</strong>
+是磁头移动到目标柱面的时间。它通常与磁头移动距离相关，距离越远，时间越长，单位通常是毫秒。</p>
+<p>这里给出平均随机寻道时间的表达式：</p>
+<p><span class="math display">$$
+S=
+\frac{
+\sum_{i=1}^{N}
+\sum_{\substack{j=1\\j\ne i}}^{N}
+\text{SEEKTIME}(i\to j)
+}{
+N(N-1)
+}
+$$</span></p>
+<p>其中 <span class="math inline"><em>N</em></span> 是柱面数量，<span
+class="math inline">SEEKTIME(<em>i</em> → <em>j</em>)</span>
+表示磁头从柱面 <span class="math inline"><em>i</em></span> 移动到柱面
+<span class="math inline"><em>j</em></span>
+的时间。典型平均随机寻道时间约为 <span class="math inline">10</span> ms
+到 <span class="math inline">40</span> ms。</p>
+<p>练习中要注意：寻道时间不是访问数据本身的传输时间，而是机械定位成本。随机
+I/O 之所以慢，主要原因之一就是每次都可能付出寻道时间。</p>
+<h2 id="rotational-delay旋转延迟">4.2 Rotational Delay：旋转延迟</h2>
+<p><strong>旋转延迟（Rotational Delay）</strong>
+是磁头已经在正确磁道上后，等待目标块转到磁头下方的时间。</p>
+<p>如果目标块在磁道上的位置随机，平均旋转延迟约为半圈：</p>
+<p><span class="math display">$$
+R=\frac{1}{2}\text{ revolution}
+$$</span></p>
+<p>这里给出例子：当磁盘转速为 <span class="math inline">3600</span> RPM
+时，平均旋转延迟约为 <span class="math inline">8.33</span>
+ms。计算方法是：</p>
+<p><span class="math display">3600 RPM = 60
+revolutions/second</span></p>
+<p>一圈时间为：</p>
+<p><span class="math display">$$
+\frac{1}{60}\text{ second}=16.67\text{ ms}
+$$</span></p>
+<p>半圈即：</p>
+<p><span class="math display">8.33 ms</span></p>
+<h2 id="transfer-time传输时间">4.3 Transfer Time：传输时间</h2>
+<p><strong>传输时间（Transfer Time）</strong>
+是数据真正从磁盘传到主存，或从主存写回磁盘所花的时间。若磁盘传输速率为
+<span class="math inline"><em>t</em></span>，块大小为 <span
+class="math inline">Block Size</span>，则：</p>
+<p><span class="math display">$$
+\text{Transfer Time}=
+\frac{\text{Block Size}}{t}
+$$</span></p>
+<p>这里给出的典型传输速率为 <span class="math inline">1</span> 到 <span
+class="math inline">3</span>
+MB/s。虽然现代硬件数值会变化，但模型思想不变：传输时间与块大小成正比，与传输速率成反比。</p>
+<h2 id="other-delays其他延迟">4.4 Other Delays：其他延迟</h2>
+<p>其他延迟包括：</p>
+<ul>
+<li>CPU 发起 I/O 请求的时间。</li>
+<li>控制器竞争。</li>
+<li>总线竞争。</li>
+<li>内存访问竞争。</li>
+</ul>
+<p>这里为了简化模型，把典型值设为 <span
+class="math inline">0</span>。这并不表示真实系统不存在这些延迟，而是说明在基础
+DBMS 代价模型中，重点通常放在 seek、rotation 和 transfer 上。</p>
+<h2 id="随机-io-与顺序-io">4.5 随机 I/O 与顺序 I/O</h2>
+<p>这里给出一个非常重要的经验法则：</p>
+<p><strong>Random I/O is expensive, sequential I/O is much less
+expensive.</strong></p>
+<p>原因是：</p>
+<ul>
+<li>随机读一个块时，通常需要寻道、旋转等待和传输。</li>
+<li>顺序读下一个块时，如果数据布局合理，可以几乎只付出传输时间。</li>
+</ul>
+<p>材料举例：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">访问方式</th>
+<th style="text-align: left;">1 KB block 的典型时间</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Random I/O</td>
+<td style="text-align: left;">约 <span class="math inline">20</span>
+ms</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sequential I/O</td>
+<td style="text-align: left;">约 <span class="math inline">1</span>
+ms</td>
+</tr>
+</tbody>
+</table>
+<p>这个差异直接影响数据库算法设计。例如外部排序、扫描、连接算法都倾向于把访问组织成大块顺序
+I/O，而不是大量分散随机 I/O。</p>
+<h2 id="写操作与修改块">4.6 写操作与修改块</h2>
+<p>这里指出，写块的成本通常与读块相似。但如果写完后需要验证写入是否正确，则需要额外成本：</p>
+<p><span class="math display">$$
+\text{extra time}=
+\text{full rotation}
++\frac{\text{Block Size}}{t}
+$$</span></p>
+<p>原因是磁头写完一个块后，不能立刻“回到”刚写过的位置进行验证，通常要等磁盘再转一圈。</p>
+<p>修改一个块通常包括：</p>
+<ol type="1">
+<li>读入块。</li>
+<li>在内存中修改。</li>
+<li>写回块。</li>
+<li>如需要，再进行验证。</li>
+</ol>
+<p>所以数据库中的更新操作往往比表面上复杂。即使只改一条记录，也可能涉及整个页/块的读入和写回。</p>
+<h1 id="dbms-的-io-计算模型">5 DBMS 的 I/O 计算模型</h1>
+<h2 id="ram-模型的局限">5.1 RAM 模型的局限</h2>
+<p>传统 <strong>RAM 模型（Random Access Machine Model）</strong>
+假设数据都在主存中，并且访问任意数据项所花时间相同。在许多算法课中，这个模型很自然，因为它适合分析
+CPU 计算复杂度。</p>
+<p>但 DBMS 面临的情况不同：</p>
+<ul>
+<li>数据通常不能完全放入主存。</li>
+<li>数据需要存储在二级甚至三级存储中。</li>
+<li>磁盘 I/O 时间远大于内存中处理数据的时间。</li>
+</ul>
+<p>因此，直接使用 RAM 模型会低估数据库算法的真实代价。例如，一个内存中
+<span class="math inline"><em>O</em>(<em>n</em>log <em>n</em>)</span>
+的排序算法，如果频繁随机访问磁盘，实际性能可能非常差。</p>
+<h2 id="io-model-of-computation">5.2 I/O Model of Computation</h2>
+<p>这里给出的 DBMS 计算模型是 <strong>I/O 计算模型（I/O Model of
+Computation）</strong>。它的基本假设是：</p>
+<p><strong>执行磁盘 I/O
+的时间远大于在主存中操作数据的时间。</strong></p>
+<p>因此，优化目标是：</p>
+<p><span class="math display">minimize the number of block
+accesses</span></p>
+<p>也就是尽可能减少磁盘块访问次数。这个模型的核心不是数 CPU
+指令，而是数读写了多少个磁盘块。</p>
+<p>例如，一个算法如果 CPU 操作稍多，但能把随机 I/O 变成顺序
+I/O，通常在数据库中更有价值。后面的两阶段多路归并排序就是典型例子：它利用内存缓冲区，把大文件排序转化成可预测的顺序读写。</p>
+<h1 id="磁盘上的排序两阶段多路归并排序">6
+磁盘上的排序：两阶段多路归并排序</h1>
+<h2 id="内存归并排序回顾">6.1 内存归并排序回顾</h2>
+<p>材料先回顾了内存中的 <strong>归并排序（Merge
+Sort）</strong>。其递归关系为：</p>
+<p><span
+class="math display"><em>T</em>(<em>n</em>) = 2<em>T</em>(<em>n</em>/2) + <em>a</em><em>n</em></span></p>
+<p>由主定理可得：</p>
+<p><span
+class="math display"><em>T</em>(<em>n</em>) = <em>O</em>(<em>n</em>log <em>n</em>)</span></p>
+<p>归并排序的基本过程是：</p>
+<ol type="1">
+<li>基础情况：只有一个元素的列表已经有序。</li>
+<li>把列表平均分成两个子列表。</li>
+<li>分别排序两个子列表。</li>
+<li>把两个有序子列表线性合并。</li>
+</ol>
+<p>两个有序列表的合并时间与两个列表总长度成线性关系。这个思想可以扩展到外存排序，但必须把“元素访问”改成“块
+I/O”来分析。</p>
+<h2 id="为什么磁盘排序不能直接套用内存排序">6.2
+为什么磁盘排序不能直接套用内存排序</h2>
+<p>如果数据全部在内存中，排序算法主要关注比较次数和 CPU
+时间。但数据库中的关系可能比内存大得多，无法一次性装入内存。</p>
+<p>若直接在磁盘上按普通归并排序方式频繁访问元素，会产生大量随机
+I/O。由于随机 I/O 的寻道和旋转成本很高，实际性能会很差。</p>
+<p>因此，外存排序的目标是：</p>
+<ul>
+<li>尽量顺序读写磁盘块。</li>
+<li>每次尽可能利用满主存。</li>
+<li>把临时结果组织成较大的有序子列表。</li>
+<li>减少完整扫描数据的轮数。</li>
+</ul>
+<h2 id="tpmms-的两个阶段">6.3 TPMMS 的两个阶段</h2>
+<p>材料重点介绍 <strong>两阶段多路归并排序（Two-phase, Multiway
+Merge-sort, TPMMS）</strong>。它分为两个阶段：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">阶段</th>
+<th style="text-align: left;">作用</th>
+<th style="text-align: left;">结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Phase 1</td>
+<td style="text-align: left;">把能放入主存的数据块读入内存并排序</td>
+<td style="text-align: left;">生成若干个有序子列表</td>
+</tr>
+<tr>
+<td style="text-align: left;">Phase 2</td>
+<td style="text-align: left;">多路归并所有有序子列表</td>
+<td style="text-align: left;">得到一个完整有序文件</td>
+</tr>
+</tbody>
+</table>
+<h3 id="phase-1生成有序子列表">6.3.1 Phase 1：生成有序子列表</h3>
+<p>第一阶段每次读入一块“主存大小”的数据。假设主存能容纳 <span
+class="math inline"><em>M</em></span> 字节，就读入最多 <span
+class="math inline"><em>M</em></span>
+字节的数据，在内存中用普通排序算法排序，然后把排序结果写回磁盘，形成一个有序子列表。</p>
+<p>这一阶段的特点是：</p>
+<ul>
+<li>读原始关系一次。</li>
+<li>写出有序子列表一次。</li>
+<li>I/O 模式主要是顺序读写。</li>
+</ul>
+<p>如果关系有 <span class="math inline"><em>R</em></span> 个磁盘块，则
+Phase 1 的 I/O 代价为：</p>
+<p><span class="math display">2<em>R</em></span></p>
+<p>其中 <span class="math inline"><em>R</em></span> 是读，<span
+class="math inline"><em>R</em></span> 是写。</p>
+<h3 id="phase-2多路归并">6.3.2 Phase 2：多路归并</h3>
+<p>第二阶段把第一阶段生成的多个有序子列表归并成一个完整有序结果。这里给出
+Phase 2 的核心步骤：</p>
+<ol type="1">
+<li>在所有子列表当前剩余元素的第一个元素中找最小 key。</li>
+<li>把最小元素移动到输出缓冲区的第一个可用位置。</li>
+<li>如果输出块满了，就把输出块写到磁盘，并重新初始化输出缓冲区。</li>
+<li>如果某个输入缓冲区耗尽，就从对应子列表读取下一块。</li>
+</ol>
+<p>这一阶段需要为每个输入子列表准备输入缓冲区，还需要一个输出缓冲区。由于每个子列表本身已经有序，所以每次只比较各子列表头部元素即可完成多路归并。</p>
+<p>Phase 2 同样需要读所有有序子列表一次，并写最终结果一次，所以 I/O
+代价也是：</p>
+<p><span class="math display">2<em>R</em></span></p>
+<h2 id="tpmms-的-io-代价">6.4 TPMMS 的 I/O 代价</h2>
+<p>如果关系共有 <span class="math inline"><em>R</em></span> 个块，则
+TPMMS 总 I/O 代价为：</p>
+<p><span class="math display">4<em>R</em></span></p>
+<p>解释如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">阶段</th>
+<th style="text-align: left;">读 I/O</th>
+<th style="text-align: left;">写 I/O</th>
+<th style="text-align: left;">合计</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Phase 1</td>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em></span></td>
+<td style="text-align: left;"><span
+class="math inline">2<em>R</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Phase 2</td>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em></span></td>
+<td style="text-align: left;"><span
+class="math inline">2<em>R</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">总计</td>
+<td style="text-align: left;"><span
+class="math inline">2<em>R</em></span></td>
+<td style="text-align: left;"><span
+class="math inline">2<em>R</em></span></td>
+<td style="text-align: left;"><span
+class="math inline">4<em>R</em></span></td>
+</tr>
+</tbody>
+</table>
+<p>这个结论是重点内容。它成立的前提是：第二阶段能够一次性归并所有第一阶段产生的有序子列表。如果子列表太多，内存缓冲区不够，就需要更多阶段。</p>
+<h2 id="tpmms-可排序数据规模上界">6.5 TPMMS 可排序数据规模上界</h2>
+<p>这里给出 TPMMS 能处理的数据规模上界。设：</p>
+<ul>
+<li>块大小为 <span class="math inline"><em>B</em></span> 字节。</li>
+<li>主存大小为 <span class="math inline"><em>M</em></span> 字节。</li>
+<li>每条记录大小为 <span class="math inline"><em>R</em></span>
+字节。</li>
+</ul>
+<p>主存中的缓冲区数量为：</p>
+<p><span class="math display">$$
+\frac{M}{B}
+$$</span></p>
+<p>其中 Phase 2 需要 <span class="math inline">1</span>
+个输出缓冲区，因此最多可同时归并的输入子列表数量为：</p>
+<p><span class="math display">$$
+\frac{M}{B}-1
+$$</span></p>
+<p>Phase 1 中每个有序子列表最多包含：</p>
+<p><span class="math display">$$
+\frac{M}{R}
+$$</span></p>
+<p>条记录，因为每次最多把 <span class="math inline"><em>M</em></span>
+字节数据读入内存排序。</p>
+<p>因此，TPMMS 能排序的总记录数上界为：</p>
+<p><span class="math display">$$
+\frac{M}{R}\left(\frac{M}{B}-1\right)
+$$</span></p>
+<p>当 <span class="math inline"><em>M</em>/<em>B</em></span>
+较大时，可近似为：</p>
+<p><span class="math display">$$
+\frac{M^2}{RB}
+$$</span></p>
+<p>这里的例子给出：</p>
+<p><span
+class="math display"><em>M</em> = 10<sup>8</sup>,  <em>B</em> = 2<sup>14</sup>,  <em>R</em> = 169</span></p>
+<p>则：</p>
+<p><span class="math display">$$
+\frac{M^2}{RB}\approx 4.2\text{ billion records}
+$$</span></p>
+<p>约等于 <span class="math inline">2/3</span> TB 数据。</p>
+<p>这个公式背后的直观含义是：主存越大，TPMMS
+能处理的数据规模增长非常快，因为主存既决定每个初始 run
+的大小，也决定第二阶段能同时归并多少个 run。</p>
+<h1 id="更大关系的多阶段归并排序">7 更大关系的多阶段归并排序</h1>
+<h2 id="为什么需要第三阶段">7.1 为什么需要第三阶段</h2>
+<p>如果关系太大，Phase 1 产生的有序子列表数量超过了：</p>
+<p><span class="math display">$$
+\frac{M}{B}-1
+$$</span></p>
+<p>那么 Phase 2
+无法一次性归并所有子列表。此时需要把若干子列表先归并成更大的有序列表，再进行最终归并。</p>
+<p>这里称这种情况为 <strong>Multiway Merging of Larger
+Relations</strong>。基本思想是：</p>
+<ol type="1">
+<li>先用 TPMMS 对一组一组的数据排序，每组规模不超过 <span
+class="math inline">$\frac{M^2}{RB}$</span> 条记录。</li>
+<li>得到多个较大的有序列表。</li>
+<li>在第三阶段中，再归并最多 <span
+class="math inline">$\frac{M}{B}-1$</span> 个这样的列表。</li>
+</ol>
+<h2 id="三阶段能力上界">7.2 三阶段能力上界</h2>
+<p>对于更大关系，这里给出的能力上界为：</p>
+<p><span class="math display">$$
+\frac{M^3}{RB^2}
+$$</span></p>
+<p>直观理解是：每多一轮多路归并，就能利用 <span
+class="math inline">$\frac{M}{B}$</span> 级别的 fan-in
+扩大可处理规模。</p>
+<p>这里的同一组参数下，三阶段归并可以支持约 <span
+class="math inline">27</span> trillion 条记录，约 <span
+class="math inline">4.3</span> PB
+数据。这里的重点不是记住具体数值，而是理解：</p>
+<p><strong>外存排序的可处理规模由主存大小、块大小、记录大小和归并路数共同决定。</strong></p>
+<h1 id="二级存储访问优化方法">8 二级存储访问优化方法</h1>
+<h2 id="优化目标">8.1 优化目标</h2>
+<p>材料最后讨论如何加速二级存储访问，列出五类方法：</p>
+<ol type="1">
+<li>按柱面组织数据。</li>
+<li>使用多个磁盘。</li>
+<li>磁盘镜像。</li>
+<li>磁盘调度算法。</li>
+<li>预取和大规模缓冲。</li>
+</ol>
+<p>这些方法的共同目标是减少随机 I/O 的机械代价、提高并行度，或把等待 I/O
+的时间与 CPU 处理时间重叠。</p>
+<h2 id="按柱面组织数据">8.2 按柱面组织数据</h2>
+<p><strong>按柱面组织数据（Organizing data by cylinders）</strong>
+是指把经常一起访问的块放在同一柱面或相邻柱面上。</p>
+<p>这样做的好处是：连续读取多个块时，可能只需要一次寻道和一次旋转等待，后续块主要付出传输时间。</p>
+<p>例如，如果一个查询经常扫描同一个表的连续页，把这些页尽量放在相邻位置可以显著降低扫描时间。</p>
+<p>材料特别提到，对于 TPMMS：</p>
+<ul>
+<li>这种策略可以显著减少 Phase 1 的时间，因为 Phase 1
+需要顺序读入主存大小的数据块并写出有序子列表。</li>
+<li>但对 Phase 2 没有明显好处，因为 Phase 2
+需要从多个子列表交替读取，访问模式不再是单一连续扫描。</li>
+</ul>
+<h2 id="使用多个磁盘与条带化">8.3 使用多个磁盘与条带化</h2>
+<p><strong>使用多个磁盘（Using multiple disks）</strong>
+可以把数据访问分摊到多个设备上。理想情况下，所有与读写磁盘相关的时间可以除以磁盘数量。</p>
+<p>但这个理想效果有前提：</p>
+<ul>
+<li>磁盘控制器能同时处理多个磁盘的数据传输。</li>
+<li>总线带宽足够。</li>
+<li>主存能以足够高的速率接收或发送数据。</li>
+</ul>
+<p>典型方法是
+<strong>条带化（Striping）</strong>：把连续数据分布到多个磁盘上，使多个磁盘可以并行读写。例如读取一个大文件时，不是由一个磁盘独自传输所有块，而是多个磁盘同时传输不同部分。</p>
+<p>条带化提升吞吐量，但也可能影响可靠性：如果没有冗余，一个磁盘故障可能导致整体数据不可用。因此实际系统常把条带化与镜像或校验结合起来。</p>
+<h2 id="磁盘镜像">8.4 磁盘镜像</h2>
+<p><strong>磁盘镜像（Mirroring Disks）</strong>
+指两个或多个磁盘保存完全相同的数据副本。这里给出两个动机：</p>
+<ul>
+<li><strong>高可用性（high
+availability）</strong>：某个磁盘损坏时，可以从副本读取。</li>
+<li><strong>加速数据访问</strong>：多个副本可以服务并行读请求。</li>
+</ul>
+<p>如果有 <span class="math inline"><em>n</em></span>
+个副本，那么可以并行读取任意 <span class="math inline"><em>n</em></span>
+个块。即使副本数量较少，也可以选择当前磁头位置更接近目标块的磁盘来读取，从而减少寻道时间。</p>
+<p>这里强调：镜像通常
+<strong>不会加速写入</strong>，但也不会显著拖慢写入。原因是写操作需要把同样的数据写到所有副本上，无法像读操作那样只选择一个副本。但在并行写和控制器支持较好的情况下，写入时间不一定比单盘慢很多。</p>
+<h2 id="磁盘调度电梯算法">8.5 磁盘调度：电梯算法</h2>
+<p>当系统中有多个独立 I/O
+请求时，请求服务顺序会影响总寻道时间。<strong>电梯算法（Elevator
+Algorithm）</strong> 的思想类似电梯运行：</p>
+<ul>
+<li>磁头沿一个方向从内圈到外圈扫描请求。</li>
+<li>到达当前方向上没有更多请求的位置后，再反向扫描。</li>
+<li>这样可以避免磁头在磁盘上来回大幅跳动。</li>
+</ul>
+<p>它相比 <strong>先来先服务（First-Come-First-Serve, FCFS）</strong>
+更能降低平均寻道距离。</p>
+<p>这里给出一个假设模型：</p>
+<p><span class="math display">average rotation time + block access
+time = 4.43 ms</span></p>
+<p><span class="math display">$$
+\text{seek time}=1+\frac{\text{number of tracks}}{1000}\text{ ms}
+$$</span></p>
+<p>这个模型用于比较不同调度策略下的访问总时间。练习中如果遇到类似题目，应先计算请求顺序导致的磁道移动距离，再加上每次访问固定的旋转和块访问时间。</p>
+<h2 id="预取与大规模缓冲">8.6 预取与大规模缓冲</h2>
+<p><strong>预取（Prefetching）</strong>
+是指当系统能够预测接下来的块访问顺序时，在程序真正需要之前提前把块读入内存。</p>
+<p>例如顺序扫描一个文件时，系统可以在处理当前块的同时预读后续块。这样
+CPU 处理和磁盘 I/O 可以部分重叠，减少等待时间。</p>
+<p><strong>大规模缓冲（Large-scale Buffering）</strong> 包括：</p>
+<ul>
+<li>track-size buffering：一次缓存整条磁道大小的数据。</li>
+<li>cylinder-size buffering：一次缓存整个柱面相关的数据。</li>
+</ul>
+<p>这样可以把每个块都付出的寻道代价，变成每条磁道或每个柱面才付出一次寻道代价。</p>
+<p>缺点是：需要额外内存。如果预取的数据最终没有被使用，还会浪费 I/O
+和缓冲区空间。</p>
+<h2 id="单缓冲与双缓冲">8.7 单缓冲与双缓冲</h2>
+<p>材料用一个顺序处理文件的例子说明 <strong>单缓冲（Single
+Buffering）</strong> 和 <strong>双缓冲（Double Buffering）</strong>
+的区别。</p>
+<p>假设：</p>
+<ul>
+<li><span class="math inline"><em>P</em></span> =
+每个块的处理时间。</li>
+<li><span class="math inline"><em>R</em></span> = 读取一个块的 I/O
+时间。</li>
+<li><span class="math inline"><em>n</em></span> = 块数量。</li>
+</ul>
+<h3 id="单缓冲">8.7.1 单缓冲</h3>
+<p>单缓冲的流程是：</p>
+<ol type="1">
+<li>读入 <span class="math inline"><em>B</em><sub>1</sub></span>
+到缓冲区。</li>
+<li>处理缓冲区中的数据。</li>
+<li>读入 <span class="math inline"><em>B</em><sub>2</sub></span>
+到同一个缓冲区。</li>
+<li>继续处理。</li>
+</ol>
+<p>读和处理不能重叠，因此总时间为：</p>
+<p><span
+class="math display"><em>n</em>(<em>P</em> + <em>R</em>)</span></p>
+<h3 id="双缓冲">8.7.2 双缓冲</h3>
+<p>双缓冲使用两个缓冲区。当程序处理当前缓冲区中的块时，磁盘可以把下一个块读入另一个缓冲区。</p>
+<p>当 <span class="math inline"><em>P</em> ≥ <em>R</em></span>
+时，这里给出的双缓冲时间为：</p>
+<p><span
+class="math display"><em>R</em> + <em>n</em><em>P</em></span></p>
+<p>解释如下：</p>
+<ul>
+<li>开始时必须先花 <span class="math inline"><em>R</em></span>
+时间读入第一个块。</li>
+<li>之后每处理一个块花 <span class="math inline"><em>P</em></span>
+时间。</li>
+<li>因为 <span
+class="math inline"><em>P</em> ≥ <em>R</em></span>，读取下一个块可以被当前块处理时间覆盖。</li>
+</ul>
+<p>与单缓冲相比：</p>
+<p><span class="math display">Single
+Buffer = <em>n</em>(<em>P</em> + <em>R</em>)</span></p>
+<p><span class="math display">Double
+Buffer = <em>R</em> + <em>n</em><em>P</em></span></p>
+<p>双缓冲显著减少了等待 I/O 的时间。它并没有让磁盘本身更快，而是通过重叠
+I/O 和计算提高整体吞吐。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260628135135798.jpg" alt="27a73b1b071ac623f699e9ffd653c1bd" style="zoom:50%;" /></p>
+<h1 id="重点内容与易混点">9 重点内容与易混点</h1>
+<h2 id="必须掌握的核心结论">9.1 必须掌握的核心结论</h2>
+<ol type="1">
+<li><p><strong>数据库性能常由 I/O 决定，而不是 CPU 决定。</strong><br />
+因为磁盘 I/O 时间远大于主存处理时间，所以 DBMS
+算法设计通常以减少块访问次数为核心。</p></li>
+<li><p><strong>随机 I/O 远慢于顺序 I/O。</strong><br />
+随机 I/O 需要寻道和旋转等待，顺序 I/O
+在布局合理时主要付出传输时间。</p></li>
+<li><p><strong>磁盘访问时间模型是：</strong></p>
+<p><span class="math display">Time = Seek Time + Rotational
+Delay + Transfer Time + Other</span></p></li>
+<li><p><strong>平均旋转延迟通常是半圈。</strong><br />
+如果转速是 <span class="math inline">3600</span> RPM，则一圈 <span
+class="math inline">16.67</span> ms，平均旋转延迟 <span
+class="math inline">8.33</span> ms。</p></li>
+<li><p><strong>I/O 计算模型的优化目标是减少 block access
+数量。</strong></p></li>
+<li><p><strong>TPMMS 的 I/O 代价是 <span
+class="math inline">4<em>R</em></span>。</strong><br />
+前提是第二阶段能一次性归并所有第一阶段产生的有序子列表。</p></li>
+<li><p><strong>TPMMS 可排序记录数上界近似为：</strong></p>
+<p><span class="math display">$$
+\frac{M^2}{RB}
+$$</span></p></li>
+<li><p><strong>更大关系的三阶段归并能力近似为：</strong></p>
+<p><span class="math display">$$
+\frac{M^3}{RB^2}
+$$</span></p></li>
+<li><p><strong>双缓冲通过重叠 I/O 与处理降低总时间。</strong><br />
+当 <span class="math inline"><em>P</em> ≥ <em>R</em></span> 时：</p>
+<p><span class="math display">Double Buffering
+Time = <em>R</em> + <em>n</em><em>P</em></span></p></li>
+</ol>
+<h2 id="常见概念对比">9.2 常见概念对比</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">容易混淆点</th>
+<th style="text-align: left;">正确理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">sector 与 block</td>
+<td style="text-align: left;">以为二者相同</td>
+<td style="text-align: left;">sector 是物理单位，block
+是磁盘与主存传输的逻辑单位，一个 block 可包含多个 sector</td>
+</tr>
+<tr>
+<td style="text-align: left;">seek time 与 rotational delay</td>
+<td style="text-align: left;">都是“找数据”的时间</td>
+<td style="text-align: left;">seek time 是磁头移动到柱面，rotational
+delay 是等待目标扇区转到磁头下</td>
+</tr>
+<tr>
+<td style="text-align: left;">random I/O 与 sequential I/O</td>
+<td style="text-align: left;">都读一个块，代价应相同</td>
+<td style="text-align: left;">random I/O 常要重新寻道和旋转，sequential
+I/O 可以摊薄这些成本</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAM model 与 I/O model</td>
+<td style="text-align: left;">都是算法分析模型</td>
+<td style="text-align: left;">RAM model 重 CPU 操作，I/O model
+重磁盘块访问次数</td>
+</tr>
+<tr>
+<td style="text-align: left;">striping 与 mirroring</td>
+<td style="text-align: left;">都使用多个磁盘</td>
+<td style="text-align: left;">striping 主要提高并行吞吐，mirroring
+主要提高可用性并可加速读</td>
+</tr>
+<tr>
+<td style="text-align: left;">single buffering 与 double buffering</td>
+<td style="text-align: left;">都只是多一个缓冲区</td>
+<td style="text-align: left;">双缓冲的关键是让 I/O 和处理重叠</td>
+</tr>
+</tbody>
+</table>
+<h2 id="典型计算题思路">9.3 典型计算题思路</h2>
+<h3 id="磁盘访问时间计算">9.3.1 磁盘访问时间计算</h3>
+<p>如果题目给出寻道时间、转速、块大小和传输速率，通常按下式计算：</p>
+<p><span class="math display">$$
+\text{Access Time}=
+\text{Seek Time}
++\frac{1}{2}\text{Rotation Time}
++\frac{\text{Block Size}}{\text{Transfer Rate}}
+$$</span></p>
+<p>如果题目要求写后验证，还要额外加：</p>
+<p><span class="math display">$$
+\text{Full Rotation}
++\frac{\text{Block Size}}{\text{Transfer Rate}}
+$$</span></p>
+<h3 id="tpmms-代价计算">9.3.2 TPMMS 代价计算</h3>
+<p>如果关系有 <span class="math inline"><em>R</em></span>
+个块，且内存足够在第二阶段归并所有 run：</p>
+<p><span class="math display">Cost = 4<em>R</em></span></p>
+<p>如果问为什么不是 <span
+class="math inline">2<em>R</em></span>，要回答：因为排序需要读原始数据、写临时有序子列表、再读临时子列表、写最终结果。</p>
+<h3 id="tpmms-上界计算">9.3.3 TPMMS 上界计算</h3>
+<p>设主存 <span class="math inline"><em>M</em></span>、块大小 <span
+class="math inline"><em>B</em></span>、记录大小 <span
+class="math inline"><em>R</em></span>。先计算：</p>
+<p><span class="math display">$$
+\text{buffer number}=\frac{M}{B}
+$$</span></p>
+<p>最多输入 run 数为：</p>
+<p><span class="math display">$$
+\frac{M}{B}-1
+$$</span></p>
+<p>每个 run 的记录数为：</p>
+<p><span class="math display">$$
+\frac{M}{R}
+$$</span></p>
+<p>所以可排序记录数为：</p>
+<p><span class="math display">$$
+\frac{M}{R}\left(\frac{M}{B}-1\right)
+$$</span></p>
+<p>近似为：</p>
+<p><span class="math display">$$
+\frac{M^2}{RB}
+$$</span></p>
+<h3 id="缓冲时间计算">9.3.4 缓冲时间计算</h3>
+<p>单缓冲：</p>
+<p><span
+class="math display"><em>n</em>(<em>P</em> + <em>R</em>)</span></p>
+<p>双缓冲在 <span class="math inline"><em>P</em> ≥ <em>R</em></span>
+时：</p>
+<p><span
+class="math display"><em>R</em> + <em>n</em><em>P</em></span></p>
+<p>如果 <span
+class="math inline"><em>R</em> &gt; <em>P</em></span>，则读取无法完全被处理覆盖，实际瓶颈会转向
+I/O，此时不能机械套用 <span
+class="math inline"><em>R</em> + <em>n</em><em>P</em></span>，要根据题目给定条件分析流水线时间。</p>
+<h2 id="本章学习建议">9.4 本章学习建议</h2>
+<p>学习本章时，不要只背硬件名词，而要抓住一条主线：</p>
+<p><strong>数据库数据太大，不能全放内存；磁盘随机访问很慢；因此 DBMS
+用块作为 I/O 单位，并设计外存算法和缓冲技术来减少随机 I/O、增加顺序
+I/O、重叠计算与 I/O。</strong></p>
+<p>如果能围绕这条主线解释存储层次、磁盘访问时间、I/O 模型、TPMMS
+和双缓冲，本章的主要内容就已经掌握。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/" rel="tag"># 数据存储</a>
+              <a href="/tags/%E7%A3%81%E7%9B%98I-O/" rel="tag"># 磁盘I/O</a>
+              <a href="/tags/%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/" rel="tag"># 外部排序</a>
+              <a href="/tags/TPMMS/" rel="tag"># TPMMS</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/AI/Reinforcement%20Learning/" rel="prev" title="Reinforcement Learning">
+                  <i class="fa fa-angle-left"></i> Reinforcement Learning
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" rel="next" title="数据的存储结构">
+                  数据的存储结构 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

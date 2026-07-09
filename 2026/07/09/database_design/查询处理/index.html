@@ -1,0 +1,2469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  外部排序操作 关系操作的执行 查询优化简介 一个典型的关系查询优化器 Proactive Query Re-optimization 补充 重点内容与公式汇总  1 外部排序操作 1.1 为什么数据库需要外部排序 排序（sorting） 是数据库系统中非常基础的操作。它不仅用于 ORDER BY 返回有序结果，还常出现在批量装载（bulk loading）、重复">
+<meta property="og:type" content="article">
+<meta property="og:title" content="查询处理">
+<meta property="og:url" content="http://example.com/2026/07/09/database_design/%E6%9F%A5%E8%AF%A2%E5%A4%84%E7%90%86/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  外部排序操作 关系操作的执行 查询优化简介 一个典型的关系查询优化器 Proactive Query Re-optimization 补充 重点内容与公式汇总  1 外部排序操作 1.1 为什么数据库需要外部排序 排序（sorting） 是数据库系统中非常基础的操作。它不仅用于 ORDER BY 返回有序结果，还常出现在批量装载（bulk loading）、重复">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604165204529.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604165237900.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606133837689.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606141456535.png">
+<meta property="article:published_time" content="2026-07-09T07:16:58.861Z">
+<meta property="article:modified_time" content="2026-07-09T07:16:58.861Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="外部排序">
+<meta property="article:tag" content="查询优化">
+<meta property="article:tag" content="查询处理">
+<meta property="article:tag" content="连接算法">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604165204529.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/database_design/%E6%9F%A5%E8%AF%A2%E5%A4%84%E7%90%86/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/database_design/%E6%9F%A5%E8%AF%A2%E5%A4%84%E7%90%86/","path":"2026/07/09/database_design/查询处理/","title":"查询处理"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>查询处理 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F%E6%93%8D%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">1 外部排序操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%95%B0%E6%8D%AE%E5%BA%93%E9%9C%80%E8%A6%81%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 为什么数据库需要外部排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E4%B8%A4%E8%B7%AF-merge-%E6%8E%92%E5%BA%8F"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 简单两路 Merge 排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E8%B7%AF%E5%A4%96%E9%83%A8-merge-%E6%8E%92%E5%BA%8F"><span class="nav-number">2.3.</span> <span class="nav-text">1.3 多路外部 Merge 排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%8F%E5%B0%91%E5%88%9D%E5%A7%8B-run-%E4%B8%AA%E6%95%B0replacement-selection-%E6%80%9D%E6%83%B3"><span class="nav-number">2.4.</span> <span class="nav-text">1.4 减少初始 run
+个数：Replacement Selection 思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9D%97-io-%E4%B8%8E%E5%8F%8C%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">2.5.</span> <span class="nav-text">1.5 块 I&#x2F;O 与双缓冲区</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%97-io"><span class="nav-number">2.5.1.</span> <span class="nav-text">1.5.1 块 I&#x2F;O</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">2.5.2.</span> <span class="nav-text">1.5.2 双缓冲区</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8-b-%E6%A0%91%E8%BF%9B%E8%A1%8C%E6%8E%92%E5%BA%8F"><span class="nav-number">2.6.</span> <span class="nav-text">1.6 利用 B+ 树进行排序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%E6%93%8D%E4%BD%9C%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-number">3.</span> <span class="nav-text">2 关系操作的执行</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E6%89%A7%E8%A1%8C%E4%B8%AD%E7%9A%84%E4%B8%89%E7%B1%BB%E5%9F%BA%E6%9C%AC%E6%8A%80%E6%9C%AF"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 查询执行中的三类基本技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E8%B7%AF%E5%BE%84%E4%B8%8E%E9%80%89%E6%8B%A9%E7%8E%87"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 访问路径与选择率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#selection-%E6%93%8D%E4%BD%9C"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 Selection 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E7%B4%A2%E5%BC%95%E6%95%B0%E6%8D%AE%E6%97%A0%E5%BA%8F"><span class="nav-number">3.3.1.</span> <span class="nav-text">2.3.1 无索引、数据无序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A0%E7%B4%A2%E5%BC%95%E6%95%B0%E6%8D%AE%E6%9C%89%E5%BA%8F"><span class="nav-number">3.3.2.</span> <span class="nav-text">2.3.2 无索引、数据有序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-b-%E6%A0%91%E7%B4%A2%E5%BC%95"><span class="nav-number">3.3.3.</span> <span class="nav-text">2.3.3 使用 B+ 树索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-hash-%E7%B4%A2%E5%BC%95"><span class="nav-number">3.3.4.</span> <span class="nav-text">2.3.4 使用 Hash 索引</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#general-selection-%E6%93%8D%E4%BD%9C"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 General Selection 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%8D%E5%90%88%E7%B4%A2%E5%BC%95%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99"><span class="nav-number">3.4.1.</span> <span class="nav-text">2.4.1 复合索引匹配规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%90%AB-disjunction-%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">3.4.2.</span> <span class="nav-text">2.4.2 不含 disjunction 的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E5%90%AB-disjunction-%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">3.4.3.</span> <span class="nav-text">2.4.3 包含 disjunction 的选择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#projection-%E6%93%8D%E4%BD%9C"><span class="nav-number">3.5.</span> <span class="nav-text">2.5 Projection 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E6%8E%92%E5%BA%8F%E7%9A%84%E6%8A%95%E5%BD%B1"><span class="nav-number">3.5.1.</span> <span class="nav-text">2.5.1 基于排序的投影</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-hashing-%E7%9A%84%E6%8A%95%E5%BD%B1"><span class="nav-number">3.5.2.</span> <span class="nav-text">2.5.2 基于 Hashing 的投影</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E6%8A%95%E5%BD%B1%E4%B8%8E-hash-%E6%8A%95%E5%BD%B1%E6%AF%94%E8%BE%83"><span class="nav-number">3.5.3.</span> <span class="nav-text">2.5.3 排序投影与 Hash 投影比较</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#join-%E6%93%8D%E4%BD%9C"><span class="nav-number">3.6.</span> <span class="nav-text">2.6 Join 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF-join"><span class="nav-number">3.6.1.</span> <span class="nav-text">2.6.1 简单嵌套循环 Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9D%97%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF-join"><span class="nav-number">3.6.2.</span> <span class="nav-text">2.6.2 块嵌套循环 Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%B5%8C%E5%A5%97%E5%BE%AA%E7%8E%AF-join"><span class="nav-number">3.6.3.</span> <span class="nav-text">2.6.3 索引嵌套循环 Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sort-merge-join"><span class="nav-number">3.6.4.</span> <span class="nav-text">2.6.4 Sort-Merge Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hash-join"><span class="nav-number">3.6.5.</span> <span class="nav-text">2.6.5 Hash Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#join-%E7%AE%97%E6%B3%95%E6%AF%94%E8%BE%83"><span class="nav-number">3.6.6.</span> <span class="nav-text">2.6.6 Join 算法比较</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E5%90%88%E6%93%8D%E4%BD%9C%E4%B8%8E%E8%81%9A%E9%9B%86%E6%93%8D%E4%BD%9C"><span class="nav-number">3.7.</span> <span class="nav-text">2.7 集合操作与聚集操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%86%B2%E5%8C%BA%E5%AF%B9%E6%9F%A5%E8%AF%A2%E6%89%A7%E8%A1%8C%E7%9A%84%E5%BD%B1%E5%93%8D"><span class="nav-number">3.8.</span> <span class="nav-text">2.8 缓冲区对查询执行的影响</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E7%AE%80%E4%BB%8B"><span class="nav-number">4.</span> <span class="nav-text">3 查询优化简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%99%A8%E7%9A%84%E4%BB%BB%E5%8A%A1"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 查询优化器的任务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%89%A7%E8%A1%8C%E4%B8%8E%E7%89%A9%E5%8C%96"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 流水线执行与物化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%89%A7%E8%A1%8C%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">4.2.1.</span> <span class="nav-text">3.2.1 流水线执行的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%A9%E5%8C%96%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">4.2.2.</span> <span class="nav-text">3.2.2 物化的例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#system-r-%E4%BC%98%E5%8C%96%E5%99%A8"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 System R 优化器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E6%95%B0%E6%8D%AE%E5%AD%97%E5%85%B8"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 系统数据字典</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E5%85%B3%E7%B3%BB%E7%9A%84-catalog-%E8%A1%A8"><span class="nav-number">4.4.1.</span> <span class="nav-text">3.4.1 描述关系的 catalog 表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E5%B1%9E%E6%80%A7%E7%9A%84-catalog-%E8%A1%A8"><span class="nav-number">4.4.2.</span> <span class="nav-text">3.4.2 描述属性的 catalog 表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95-catalog"><span class="nav-number">4.4.3.</span> <span class="nav-text">3.4.3 索引 catalog</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E5%90%8C%E8%AE%BF%E9%97%AE%E8%AE%A1%E5%88%92%E7%9A%84%E4%BB%A3%E4%BB%B7%E5%B7%AE%E5%BC%82"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 不同访问计划的代价差异</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%80%E4%B8%AA%E5%85%B8%E5%9E%8B%E7%9A%84%E5%85%B3%E7%B3%BB%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E5%99%A8"><span class="nav-number">5.</span> <span class="nav-text">4 一个典型的关系查询优化器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sql-%E6%9F%A5%E8%AF%A2%E5%9D%97%E4%B8%8E%E5%85%B3%E7%B3%BB%E4%BB%A3%E6%95%B0%E8%BD%AC%E6%8D%A2"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 SQL 查询块与关系代数转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E8%AE%A1%E5%88%92%E4%BB%A3%E4%BB%B7%E4%BC%B0%E7%AE%97"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 访问计划代价估算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#reduction-factor"><span class="nav-number">5.2.1.</span> <span class="nav-text">4.2.1 Reduction Factor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B4%E6%96%B9%E5%9B%BE%E4%BC%B0%E8%AE%A1"><span class="nav-number">5.2.2.</span> <span class="nav-text">4.2.2 直方图估计</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%E4%BB%A3%E6%95%B0%E7%AD%89%E4%BB%B7%E5%8F%98%E6%8D%A2"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 关系代数等价变换</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E4%B8%8E%E6%8A%95%E5%BD%B1"><span class="nav-number">5.3.1.</span> <span class="nav-text">4.3.1 选择与投影</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%89%E4%B9%98%E4%B8%8E%E8%BF%9E%E6%8E%A5"><span class="nav-number">5.3.2.</span> <span class="nav-text">4.3.2 叉乘与连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%8A%95%E5%BD%B1%E4%B8%8E%E8%BF%9E%E6%8E%A5%E7%9A%84%E4%B8%8B%E6%8E%A8"><span class="nav-number">5.3.3.</span> <span class="nav-text">4.3.3 选择、投影与连接的下推</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E5%85%B3%E7%B3%BB%E6%9F%A5%E8%AF%A2%E8%AE%BF%E9%97%AE%E8%AE%A1%E5%88%92"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 单关系查询访问计划</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8D%95%E7%B4%A2%E5%BC%95%E8%AE%BF%E9%97%AE%E8%B7%AF%E5%BE%84"><span class="nav-number">5.4.1.</span> <span class="nav-text">4.4.1 单索引访问路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E7%B4%A2%E5%BC%95%E8%AE%BF%E9%97%AE%E8%B7%AF%E5%BE%84"><span class="nav-number">5.4.2.</span> <span class="nav-text">4.4.2 多索引访问路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E7%B4%A2%E5%BC%95%E8%AE%BF%E9%97%AE%E8%B7%AF%E5%BE%84"><span class="nav-number">5.4.3.</span> <span class="nav-text">4.4.3 排序索引访问路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A6%86%E7%9B%96%E7%B4%A2%E5%BC%95%E8%AE%BF%E9%97%AE%E8%B7%AF%E5%BE%84"><span class="nav-number">5.4.4.</span> <span class="nav-text">4.4.4 覆盖索引访问路径</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E5%85%B3%E7%B3%BB%E6%9F%A5%E8%AF%A2%E8%AE%BF%E9%97%AE%E8%AE%A1%E5%88%92"><span class="nav-number">5.5.</span> <span class="nav-text">4.5 多关系查询访问计划</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E8%A1%A8-join-%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">5.5.1.</span> <span class="nav-text">4.5.1 两表 join 的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E8%A1%A8-join-%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">5.5.2.</span> <span class="nav-text">4.5.2 三表 join 的例子</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B5%8C%E5%A5%97%E5%AD%90%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96"><span class="nav-number">5.6.</span> <span class="nav-text">4.6 嵌套子查询优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%9E%E7%9B%B8%E5%85%B3%E5%B5%8C%E5%A5%97%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-number">5.6.1.</span> <span class="nav-text">4.6.1 非相关嵌套子查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%B5%8C%E5%A5%97%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-number">5.6.2.</span> <span class="nav-text">4.6.2 相关嵌套子查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95"><span class="nav-number">5.7.</span> <span class="nav-text">4.7 其他查询优化方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#proactive-query-re-optimization-%E8%A1%A5%E5%85%85"><span class="nav-number">6.</span> <span class="nav-text">5 Proactive Query
+Re-optimization 补充</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%A0%E7%BB%9F%E4%BC%98%E5%8C%96%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 传统优化的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reactive-re-optimization"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 Reactive Re-optimization</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#proactive-re-optimization-%E7%9A%84%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 Proactive
+Re-optimization 的核心思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#bounding-box-%E4%B8%8E%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 Bounding Box 与不确定性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#robust-plan-%E4%B8%8E-switchable-plan"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 Robust Plan 与 Switchable
+Plan</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rio-%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%BB%86%E8%8A%82"><span class="nav-number">6.6.</span> <span class="nav-text">5.6 RIO 的实现细节</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E5%85%AC%E5%BC%8F%E6%B1%87%E6%80%BB"><span class="nav-number">7.</span> <span class="nav-text">6 重点内容与公式汇总</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AB%98%E9%A2%91%E6%A6%82%E5%BF%B5"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 高频概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8-io-%E5%85%AC%E5%BC%8F"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 常用 I&#x2F;O 公式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E9%80%89%E6%8B%A9%E9%80%9F%E8%AE%B0"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 算法选择速记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%93%E9%94%99%E7%82%B9"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 易错点</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/database_design/%E6%9F%A5%E8%AF%A2%E5%A4%84%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="查询处理 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          查询处理
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:16:58" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">数据库设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ol type="1">
+<li>外部排序操作</li>
+<li>关系操作的执行</li>
+<li>查询优化简介</li>
+<li>一个典型的关系查询优化器</li>
+<li>Proactive Query Re-optimization 补充</li>
+<li>重点内容与公式汇总</li>
+</ol>
+<h1 id="外部排序操作">1 外部排序操作</h1>
+<h2 id="为什么数据库需要外部排序">1.1 为什么数据库需要外部排序</h2>
+<p><strong>排序（sorting）</strong>
+是数据库系统中非常基础的操作。它不仅用于 <code>ORDER BY</code>
+返回有序结果，还常出现在批量装载（bulk
+loading）、重复元组删除、投影、集合操作以及连接算法中。数据库中的关系通常远大于内存，且
+DBMS
+还要支持多用户并发，因此不能假设数据可以一次性全部装入内存排序，这就需要
+<strong>外部排序（external sorting）</strong>。</p>
+<p>外部排序的性能通常以 <strong>磁盘 I/O 页数</strong>
+衡量。原因是相对于内存计算，磁盘读写在传统数据库代价模型中占主导地位。这里的公式也基本都围绕“每一页被读几次、写几次”展开。</p>
+<h2 id="简单两路-merge-排序">1.2 简单两路 Merge 排序</h2>
+<p>简单两路外部归并排序只使用 3
+个缓冲页：两个输入缓冲页和一个输出缓冲页。基本思想是：</p>
+<ol type="1">
+<li><strong>Pass
+0</strong>：每次读入一页，在内存中排序后写回磁盘，形成一个长度为 1
+页的有序 run。</li>
+<li><strong>后续 Pass</strong>：每次选两个 run 进行归并，输出更长的
+run。</li>
+<li>不断重复，直到只剩下一个有序 run。</li>
+</ol>
+<p><strong>run</strong>
+是指一个<strong>已经排好序的临时子文件/有序段</strong>，<strong>pass</strong>
+是指 <strong>外部排序中的一轮处理过程。</strong></p>
+<p>例子：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604165204529.png" alt="image-20260604165204300" style="zoom:50%;" /></p>
+<p>如果输入文件有 <span class="math inline"><em>N</em></span> 页，且
+<span
+class="math inline"><em>N</em> = 2<sup><em>k</em></sup></span>，那么：</p>
+<ul>
+<li>Pass 0 产生 <span class="math inline"><em>N</em></span> 个 run，每个
+run 1 页。</li>
+<li>Pass 1 产生 <span class="math inline"><em>N</em>/2</span> 个
+run，每个 run 2 页。</li>
+<li>Pass 2 产生 <span class="math inline"><em>N</em>/4</span> 个
+run，每个 run 4 页。</li>
+<li>总 pass 数为 <span
+class="math inline">⌈log<sub>2</sub><em>N</em>⌉ + 1</span>。</li>
+</ul>
+<p>每个 pass 都要读一遍文件、写一遍文件，因此总代价为：</p>
+<p><span
+class="math display">2<em>N</em>(⌈log<sub>2</sub><em>N</em>⌉ + 1)</span></p>
+<p>这里的 <span class="math inline">2<em>N</em></span> 表示一次完整 pass
+中对 <span class="math inline"><em>N</em></span>
+页各读一次、写一次。</p>
+<h2 id="多路外部-merge-排序">1.3 多路外部 Merge 排序</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604165237900.png" alt="image-20260604165237694" style="zoom: 50%;" /></p>
+<p>如果内存中有 <span class="math inline"><em>B</em></span>
+个缓冲页（<span class="math inline"><em>B</em> − 1</span>
+个输入缓冲区，<span class="math inline">1</span>
+个输出缓冲区），就可以比两路归并更有效地利用内存：</p>
+<ul>
+<li><strong>Pass 0</strong>：分多次读入 <span
+class="math inline"><em>B</em></span>
+页，在内存中排序，写出一个长度最多为 <span
+class="math inline"><em>B</em></span> 页的 run。</li>
+<li><strong>后续 Pass</strong>：使用 <span
+class="math inline"><em>B</em> − 1</span> 个缓冲页作为输入缓冲区，1
+个缓冲页作为输出缓冲区，做 <span
+class="math inline"><em>B</em> − 1</span> 路归并。</li>
+</ul>
+<p>第一次之后的 run 数为：</p>
+<p><span
+class="math display"><em>N</em><sub>1</sub> = ⌈<em>N</em>/<em>B</em>⌉</span></p>
+<p>总扫描遍数为：</p>
+<p><span
+class="math display">⌈log<sub><em>B</em> − 1</sub><em>N</em><sub>1</sub>⌉ + 1</span></p>
+<p>因此 I/O 代价为：</p>
+<p><span
+class="math display">2<em>N</em>(⌈log<sub><em>B</em> − 1</sub>⌈<em>N</em>/<em>B</em>⌉⌉ + 1)</span></p>
+<p>举一个具体例子。为方便理解，先把“1 页”想成“1 个数字”。假设文件共有
+<span class="math inline"><em>N</em> = 12</span> 页，内存有 <span
+class="math inline"><em>B</em> = 4</span> 页，原始数据顺序为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">9, 3, 7, 1,  8, 2, 6, 4,  12, 5, 11, 10</span><br></pre></td></tr></table></figure>
+<p>Pass 0 时，每次读入 4 页，在内存中排序后写出一个 run：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Pass 0：</span><br><span class="line">读入 9, 3, 7, 1      -&gt; 排序 -&gt; run1 = [1, 3, 7, 9]</span><br><span class="line">读入 8, 2, 6, 4      -&gt; 排序 -&gt; run2 = [2, 4, 6, 8]</span><br><span class="line">读入 12, 5, 11, 10   -&gt; 排序 -&gt; run3 = [5, 10, 11, 12]</span><br></pre></td></tr></table></figure>
+<p>所以 Pass 0 之后共有：</p>
+<p><span
+class="math display"><em>N</em><sub>1</sub> = ⌈12/4⌉ = 3</span></p>
+<p>个初始 run。后续归并阶段中，4 个缓冲页要分成 3 个输入缓冲页和 1
+个输出缓冲页，因此一次最多可以做 <span
+class="math inline"><em>B</em> − 1 = 3</span> 路归并：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Pass 1：</span><br><span class="line">run1 = [1, 3, 7, 9]</span><br><span class="line">run2 = [2, 4, 6, 8]</span><br><span class="line">run3 = [5, 10, 11, 12]</span><br><span class="line"></span><br><span class="line">3 路归并后：</span><br><span class="line">run_final = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]</span><br></pre></td></tr></table></figure>
+<p>这个例子只需要两个 pass：Pass 0 生成 3 个初始 run，Pass 1 把这 3 个
+run 一次性归并完成。每个 pass 都读写整个文件一遍，所以总 I/O 约为：</p>
+<p><span
+class="math display">2<em>N</em> × 2 = 2 × 12 × 2 = 48</span></p>
+<p>也就是 48 次页
+I/O。相比两路归并，多路归并的优势就在于：内存越多，一次能合并的 run
+越多，所需 pass 数越少。</p>
+<p><strong>核心结论</strong>：缓冲页数越大，每轮可以归并的 run
+越多，pass 数越少，I/O 代价下降明显。</p>
+<h2 id="减少初始-run-个数replacement-selection-思想">1.4 减少初始 run
+个数：Replacement Selection 思想</h2>
+<p>这里提到在 Pass 0 中可以用一些技巧让初始 run 平均长度达到约 <span
+class="math inline">2<em>B</em></span>。其思想类似 <strong>replacement
+selection</strong>：</p>
+<ul>
+<li>使用输入缓冲区、输出缓冲区和当前排序缓冲区。</li>
+<li>先把 <span class="math inline"><em>B</em> − 2</span>
+页数据放入当前排序缓冲区并排序。</li>
+<li>不断选择“比当前输出值更大”的最小记录输出，同时从输入缓冲区补充新记录。</li>
+<li>当当前缓冲区中再也找不到可继续当前 run 的记录时，一个 run
+结束。</li>
+</ul>
+<p>举一个具体数字例子。为方便理解，假设当前排序缓冲区最多放 3
+个数字，输入序列为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">5, 8, 10, 2, 6, 12, 1, 7</span><br></pre></td></tr></table></figure>
+<p>先读入前 3 个数字并排序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">当前排序缓冲区：[5, 8, 10]</span><br><span class="line">当前 run：[]</span><br></pre></td></tr></table></figure>
+<p>接下来不断输出“能接在当前 run
+后面”的最小数字。刚开始还没有输出过数字，所以先输出
+5，然后从输入中补入下一个数字 2：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">输出 5</span><br><span class="line">当前 run：[5]</span><br><span class="line">补入 2</span><br><span class="line">当前缓冲区：[2, 8, 10]</span><br></pre></td></tr></table></figure>
+<p>因为当前 run 最后一个数字是 5，而 2 小于 5，所以 2 不能继续放进当前
+run，否则 run 就不是有序的。于是 2 被“冻结”，留给下一个 run。当前 run
+只能继续从未冻结的 8 和 10 中选择最小值：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">冻结：2</span><br><span class="line">输出 8</span><br><span class="line">当前 run：[5, 8]</span><br><span class="line">补入 6</span><br><span class="line">当前缓冲区：[2(冻结), 6, 10]</span><br></pre></td></tr></table></figure>
+<p>此时 6 小于当前 run 的最后一个数字 8，也不能接在当前 run 后面，因此 6
+也被冻结。继续输出未冻结的 10：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">冻结：2, 6</span><br><span class="line">输出 10</span><br><span class="line">当前 run：[5, 8, 10]</span><br><span class="line">补入 12</span><br><span class="line">当前缓冲区：[2(冻结), 6(冻结), 12]</span><br></pre></td></tr></table></figure>
+<p>12 大于 10，可以继续当前 run，于是输出 12：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">输出 12</span><br><span class="line">当前 run：[5, 8, 10, 12]</span><br><span class="line">当前缓冲区：[2(冻结), 6(冻结)]</span><br></pre></td></tr></table></figure>
+<p>这时当前缓冲区里已经没有未冻结、且能接在 12 后面的数字，所以第一个
+run 结束：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">run1 = [5, 8, 10, 12]</span><br></pre></td></tr></table></figure>
+<p>被冻结的数字会进入下一个 run。继续读取后面的 1 和 7 后，第二个 run
+可以从这些数字开始重新排序生成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">待处理/冻结数据：2, 6, 1, 7</span><br><span class="line">排序后可生成：</span><br><span class="line">run2 = [1, 2, 6, 7]</span><br></pre></td></tr></table></figure>
+<p>这个例子的重点是：虽然排序缓冲区一次只能放 3 个数字，但第一个 run
+的长度达到了
+4。实际数据库中，如果输入数据近似随机，新读入的数据大约有一半能继续接在当前
+run 后面，因此初始 run 的平均长度可接近 <span
+class="math inline">2<em>B</em></span>。</p>
+<p>这样做的意义是：初始 run 变长，后续归并 pass 数减少，从而降低
+I/O。</p>
+<h2 id="块-io-与双缓冲区">1.5 块 I/O 与双缓冲区</h2>
+<h3 id="块-io">1.5.1 块 I/O</h3>
+<p>如果一次读写一个连续块（block），每个块包含 <span
+class="math inline"><em>b</em></span>
+个页，可以减少磁头移动或随机访问开销。此时可同时归并的 run 数不再是
+<span class="math inline"><em>B</em> − 1</span>，而是：</p>
+<p><span class="math display">$$
+F = \left\lfloor \frac{B-b}{b} \right\rfloor
+$$</span></p>
+<p>其中 <span class="math inline"><em>B</em></span> 是总缓冲页数，<span
+class="math inline"><em>b</em></span> 是每个块的页数。若初始 run
+平均长度用优化方法达到约 <span
+class="math inline">2<em>B</em></span>，则：</p>
+<p><span
+class="math display"><em>N</em><sub>2</sub> = ⌈<em>N</em>/(2<em>B</em>)⌉</span></p>
+<p>扫描遍数可估为：</p>
+<p><span
+class="math display">⌈log<sub><em>F</em></sub><em>N</em><sub>2</sub>⌉ + 1</span></p>
+<h3 id="双缓冲区">1.5.2 双缓冲区</h3>
+<p>排序时间包含 I/O 时间和 CPU 计算时间。普通方法中，CPU 计算和 I/O
+往往串行发生。<strong>双缓冲区（double buffering）</strong> 为每个 run
+准备两个缓冲区：一个缓冲区做 I/O 时，另一个缓冲区被 CPU 处理，从而实现
+I/O 与计算重叠，提高吞吐率。</p>
+<h2 id="利用-b-树进行排序">1.6 利用 B+ 树进行排序</h2>
+<p>B+
+树索引可以天然提供按键值有序的访问路径，但聚集索引与非聚集索引差别很大：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">索引类型</th>
+<th style="text-align: left;">排序访问特点</th>
+<th style="text-align: left;">代价直觉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">聚集 B+ 树索引</td>
+<td style="text-align: left;">数据页本身按照索引键顺序组织</td>
+<td style="text-align: left;">顺序扫描数据页，排序和访问性能都高</td>
+</tr>
+<tr>
+<td style="text-align: left;">非聚集 B+ 树索引</td>
+<td style="text-align: left;">data entry 有序，但数据页物理位置无序</td>
+<td style="text-align: left;">可能需要大量随机 I/O</td>
+</tr>
+</tbody>
+</table>
+<p>这里给出非聚集索引排序代价估计：</p>
+<p><span
+class="math display">(<em>f</em> + <em>p</em>)<em>N</em></span></p>
+<p>其中 <span class="math inline"><em>N</em></span> 是数据页数，<span
+class="math inline"><em>p</em></span> 是每页平均记录数，<span
+class="math inline"><em>f</em></span> 是 data entry
+长度与记录长度的比值。该公式反映了：既要扫描索引项，又可能为每条记录访问数据页。</p>
+<h1 id="关系操作的执行">2 关系操作的执行</h1>
+<h2 id="查询执行中的三类基本技术">2.1 查询执行中的三类基本技术</h2>
+<p>关系操作包括选择、投影、连接、集合、聚集等操作。不同操作会有多种执行方法，优化器根据表大小、索引、排序状态、缓冲区大小和中间结果特性选择具体算法。</p>
+<p>常见基本技术有三类：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">技术</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Iteration</td>
+<td style="text-align: left;">顺序扫描关系或索引项，逐条检查</td>
+<td style="text-align: left;">无索引选择、聚集</td>
+</tr>
+<tr>
+<td style="text-align: left;">Indexing</td>
+<td style="text-align: left;">利用索引定位满足条件的元组</td>
+<td style="text-align: left;">选择、索引嵌套循环连接</td>
+</tr>
+<tr>
+<td style="text-align: left;">Partitioning</td>
+<td style="text-align: left;">通过排序或哈希把关系划分成更小部分</td>
+<td style="text-align: left;">投影去重、Hash Join、Sort-Merge Join</td>
+</tr>
+</tbody>
+</table>
+<h2 id="访问路径与选择率">2.2 访问路径与选择率</h2>
+<p><strong>访问路径（access path）</strong>
+指从关系中访问记录的方法，包括：</p>
+<ul>
+<li>文件扫描（file scan）。</li>
+<li>利用索引和匹配条件访问，例如 <code>attr op value</code>。</li>
+</ul>
+<p>这里<strong>“选择率（selectivity）”</strong>用总共访问的页数衡量。更准确地说，优化目标是选择访问页数更少、过滤效果更好的访问路径。索引只有建立在相关属性上，且谓词形式适合该索引时，才能成为有效访问路径。</p>
+<p>后续例子使用：</p>
+<ul>
+<li><code>Reserves(sid, bid, day, rname)</code>：1000 页，每页 100
+条记录。</li>
+<li><code>Sailors(sid, sname, rating, age)</code>：500 页，每页 80
+条记录。</li>
+<li>只考虑 I/O 页数，忽略结果输出大小。</li>
+</ul>
+<h2 id="selection-操作">2.3 Selection 操作</h2>
+<p>以查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> Reserves R</span><br><span class="line"><span class="keyword">WHERE</span> R.rname <span class="operator">=</span> <span class="string">&#x27;Joe&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>为例。它对应关系代数：</p>
+<p><span
+class="math display"><em>σ</em><sub><em>r</em><em>n</em><em>a</em><em>m</em><em>e</em>=<sup>′</sup><em>J</em><em>o</em><em>e</em><sup>′</sup></sub>(<em>R</em>)</span></p>
+<h3 id="无索引数据无序">2.3.1 无索引、数据无序</h3>
+<p>只能扫描整个表。对 <code>Reserves</code> 来说代价为 1000 次
+I/O。优点是简单稳定，缺点是无论结果多少都要读完整表。</p>
+<h3 id="无索引数据有序">2.3.2 无索引、数据有序</h3>
+<p>如果数据已经按选择属性排序，可用二分查找找到起点。例如 1000
+页约需：</p>
+<p><span
+class="math display"><em>O</em>(log<sub>2</sub>1000) ≈ 10</span></p>
+<p>次 I/O 找到位置。对于范围条件如
+<code>attr &gt; 5</code>，找到起点后再顺序扫描后续页。</p>
+<h3 id="使用-b-树索引">2.3.3 使用 B+ 树索引</h3>
+<p>B+ 树索引适合等值查询和范围查询。执行过程是：</p>
+<ol type="1">
+<li>从根到叶找到满足条件的起始 data entry。</li>
+<li>沿叶节点顺序扫描满足条件的 data entry。</li>
+<li>根据 data entry 中的 rid 访问数据元组。</li>
+</ol>
+<p>主要代价不在“找到叶节点”，因为通常只需 2-3 次
+I/O；真正的差异来自索引是否聚集：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">情况</th>
+<th style="text-align: left;">读取结果元组的代价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">聚集索引</td>
+<td
+style="text-align: left;">满足条件的数据页通常连续，范围查询代价接近结果页数</td>
+</tr>
+<tr>
+<td style="text-align: left;">非聚集索引</td>
+<td style="text-align: left;">数据页分散，最坏接近每条结果一次 I/O</td>
+</tr>
+</tbody>
+</table>
+<p>例如 <code>rname &lt; 'c%'</code> 返回 10% 的
+<code>Reserves</code>：</p>
+<ul>
+<li>聚集索引：约访问 100 个数据页。</li>
+<li>非聚集索引：最坏可能访问 10000 次记录级随机 I/O。</li>
+<li>如果先对 page id 排序，可避免重复读同一页，最坏约 1000 页。</li>
+</ul>
+<h3 id="使用-hash-索引">2.3.4 使用 Hash 索引</h3>
+<p>Hash 索引适合
+<strong>等值选择</strong>，不适合范围查询。执行过程是：</p>
+<ol type="1">
+<li>根据 Hash 函数找到桶。</li>
+<li>在桶中检查 data entry。</li>
+<li>根据 rid 访问数据页。</li>
+</ol>
+<p>如果索引非聚集，且结果较多，访问结果元组时仍可能产生大量随机 I/O。对
+page id 排序可以减少重复读取。</p>
+<h2 id="general-selection-操作">2.4 General Selection 操作</h2>
+<p>一般选择条件是由逻辑连接词 <span class="math inline">∧</span> 和
+<span class="math inline">∨</span> 组成的表达式。这里使用
+<strong>CNF（Conjunctive Normal Form，合取范式）</strong> 描述：</p>
+<ul>
+<li>一个 CNF 是多个 conjunct 用 <span class="math inline">∧</span>
+连接。</li>
+<li>一个 conjunct 可以是多个 term 用 <span class="math inline">∨</span>
+连接。</li>
+<li>term 形式通常是 <code>attr op value</code> 或
+<code>attr1 op attr2</code>。</li>
+</ul>
+<p>例如：</p>
+<p><span
+class="math display">(<em>d</em><em>a</em><em>y</em> &lt; 8/9/94 ∧ <em>r</em><em>n</em><em>a</em><em>m</em><em>e</em>=<sup>′</sup><em>J</em><em>o</em><em>e</em><sup>′</sup>) ∨ <em>b</em><em>i</em><em>d</em> = 5 ∨ <em>s</em><em>i</em><em>d</em> = 3</span></p>
+<p>可变换为：</p>
+<p><span
+class="math display">(<em>d</em><em>a</em><em>y</em> &lt; 8/9/94 ∨ <em>b</em><em>i</em><em>d</em> = 5 ∨ <em>s</em><em>i</em><em>d</em> = 3) ∧ (<em>r</em><em>n</em><em>a</em><em>m</em><em>e</em>=<sup>′</sup><em>J</em><em>o</em><em>e</em><sup>′</sup> ∨ <em>b</em><em>i</em><em>d</em> = 5 ∨ <em>s</em><em>i</em><em>d</em> = 3)</span></p>
+<h3 id="复合索引匹配规则">2.4.1 复合索引匹配规则</h3>
+<p>设条件为：</p>
+<p><span
+class="math display"><em>r</em><em>n</em><em>a</em><em>m</em><em>e</em>=<sup>′</sup><em>J</em><em>o</em><em>e</em><sup>′</sup> ∧ <em>b</em><em>i</em><em>d</em> = 5 ∧ <em>s</em><em>i</em><em>d</em> = 3</span></p>
+<p>复合索引能否使用，取决于索引类型和属性顺序：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">索引</th>
+<th style="text-align: left;">能否支持条件</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td
+style="text-align: left;">Hash(<code>&lt;rname,bid,sid&gt;</code>)</td>
+<td style="text-align: left;">支持完整三属性等值查询</td>
+<td style="text-align: left;">但不能直接支持只给
+<code>&lt;rname,bid&gt;</code> 的前缀查询</td>
+</tr>
+<tr>
+<td style="text-align: left;">B+
+树(<code>&lt;rname,bid,sid&gt;</code>)</td>
+<td style="text-align: left;">支持完整查询，也支持
+<code>&lt;rname,bid&gt;</code> 前缀</td>
+<td style="text-align: left;">不适合只给
+<code>bid=5 AND sid=3</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Hash/B+
+树(<code>&lt;bid,sid&gt;</code>)</td>
+<td style="text-align: left;">支持 <code>bid=5 AND sid=3</code></td>
+<td style="text-align: left;">之后还需检查 <code>rname</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键辨析</strong>：B+ 树复合索引通常支持最左前缀；Hash
+复合索引通常要求完整键值匹配。</p>
+<h3 id="不含-disjunction-的选择">2.4.2 不含 disjunction 的选择</h3>
+<p>如果选择条件没有 <span class="math inline">∨</span>，可以：</p>
+<ul>
+<li>文件扫描并检查所有 conjunct。</li>
+<li>选择过滤性最强的 primary
+conjunct，通过索引先取候选元组，再用剩余条件筛选。</li>
+<li>如果多个索引都能提供候选 rid 集合，可以分别取出 rid，再做交集。</li>
+</ul>
+<p>实际系统中 rid 集合交操作可能使用位图、Hash Join、Bloom filter
+或索引连接等方法。</p>
+<h3 id="包含-disjunction-的选择">2.4.3 包含 disjunction 的选择</h3>
+<p>如果条件中有 <span
+class="math inline">∨</span>，处理更复杂。关键原则是：</p>
+<ul>
+<li>若某个 disjunct 无法使用索引且需要全表扫描，则整个 <span
+class="math inline">∨</span> 条件往往难以避免全表扫描。</li>
+<li>若每个 disjunct
+都有索引支持，可以分别通过索引找候选集合，再做并集。</li>
+<li>若外层还有强选择条件，例如：</li>
+</ul>
+<p><span
+class="math display">(<em>d</em><em>a</em><em>y</em> &lt; 8/9/94 ∨ <em>r</em><em>n</em><em>a</em><em>m</em><em>e</em>=<sup>′</sup><em>J</em><em>o</em><em>e</em><sup>′</sup>) ∧ <em>s</em><em>i</em><em>d</em> = 3</span></p>
+<p>可以先利用 <code>sid=3</code> 的索引缩小候选集，再检查前半部分。</p>
+<h2 id="projection-操作">2.5 Projection 操作</h2>
+<p>投影操作如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> R.sid, R.bid</span><br><span class="line"><span class="keyword">FROM</span> Reserves R;</span><br></pre></td></tr></table></figure>
+<p>对应：</p>
+<p><span
+class="math display"><em>π</em><sub><em>s</em><em>i</em><em>d</em>, <em>b</em><em>i</em><em>d</em></sub>(<em>R</em><em>e</em><em>s</em><em>e</em><em>r</em><em>v</em><em>e</em><em>s</em>)</span></p>
+<p>投影有两个任务：</p>
+<ol type="1">
+<li>去掉不需要的属性。</li>
+<li>如果有 <code>DISTINCT</code>，删除重复元组。</li>
+</ol>
+<h3 id="基于排序的投影">2.5.1 基于排序的投影</h3>
+<p>基本步骤：</p>
+<ol type="1">
+<li>扫描关系 <span
+class="math inline"><em>R</em></span>，生成只包含目标属性的中间结果。</li>
+<li>对中间结果排序。</li>
+<li>扫描排序结果，比较相邻元组并去重。</li>
+</ol>
+<p>设原表大小为 <span class="math inline"><em>M</em></span>
+页，投影后的中间结果为 <span class="math inline"><em>T</em></span>
+页，则基础代价包括：</p>
+<ul>
+<li>扫描并写出中间结果：<span
+class="math inline"><em>M</em> + <em>T</em></span>。</li>
+<li>排序中间结果：取决于外排序代价。</li>
+<li>扫描排序结果去重：<span class="math inline"><em>T</em></span>。</li>
+</ul>
+<p>示例中，<code>Reserves</code> 为 1000 页，投影后 <code>sid+bid</code>
+长度为原记录的 <span
+class="math inline">$10/40=\frac{1}{4}$</span>，所以 <span
+class="math inline"><em>T</em> = 250</span> 页。直接方法代价为：</p>
+<p><span
+class="math display">1000 + 250 + 2 × 2 × 250 + 250 = 2500</span></p>
+<p>若有 20 页缓冲区，可将投影写出与排序 Pass 0 合并，并在 merge
+时去重，总代价可降为约 1500。</p>
+<p>举一个小例子。假设原关系 <code>Reserves</code> 中有如下 6
+条记录：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">bid</th>
+<th style="text-align: left;">day</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">101</td>
+<td style="text-align: left;">10/10</td>
+</tr>
+<tr>
+<td style="text-align: left;">31</td>
+<td style="text-align: left;">101</td>
+<td style="text-align: left;">10/11</td>
+</tr>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">101</td>
+<td style="text-align: left;">10/12</td>
+</tr>
+<tr>
+<td style="text-align: left;">58</td>
+<td style="text-align: left;">103</td>
+<td style="text-align: left;">11/12</td>
+</tr>
+<tr>
+<td style="text-align: left;">31</td>
+<td style="text-align: left;">102</td>
+<td style="text-align: left;">10/13</td>
+</tr>
+<tr>
+<td style="text-align: left;">31</td>
+<td style="text-align: left;">101</td>
+<td style="text-align: left;">10/14</td>
+</tr>
+</tbody>
+</table>
+<p>执行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> sid, bid</span><br><span class="line"><span class="keyword">FROM</span> Reserves;</span><br></pre></td></tr></table></figure>
+<p>第一步先扫描原表，只保留投影属性 <code>sid</code> 和
+<code>bid</code>，得到中间结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(22,101), (31,101), (22,101), (58,103), (31,102), (31,101)</span><br></pre></td></tr></table></figure>
+<p>第二步对中间结果按 <code>(sid,bid)</code> 排序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(22,101), (22,101), (31,101), (31,101), (31,102), (58,103)</span><br></pre></td></tr></table></figure>
+<p>第三步顺序扫描排序结果，只要当前元组和前一个元组相同，就丢弃当前元组。最终得到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(22,101), (31,101), (31,102), (58,103)</span><br></pre></td></tr></table></figure>
+<p>排序方法去重的关键是：<strong>重复元组在排序后会相邻出现</strong>，因此只需要比较相邻元组即可删除重复项。</p>
+<h3 id="基于-hashing-的投影">2.5.2 基于 Hashing 的投影</h3>
+<p>Hash 投影分两阶段：</p>
+<ol type="1">
+<li><strong>分区阶段</strong>：扫描输入，把投影后的元组用 Hash 函数分到
+<span class="math inline"><em>B</em> − 1</span> 个分区。</li>
+<li><strong>去重阶段</strong>：逐个读取分区，在内存中用另一个 Hash
+函数去重。</li>
+</ol>
+<p>如果第二阶段每个分区都能放入内存：</p>
+<p><span
+class="math display">总代价 = <em>M</em> + 2<em>T</em></span></p>
+<p>对示例：</p>
+<p><span class="math display">1000 + 2 × 250 = 1500</span></p>
+<p>仍然使用上面的投影中间结果：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(22,101), (31,101), (22,101), (58,103), (31,102), (31,101)</span><br></pre></td></tr></table></figure>
+<p>假设内存中可以使用 3 个输出分区，即分区阶段把元组分到
+<code>partition0</code>、<code>partition1</code>、<code>partition2</code>。为了便于说明，设
+Hash 函数按 <code>sid mod 3</code> 分区：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(22,101) -&gt; 22 mod 3 = 1 -&gt; partition1</span><br><span class="line">(31,101) -&gt; 31 mod 3 = 1 -&gt; partition1</span><br><span class="line">(22,101) -&gt; 22 mod 3 = 1 -&gt; partition1</span><br><span class="line">(58,103) -&gt; 58 mod 3 = 1 -&gt; partition1</span><br><span class="line">(31,102) -&gt; 31 mod 3 = 1 -&gt; partition1</span><br><span class="line">(31,101) -&gt; 31 mod 3 = 1 -&gt; partition1</span><br></pre></td></tr></table></figure>
+<p>这个 Hash
+函数在这个小例子里分布很差，所有元组都落到同一个分区。为了展示正常分区效果，也可以设
+Hash 函数按 <code>(sid+bid) mod 3</code> 分区：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">(22,101) -&gt; 123 mod 3 = 0 -&gt; partition0</span><br><span class="line">(31,101) -&gt; 132 mod 3 = 0 -&gt; partition0</span><br><span class="line">(22,101) -&gt; 123 mod 3 = 0 -&gt; partition0</span><br><span class="line">(58,103) -&gt; 161 mod 3 = 2 -&gt; partition2</span><br><span class="line">(31,102) -&gt; 133 mod 3 = 1 -&gt; partition1</span><br><span class="line">(31,101) -&gt; 132 mod 3 = 0 -&gt; partition0</span><br></pre></td></tr></table></figure>
+<p>分区阶段结束后：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">partition0: (22,101), (31,101), (22,101), (31,101)</span><br><span class="line">partition1: (31,102)</span><br><span class="line">partition2: (58,103)</span><br></pre></td></tr></table></figure>
+<p>第二阶段逐个读取分区，在内存 Hash 表中删除重复元组：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">处理 partition0:</span><br><span class="line">  读入 (22,101)，Hash 表中没有，保留</span><br><span class="line">  读入 (31,101)，Hash 表中没有，保留</span><br><span class="line">  读入 (22,101)，Hash 表中已有，丢弃</span><br><span class="line">  读入 (31,101)，Hash 表中已有，丢弃</span><br><span class="line"></span><br><span class="line">处理 partition1:</span><br><span class="line">  保留 (31,102)</span><br><span class="line"></span><br><span class="line">处理 partition2:</span><br><span class="line">  保留 (58,103)</span><br></pre></td></tr></table></figure>
+<p>最终结果仍然是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(22,101), (31,101), (31,102), (58,103)</span><br></pre></td></tr></table></figure>
+<p>Hash 方法去重的关键是：<strong>相同的投影元组一定会被 Hash
+到同一个分区</strong>，所以只要在每个分区内部去重，就不会漏掉跨分区重复项。</p>
+<h3 id="排序投影与-hash-投影比较">2.5.3 排序投影与 Hash 投影比较</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">排序投影</td>
+<td style="text-align: left;">结果有序；对小内存和数据倾斜更稳健</td>
+<td style="text-align: left;">排序 I/O 可能较高</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hash 投影</td>
+<td style="text-align: left;">内存足够且分布均匀时效率高</td>
+<td style="text-align: left;">数据倾斜或分区过大时可能退化</td>
+</tr>
+<tr>
+<td style="text-align: left;">索引投影</td>
+<td style="text-align: left;">若所需属性都在索引中，可不访问数据表</td>
+<td style="text-align: left;">依赖覆盖索引</td>
+</tr>
+</tbody>
+</table>
+<h2 id="join-操作">2.6 Join 操作</h2>
+<p>连接例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> Reserves R, Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> R.sid <span class="operator">=</span> S.sid;</span><br></pre></td></tr></table></figure>
+<p>连接可视为笛卡尔积后再选择，但实际执行不会真的先生成完整笛卡尔积，因为那会极其昂贵。</p>
+<p>设：</p>
+<ul>
+<li><span class="math inline"><em>R</em></span> 有 <span
+class="math inline"><em>M</em></span> 页，每页 <span
+class="math inline"><em>P</em><sub><em>R</em></sub></span> 个元组。</li>
+<li><span class="math inline"><em>S</em></span> 有 <span
+class="math inline"><em>N</em></span> 页，每页 <span
+class="math inline"><em>P</em><sub><em>S</em></sub></span> 个元组。</li>
+</ul>
+<p>下面各 Join 例子都使用同一组小数据。假设要执行：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> R.sid, S.sname, R.bid</span><br><span class="line"><span class="keyword">FROM</span> Reserves R, Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> R.sid <span class="operator">=</span> S.sid;</span><br></pre></td></tr></table></figure>
+<p><code>Sailors</code> 表：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">sname</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">Dustin</td>
+</tr>
+<tr>
+<td style="text-align: left;">31</td>
+<td style="text-align: left;">Lubber</td>
+</tr>
+<tr>
+<td style="text-align: left;">58</td>
+<td style="text-align: left;">Rusty</td>
+</tr>
+</tbody>
+</table>
+<p><code>Reserves</code> 表：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">bid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">101</td>
+</tr>
+<tr>
+<td style="text-align: left;">31</td>
+<td style="text-align: left;">102</td>
+</tr>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">103</td>
+</tr>
+<tr>
+<td style="text-align: left;">44</td>
+<td style="text-align: left;">104</td>
+</tr>
+<tr>
+<td style="text-align: left;">58</td>
+<td style="text-align: left;">105</td>
+</tr>
+</tbody>
+</table>
+<p>正确 Join 结果应为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">(22, Dustin, 101)</span><br><span class="line">(31, Lubber, 102)</span><br><span class="line">(22, Dustin, 103)</span><br><span class="line">(58, Rusty, 105)</span><br></pre></td></tr></table></figure>
+<p><code>Reserves</code> 中的 <code>(44,104)</code> 找不到
+<code>sid=44</code> 的 <code>Sailors</code>
+元组，因此不会出现在结果中。</p>
+<h3 id="简单嵌套循环-join">2.6.1 简单嵌套循环 Join</h3>
+<p>伪代码思想：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">for each tuple r in R:</span><br><span class="line">  for each tuple s in S:</span><br><span class="line">    if r.i == s.j:</span><br><span class="line">      output &lt;r, s&gt;</span><br></pre></td></tr></table></figure>
+<p>若 <span class="math inline"><em>R</em></span> 为 outer，<span
+class="math inline"><em>S</em></span> 为 inner，逐元组扫描代价为：</p>
+<p><span
+class="math display"><em>M</em> + <em>P</em><sub><em>R</em></sub> × <em>M</em> × <em>N</em></span></p>
+<p>对 <span
+class="math inline"><em>M</em> = 1000, <em>P</em><sub><em>R</em></sub> = 100, <em>N</em> = 500</span>：</p>
+<p><span
+class="math display">1000 + 100 × 1000 × 500 = 1000 + 5 × 10<sup>7</sup></span></p>
+<p>优化方式：</p>
+<ul>
+<li>一次读入 outer 的一页，而不是一个元组，代价可近似为 <span
+class="math inline"><em>M</em> + <em>M</em><em>N</em></span>。</li>
+<li>选择较小关系作为 outer，减少 outer 循环次数。</li>
+</ul>
+<p>用上面的小数据举例，令 <code>Reserves</code> 为
+outer，<code>Sailors</code> 为 inner。简单嵌套循环会对每条
+<code>Reserves</code> 元组完整扫描一遍 <code>Sailors</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">外层 R=(22,101):</span><br><span class="line">  比较 S=(22,Dustin) -&gt; sid 相等，输出 (22,Dustin,101)</span><br><span class="line">  比较 S=(31,Lubber) -&gt; 不相等</span><br><span class="line">  比较 S=(58,Rusty)  -&gt; 不相等</span><br><span class="line"></span><br><span class="line">外层 R=(31,102):</span><br><span class="line">  比较 S=(22,Dustin) -&gt; 不相等</span><br><span class="line">  比较 S=(31,Lubber) -&gt; sid 相等，输出 (31,Lubber,102)</span><br><span class="line">  比较 S=(58,Rusty)  -&gt; 不相等</span><br><span class="line"></span><br><span class="line">外层 R=(22,103):</span><br><span class="line">  再次从头扫描 Sailors</span><br><span class="line">  找到 S=(22,Dustin)，输出 (22,Dustin,103)</span><br><span class="line"></span><br><span class="line">外层 R=(44,104):</span><br><span class="line">  扫完整个 Sailors，没有匹配结果</span><br><span class="line"></span><br><span class="line">外层 R=(58,105):</span><br><span class="line">  扫描 Sailors，找到 S=(58,Rusty)，输出 (58,Rusty,105)</span><br></pre></td></tr></table></figure>
+<p>这个例子里有 5 条 <code>Reserves</code>、3 条
+<code>Sailors</code>，所以会做 <span
+class="math inline">5 × 3 = 15</span> 次元组比较。它的特点是非常直接，但
+inner 表会被反复扫描。</p>
+<h3 id="块嵌套循环-join">2.6.2 块嵌套循环 Join</h3>
+<p>块嵌套循环连接（block nested loop join）每次将 <span
+class="math inline"><em>B</em> − 2</span> 页 outer 关系读入内存，1
+页用于 inner 输入，1 页用于输出。代价为：</p>
+<p><span class="math display">$$
+M+\left\lceil \frac{M}{B-2} \right\rceil N
+$$</span></p>
+<p>对 <span
+class="math inline"><em>M</em> = 1000, <em>N</em> = 500, <em>B</em> = 100</span>：</p>
+<p><span class="math display">$$
+1000+\left\lceil \frac{1000}{98}\right\rceil \times 500
+\approx 1000+10\times500=6000
+$$</span></p>
+<p>如果将较小的 <code>Sailors</code> 作为 outer：</p>
+<p><span class="math display">$$
+500+\left\lceil \frac{500}{98}\right\rceil \times 1000
+\approx 5500
+$$</span></p>
+<p>内存中的 outer block 可以建 Hash 表，以加快与 inner
+页元组的匹配，但这主要降低 CPU 代价，I/O 公式仍由扫描次数决定。</p>
+<p>用小数据举例，假设内存一次可以放入 2 条 outer 元组作为一个 block。把
+<code>Reserves</code> 分成 3 个 block：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Block 1: (22,101), (31,102)</span><br><span class="line">Block 2: (22,103), (44,104)</span><br><span class="line">Block 3: (58,105)</span><br></pre></td></tr></table></figure>
+<p>执行时每次读入一个 <code>Reserves</code> block，然后扫描整个
+<code>Sailors</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">读入 Block 1:</span><br><span class="line">  扫描 S=(22,Dustin)，匹配 R=(22,101)，输出 (22,Dustin,101)</span><br><span class="line">  扫描 S=(31,Lubber)，匹配 R=(31,102)，输出 (31,Lubber,102)</span><br><span class="line">  扫描 S=(58,Rusty)，无匹配</span><br><span class="line"></span><br><span class="line">读入 Block 2:</span><br><span class="line">  扫描 S=(22,Dustin)，匹配 R=(22,103)，输出 (22,Dustin,103)</span><br><span class="line">  扫描 S=(31,Lubber)，无匹配</span><br><span class="line">  扫描 S=(58,Rusty)，无匹配</span><br><span class="line"></span><br><span class="line">读入 Block 3:</span><br><span class="line">  扫描 S=(22,Dustin)，无匹配</span><br><span class="line">  扫描 S=(31,Lubber)，无匹配</span><br><span class="line">  扫描 S=(58,Rusty)，匹配 R=(58,105)，输出 (58,Rusty,105)</span><br></pre></td></tr></table></figure>
+<p>和简单嵌套循环相比，块嵌套循环不是“每条 outer 元组扫描一次
+inner”，而是“每个 outer block 扫描一次 inner”。如果 block 越大，inner
+被重复扫描的次数越少。CPU 比较次数未必降低特别多，它真正省的是
+<strong>inner 表反复从磁盘读入的 I/O 代价</strong>。</p>
+<h3 id="索引嵌套循环-join">2.6.3 索引嵌套循环 Join</h3>
+<p>索引嵌套循环连接（index nested loop join）要求 inner
+关系在连接属性上有索引。执行方式是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">for each tuple r in R:</span><br><span class="line">  use index on S.j to find tuples s where s.j = r.i</span><br><span class="line">  output matches</span><br></pre></td></tr></table></figure>
+<p>其代价可理解为：</p>
+<p><span class="math display">扫描 outer 的代价 + outer
+元组数 × 每次索引查找及取数代价</span></p>
+<p>如果 inner 索引是 B+ 树，定位叶节点通常 2-4 次 I/O；如果是 Hash
+索引，通常 1-2 次 I/O。若索引非聚集，取数据元组的随机 I/O 可能很高。</p>
+<p>示例中，如果 <code>Sailors.sid</code> 上有 Hash 索引，且
+<code>sid</code> 是键，每个 <code>Reserves</code> 元组最多匹配一个
+<code>Sailors</code> 元组，则代价约为：</p>
+<p><span class="math display">1000 + 100000 × 1.2</span></p>
+<p>其中 <span class="math inline">100000</span> 是 <code>Reserves</code>
+的元组数。</p>
+<p>用小数据举例，仍令 <code>Reserves</code> 为 outer，并假设
+<code>Sailors.sid</code> 上有 Hash 索引：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Sailors.sid 的索引：</span><br><span class="line">22 -&gt; (22,Dustin)</span><br><span class="line">31 -&gt; (31,Lubber)</span><br><span class="line">58 -&gt; (58,Rusty)</span><br></pre></td></tr></table></figure>
+<p>执行过程变成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">读 R=(22,101):</span><br><span class="line">  用 sid=22 查索引 -&gt; 找到 (22,Dustin)</span><br><span class="line">  输出 (22,Dustin,101)</span><br><span class="line"></span><br><span class="line">读 R=(31,102):</span><br><span class="line">  用 sid=31 查索引 -&gt; 找到 (31,Lubber)</span><br><span class="line">  输出 (31,Lubber,102)</span><br><span class="line"></span><br><span class="line">读 R=(22,103):</span><br><span class="line">  用 sid=22 查索引 -&gt; 找到 (22,Dustin)</span><br><span class="line">  输出 (22,Dustin,103)</span><br><span class="line"></span><br><span class="line">读 R=(44,104):</span><br><span class="line">  用 sid=44 查索引 -&gt; 没有结果</span><br><span class="line"></span><br><span class="line">读 R=(58,105):</span><br><span class="line">  用 sid=58 查索引 -&gt; 找到 (58,Rusty)</span><br><span class="line">  输出 (58,Rusty,105)</span><br></pre></td></tr></table></figure>
+<p>这里不再反复扫描完整 <code>Sailors</code>，而是对每条 outer
+元组做一次索引查找。若 outer 很小、inner
+索引选择性高，这种方法通常很快；但如果索引非聚集且匹配结果很多，随机访问数据页的代价可能很高。</p>
+<h3 id="sort-merge-join">2.6.4 Sort-Merge Join</h3>
+<p>Sort-Merge Join
+适合等值连接，特别是输入已排序或需要输出有序结果时。步骤：</p>
+<ol type="1">
+<li>如果 <span class="math inline"><em>R</em></span>
+未按连接属性排序，则排序 <span
+class="math inline"><em>R</em></span>。</li>
+<li>如果 <span class="math inline"><em>S</em></span>
+未按连接属性排序，则排序 <span
+class="math inline"><em>S</em></span>。</li>
+<li>用两个指针顺序扫描两个有序关系，找到连接属性相同的分组并输出匹配结果。</li>
+</ol>
+<p>代价包括：</p>
+<p><span
+class="math display">sort(<em>R</em>) + sort(<em>S</em>) + <em>M</em> + <em>N</em></span></p>
+<p>示例中 <span
+class="math inline"><em>M</em> = 1000, <em>N</em> = 500, <em>B</em> = 100</span>，排序代价为：</p>
+<p><span
+class="math display">2 × 2 × 1000 + 2 × 2 × 500 = 6000</span></p>
+<p>merge 阶段：</p>
+<p><span class="math display">1000 + 500 = 1500</span></p>
+<p>总代价为 7500。</p>
+<p>如果排序的最后一次 merge 可以和 Join 的 merge 合并，还能进一步减少
+I/O。</p>
+<p>用小数据举例，先分别按 <code>sid</code> 排序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Reserves 按 sid 排序：</span><br><span class="line">(22,101), (22,103), (31,102), (44,104), (58,105)</span><br><span class="line"></span><br><span class="line">Sailors 按 sid 排序：</span><br><span class="line">(22,Dustin), (31,Lubber), (58,Rusty)</span><br></pre></td></tr></table></figure>
+<p>然后用两个指针从前往后扫描：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">R 指向 sid=22，S 指向 sid=22:</span><br><span class="line">  相等。R 中 sid=22 的分组是 (22,101), (22,103)</span><br><span class="line">  S 中 sid=22 的分组是 (22,Dustin)</span><br><span class="line">  输出 (22,Dustin,101), (22,Dustin,103)</span><br><span class="line"></span><br><span class="line">R 指向 sid=31，S 指向 sid=31:</span><br><span class="line">  相等，输出 (31,Lubber,102)</span><br><span class="line"></span><br><span class="line">R 指向 sid=44，S 指向 sid=58:</span><br><span class="line">  44 &lt; 58，移动 R 指针，跳过 (44,104)</span><br><span class="line"></span><br><span class="line">R 指向 sid=58，S 指向 sid=58:</span><br><span class="line">  相等，输出 (58,Rusty,105)</span><br></pre></td></tr></table></figure>
+<p>Sort-Merge Join
+的关键是：两个输入已经按连接属性排序后，不需要反复回头扫描；指针整体向前移动即可。若某个
+<code>sid</code> 在两边都有多个元组，则需要对这两个相同 <code>sid</code>
+的分组做局部匹配。</p>
+<h3 id="hash-join">2.6.5 Hash Join</h3>
+<p>Hash Join 分为两个阶段：</p>
+<ol type="1">
+<li><strong>Partitioning 阶段</strong>：对两个关系的连接属性使用同一个
+Hash 函数分区。能连接的元组必定落在同编号分区。</li>
+<li><strong>Probing
+阶段</strong>：逐个处理对应分区。通常把较小分区装入内存建 Hash
+表，再扫描另一个分区并探测匹配。</li>
+</ol>
+<p>若分区能放入内存，代价为：</p>
+<p><span
+class="math display">2(<em>M</em> + <em>N</em>) + (<em>M</em> + <em>N</em>) = 3(<em>M</em> + <em>N</em>)</span></p>
+<p>对 <span
+class="math inline"><em>M</em> = 1000, <em>N</em> = 500</span>：</p>
+<p><span class="math display">3(1000 + 500) = 4500</span></p>
+<p>如果某个分区太大，需再次分区。若缓冲区足够大，可以使用 <strong>Hybrid
+Hash
+Join</strong>：分区时保留一个分区在内存中，读另一个关系时直接完成该分区的
+probing，从而减少一部分写出和读回。</p>
+<p>用小数据举例，设 Hash 函数为：</p>
+<p><span
+class="math display"><em>h</em>(<em>s</em><em>i</em><em>d</em>) = <em>s</em><em>i</em><em>d</em> mod  3</span></p>
+<p>先进行 Partitioning 阶段。对 <code>Reserves</code> 分区：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(22,101) -&gt; 22 mod 3 = 1 -&gt; R1</span><br><span class="line">(31,102) -&gt; 31 mod 3 = 1 -&gt; R1</span><br><span class="line">(22,103) -&gt; 22 mod 3 = 1 -&gt; R1</span><br><span class="line">(44,104) -&gt; 44 mod 3 = 2 -&gt; R2</span><br><span class="line">(58,105) -&gt; 58 mod 3 = 1 -&gt; R1</span><br></pre></td></tr></table></figure>
+<p>对 <code>Sailors</code> 分区：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">(22,Dustin) -&gt; 22 mod 3 = 1 -&gt; S1</span><br><span class="line">(31,Lubber) -&gt; 31 mod 3 = 1 -&gt; S1</span><br><span class="line">(58,Rusty)  -&gt; 58 mod 3 = 1 -&gt; S1</span><br></pre></td></tr></table></figure>
+<p>得到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">R1: (22,101), (31,102), (22,103), (58,105)</span><br><span class="line">R2: (44,104)</span><br><span class="line"></span><br><span class="line">S1: (22,Dustin), (31,Lubber), (58,Rusty)</span><br></pre></td></tr></table></figure>
+<p>Probing 阶段只需要比较同编号分区。比如处理 <code>R1</code> 和
+<code>S1</code> 时，先把较小的 <code>S1</code> 放入内存 Hash 表：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">内存 Hash 表：</span><br><span class="line">22 -&gt; (22,Dustin)</span><br><span class="line">31 -&gt; (31,Lubber)</span><br><span class="line">58 -&gt; (58,Rusty)</span><br></pre></td></tr></table></figure>
+<p>然后扫描 <code>R1</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">R=(22,101) -&gt; 查 22 -&gt; 输出 (22,Dustin,101)</span><br><span class="line">R=(31,102) -&gt; 查 31 -&gt; 输出 (31,Lubber,102)</span><br><span class="line">R=(22,103) -&gt; 查 22 -&gt; 输出 (22,Dustin,103)</span><br><span class="line">R=(58,105) -&gt; 查 58 -&gt; 输出 (58,Rusty,105)</span><br></pre></td></tr></table></figure>
+<p><code>R2</code> 中的 <code>(44,104)</code> 只会和 <code>S2</code>
+比较；由于 <code>S2</code> 为空，所以没有输出。Hash Join
+的关键是：<strong>能连接的元组一定会落到同一个分区</strong>，因此不同分区之间不需要互相比较。</p>
+<h3 id="join-算法比较">2.6.6 Join 算法比较</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Join 算法</th>
+<th style="text-align: left;">适用条件</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">风险或局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">简单嵌套循环</td>
+<td style="text-align: left;">无索引、实现简单</td>
+<td style="text-align: left;">通用</td>
+<td style="text-align: left;">代价极高</td>
+</tr>
+<tr>
+<td style="text-align: left;">块嵌套循环</td>
+<td style="text-align: left;">有一定缓冲区</td>
+<td style="text-align: left;">比简单嵌套循环大幅减少 inner 扫描次数</td>
+<td style="text-align: left;">内存不足时仍要多次扫 inner</td>
+</tr>
+<tr>
+<td style="text-align: left;">索引嵌套循环</td>
+<td style="text-align: left;">inner 连接属性有索引</td>
+<td style="text-align: left;">outer 很小或索引选择性高时很好</td>
+<td style="text-align: left;">非聚集索引可能随机 I/O 很高</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sort-Merge Join</td>
+<td style="text-align: left;">等值连接、输入已排序、结果需有序</td>
+<td style="text-align: left;">对数据倾斜较稳健，输出有序</td>
+<td style="text-align: left;">排序代价高</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hash Join</td>
+<td style="text-align: left;">等值连接、分布较均匀、内存足够</td>
+<td style="text-align: left;">通常 I/O 代价低</td>
+<td style="text-align: left;">不适合非等值连接；数据倾斜会影响分区</td>
+</tr>
+</tbody>
+</table>
+<p>对于条件如 <span
+class="math inline"><em>R</em>.<em>r</em><em>n</em><em>a</em><em>m</em><em>e</em> &lt; <em>S</em>.<em>s</em><em>n</em><em>a</em><em>m</em><em>e</em></span>
+的非等值连接，Hash Join 和普通 Sort-Merge Join
+不适用，索引嵌套循环可能更合适。</p>
+<p>用一个选择算法的例子来总结。假设查询仍是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> R.sid, S.sname, R.bid</span><br><span class="line"><span class="keyword">FROM</span> Reserves R, Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> R.sid <span class="operator">=</span> S.sid;</span><br></pre></td></tr></table></figure>
+<p>如果 <code>Sailors.sid</code> 上有 Hash 索引，且
+<code>Reserves</code> 经过选择后只剩很少几条记录，那么
+<strong>索引嵌套循环 Join</strong> 很合适，因为每条
+<code>Reserves</code> 记录只需查一次索引。</p>
+<p>如果两个表都很大、没有可用索引、连接条件是等值连接，并且内存足够让分区较好地放入缓冲区，那么
+<strong>Hash Join</strong>
+往往更合适，因为它通常只需要固定几遍扫描。</p>
+<p>如果两个输入本来已经按 <code>sid</code> 排序，或者后续还需要按
+<code>sid</code> 有序输出，那么 <strong>Sort-Merge Join</strong>
+很有吸引力，因为它可以利用已有顺序，并产生有序结果。</p>
+<p>如果没有索引、内存也比较小，但还能一次放入若干页 outer 关系，那么
+<strong>块嵌套循环 Join</strong> 通常比简单嵌套循环更好，因为它减少了
+inner 表的重复扫描次数。</p>
+<h2 id="集合操作与聚集操作">2.7 集合操作与聚集操作</h2>
+<p>集合操作包括：</p>
+<p><span
+class="math display"><em>R</em> ∪ <em>S</em>,  <em>R</em> ∩ <em>S</em>,  <em>R</em> × <em>S</em>,  <em>R</em> − <em>S</em></span></p>
+<p>其中交集和笛卡尔积可视为特殊
+Join；并集和差集的关键是识别两个关系中相同元组，常用排序或 Hash
+方法实现。</p>
+<p>SQL-92 中常见聚集包括
+<code>AVG</code>、<code>MIN</code>、<code>MAX</code>、<code>SUM</code>、<code>COUNT</code>。普通聚集通常扫描全表并维护少量状态：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">聚集</th>
+<th style="text-align: left;">需要维护的信息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>SUM</code></td>
+<td style="text-align: left;">当前总和</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>AVG</code></td>
+<td style="text-align: left;">当前总和与计数</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>COUNT</code></td>
+<td style="text-align: left;">计数</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>MIN</code></td>
+<td style="text-align: left;">当前最小值</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>MAX</code></td>
+<td style="text-align: left;">当前最大值</td>
+</tr>
+</tbody>
+</table>
+<p><code>GROUP BY</code> 需要先按分组属性聚类，可用：</p>
+<ul>
+<li>排序方法：按 group-by 属性排序后逐组聚集。</li>
+<li>Hash 方法：按 group-by 属性哈希分区并维护组状态。</li>
+<li>索引方法：如果 group-by
+属性上有索引，或所需属性都在索引中，可直接利用索引顺序或覆盖索引。</li>
+</ul>
+<h2 id="缓冲区对查询执行的影响">2.8 缓冲区对查询执行的影响</h2>
+<p>缓冲区大小对算法选择影响非常大。典型影响包括：</p>
+<ul>
+<li>外排序中，<span class="math inline"><em>B</em></span> 越大，pass
+数越少。</li>
+<li>块嵌套循环中，<span class="math inline"><em>B</em></span>
+越大，outer block 越大，inner 扫描次数越少。</li>
+<li>Hash Join 中，<span class="math inline"><em>B</em></span>
+决定分区是否能放入内存。</li>
+<li>非聚集索引访问数据页时，如果缓冲区太小且访问顺序混乱，会造成重复读页。</li>
+</ul>
+<p>缓冲区替换策略也会影响执行。例如简单 nested loop join 中，如果 inner
+关系不能全放入缓冲区，LRU 可能导致大量无效换入换出；某些访问模式下 MRU
+反而更合适。对于 index nested loop join，如果 inner 索引非聚集，可以先按
+outer 产生的 page id 排序，减少 inner 数据页重复读取。</p>
+<h1 id="查询优化简介">3 查询优化简介</h1>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606133837689.png" style="zoom: 50%;" /></p>
+<h2 id="查询优化器的任务">3.1 查询优化器的任务</h2>
+<p>同一个 SQL 查询可以有多种等价执行方式。查询优化器的任务是：</p>
+<ol type="1">
+<li>根据 SQL 生成关系代数表达式。</li>
+<li>枚举可能的访问计划。</li>
+<li>估算每个计划的执行代价。</li>
+<li>选择代价最低或足够好的计划。</li>
+</ol>
+<p>一个访问计划不仅描述关系代数树，还要在每个节点上标明：</p>
+<ul>
+<li>关系访问方法，如 file scan、B+ 树索引、Hash 索引。</li>
+<li>操作执行算法，如 block nested loop join、sort-merge join、hash
+join。</li>
+<li>是否流水线执行（pipelined / on-the-fly）或物化中间结果。</li>
+</ul>
+<h2 id="流水线执行与物化">3.2 流水线执行与物化</h2>
+<p>如果一个操作的结果直接传给下一个操作，不生成临时表，称为
+<strong>流水线执行（pipelined evaluation /
+on-the-fly）</strong>。例如连续选择、选择后投影、某些连续连接都可以流水线。</p>
+<p>如果一个操作先把结果写成中间表，再由父操作读取，称为
+<strong>物化（materialization）</strong>。物化会增加写出和读回中间结果的
+I/O，但有时是必要的，例如排序、Hash 分区或某些阻塞算子。</p>
+<p>执行器通常提供迭代器接口：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">接口</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>Open</code></td>
+<td style="text-align: left;">初始化算子并分配缓冲区</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Get_next</code></td>
+<td style="text-align: left;">产生下一个结果元组</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Close</code></td>
+<td style="text-align: left;">释放资源</td>
+</tr>
+</tbody>
+</table>
+<p>这个接口天然支持流水线：父算子调用子算子的
+<code>Get_next</code>，逐步拉取结果。</p>
+<h3 id="流水线执行的例子">3.2.1 流水线执行的例子</h3>
+<p>举一个流水线执行的例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sname</span><br><span class="line"><span class="keyword">FROM</span> Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> S.rating <span class="operator">&gt;</span> <span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+<p>对应的逻辑操作是：</p>
+<p><span
+class="math display"><em>π</em><sub><em>s</em><em>n</em><em>a</em><em>m</em><em>e</em></sub>(<em>σ</em><sub><em>r</em><em>a</em><em>t</em><em>i</em><em>n</em><em>g</em> &gt; 5</sub>(<em>S</em><em>a</em><em>i</em><em>l</em><em>o</em><em>r</em><em>s</em>))</span></p>
+<p>如果采用流水线方式，执行过程可以是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">File Scan 读出一条 Sailors 元组</span><br><span class="line">  -&gt; Selection 立刻判断 rating &gt; 5</span><br><span class="line">    -&gt; 如果满足，Projection 立刻取出 sname</span><br><span class="line">      -&gt; 返回给用户或上层算子</span><br></pre></td></tr></table></figure>
+<p>例如 <code>Sailors</code> 表为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">sname</th>
+<th style="text-align: left;">rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">Dustin</td>
+<td style="text-align: left;">7</td>
+</tr>
+<tr>
+<td style="text-align: left;">31</td>
+<td style="text-align: left;">Lubber</td>
+<td style="text-align: left;">4</td>
+</tr>
+<tr>
+<td style="text-align: left;">58</td>
+<td style="text-align: left;">Rusty</td>
+<td style="text-align: left;">10</td>
+</tr>
+</tbody>
+</table>
+<p>流水线执行时：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">读 (22,Dustin,7)  -&gt; rating&gt;5 成立 -&gt; 立刻输出 Dustin</span><br><span class="line">读 (31,Lubber,4)  -&gt; rating&gt;5 不成立 -&gt; 丢弃</span><br><span class="line">读 (58,Rusty,10)  -&gt; rating&gt;5 成立 -&gt; 立刻输出 Rusty</span><br></pre></td></tr></table></figure>
+<p>这里不会先把所有满足 <code>rating&gt;5</code>
+的元组写成临时表，再做投影；每条元组被读出后就沿着算子链向上流动。</p>
+<h3 id="物化的例子">3.2.2 物化的例子</h3>
+<p>再举一个物化的例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.rating, <span class="built_in">COUNT</span>(<span class="operator">*</span>)</span><br><span class="line"><span class="keyword">FROM</span> Sailors S</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> S.rating;</span><br></pre></td></tr></table></figure>
+<p>如果采用基于排序的 <code>GROUP BY</code>，执行过程通常需要先把输入按
+<code>rating</code> 排好序。排序是一个 <strong>阻塞操作（blocking
+operator）</strong>：它必须先看到足够多甚至全部输入，才能产生正确的有序输出。</p>
+<p>假设 <code>Sailors</code> 表为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">sname</th>
+<th style="text-align: left;">rating</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">Dustin</td>
+<td style="text-align: left;">7</td>
+</tr>
+<tr>
+<td style="text-align: left;">31</td>
+<td style="text-align: left;">Lubber</td>
+<td style="text-align: left;">4</td>
+</tr>
+<tr>
+<td style="text-align: left;">58</td>
+<td style="text-align: left;">Rusty</td>
+<td style="text-align: left;">7</td>
+</tr>
+<tr>
+<td style="text-align: left;">44</td>
+<td style="text-align: left;">Guppy</td>
+<td style="text-align: left;">4</td>
+</tr>
+</tbody>
+</table>
+<p>基于排序的物化过程可以是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">第一步：扫描 Sailors，取出 group-by 需要的 rating</span><br><span class="line">中间结果：[7, 4, 7, 4]</span><br><span class="line"></span><br><span class="line">第二步：把中间结果排序并写成临时结果</span><br><span class="line">临时结果：[4, 4, 7, 7]</span><br><span class="line"></span><br><span class="line">第三步：扫描临时结果，按相邻相同 rating 聚集</span><br><span class="line">rating=4 -&gt; count=2</span><br><span class="line">rating=7 -&gt; count=2</span><br></pre></td></tr></table></figure>
+<p>这里排序结果需要先形成一个中间状态，父算子不能在读到第一条元组时就立刻知道每个
+<code>rating</code> 的最终
+<code>COUNT(*)</code>。因此这种执行方式就是物化，或者至少包含一个必须暂存大量中间结果的阻塞阶段。</p>
+<h2 id="system-r-优化器">3.3 System R 优化器</h2>
+<p>System R 是第一个关系数据库管理系统，其优化器对后来的 DBMS
+影响很大。这里总结其特点：</p>
+<ul>
+<li>使用系统统计信息估计访问计划代价。</li>
+<li>主要考虑二元 Join，并用启发式方法减少候选计划数量。</li>
+<li>不优化嵌套查询。</li>
+<li>投影通常不做重复元组删除。</li>
+<li>代价模型同时考虑 CPU 和 I/O，但课程例子主要关注 I/O。</li>
+</ul>
+<p>System R
+风格优化器的核心思想是：<strong>用统计信息估计中间结果大小，再用代价模型比较不同计划</strong>。</p>
+<h2 id="系统数据字典">3.4 系统数据字典</h2>
+<p>DBMS 的系统数据字典（system catalog /
+catalog）存储数据库对象及统计信息。优化器依赖这些信息估算代价。</p>
+<p>对关系，数据字典记录：</p>
+<ul>
+<li>关系名、属性名、属性类型。</li>
+<li>索引名、约束描述。</li>
+<li>元组数量、页数量。</li>
+</ul>
+<p>对索引，数据字典记录：</p>
+<ul>
+<li>索引名。</li>
+<li>索引结构类型。</li>
+<li>索引属性。</li>
+<li>是否聚集。</li>
+<li>不同键值数量、索引大小、高度、取值范围等。</li>
+</ul>
+<p>统计信息越准确，优化器越容易选择正确计划。</p>
+<p>举例来说，假设数据库里有两张表：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Sailors(sid, sname, rating, age)</span><br><span class="line">Reserves(sid, bid, <span class="keyword">day</span>, rname)</span><br></pre></td></tr></table></figure>
+<h3 id="描述关系的-catalog-表">3.4.1 描述关系的 catalog 表</h3>
+<p>系统数据字典中可能会有一张描述“关系”的 catalog 表，内容类似：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">relname</th>
+<th style="text-align: left;">tuple_count</th>
+<th style="text-align: left;">page_count</th>
+<th style="text-align: left;">record_size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Sailors</td>
+<td style="text-align: left;">40000</td>
+<td style="text-align: left;">500</td>
+<td style="text-align: left;">50 bytes</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reserves</td>
+<td style="text-align: left;">100000</td>
+<td style="text-align: left;">1000</td>
+<td style="text-align: left;">40 bytes</td>
+</tr>
+</tbody>
+</table>
+<p>优化器看到这些信息后，就知道 <code>Reserves</code> 比
+<code>Sailors</code> 更大。如果要做 block nested loop
+join，它会倾向于考虑把较小的 <code>Sailors</code> 放在 outer
+位置，因为这样 outer block 数量可能更少。</p>
+<h3 id="描述属性的-catalog-表">3.4.2 描述属性的 catalog 表</h3>
+<p>还可能有一张描述“属性”的 catalog 表：</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">relname</th>
+<th style="text-align: left;">attrname</th>
+<th style="text-align: left;">type</th>
+<th style="text-align: left;">length</th>
+<th style="text-align: left;">low_value</th>
+<th style="text-align: left;">high_value</th>
+<th style="text-align: left;">num_distinct</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Sailors</td>
+<td style="text-align: left;">sid</td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">60000</td>
+<td style="text-align: left;">40000</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sailors</td>
+<td style="text-align: left;">rating</td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reserves</td>
+<td style="text-align: left;">bid</td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">500</td>
+<td style="text-align: left;">500</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reserves</td>
+<td style="text-align: left;">sid</td>
+<td style="text-align: left;">integer</td>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">60000</td>
+<td style="text-align: left;">30000</td>
+</tr>
+</tbody>
+</table>
+<p>如果查询条件是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> S.rating <span class="operator">=</span> <span class="number">5</span></span><br></pre></td></tr></table></figure>
+<p>优化器可以用 <code>num_distinct=10</code> 粗略估计：</p>
+<p><span class="math display">$$
+RF(rating=5)=\frac{1}{10}
+$$</span></p>
+<p>也就是说，<code>Sailors</code> 的 40000 条记录中，大约有 4000
+条满足条件。如果查询条件是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> R.bid <span class="operator">=</span> <span class="number">100</span></span><br></pre></td></tr></table></figure>
+<p>优化器可以用 <code>num_distinct=500</code> 估计：</p>
+<p><span class="math display">$$
+RF(bid=100)=\frac{1}{500}
+$$</span></p>
+<p>所以 <code>Reserves</code> 的 100000 条记录中，大约有 200
+条满足条件。这个估计会影响优化器是否选择索引访问。</p>
+<h3 id="索引-catalog">3.4.3 索引 catalog</h3>
+<p>索引 catalog 可能类似：</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">index_name</th>
+<th style="text-align: left;">relname</th>
+<th style="text-align: left;">attrs</th>
+<th style="text-align: left;">index_type</th>
+<th style="text-align: left;">clustered</th>
+<th style="text-align: left;">height</th>
+<th style="text-align: left;">num_keys</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">idx_sailors_sid</td>
+<td style="text-align: left;">Sailors</td>
+<td style="text-align: left;">sid</td>
+<td style="text-align: left;">Hash</td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">40000</td>
+</tr>
+<tr>
+<td style="text-align: left;">idx_sailors_rating</td>
+<td style="text-align: left;">Sailors</td>
+<td style="text-align: left;">rating</td>
+<td style="text-align: left;">B+Tree</td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">idx_reserves_bid</td>
+<td style="text-align: left;">Reserves</td>
+<td style="text-align: left;">bid</td>
+<td style="text-align: left;">B+Tree</td>
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">500</td>
+</tr>
+<tr>
+<td style="text-align: left;">idx_reserves_sid</td>
+<td style="text-align: left;">Reserves</td>
+<td style="text-align: left;">sid</td>
+<td style="text-align: left;">Hash</td>
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">-</td>
+<td style="text-align: left;">30000</td>
+</tr>
+</tbody>
+</table>
+<p>例如查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> Reserves R</span><br><span class="line"><span class="keyword">WHERE</span> R.bid <span class="operator">=</span> <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+<p>优化器看到 <code>idx_reserves_bid</code> 是建在 <code>bid</code>
+上的聚集 B+ 树索引，并且 <code>bid=100</code> 预计只返回约 200
+条记录，就可能选择该索引，而不是扫描 1000 页的整个 <code>Reserves</code>
+表。</p>
+<p>再看 Join 查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> Reserves R, Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> R.sid <span class="operator">=</span> S.sid</span><br><span class="line">  <span class="keyword">AND</span> R.bid <span class="operator">=</span> <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+<p>优化器可能根据 catalog 做出如下判断：</p>
+<ol type="1">
+<li>先用 <code>idx_reserves_bid</code> 找到 <code>bid=100</code> 的少量
+<code>Reserves</code> 元组。</li>
+<li>对每条结果，用 <code>idx_sailors_sid</code> 到 <code>Sailors</code>
+中查对应水手。</li>
+<li>因为 <code>Sailors.sid</code> 是高选择性键值索引，所以 index nested
+loop join 可能很便宜。</li>
+</ol>
+<p>如果 catalog 统计信息过期，例如 <code>bid=100</code> 实际上有 50000
+条记录，但 catalog 仍估计只有 200 条，那么优化器就可能误选 index nested
+loop join，导致大量随机 I/O。这也是为什么实际 DBMS
+需要定期更新统计信息。</p>
+<h2 id="不同访问计划的代价差异">3.5 不同访问计划的代价差异</h2>
+<p>示例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sname</span><br><span class="line"><span class="keyword">FROM</span> Reserves R, Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> R.sid <span class="operator">=</span> S.sid</span><br><span class="line">  <span class="keyword">AND</span> R.bid <span class="operator">=</span> <span class="number">100</span></span><br><span class="line">  <span class="keyword">AND</span> S.rating <span class="operator">&gt;</span> <span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+<p>原始关系代数可写成：</p>
+<p><span
+class="math display"><em>π</em><sub><em>s</em><em>n</em><em>a</em><em>m</em><em>e</em></sub>(<em>σ</em><sub><em>b</em><em>i</em><em>d</em> = 100 ∧ <em>r</em><em>a</em><em>t</em><em>i</em><em>n</em><em>g</em> &gt; 5</sub>(<em>R</em><em>e</em><em>s</em><em>e</em><em>r</em><em>v</em><em>e</em><em>s</em>⋈<sub><em>s</em><em>i</em><em>d</em> = <em>s</em><em>i</em><em>d</em></sub><em>S</em><em>a</em><em>i</em><em>l</em><em>o</em><em>r</em><em>s</em>))</span></p>
+<p>如果直接对 <code>Reserves</code> 和 <code>Sailors</code>
+做简单嵌套循环连接，代价可能为：</p>
+<p><span class="math display">1000 + 1000 × 500 = 501000</span></p>
+<p>但若先下推选择，假设：</p>
+<ul>
+<li><code>Reserves</code> 选择结果为 10 页。</li>
+<li><code>Sailors</code> 选择结果为 250 页。</li>
+<li>缓冲区为 5 页。</li>
+</ul>
+<p>采用排序并 Sort-Merge Join：</p>
+<p><span
+class="math display">(1000 + 10 + 500 + 250) + (40 + 2000 + 260) = 4060</span></p>
+<p>采用 block nested loop join：</p>
+<p><span class="math display">10 + 4 × 250 = 1010</span></p>
+<p>总计：</p>
+<p><span
+class="math display">1000 + 10 + 500 + 250 + 1010 = 2770</span></p>
+<p>如果能利用索引和流水线执行，例如 <code>Reserves.bid</code> 上有聚集
+Hash 索引，<code>Sailors.sid</code> 上有 Hash
+索引，总代价可能降到约：</p>
+<p><span class="math display">10 + 1.2 × 1000 = 1210</span></p>
+<p>这个例子说明：<strong>选择下推、合适的 Join
+算法、索引利用和避免不必要物化，是查询优化的关键。</strong></p>
+<h1 id="一个典型的关系查询优化器">4 一个典型的关系查询优化器</h1>
+<h2 id="sql-查询块与关系代数转换">4.1 SQL 查询块与关系代数转换</h2>
+<p>查询优化器通常先把 SQL 分解为多个 <strong>查询块（query
+block）</strong>。一个查询块是不含嵌套的查询语句，具有唯一的
+<code>SELECT</code>、<code>FROM</code>、<code>WHERE</code>、<code>GROUP BY</code>、<code>HAVING</code>
+子句。</p>
+<p>例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sid, <span class="built_in">MIN</span>(R.day)</span><br><span class="line"><span class="keyword">FROM</span> Sailors S, Reserves R, Boats B</span><br><span class="line"><span class="keyword">WHERE</span> S.sid <span class="operator">=</span> R.sid</span><br><span class="line">  <span class="keyword">AND</span> R.bid <span class="operator">=</span> B.bid</span><br><span class="line">  <span class="keyword">AND</span> B.color <span class="operator">=</span> <span class="string">&#x27;red&#x27;</span></span><br><span class="line">  <span class="keyword">AND</span> S.rating <span class="operator">=</span> (<span class="keyword">SELECT</span> <span class="built_in">MAX</span>(S2.rating) <span class="keyword">FROM</span> Sailors S2)</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> S.sid</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="operator">&gt;</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>可拆成：</p>
+<ul>
+<li>嵌套块：<code>SELECT MAX(S2.rating) FROM Sailors S2</code></li>
+<li>外部块：主查询，其中 <code>S.rating</code> 与嵌套块结果比较。</li>
+</ul>
+<p>外部块可转换为带扩展操作的关系代数：</p>
+<p><span
+class="math display"><em>π</em><sub><em>S</em>.<em>s</em><em>i</em><em>d</em>, <em>M</em><em>I</em><em>N</em>(<em>R</em>.<em>d</em><em>a</em><em>y</em>)</sub>(<em>H</em><em>A</em><em>V</em><em>I</em><em>N</em><em>G</em><sub><em>C</em><em>O</em><em>U</em><em>N</em><em>T</em>(*) &gt; 2</sub>(<em>G</em><em>R</em><em>O</em><em>U</em><em>P</em><em>B</em><em>Y</em><sub><em>S</em>.<em>s</em><em>i</em><em>d</em></sub>(<em>σ</em><sub><em>S</em>.<em>s</em><em>i</em><em>d</em> = <em>R</em>.<em>s</em><em>i</em><em>d</em> ∧ <em>R</em>.<em>b</em><em>i</em><em>d</em> = <em>B</em>.<em>b</em><em>i</em><em>d</em> ∧ <em>B</em>.<em>c</em><em>o</em><em>l</em><em>o</em><em>r</em>=<sup>′</sup><em>r</em><em>e</em><em>d</em><sup>′</sup> ∧ <em>S</em>.<em>r</em><em>a</em><em>t</em><em>i</em><em>n</em><em>g</em> = <em>v</em><em>a</em><em>l</em><em>u</em><em>e</em></sub>(<em>S</em><em>a</em><em>i</em><em>l</em><em>o</em><em>r</em><em>s</em> × <em>R</em><em>e</em><em>s</em><em>e</em><em>r</em><em>v</em><em>e</em><em>s</em> × <em>B</em><em>o</em><em>a</em><em>t</em><em>s</em>))))</span></p>
+<h2 id="访问计划代价估算">4.2 访问计划代价估算</h2>
+<p>估算一个访问计划时要考虑：</p>
+<ul>
+<li>每个操作本身的执行代价。</li>
+<li>子结果是流水线输入还是临时表输入。</li>
+<li>每个操作输出多少页、多少元组。</li>
+<li>输出是否已有序，能否帮助父节点执行
+<code>GROUP BY</code>、<code>ORDER BY</code> 或 Sort-Merge Join。</li>
+</ul>
+<p>结果大小由两个因素决定：</p>
+<ol type="1">
+<li>返回属性的长度。</li>
+<li><code>WHERE</code> 条件带来的 <strong>Reduction
+Factor（缩减因子）</strong>。</li>
+</ol>
+<p><strong>缩减因子</strong>
+可以理解成：一个查询条件会把原表“缩小到原来的多少比例”。如果一个表有
+10000 条记录，某个条件的缩减因子是 <span
+class="math inline">0.1</span>，那优化器就估计结果大约有 <span
+class="math inline">1000</span> 条记录。</p>
+<p>比如有一个查询条件是 <code>WHERE rating = 5</code>。如果 rating
+一共有 10
+种可能取值，并且假设分布均匀，那么大约只有十分之一的记录满足条件，因此
+<span class="math inline">$RF(rating=5)=\frac{1}{10}$</span>。</p>
+<h3 id="reduction-factor">4.2.1 Reduction Factor</h3>
+<p>这里给出 System R 风格估计：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">条件</th>
+<th style="text-align: left;">Reduction Factor</th>
+<th style="text-align: left;">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>Column = value</code> 且有索引</td>
+<td style="text-align: left;"><span
+class="math inline">1/<em>N</em><em>K</em><em>e</em><em>y</em><em>s</em>(<em>I</em>)</span></td>
+<td
+style="text-align: left;">用索引统计信息中的不同键值数估计命中比例。例如
+<code>rating</code> 有 10 个不同取值，则 <code>rating=5</code> 约留下
+<span class="math inline">1/10</span> 的记录。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Column = value</code> 且无索引</td>
+<td style="text-align: left;">估计为 <span
+class="math inline">1/10</span></td>
+<td style="text-align: left;">没有索引或更细统计信息时，System R
+使用经验值粗略估计。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Column1 = Column2</code>
+且两列有索引</td>
+<td style="text-align: left;"><span
+class="math inline">1/max (<em>N</em><em>K</em><em>e</em><em>y</em><em>s</em>(<em>I</em><sub>1</sub>), <em>N</em><em>K</em><em>e</em><em>y</em><em>s</em>(<em>I</em><sub>2</sub>))</span></td>
+<td style="text-align: left;">常用于等值 Join，如
+<code>R.sid=S.sid</code>。若 <code>R.sid</code> 有 30000
+个不同值、<code>S.sid</code> 有 40000 个不同值，则 RF 约为 <span
+class="math inline">1/40000</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Column1 = Column2</code>
+且无索引</td>
+<td style="text-align: left;">估计为 <span
+class="math inline">1/10</span></td>
+<td
+style="text-align: left;">缺少索引统计信息时的经验估计，实际系统通常会尽量依赖
+catalog 统计、直方图或采样提高精度。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Column &gt; value</code></td>
+<td style="text-align: left;"><span
+class="math inline">(<em>H</em><em>i</em><em>g</em><em>h</em>(<em>I</em>) − <em>v</em><em>a</em><em>l</em><em>u</em><em>e</em>)/(<em>H</em><em>i</em><em>g</em><em>h</em>(<em>I</em>) − <em>L</em><em>o</em><em>w</em>(<em>I</em>))</span></td>
+<td style="text-align: left;">用属性取值范围估计范围谓词比例。例如
+<code>age</code> 范围为 0 到 100，<code>age&gt;60</code> 的 RF 约为
+<span class="math inline">(100 − 60)/(100 − 0) = 0.4</span>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>Column IN (value list)</code></td>
+<td style="text-align: left;"><code>Column=value</code>
+的缩减因子乘以列表长度</td>
+<td style="text-align: left;">可近似看作多个等值条件的并集。例如
+<code>rating IN (3,5,7)</code>，若 <code>rating</code> 有 10
+个不同取值，则 RF 约为 <span
+class="math inline">3 × 1/10 = 3/10</span>。</td>
+</tr>
+</tbody>
+</table>
+<h3 id="直方图估计">4.2.2 直方图估计</h3>
+<p>为提高估计精度，DBMS 常使用
+<strong>直方图（histogram）</strong>。直方图把属性取值范围分成若干桶，记录每个桶中的元组数量，并假设桶内均匀分布。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">直方图类型</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">等宽直方图</td>
+<td style="text-align: left;">每个桶覆盖相同取值范围</td>
+<td style="text-align: left;">简单，但对倾斜分布不敏感</td>
+</tr>
+<tr>
+<td style="text-align: left;">等深直方图</td>
+<td style="text-align: left;">每个桶包含相近数量的元组</td>
+<td style="text-align: left;">对倾斜分布描述更准确</td>
+</tr>
+</tbody>
+</table>
+<p>举一个具体例子。假设 <code>Sailors.rating</code> 的取值范围是 1 到
+10，但数据分布并不均匀：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">rating</th>
+<th style="text-align: left;">1</th>
+<th style="text-align: left;">2</th>
+<th style="text-align: left;">3</th>
+<th style="text-align: left;">4</th>
+<th style="text-align: left;">5</th>
+<th style="text-align: left;">6</th>
+<th style="text-align: left;">7</th>
+<th style="text-align: left;">8</th>
+<th style="text-align: left;">9</th>
+<th style="text-align: left;">10</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">元组数</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">30</td>
+<td style="text-align: left;">25</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">1</td>
+</tr>
+</tbody>
+</table>
+<p>总元组数为 100。现在要估计：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> rating <span class="operator">&gt;</span> <span class="number">6</span></span><br></pre></td></tr></table></figure>
+<p>真实结果是 <code>rating=7,8,9,10</code> 的元组数之和：</p>
+<p><span class="math display">15 + 6 + 3 + 1 = 25</span></p>
+<p>所以真实选择率为：</p>
+<p><span class="math display">25/100 = 0.25</span></p>
+<p>如果使用 <strong>等宽直方图</strong>，可以把 1 到 10 分成 5
+个桶，每个桶覆盖 2 个取值：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">桶</th>
+<th style="text-align: left;">覆盖范围</th>
+<th style="text-align: left;">桶内元组数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">bucket1</td>
+<td style="text-align: left;">1-2</td>
+<td style="text-align: left;"><span
+class="math inline">2 + 3 = 5</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">bucket2</td>
+<td style="text-align: left;">3-4</td>
+<td style="text-align: left;"><span
+class="math inline">5 + 10 = 15</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">bucket3</td>
+<td style="text-align: left;">5-6</td>
+<td style="text-align: left;"><span
+class="math inline">30 + 25 = 55</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">bucket4</td>
+<td style="text-align: left;">7-8</td>
+<td style="text-align: left;"><span
+class="math inline">15 + 6 = 21</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">bucket5</td>
+<td style="text-align: left;">9-10</td>
+<td style="text-align: left;"><span
+class="math inline">3 + 1 = 4</span></td>
+</tr>
+</tbody>
+</table>
+<p>估计 <code>rating &gt; 6</code> 时，查询范围刚好覆盖 bucket4 和
+bucket5，因此估计结果为：</p>
+<p><span class="math display">21 + 4 = 25</span></p>
+<p>这次估计正好等于真实值。但如果查询是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> rating <span class="operator">&gt;</span> <span class="number">5</span></span><br></pre></td></tr></table></figure>
+<p>它会切到 bucket3 的内部。等宽直方图通常假设桶内均匀分布，因此 bucket3
+覆盖 5 和 6，总数为 55，估计其中一半属于 <code>rating=6</code>：</p>
+<p><span class="math display">55/2 = 27.5</span></p>
+<p>再加上 bucket4 和 bucket5：</p>
+<p><span class="math display">27.5 + 21 + 4 = 52.5</span></p>
+<p>而真实结果是：</p>
+<p><span class="math display">25 + 15 + 6 + 3 + 1 = 50</span></p>
+<p>误差来自桶内“均匀分布”的假设。若某个桶内部数据倾斜更严重，误差会更大。</p>
+<p>如果使用
+<strong>等深直方图</strong>，目标是让每个桶包含相近数量的元组，而不是覆盖相同取值范围。对于上面的数据，可以粗略分成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">桶</th>
+<th style="text-align: left;">覆盖取值</th>
+<th style="text-align: left;">桶内元组数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">bucket1</td>
+<td style="text-align: left;">1,2,3,4</td>
+<td style="text-align: left;"><span
+class="math inline">2 + 3 + 5 + 10 = 20</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">bucket2</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">30</td>
+</tr>
+<tr>
+<td style="text-align: left;">bucket3</td>
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">25</td>
+</tr>
+<tr>
+<td style="text-align: left;">bucket4</td>
+<td style="text-align: left;">7,8,9,10</td>
+<td style="text-align: left;"><span
+class="math inline">15 + 6 + 3 + 1 = 25</span></td>
+</tr>
+</tbody>
+</table>
+<p>等深直方图会把高频值 <code>rating=5</code> 和 <code>rating=6</code>
+单独放入桶中，因此能更清楚地描述数据倾斜。估计
+<code>rating &gt; 6</code> 时，直接取 bucket4：</p>
+<p><span class="math display">25</span></p>
+<p>估计 <code>rating &gt; 5</code> 时，直接取 bucket3 和 bucket4：</p>
+<p><span class="math display">25 + 25 = 50</span></p>
+<p>这个例子说明：<strong>直方图不是只记录最小值和最大值，而是记录每个取值区间里大约有多少数据</strong>。等宽直方图实现简单，但如果热点值集中在某个桶内，估计可能不准；等深直方图更能反映倾斜分布，因此很多实际
+DBMS 会使用等深或类似变体。</p>
+<p>实际系统中，Oracle、DB2、Informix、Sybase、SQL Server
+都使用不同形式的直方图，并对高频值、重复值或特殊分布做额外处理。</p>
+<h2 id="关系代数等价变换">4.3 关系代数等价变换</h2>
+<p>查询优化依赖关系代数表达式的等价变换。两个表达式等价，当且仅当它们对任意数据库实例产生相同结果。</p>
+<h3 id="选择与投影">4.3.1 选择与投影</h3>
+<p>层叠选择：</p>
+<p><span
+class="math display"><em>σ</em><sub><em>c</em><sub>1</sub> ∧ <em>c</em><sub>2</sub> ∧ ⋯ ∧ <em>c</em><sub><em>n</em></sub></sub>(<em>R</em>) ≡ <em>σ</em><sub><em>c</em><sub>1</sub></sub>(<em>σ</em><sub><em>c</em><sub>2</sub></sub>(⋯(<em>σ</em><sub><em>c</em><sub><em>n</em></sub></sub>(<em>R</em>))⋯))</span></p>
+<p>选择交换：</p>
+<p><span
+class="math display"><em>σ</em><sub><em>c</em><sub>2</sub></sub>(<em>σ</em><sub><em>c</em><sub>1</sub></sub>(<em>R</em>)) ≡ <em>σ</em><sub><em>c</em><sub>1</sub></sub>(<em>σ</em><sub><em>c</em><sub>2</sub></sub>(<em>R</em>))</span></p>
+<p>投影层叠：</p>
+<p><span
+class="math display"><em>π</em><sub><em>a</em><sub>1</sub></sub>(<em>R</em>) ≡ <em>π</em><sub><em>a</em><sub>1</sub></sub>(<em>π</em><sub><em>a</em><sub>2</sub></sub>(⋯(<em>π</em><sub><em>a</em><sub><em>n</em></sub></sub>(<em>R</em>))⋯))</span></p>
+<p>其中 <span
+class="math inline"><em>a</em><sub>1</sub> ⊆ <em>a</em><sub>2</sub> ⊆ ⋯ ⊆ <em>a</em><sub><em>n</em></sub></span>。</p>
+<h3 id="叉乘与连接">4.3.2 叉乘与连接</h3>
+<p>交换律：</p>
+<p><span
+class="math display"><em>R</em> × <em>S</em> ≡ <em>S</em> × <em>R</em></span></p>
+<p><span
+class="math display"><em>R</em> ⋈ <em>S</em> ≡ <em>S</em> ⋈ <em>R</em></span></p>
+<p>结合律：</p>
+<p><span
+class="math display"><em>R</em> × (<em>S</em> × <em>T</em>) ≡ (<em>R</em> × <em>S</em>) × <em>T</em></span></p>
+<p><span
+class="math display"><em>R</em> ⋈ (<em>S</em> ⋈ <em>T</em>) ≡ (<em>R</em> ⋈ <em>S</em>) ⋈ <em>T</em></span></p>
+<p>这些规则允许优化器改变 Join 顺序。</p>
+<h3 id="选择投影与连接的下推">4.3.3 选择、投影与连接的下推</h3>
+<p>选择与连接：</p>
+<p><span
+class="math display"><em>R</em>⋈<sub><em>c</em></sub><em>S</em> ≡ <em>σ</em><sub><em>c</em></sub>(<em>R</em> × <em>S</em>)</span></p>
+<p>如果条件 <span class="math inline"><em>c</em></span> 只涉及 <span
+class="math inline"><em>R</em></span> 的属性，则：</p>
+<p><span
+class="math display"><em>σ</em><sub><em>c</em></sub>(<em>R</em> × <em>S</em>) ≡ (<em>σ</em><sub><em>c</em></sub><em>R</em>) × <em>S</em></span></p>
+<p><span
+class="math display"><em>σ</em><sub><em>c</em></sub>(<em>R</em> ⋈ <em>S</em>) ≡ (<em>σ</em><sub><em>c</em></sub><em>R</em>) ⋈ <em>S</em></span></p>
+<p>这就是 <strong>选择下推（selection pushdown）</strong>
+的理论基础。它能提前缩小中间结果，是降低 Join 代价的主要手段。</p>
+<p>投影也可下推，但必须保留后续操作需要的属性，包括连接属性、分组属性、输出属性等。</p>
+<h2 id="单关系查询访问计划">4.4 单关系查询访问计划</h2>
+<p>单关系查询的优化重点是：</p>
+<ul>
+<li>是否使用索引。</li>
+<li>使用哪个索引。</li>
+<li>是否合并多个索引的 rid 集合。</li>
+<li>是否利用索引顺序支持 <code>GROUP BY</code> 或
+<code>ORDER BY</code>。</li>
+<li>是否能只通过覆盖索引完成查询。</li>
+</ul>
+<p>例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.rating, <span class="built_in">COUNT</span>(<span class="operator">*</span>)</span><br><span class="line"><span class="keyword">FROM</span> Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> S.rating <span class="operator">&gt;</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">AND</span> S.age <span class="operator">=</span> <span class="number">20</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> S.rating</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="keyword">DISTINCT</span> S.sname) <span class="operator">&gt;</span> <span class="number">2</span>;</span><br></pre></td></tr></table></figure>
+<p>如果不使用索引：</p>
+<ul>
+<li>扫描 <code>Sailors</code>：500 页。</li>
+<li>选择和投影后写出中间结果，材料估计为 20 页。</li>
+<li>对中间结果排序，代价约 <span
+class="math inline">3 × 20 = 60</span>。</li>
+<li>总代价约 <span class="math inline">500 + 20 + 60 = 580</span>。</li>
+</ul>
+<p>如果使用索引，可能的访问路径包括：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">访问路径</th>
+<th style="text-align: left;">思路</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">单索引</td>
+<td style="text-align: left;">选择过滤性最高的索引，再检查其他条件</td>
+</tr>
+<tr>
+<td style="text-align: left;">多索引</td>
+<td style="text-align: left;">分别用多个索引取
+rid，求交集后访问数据页</td>
+</tr>
+<tr>
+<td style="text-align: left;">排序索引</td>
+<td style="text-align: left;">若索引顺序匹配
+<code>GROUP BY</code>，可减少排序</td>
+</tr>
+<tr>
+<td style="text-align: left;">覆盖索引</td>
+<td
+style="text-align: left;">查询所需属性都在索引中，可避免访问数据表</td>
+</tr>
+</tbody>
+</table>
+<p>这四类访问路径的区别可以展开如下。</p>
+<h3 id="单索引访问路径">4.4.1 单索引访问路径</h3>
+<p><strong>单索引访问路径</strong>
+是指优化器只选择一个最有用的索引来缩小候选集合，然后再对候选元组检查剩余条件。</p>
+<p>仍以上面的查询为例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> S.rating <span class="operator">&gt;</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">AND</span> S.age <span class="operator">=</span> <span class="number">20</span></span><br></pre></td></tr></table></figure>
+<p>假设有两个索引：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">idx_rating: 建在 rating 上的 B+ 树索引</span><br><span class="line">idx_age:    建在 age 上的 Hash 索引</span><br></pre></td></tr></table></figure>
+<p>如果 catalog 估计：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rating &gt; 5  会留下约 50% 的 Sailors</span><br><span class="line">age = 20    会留下约 10% 的 Sailors</span><br></pre></td></tr></table></figure>
+<p>那么 <code>age=20</code> 的过滤性更强，优化器可能选择：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">用 idx_age 找出 age=20 的候选 rid</span><br><span class="line">  -&gt; 根据 rid 取出对应 Sailors 元组</span><br><span class="line">    -&gt; 再检查 rating &gt; 5</span><br><span class="line">      -&gt; 对结果执行 GROUP BY rating</span><br></pre></td></tr></table></figure>
+<p>这里虽然查询里有两个条件，但真正用来访问数据的只有一个索引。另一个条件作为
+residual predicate，在取出候选元组后再判断。</p>
+<h3 id="多索引访问路径">4.4.2 多索引访问路径</h3>
+<p><strong>多索引访问路径</strong> 是指优化器同时利用多个索引分别找候选
+rid，然后对 rid 集合求交集，再访问数据页。</p>
+<p>仍假设：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">idx_rating: rating 上的 B+ 树索引</span><br><span class="line">idx_age:    age 上的 Hash 索引</span><br></pre></td></tr></table></figure>
+<p>查询条件为：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> S.rating <span class="operator">&gt;</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">AND</span> S.age <span class="operator">=</span> <span class="number">20</span></span><br></pre></td></tr></table></figure>
+<p>执行思路可以是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">idx_rating 找到 rating&gt;5 的 rid 集合：</span><br><span class="line">R_rating = &#123;r1, r2, r3, r4, r5, r6&#125;</span><br><span class="line"></span><br><span class="line">idx_age 找到 age=20 的 rid 集合：</span><br><span class="line">R_age = &#123;r2, r4, r8&#125;</span><br><span class="line"></span><br><span class="line">求交集：</span><br><span class="line">R_rating ∩ R_age = &#123;r2, r4&#125;</span><br><span class="line"></span><br><span class="line">只访问 r2 和 r4 所在的数据页</span><br></pre></td></tr></table></figure>
+<p>这样做的好处是：如果两个条件单独看都不算特别强，但合起来很强，多索引交集可以大幅减少真正访问的数据页。实际系统中，rid
+集合可以用排序列表、位图、Hash 表、Bloom filter 等结构处理。</p>
+<p>但多索引也有额外代价：需要扫描多个索引，还要合并 rid
+集合。如果某个单索引已经足够过滤，额外使用另一个索引未必划算。</p>
+<h3 id="排序索引访问路径">4.4.3 排序索引访问路径</h3>
+<p><strong>排序索引访问路径</strong>
+强调的不只是“过滤”，而是利用索引本身的顺序。B+
+树索引中的键值天然有序，如果查询后续需要
+<code>GROUP BY</code>、<code>ORDER BY</code> 或 Sort-Merge
+Join，这个顺序可能很有价值。</p>
+<p>例如查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.rating, <span class="built_in">COUNT</span>(<span class="operator">*</span>)</span><br><span class="line"><span class="keyword">FROM</span> Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> S.rating <span class="operator">&gt;</span> <span class="number">5</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> S.rating;</span><br></pre></td></tr></table></figure>
+<p>如果 <code>rating</code> 上有 B+ 树索引，优化器可以沿着索引从
+<code>rating&gt;5</code> 的第一个位置开始顺序扫描：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">rating=6 的元组连续出现</span><br><span class="line">rating=7 的元组连续出现</span><br><span class="line">rating=8 的元组连续出现</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>这样输入天然按 <code>rating</code> 分组，后面的
+<code>GROUP BY rating</code> 可以边扫描边聚集：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">看到一批 rating=6 -&gt; 统计 count</span><br><span class="line">看到一批 rating=7 -&gt; 输出上一组，开始统计新组</span><br><span class="line">看到一批 rating=8 -&gt; 继续</span><br></pre></td></tr></table></figure>
+<p>因此排序索引的价值在于：它可能减少甚至避免额外排序。即使某个索引不是过滤性最强的索引，只要它能提供后续需要的
+interesting order，优化器也可能保留这个计划作为候选。</p>
+<h3 id="覆盖索引访问路径">4.4.4 覆盖索引访问路径</h3>
+<p><strong>覆盖索引（covering index）访问路径</strong>
+是指查询需要的所有属性都已经包含在某个索引中，因此可以只读索引，不访问原始数据表。</p>
+<p>例如查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.rating, S.sname</span><br><span class="line"><span class="keyword">FROM</span> Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> S.rating <span class="operator">&gt;</span> <span class="number">5</span></span><br><span class="line">  <span class="keyword">AND</span> S.age <span class="operator">=</span> <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>如果有一个复合 B+ 树索引：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">idx_rating_sname_age = &lt;rating, sname, age&gt;</span><br></pre></td></tr></table></figure>
+<p>那么查询中涉及的属性只有：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rating, sname, age</span><br></pre></td></tr></table></figure>
+<p>这些属性都在索引项里。优化器可以：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">沿 idx_rating_sname_age 找到 rating&gt;5 的索引项</span><br><span class="line">  -&gt; 在索引项中直接检查 age=20</span><br><span class="line">    -&gt; 从索引项中直接取出 rating 和 sname</span><br><span class="line">      -&gt; 返回结果</span><br></pre></td></tr></table></figure>
+<p>整个过程不需要根据 rid 回表访问 <code>Sailors</code>
+的数据页。覆盖索引尤其适合非聚集索引场景，因为非聚集索引回表可能产生大量随机
+I/O；如果能只读索引，就能避免这部分代价。</p>
+<p>不过覆盖索引也不是越多越好。索引越宽，维护成本越高，插入、删除、更新时需要同步维护更多索引页。因此实际系统会在查询性能和更新成本之间权衡。</p>
+<h2 id="多关系查询访问计划">4.5 多关系查询访问计划</h2>
+<p>多关系查询的主要难点是 <strong>Join
+顺序选择</strong>。关系越多，可能的 Join 树越多，搜索空间爆炸。</p>
+<p>Join 树常见两类：</p>
+<ul>
+<li><strong>Left-deep
+tree</strong>：每次把已有中间结果与一个基表连接。</li>
+<li><strong>Bushy tree</strong>：允许两个中间结果互相连接。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260606141456535.png" style="zoom:50%;" /></p>
+<blockquote>
+<p>左图是 Left-deep-tree，右图是 Bushy tree。图中的 <span
+class="math inline">∞</span> 应该是连接的意思。</p>
+</blockquote>
+<p>System R 和许多商业系统偏向 left-deep tree，原因是：</p>
+<ul>
+<li>候选计划数量较少。</li>
+<li>更容易使用流水线执行。</li>
+<li>中间结果物化代价较低。</li>
+</ul>
+<p>Left-deep 枚举过程：</p>
+<ol type="1">
+<li>第一遍：枚举每个单关系的最佳访问计划，考虑选择、投影、索引和输出顺序。</li>
+<li>第二遍：枚举两个关系的 Join 计划，把第一遍结果作为
+outer，另一个关系作为 inner，考虑不同 Join 算法。</li>
+<li>第三遍及以后：继续扩展到三个关系、四个关系，直到覆盖整个查询。</li>
+<li>如果有 <code>GROUP BY</code> 和
+<code>HAVING</code>，通常最后再考虑。</li>
+</ol>
+<p>优化器不会保留所有计划，而是保留“有希望”的计划，例如代价最低的计划，以及具有有用输出顺序（interesting
+order）的计划。</p>
+<h3 id="两表-join-的例子">4.5.1 两表 join 的例子</h3>
+<p>这里的例子 1 是一个两表 Join：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sname</span><br><span class="line"><span class="keyword">FROM</span> Reserves R, Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> R.sid <span class="operator">=</span> S.sid</span><br><span class="line">  <span class="keyword">AND</span> R.bid <span class="operator">=</span> <span class="number">100</span></span><br><span class="line">  <span class="keyword">AND</span> S.rating <span class="operator">&gt;</span> <span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+<p>对应的逻辑树可以理解为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">           π sname</span><br><span class="line">              |</span><br><span class="line">         Join R.sid=S.sid</span><br><span class="line">         /              \</span><br><span class="line">σ bid=100(R)      σ rating&gt;5(S)</span><br></pre></td></tr></table></figure>
+<p>假设索引情况如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Sailors:</span><br><span class="line">  rating 上有非聚集 B+ 树索引</span><br><span class="line">  sid 上有 Hash 索引</span><br><span class="line"></span><br><span class="line">Reserves:</span><br><span class="line">  bid 上有 B+ 树索引</span><br></pre></td></tr></table></figure>
+<p>Left-deep 枚举会分两遍做。</p>
+<p>第一遍先看单个关系的访问计划：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">对 Reserves:</span><br><span class="line">  查询条件是 R.bid=100</span><br><span class="line">  可以考虑使用 bid 上的 B+ 树索引</span><br><span class="line">  得到 σ bid=100(R)</span><br><span class="line"></span><br><span class="line">对 Sailors:</span><br><span class="line">  查询条件是 S.rating&gt;5</span><br><span class="line">  可以考虑使用 rating 上的 B+ 树索引</span><br><span class="line">  得到 σ rating&gt;5(S)</span><br></pre></td></tr></table></figure>
+<p>这一步只是在为每张基表挑访问路径，并记录每个访问路径的代价、输出大小、输出是否有序等性质。</p>
+<p>第二遍枚举两个关系的 Join 计划。优化器会考虑两个方向：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">方案 A:</span><br><span class="line">  outer = σ bid=100(Reserves)</span><br><span class="line">  inner = Sailors</span><br><span class="line"></span><br><span class="line">方案 B:</span><br><span class="line">  outer = σ rating&gt;5(Sailors)</span><br><span class="line">  inner = Reserves</span><br></pre></td></tr></table></figure>
+<p>对于方案 A，<code>Reserves</code> 经过 <code>bid=100</code>
+过滤后可能比较小。对每条外层 <code>Reserves</code>
+元组，都需要找满足：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S.sid = R.sid</span><br></pre></td></tr></table></figure>
+<p>的 <code>Sailors</code> 元组。由于 <code>Sailors.sid</code> 上有 Hash
+索引，优化器可能选择 <strong>index nested loop join</strong>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">用 Reserves.bid 的 B+ 树索引找到 bid=100 的 R 元组</span><br><span class="line">  -&gt; 对每条 R 元组，用 S.sid 的 Hash 索引查 Sailors</span><br><span class="line">    -&gt; 查到后再判断 S.rating&gt;5</span><br><span class="line">      -&gt; 输出 S.sname</span><br></pre></td></tr></table></figure>
+<p>这里有一个细节：虽然第一遍中 <code>Sailors.rating&gt;5</code> 可以用
+rating 上的 B+ 树索引，但当 <code>Sailors</code> 作为 inner
+且连接条件变成 <code>sid=value</code> 时，<code>Sailors.sid</code> 上的
+Hash 索引反而更有用。因此材料说“内关系要满足 <code>sid=value</code>，且
+<code>sid</code> 上有 Hash 索引，所以可以使用这种方法替代 B+ 树”。</p>
+<p>对于方案 B，优化器也会考虑把 <code>Sailors</code> 作为 outer：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">先用 Sailors.rating 的 B+ 树索引找 rating&gt;5 的 S 元组</span><br><span class="line">  -&gt; 再和 Reserves 按 sid 连接</span><br><span class="line">  -&gt; 同时还要满足 R.bid=100</span><br></pre></td></tr></table></figure>
+<p>如果 <code>Reserves.sid</code> 上没有合适索引，而
+<code>Reserves.bid</code> 上的索引更适合先做
+<code>bid=100</code>，那么方案 B
+未必便宜。优化器会比较这些候选方案的估计代价，最后保留代价最低的
+left-deep 计划。</p>
+<p>这个例子体现了 left-deep
+枚举的核心：<strong>先为单表选择访问路径，再把一个已有结果作为
+outer，不断接上一个基表作为 inner。inner 的访问方法要根据 Join
+条件重新考虑，不一定沿用第一遍单表查询时的访问路径。</strong></p>
+<h3 id="三表-join-的例子">4.5.2 三表 join 的例子</h3>
+<p>这里的例子 2 是一个三表 Join：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sid, <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="keyword">AS</span> numrs</span><br><span class="line"><span class="keyword">FROM</span> Sailors S, Reserves R, Boats B</span><br><span class="line"><span class="keyword">WHERE</span> S.sid <span class="operator">=</span> R.sid</span><br><span class="line">  <span class="keyword">AND</span> R.bid <span class="operator">=</span> B.bid</span><br><span class="line">  <span class="keyword">AND</span> B.color <span class="operator">=</span> <span class="string">&#x27;red&#x27;</span></span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> S.sid;</span><br></pre></td></tr></table></figure>
+<p>逻辑上可以看成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">            GROUP BY S.sid</span><br><span class="line">                   |</span><br><span class="line">            Join S.sid=R.sid</span><br><span class="line">            /              \</span><br><span class="line">    Join R.bid=B.bid      Sailors</span><br><span class="line">      /          \</span><br><span class="line">σ color=&#x27;red&#x27;(Boats)   Reserves</span><br></pre></td></tr></table></figure>
+<p>假设索引情况为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Boats:</span><br><span class="line">  color 上有 B+ 树索引或 Hash 索引</span><br><span class="line"></span><br><span class="line">Reserves:</span><br><span class="line">  bid 上有聚集 B+ 树索引</span><br><span class="line"></span><br><span class="line">Sailors:</span><br><span class="line">  sid 上有 B+ 树索引或 Hash 索引</span><br></pre></td></tr></table></figure>
+<p>Left-deep 枚举过程可以理解为：</p>
+<ol type="1">
+<li><p>第一遍枚举单表计划。</p>
+<p><code>Boats</code> 有选择条件 <code>B.color='red'</code>，所以可以用
+<code>color</code> 上的索引先缩小结果。<code>Sailors</code> 和
+<code>Reserves</code>
+本身没有单表选择条件，文件扫描可能就是合理选择。</p></li>
+<li><p>第二遍枚举两表 Join。</p>
+<p>优化器会考虑：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">σ color=&#x27;red&#x27;(Boats) Join Reserves</span><br><span class="line">Reserves Join Sailors</span><br><span class="line">Sailors Join Reserves</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>对每个组合，还要考虑谁做 outer、谁做 inner，以及使用 nested
+loop、index nested loop、sort-merge、hash join 等哪种 Join
+算法。</p></li>
+<li><p>第三遍把两表 Join 结果继续作为 outer，再接上剩下的一个基表。</p>
+<p>例如可能形成这样的 left-deep 计划：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((σ color=&#x27;red&#x27;(Boats) Join Reserves) Join Sailors)</span><br></pre></td></tr></table></figure>
+<p>也可能形成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">((Sailors Join Reserves) Join σ color=&#x27;red&#x27;(Boats))</span><br></pre></td></tr></table></figure>
+<p>优化器会根据中间结果大小、索引可用性、输出顺序和 Join
+算法代价选择更便宜的方案。</p></li>
+<li><p>最后再处理 <code>GROUP BY S.sid</code>。</p>
+<p>如果前面的计划输出已经按 <code>S.sid</code>
+有序，<code>GROUP BY</code> 可能受益；否则可能需要排序或 Hash
+聚集。</p></li>
+</ol>
+<p>这个三表例子说明：left-deep tree 不是随便固定一个 Join
+顺序，而是在每一轮动态保留较优的局部计划，然后逐步扩展到包含所有关系的完整计划。</p>
+<h2 id="嵌套子查询优化">4.6 嵌套子查询优化</h2>
+<p>嵌套子查询分为非相关和相关两类。</p>
+<h3 id="非相关嵌套子查询">4.6.1 非相关嵌套子查询</h3>
+<p>例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sname</span><br><span class="line"><span class="keyword">FROM</span> Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> S.rating <span class="operator">=</span> (<span class="keyword">SELECT</span> <span class="built_in">MAX</span>(S2.rating) <span class="keyword">FROM</span> Sailors S2);</span><br></pre></td></tr></table></figure>
+<p>子查询不依赖外层元组，只需执行一次。优化器可先执行子查询，把结果作为常量带入外层查询。</p>
+<p>另一个例子：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sname</span><br><span class="line"><span class="keyword">FROM</span> Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> S.sid <span class="operator">=</span> (</span><br><span class="line">  <span class="keyword">SELECT</span> R.sid</span><br><span class="line">  <span class="keyword">FROM</span> Reserves R</span><br><span class="line">  <span class="keyword">WHERE</span> R.bid <span class="operator">=</span> <span class="number">103</span></span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>也可先执行子查询，或把子查询结果作为临时表，与外层查询连接。</p>
+<h3 id="相关嵌套子查询">4.6.2 相关嵌套子查询</h3>
+<p>例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sname</span><br><span class="line"><span class="keyword">FROM</span> Sailors S</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> (</span><br><span class="line">  <span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> Reserves R</span><br><span class="line">  <span class="keyword">WHERE</span> R.bid <span class="operator">=</span> <span class="number">103</span></span><br><span class="line">    <span class="keyword">AND</span> S.sid <span class="operator">=</span> R.sid</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>子查询引用了外层的 <code>S.sid</code>，因此称为
+<strong>相关子查询（correlated
+subquery）</strong>。朴素执行会对外层每个元组执行一次子查询，代价很高。</p>
+<p>常见优化是把它转换成非嵌套 Join：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.sname</span><br><span class="line"><span class="keyword">FROM</span> Sailors S, Reserves R</span><br><span class="line"><span class="keyword">WHERE</span> S.sid <span class="operator">=</span> R.sid</span><br><span class="line">  <span class="keyword">AND</span> R.bid <span class="operator">=</span> <span class="number">103</span>;</span><br></pre></td></tr></table></figure>
+<p>这样就可以使用所有常规 Join 算法，而不是局限于 index nested
+loop。</p>
+<h2 id="其他查询优化方法">4.7 其他查询优化方法</h2>
+<p>当关系数量较多时，传统枚举空间太大，这里提到一些扩展方法：</p>
+<ul>
+<li>基于规则的方法：使用启发式规则快速改写查询。</li>
+<li>随机访问计划生成方法：在巨大搜索空间中随机或启发式搜索好计划。</li>
+<li>带参数的查询优化：考虑参数值变化导致的不同最佳计划。</li>
+<li>多查询优化：同时优化多个查询，复用公共子表达式或共享扫描。</li>
+</ul>
+<h1 id="proactive-query-re-optimization-补充">5 Proactive Query
+Re-optimization 补充</h1>
+<p>材料后半部分介绍 SIGMOD 2005 的 Proactive Query
+Re-optimization，核心关注传统优化器在统计信息不准确时如何避免选错计划。</p>
+<h2 id="传统优化的问题">5.1 传统优化的问题</h2>
+<p>传统优化流程是：</p>
+<ol type="1">
+<li>Parsing。</li>
+<li>Optimization。</li>
+<li>Code generation。</li>
+<li>Execution。</li>
+</ol>
+<p>优化器通常先枚举计划，用统计信息估计每个计划代价，然后选择估计代价最低的计划。这种
+<strong>plan-first-execute-next</strong> 方法强依赖统计估计准确性。</p>
+<p>问题在于：由于数据倾斜、属性相关性或过期统计信息，优化器可能严重低估或高估中间结果大小。例如示例中：</p>
+<ul>
+<li><span
+class="math inline">|<em>R</em>| = 500<em>M</em><em>B</em></span></li>
+<li><span
+class="math inline">|<em>S</em>| = 160<em>M</em><em>B</em></span></li>
+<li>实际 <span
+class="math inline">|<em>σ</em>(<em>R</em>)| = 300<em>M</em><em>B</em></span></li>
+<li>优化器误估为 <span
+class="math inline">150<em>M</em><em>B</em></span></li>
+<li>Buffer cache 为 <span
+class="math inline">200<em>M</em><em>B</em></span></li>
+</ul>
+<p>如果优化器以为 <span
+class="math inline"><em>σ</em>(<em>R</em>)</span>
+能放入内存，就可能选择依赖该假设的计划
+P1a；但实际大小超过预期后，另一个计划 P1b 才更优。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260607140213429.png" /></p>
+<h2 id="reactive-re-optimization">5.2 Reactive Re-optimization</h2>
+<p><strong>Reactive re-optimization</strong> 的思路是：</p>
+<ol type="1">
+<li>先用传统优化器选择计划。</li>
+<li>执行过程中用 check operator 监测是否偏离估计。</li>
+<li>如果发现计划明显次优，触发重新优化。</li>
+</ol>
+<p>它的问题包括：</p>
+<ul>
+<li>初始优化器可能选择高度依赖不确定统计信息的计划，导致很容易触发重优化。</li>
+<li>如果原计划是流水线执行，重优化时已经完成的部分工作可能丢失。</li>
+<li>执行中快速且准确收集统计信息并不容易。</li>
+<li>重优化后仍可能因为新统计不准再次选错，导致
+thrashing（激烈扭动，翻来覆去）。</li>
+</ul>
+<h2 id="proactive-re-optimization-的核心思想">5.3 Proactive
+Re-optimization 的核心思想</h2>
+<p>Proactive Re-optimization 不把统计信息看作单点估计，而用
+<strong>bounding box（边界盒 / 区间不确定性）</strong>
+表示估计不确定范围。</p>
+<p>它的目标不是只找单点估计下最优的计划，而是找：</p>
+<ul>
+<li>在整个不确定范围内都最优的计划。</li>
+<li>或者在整个范围内都接近最优的 robust plan。</li>
+<li>或者可以在执行中根据更准统计信息切换的 switchable plan。</li>
+</ul>
+<p>这样可以减少重优化次数，避免大量流水线工作被丢弃。</p>
+<h2 id="bounding-box-与不确定性">5.4 Bounding Box 与不确定性</h2>
+<p>传统优化器使用单点估计，例如认为某个选择结果大小就是 <span
+class="math inline">150<em>M</em><em>B</em></span>。Proactive
+方法使用区间，例如 <span
+class="math inline">[100<em>M</em><em>B</em>, 350<em>M</em><em>B</em>]</span>。随着执行过程中采样和统计更准确，区间会逐渐变窄。</p>
+<p>RIO
+系统（即作者做的一个系统，用于验证他的想法）中，不确定性主要用于大小和选择率估计。每个估计值
+<span class="math inline"><em>E</em></span> 会被分配一个不确定桶 <span
+class="math inline"><em>U</em></span>，<span
+class="math inline"><em>U</em></span> 取值从 0 到 6：</p>
+<ul>
+<li>0 表示无不确定性。</li>
+<li>6 表示非常高的不确定性。</li>
+</ul>
+<p>系统根据 <span class="math inline">(<em>E</em>, <em>U</em>)</span>
+计算 bounding box。论文中使用的简单规则是：</p>
+<p><span
+class="math display"><em>B</em> = [<em>l</em><em>o</em><em>w</em>, <em>h</em><em>i</em><em>g</em><em>h</em>]</span></p>
+<p><span
+class="math display"><em>l</em><em>o</em><em>w</em> = <em>E</em>(1 − 0.1<em>U</em>),  <em>h</em><em>i</em><em>g</em><em>h</em> = <em>E</em>(1 + 0.2<em>U</em>)</span></p>
+<p>例如 <span
+class="math inline"><em>E</em> = 160<em>M</em><em>B</em>, <em>U</em> = 1</span>，则
+<span
+class="math inline"><em>B</em> = [144<em>M</em><em>B</em>, 192<em>M</em><em>B</em>]</span>；如果
+<span
+class="math inline"><em>E</em> = 150<em>M</em><em>B</em>, <em>U</em> = 5</span>，则
+<span
+class="math inline"><em>B</em> = [75<em>M</em><em>B</em>, 300<em>M</em><em>B</em>]</span>。也就是说，<span
+class="math inline"><em>U</em></span>
+越大，估计越不可靠，区间就越宽。</p>
+<h2 id="robust-plan-与-switchable-plan">5.5 Robust Plan 与 Switchable
+Plan</h2>
+<p>对于一个 bounding box <span
+class="math inline"><em>B</em></span>，可能出现四种情况：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">情况</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Single optimal plan</td>
+<td style="text-align: left;">同一个计划在 <span
+class="math inline"><em>B</em></span> 内所有点都最优</td>
+</tr>
+<tr>
+<td style="text-align: left;">Single robust plan</td>
+<td style="text-align: left;">同一个计划虽不处处最优，但在 <span
+class="math inline"><em>B</em></span> 内都接近最优</td>
+</tr>
+<tr>
+<td style="text-align: left;">Switchable plan</td>
+<td style="text-align: left;">有一组计划，可推迟到统计更准后再选</td>
+</tr>
+<tr>
+<td style="text-align: left;">None</td>
+<td
+style="text-align: left;">没有单一稳健计划，也无法构造可切换计划</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Switchable plan</strong> 是一组计划 <span
+class="math inline"><em>S</em></span>，满足：</p>
+<ul>
+<li>对 <span class="math inline"><em>B</em></span> 内每个点，<span
+class="math inline"><em>S</em></span>
+中至少有一个计划接近该点最优计划。</li>
+<li>可以推迟到获得更准确统计信息后再决定执行哪个计划。</li>
+<li>如果真实统计落在 <span class="math inline"><em>B</em></span>
+内，切换时不会损失大量已完成工作。</li>
+</ul>
+<h2 id="rio-的实现细节">5.6 RIO 的实现细节</h2>
+<p>RIO 的流程包括：</p>
+<ol type="1">
+<li>为输入大小和选择率估计计算 bounding box。</li>
+<li>对每个 Join 子集（JS）和 interesting order（IO）组合尝试生成
+switchable plan。</li>
+<li>如果失败，则退回传统单点估计下的最优计划。</li>
+</ol>
+<p>生成 seed plans 时，RIO 对每个候选计划考虑三种代价：</p>
+<ul>
+<li><span
+class="math inline"><em>C</em><sub><em>L</em><em>O</em><em>W</em></sub></span>：bounding
+box 左下角的代价。</li>
+<li><span
+class="math inline"><em>C</em><sub><em>E</em><em>S</em><em>T</em></sub></span>：传统单点估计代价。</li>
+<li><span
+class="math inline"><em>C</em><sub><em>H</em><em>I</em><em>G</em><em>H</em></sub></span>：bounding
+box 右上角的代价。</li>
+</ul>
+<p>由此得到：</p>
+<ul>
+<li><code>BestPlanLow</code></li>
+<li><code>BestPlanEst</code></li>
+<li><code>BestPlanHigh</code></li>
+</ul>
+<p>之后判断：</p>
+<ul>
+<li>如果三个 seed 是同一计划，则直接使用它。</li>
+<li>如果不同但其中一个是 robust plan，则用该 robust plan。</li>
+<li>如果可以由 seeds 构造 switchable plan，则构造之。</li>
+<li>如果都不行，则使用 <code>BestPlanEst</code>。</li>
+</ul>
+<p>为了支持主动重优化，执行引擎还需要：</p>
+<ul>
+<li>switch operator：处理可切换计划。</li>
+<li>buffer operator：在决定计划前暂存元组。</li>
+<li>randomization-aware operators：执行随机采样以获得更准确统计。</li>
+<li>inter-operator communication：算子之间交换估计值和样本。</li>
+</ul>
+<h1 id="重点内容与公式汇总">6 重点内容与公式汇总</h1>
+<h2 id="高频概念">6.1 高频概念</h2>
+<p><strong>外部排序</strong>：当数据无法全部放入内存时，通过初始 run
+生成和多路 merge 完成排序。</p>
+<p><strong>run</strong>：外部排序中已经排好序的子文件。</p>
+<p><strong>聚集索引与非聚集索引</strong>：聚集索引的数据页物理顺序接近索引顺序；非聚集索引
+data entry 有序但数据页分散，范围查询和排序可能产生大量随机 I/O。</p>
+<p><strong>访问路径</strong>：DBMS
+从关系读取记录的方法，包括文件扫描和索引访问。</p>
+<p><strong>选择下推</strong>：尽早执行选择操作，减少后续 Join
+输入大小。</p>
+<p><strong>流水线执行</strong>：不物化中间结果，父算子通过迭代器接口逐步消费子算子输出。</p>
+<p><strong>Reduction
+Factor</strong>：谓词对结果规模的缩减比例，是代价估计的基础。</p>
+<p><strong>Interesting
+Order</strong>：某个访问计划输出的有用排序顺序，可能帮助后续
+<code>ORDER BY</code>、<code>GROUP BY</code> 或 Sort-Merge Join。</p>
+<h2 id="常用-io-公式">6.2 常用 I/O 公式</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">公式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">两路外部排序</td>
+<td style="text-align: left;"><span
+class="math inline">2<em>N</em>(⌈log<sub>2</sub><em>N</em>⌉ + 1)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">多路外部排序</td>
+<td style="text-align: left;"><span
+class="math inline">2<em>N</em>(⌈log<sub><em>B</em> − 1</sub>⌈<em>N</em>/<em>B</em>⌉⌉ + 1)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">简单嵌套循环 Join</td>
+<td style="text-align: left;"><span
+class="math inline"><em>M</em> + <em>P</em><sub><em>R</em></sub><em>M</em><em>N</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">页级嵌套循环 Join</td>
+<td style="text-align: left;"><span
+class="math inline"><em>M</em> + <em>M</em><em>N</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">块嵌套循环 Join</td>
+<td style="text-align: left;"><span
+class="math inline"><em>M</em> + ⌈<em>M</em>/(<em>B</em> − 2)⌉<em>N</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Sort-Merge Join</td>
+<td style="text-align: left;"><span
+class="math inline">sort(<em>R</em>) + sort(<em>S</em>) + <em>M</em> + <em>N</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Hash Join</td>
+<td style="text-align: left;"><span
+class="math inline">3(<em>M</em> + <em>N</em>)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Hash 投影去重</td>
+<td style="text-align: left;"><span
+class="math inline"><em>M</em> + 2<em>T</em></span></td>
+</tr>
+</tbody>
+</table>
+<p>其中：</p>
+<ul>
+<li><span class="math inline"><em>N</em></span>：文件页数，或 Join 中
+inner 关系页数，视上下文而定。</li>
+<li><span class="math inline"><em>M</em></span>：Join 中 outer
+关系页数。</li>
+<li><span class="math inline"><em>B</em></span>：缓冲区页数。</li>
+<li><span
+class="math inline"><em>P</em><sub><em>R</em></sub></span>：outer
+关系每页元组数。</li>
+<li><span
+class="math inline"><em>T</em></span>：投影后的中间结果页数。</li>
+</ul>
+<h2 id="算法选择速记">6.3 算法选择速记</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">场景</th>
+<th style="text-align: left;">优先考虑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">等值选择，有 Hash 索引</td>
+<td style="text-align: left;">Hash 索引</td>
+</tr>
+<tr>
+<td style="text-align: left;">范围选择，有 B+ 树索引</td>
+<td style="text-align: left;">B+ 树索引，聚集更佳</td>
+</tr>
+<tr>
+<td style="text-align: left;">投影去重且需要有序结果</td>
+<td style="text-align: left;">排序投影</td>
+</tr>
+<tr>
+<td style="text-align: left;">投影去重且内存足、分布均匀</td>
+<td style="text-align: left;">Hash 投影</td>
+</tr>
+<tr>
+<td style="text-align: left;">等值 Join 且内存足、分布均匀</td>
+<td style="text-align: left;">Hash Join</td>
+</tr>
+<tr>
+<td style="text-align: left;">输入已按连接属性排序</td>
+<td style="text-align: left;">Sort-Merge Join</td>
+</tr>
+<tr>
+<td style="text-align: left;">inner 连接属性有高选择性索引</td>
+<td style="text-align: left;">Index Nested Loop Join</td>
+</tr>
+<tr>
+<td style="text-align: left;">outer 很小</td>
+<td style="text-align: left;">Index Nested Loop Join 往往有利</td>
+</tr>
+<tr>
+<td style="text-align: left;">非等值 Join</td>
+<td style="text-align: left;">Index Nested Loop 或其他专门方法</td>
+</tr>
+</tbody>
+</table>
+<h2 id="易错点">6.4 易错点</h2>
+<ol type="1">
+<li>Hash 索引不适合范围查询；B+ 树适合范围查询。</li>
+<li>非聚集索引不等于低代价，结果多时可能比全表扫描更差。</li>
+<li>Sort-Merge Join 的优势不只是 Join，也包括输出有序。</li>
+<li>Hash Join 通常只适合等值 Join。</li>
+<li>选择下推通常有利，但有时提前物化或破坏索引利用也可能不划算。</li>
+<li>查询优化器选择的是估计代价最低的计划，不一定是真实执行最快的计划。</li>
+<li>统计信息的均匀分布和独立性假设可能导致严重估计错误。</li>
+<li>多关系查询中，Join 顺序往往比单个算子选择更影响总代价。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%A4%96%E9%83%A8%E6%8E%92%E5%BA%8F/" rel="tag"># 外部排序</a>
+              <a href="/tags/%E6%9F%A5%E8%AF%A2%E5%A4%84%E7%90%86/" rel="tag"># 查询处理</a>
+              <a href="/tags/%E6%9F%A5%E8%AF%A2%E4%BC%98%E5%8C%96/" rel="tag"># 查询优化</a>
+              <a href="/tags/%E8%BF%9E%E6%8E%A5%E7%AE%97%E6%B3%95/" rel="tag"># 连接算法</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/database_design/%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/" rel="prev" title="索引结构">
+                  <i class="fa fa-angle-left"></i> 索引结构
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

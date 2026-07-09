@@ -1,0 +1,2649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  1 索引结构的基本思想 2 索引的 data entry 与基本分类 3 树结构索引：ISAM 4 动态树索引：B+ 树 5 基于 Hash 的索引结构 6 多键索引与特殊数据类型索引 7 本讲总结与重点内容  1 索引结构的基本思想 本讲讨论数据库系统中经典的索引结构（Index Structure）。索引的核心目标是减少查询时需要访问的数据页数量，使 DBMS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="索引结构">
+<meta property="og:url" content="http://example.com/2026/07/09/database_design/%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  1 索引结构的基本思想 2 索引的 data entry 与基本分类 3 树结构索引：ISAM 4 动态树索引：B+ 树 5 基于 Hash 的索引结构 6 多键索引与特殊数据类型索引 7 本讲总结与重点内容  1 索引结构的基本思想 本讲讨论数据库系统中经典的索引结构（Index Structure）。索引的核心目标是减少查询时需要访问的数据页数量，使 DBMS">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260605110733150.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260605114620411.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260619223736194.png">
+<meta property="article:published_time" content="2026-07-09T07:16:58.859Z">
+<meta property="article:modified_time" content="2026-07-09T07:16:58.860Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="B+树">
+<meta property="article:tag" content="Hash索引">
+<meta property="article:tag" content="ISAM">
+<meta property="article:tag" content="索引">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260605110733150.png">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/database_design/%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/database_design/%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/","path":"2026/07/09/database_design/索引结构/","title":"索引结构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>索引结构 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">2.</span> <span class="nav-text">1 索引结构的基本思想</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E7%B4%A2%E5%BC%95"><span class="nav-number">2.1.</span> <span class="nav-text">1.1 为什么需要索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E8%AE%BE%E8%AE%A1%E8%A6%81%E8%80%83%E8%99%91%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 索引设计要考虑的问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%9A%84-data-entry-%E4%B8%8E%E5%9F%BA%E6%9C%AC%E5%88%86%E7%B1%BB"><span class="nav-number">3.</span> <span class="nav-text">2 索引的 data entry
+与基本分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D-data-entry-%E5%BD%A2%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 三种 data entry 形式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#clustered-%E4%B8%8E-unclustered-index"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 Clustered 与 Unclustered
+Index</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dense-%E4%B8%8E-sparse-index"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 Dense 与 Sparse Index</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#primarysecondaryunique-%E4%B8%8E-duplicates-index"><span class="nav-number">3.4.</span> <span class="nav-text">2.4
+Primary、Secondary、Unique 与 Duplicates Index</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#composite-search-key-%E7%B4%A2%E5%BC%95"><span class="nav-number">3.5.</span> <span class="nav-text">2.5 Composite Search Key 索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sql-%E4%B8%AD%E7%B4%A2%E5%BC%95%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">3.6.</span> <span class="nav-text">2.6 SQL 中索引的定义</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A0%91%E7%BB%93%E6%9E%84%E7%B4%A2%E5%BC%95isam"><span class="nav-number">4.</span> <span class="nav-text">3 树结构索引：ISAM</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8E%E6%8E%92%E5%BA%8F%E6%96%87%E4%BB%B6%E5%88%B0%E4%BA%8C%E7%BA%A7%E7%B4%A2%E5%BC%95"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 从排序文件到二级索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isam-%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 ISAM 的结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isam-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 ISAM 的基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2"><span class="nav-number">4.3.1.</span> <span class="nav-text">3.3.1 搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5"><span class="nav-number">4.3.2.</span> <span class="nav-text">3.3.2 插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4"><span class="nav-number">4.3.3.</span> <span class="nav-text">3.3.3 删除</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isam-%E7%9A%84%E5%A4%8D%E6%9D%82%E6%80%A7%E4%B8%8E%E6%80%A7%E8%83%BD%E7%9B%B4%E8%A7%89"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 ISAM 的复杂性与性能直觉</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isam-%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 ISAM 的优缺点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E6%A0%91%E7%B4%A2%E5%BC%95b-%E6%A0%91"><span class="nav-number">5.</span> <span class="nav-text">4 动态树索引：B+ 树</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#b-%E6%A0%91%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%A7%E8%B4%A8"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 B+ 树的基本性质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b-%E6%A0%91%E7%BB%93%E7%82%B9%E7%BB%93%E6%9E%84"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 B+ 树结点结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b-%E6%A0%91%E6%90%9C%E7%B4%A2"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 B+ 树搜索</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%88%86%E8%A3%82%E4%B8%8E%E9%87%8D%E5%88%86%E9%85%8D"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 插入：分裂与重分配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%83%85%E5%86%B5-1%E5%8F%B6%E5%AD%90%E6%9C%AA%E6%BB%A1%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5"><span class="nav-number">5.4.1.</span> <span class="nav-text">插入情况 1：叶子未满，直接插入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%83%85%E5%86%B5-2%E5%8F%B6%E5%AD%90%E6%BB%A1%E5%88%86%E8%A3%82%E5%8F%B6%E5%AD%90%E4%BD%86%E7%88%B6%E7%BB%93%E7%82%B9%E6%9C%AA%E6%BB%A1"><span class="nav-number">5.4.2.</span> <span class="nav-text">插入情况
+2：叶子满，分裂叶子，但父结点未满</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%83%85%E5%86%B5-3%E5%8F%B6%E5%AD%90%E5%88%86%E8%A3%82%E5%90%8E%E7%88%B6%E7%BB%93%E7%82%B9%E4%B9%9F%E6%BB%A1%E7%BB%A7%E7%BB%AD%E5%90%91%E4%B8%8A%E5%88%86%E8%A3%82%E5%B9%B6%E4%BA%A7%E7%94%9F%E6%96%B0%E6%A0%B9"><span class="nav-number">5.4.3.</span> <span class="nav-text">插入情况
+3：叶子分裂后父结点也满，继续向上分裂并产生新根</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%83%85%E5%86%B5-4%E5%85%84%E5%BC%9F%E7%BB%93%E7%82%B9%E6%9C%89%E7%A9%BA%E9%97%B4%E5%85%88%E9%87%8D%E6%96%B0%E5%88%86%E9%85%8D%E8%80%8C%E4%B8%8D%E6%98%AF%E5%88%86%E8%A3%82"><span class="nav-number">5.4.4.</span> <span class="nav-text">插入情况
+4：兄弟结点有空间，先重新分配而不是分裂</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%90%88%E5%B9%B6%E4%B8%8E%E9%87%8D%E5%88%86%E9%85%8D"><span class="nav-number">5.5.</span> <span class="nav-text">4.5 删除：合并与重分配</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%83%85%E5%86%B5-1%E5%88%A0%E9%99%A4%E5%90%8E%E5%8F%B6%E5%AD%90%E4%BB%8D%E6%BB%A1%E8%B6%B3%E6%9C%80%E5%B0%8F%E5%8D%A0%E7%94%A8"><span class="nav-number">5.5.1.</span> <span class="nav-text">删除情况
+1：删除后叶子仍满足最小占用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%83%85%E5%86%B5-2%E5%88%A0%E9%99%A4%E4%BA%86%E5%8F%B6%E5%AD%90%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%94%AE%E9%9C%80%E8%A6%81%E6%9B%B4%E6%96%B0%E7%88%B6%E7%BB%93%E7%82%B9%E5%88%86%E9%9A%94%E9%94%AE"><span class="nav-number">5.5.2.</span> <span class="nav-text">删除情况
+2：删除了叶子第一个键，需要更新父结点分隔键</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%83%85%E5%86%B5-3%E5%8F%B6%E5%AD%90%E8%BF%87%E7%A9%BA%E5%90%91%E5%B7%A6%E5%85%84%E5%BC%9F%E5%80%9F%E4%B8%80%E4%B8%AA-entry"><span class="nav-number">5.5.3.</span> <span class="nav-text">删除情况
+3：叶子过空，向左兄弟借一个 entry</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%83%85%E5%86%B5-4%E5%8F%B6%E5%AD%90%E8%BF%87%E7%A9%BA%E5%90%91%E5%8F%B3%E5%85%84%E5%BC%9F%E5%80%9F%E4%B8%80%E4%B8%AA-entry"><span class="nav-number">5.5.4.</span> <span class="nav-text">删除情况
+4：叶子过空，向右兄弟借一个 entry</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%83%85%E5%86%B5-5%E5%85%84%E5%BC%9F%E4%B8%8D%E8%83%BD%E5%80%9F%E5%8F%B6%E5%AD%90%E5%90%88%E5%B9%B6%E4%BD%86%E7%88%B6%E7%BB%93%E7%82%B9%E4%BB%8D%E5%90%88%E6%B3%95"><span class="nav-number">5.5.5.</span> <span class="nav-text">删除情况
+5：兄弟不能借，叶子合并，但父结点仍合法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%83%85%E5%86%B5-6%E5%8F%B6%E5%AD%90%E5%90%88%E5%B9%B6%E5%AF%BC%E8%87%B4%E7%88%B6%E7%BB%93%E7%82%B9%E8%BF%87%E7%A9%BA%E7%BB%A7%E7%BB%AD%E5%90%91%E4%B8%8A%E5%90%88%E5%B9%B6%E6%9C%80%E7%BB%88%E6%A0%B9%E6%94%B6%E7%BC%A9"><span class="nav-number">5.5.6.</span> <span class="nav-text">删除情况
+6：叶子合并导致父结点过空，继续向上合并，最终根收缩</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%A4%8D%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">5.6.</span> <span class="nav-text">4.6 重复数据的处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b-%E6%A0%91%E5%9C%A8%E5%AE%9E%E9%99%85%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E4%BC%98%E5%8C%96"><span class="nav-number">5.7.</span> <span class="nav-text">4.7 B+ 树在实际系统中的优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E5%80%BC%E5%8E%8B%E7%BC%A9"><span class="nav-number">5.7.1.</span> <span class="nav-text">4.7.1 索引值压缩</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E9%99%85%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E5%88%A0%E9%99%A4"><span class="nav-number">5.7.2.</span> <span class="nav-text">4.7.2 实际系统中的删除</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#b-%E6%A0%91%E6%89%B9%E9%87%8F%E5%BB%BA%E7%AB%8B"><span class="nav-number">5.7.3.</span> <span class="nav-text">4.7.3 B+ 树批量建立</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-hash-%E7%9A%84%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84"><span class="nav-number">6.</span> <span class="nav-text">5 基于 Hash 的索引结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hash-%E7%B4%A2%E5%BC%95%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 Hash 索引的基本思想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81-hashing"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 静态 Hashing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E6%89%A9%E5%85%85-hashing"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 可扩充 Hashing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BA%BF%E6%80%A7-hashing"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 线性 Hashing</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%AF%E6%89%A9%E5%85%85-hashing-%E4%B8%8E%E7%BA%BF%E6%80%A7-hashing-%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 可扩充 Hashing 与线性
+Hashing 的比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E9%94%AE%E7%B4%A2%E5%BC%95%E4%B8%8E%E7%89%B9%E6%AE%8A%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%B4%A2%E5%BC%95"><span class="nav-number">7.</span> <span class="nav-text">6 多键索引与特殊数据类型索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%9A%E9%94%AE%E7%B4%A2%E5%BC%95%E9%97%AE%E9%A2%98"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 多键索引问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BD%91%E6%A0%BC%E6%96%87%E4%BB%B6"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 网格文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E6%95%A3%E5%88%97%E6%8A%80%E6%9C%AF"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 分区散列技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#r-%E6%A0%91"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 R 树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#kd-%E6%A0%91"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 KD 树</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E7%B4%A2%E5%BC%95"><span class="nav-number">7.6.</span> <span class="nav-text">6.6 图数据索引</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-number">7.6.1.</span> <span class="nav-text">6.6.1 图数据库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE%E6%95%B0%E6%8D%AE%E7%B4%A2%E5%BC%95-1"><span class="nav-number">7.6.2.</span> <span class="nav-text">6.6.2 图数据索引</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%B4%A2%E5%BC%95%E4%B8%8E-isax"><span class="nav-number">7.7.</span> <span class="nav-text">6.7 时间序列索引与 iSAX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gist"><span class="nav-number">7.8.</span> <span class="nav-text">6.8 GiST</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%AC%E8%AE%B2%E6%80%BB%E7%BB%93%E4%B8%8E%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9"><span class="nav-number">8.</span> <span class="nav-text">7 本讲总结与重点内容</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9C%80%E8%A6%81%E6%8E%8C%E6%8F%A1%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 需要掌握的核心概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#isam-%E4%B8%8E-b-%E6%A0%91%E5%AF%B9%E6%AF%94"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 ISAM 与 B+ 树对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#b-%E6%A0%91%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 B+ 树重点内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hash-%E7%B4%A2%E5%BC%95%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 Hash 索引重点内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84%E6%9E%84%E5%BB%BA%E7%9A%84%E6%80%BB%E4%BD%93%E6%80%9D%E8%B7%AF"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 索引结构构建的总体思路</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/database_design/%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="索引结构 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          索引结构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:16:58" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">数据库设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ul>
+<li>1 索引结构的基本思想</li>
+<li>2 索引的 data entry 与基本分类</li>
+<li>3 树结构索引：ISAM</li>
+<li>4 动态树索引：B+ 树</li>
+<li>5 基于 Hash 的索引结构</li>
+<li>6 多键索引与特殊数据类型索引</li>
+<li>7 本讲总结与重点内容</li>
+</ul>
+<h1 id="索引结构的基本思想">1 索引结构的基本思想</h1>
+<p>本讲讨论数据库系统中经典的<strong>索引结构（Index
+Structure）</strong>。索引的核心目标是减少查询时需要访问的数据页数量，使
+DBMS
+不必从头到尾扫描整个数据文件，而是借助一个较小的辅助结构快速定位满足条件的记录。</p>
+<p>从逻辑上看，索引可以理解为一个由 <strong>data entry</strong>
+组成的集合。每个 data entry
+通常围绕某个查询属性值组织，并记录如何找到对应记录的位置。索引并不改变关系表的逻辑语义，但会显著影响查询、插入、删除和更新的代价。</p>
+<h2 id="为什么需要索引">1.1 为什么需要索引</h2>
+<p>如果没有索引，数据库要查找某个属性值，通常只能进行顺序扫描。例如要找所有
+<code>age=44</code>
+的记录，系统可能需要读取整张表的许多页。索引通过对属性值进行重新组织，让查询过程先在索引中查找，再根据索引给出的记录位置访问数据文件。</p>
+<p>索引项常见形式可以抽象为：</p>
+<p><span
+class="math display"><em>M</em><em>a</em><em>p</em> : 属性值 → rid</span></p>
+<p>其中 <code>rid</code> 是记录标识符（Record
+ID），用于定位记录所在的数据页和页内位置。</p>
+<h2 id="索引设计要考虑的问题">1.2 索引设计要考虑的问题</h2>
+<p>索引不是简单地“建一个查找表”就结束了。实际 DBMS
+必须同时考虑两个方面：</p>
+<ul>
+<li><strong>如何组织 data entry：</strong>
+即每个索引项保存什么内容，是保存整条记录、单个 rid，还是 rid 列表。</li>
+<li><strong>如何适应存储介质：</strong> 数据库主要运行在磁盘、SSD
+等外存上，访问代价以页为单位，因此索引结点通常也设计成一个物理页大小，以减少
+I/O 次数。</li>
+</ul>
+<p>因此，索引结构的设计重点不是单纯追求 CPU
+上的比较次数，而是尽量减少磁盘页访问次数。</p>
+<h1 id="索引的-data-entry-与基本分类">2 索引的 data entry
+与基本分类</h1>
+<p>索引的许多性质都取决于 data entry
+的形式，以及索引顺序与数据文件物理顺序之间的关系。本节是理解后续
+ISAM、B+ 树和 Hash 索引的基础。</p>
+<h2 id="三种-data-entry-形式">2.1 三种 data entry 形式</h2>
+<p>这里给出了三种经典 data entry：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">形式</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>k</em><sup>*</sup></span></td>
+<td style="text-align: left;">搜索键值为 <span
+class="math inline"><em>k</em></span> 的完整记录</td>
+<td
+style="text-align: left;">索引本身就保存数据，因此可视为一种特殊文件组织形式</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>⟩</span></td>
+<td style="text-align: left;">一个键值 <span
+class="math inline"><em>k</em></span> 对应一条记录的位置</td>
+<td
+style="text-align: left;">适合一个键值可能出现多条记录的情况，每条记录有一个索引项</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>-<em>l</em><em>i</em><em>s</em><em>t</em>⟩</span></td>
+<td style="text-align: left;">一个键值 <span
+class="math inline"><em>k</em></span> 对应一组记录位置</td>
+<td style="text-align: left;">重复值较多时更紧凑，但维护 rid
+列表会更复杂</td>
+</tr>
+</tbody>
+</table>
+<p>第一种 <span class="math inline"><em>k</em><sup>*</sup></span>
+中已经包含完整记录，因此不需要另存一份数据文件。第二、三种更常见，尤其适用于一个表上存在多个索引的情况：数据文件只保存一份，而不同索引分别保存到记录位置的引用。</p>
+<p>下面用同一组记录来理解三种 data
+entry。假设数据文件中有如下员工记录，其中 <code>rid</code>
+表示记录在数据文件中的物理位置：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">rid</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">age</th>
+<th style="text-align: left;">sal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">r1</td>
+<td style="text-align: left;">Smith</td>
+<td style="text-align: left;">44</td>
+<td style="text-align: left;">3000</td>
+</tr>
+<tr>
+<td style="text-align: left;">r2</td>
+<td style="text-align: left;">Jones</td>
+<td style="text-align: left;">40</td>
+<td style="text-align: left;">6003</td>
+</tr>
+<tr>
+<td style="text-align: left;">r3</td>
+<td style="text-align: left;">Tracy</td>
+<td style="text-align: left;">44</td>
+<td style="text-align: left;">5004</td>
+</tr>
+<tr>
+<td style="text-align: left;">r4</td>
+<td style="text-align: left;">Ashby</td>
+<td style="text-align: left;">25</td>
+<td style="text-align: left;">3000</td>
+</tr>
+</tbody>
+</table>
+<p>如果在 <code>age</code> 上建立索引，三种 data entry
+的例子分别是：</p>
+<ul>
+<li><strong><span
+class="math inline"><em>k</em><sup>*</sup></span>：</strong> data entry
+保存完整记录。例如 <code>44*</code> 可以直接表示搜索键
+<code>age=44</code> 对应的完整记录，如 <code>(Smith,44,3000)</code> 和
+<code>(Tracy,44,5004)</code>。采用这种方式时，索引叶子层本身就是数据记录的存放处，因此通常只能作为一种文件组织方式，而不适合在同一张表上为很多属性都这样建索引。</li>
+<li><strong><span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>⟩</span>：</strong>
+每条满足键值的记录都有一个索引项。例如 <code>age=44</code>
+有两条记录，则索引中可以出现 <span
+class="math inline">⟨44, <em>r</em>1⟩</span> 和 <span
+class="math inline">⟨44, <em>r</em>3⟩</span>。查询 <code>age=44</code>
+时，系统先找到这两个索引项，再根据 <code>r1</code>、<code>r3</code>
+到数据文件中取出完整记录。</li>
+<li><strong><span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>-<em>l</em><em>i</em><em>s</em><em>t</em>⟩</span>：</strong>
+相同键值只保留一个索引项，但它携带一组 rid。例如 <code>age=44</code>
+可以写成 <span
+class="math inline">⟨44, [<em>r</em>1, <em>r</em>3]⟩</span>，<code>age=25</code>
+可以写成 <span
+class="math inline">⟨25, [<em>r</em>4]⟩</span>。这种形式在重复值较多时节省键值存储空间，但插入、删除记录时需要维护
+rid-list。</li>
+</ul>
+<p>可以对不止一个属性建索引。例如，若表中有 <code>age</code> 和
+<code>sal</code> 两个属性，可以分别在 <code>age</code> 和
+<code>sal</code> 上建立索引。<code>age</code>
+索引用于快速查找某年龄的人，<code>sal</code>
+索引用于快速查找某薪资的人。两者都通过 <code>rid</code>
+指向同一份数据记录。</p>
+<h2 id="clustered-与-unclustered-index">2.2 Clustered 与 Unclustered
+Index</h2>
+<p><strong>簇聚索引（Clustered Index）</strong> 指索引中 data entry
+的顺序与数据文件中记录的物理顺序一致或接近一致。若文件中的记录按照
+<code>age</code> 排序，而 <code>age</code> 索引中的 data entry 也按
+<code>age</code> 排序，则这个索引可以是簇聚索引。</p>
+<p><strong>非簇聚索引（Unclustered Index）</strong>
+指索引顺序与数据文件记录的物理顺序不一致。通过非簇聚索引找到多个记录时，这些记录可能分散在许多不同数据页中，导致大量随机
+I/O。</p>
+<p>两者的主要区别如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">Clustered Index</th>
+<th style="text-align: left;">Unclustered Index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">数据顺序</td>
+<td style="text-align: left;">与索引键顺序一致或接近一致</td>
+<td style="text-align: left;">与索引键顺序无关</td>
+</tr>
+<tr>
+<td style="text-align: left;">一个表可有数量</td>
+<td style="text-align: left;">通常只能有一个</td>
+<td style="text-align: left;">可以有多个</td>
+</tr>
+<tr>
+<td style="text-align: left;">范围查询</td>
+<td style="text-align: left;">很有优势，可顺序读连续数据页</td>
+<td style="text-align: left;">可能频繁随机访问数据页</td>
+</tr>
+<tr>
+<td style="text-align: left;">维护代价</td>
+<td style="text-align: left;">插入、删除、更新可能影响数据物理顺序</td>
+<td style="text-align: left;">维护相对灵活</td>
+</tr>
+</tbody>
+</table>
+<p>下面用一个具体例子说明两者差别。假设数据文件中有 6
+条员工记录，每个数据页只能放 2 条记录，并且要在 <code>age</code>
+上建立索引。</p>
+<p>如果数据文件本身按照 <code>age</code> 排序存放：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">数据页</th>
+<th style="text-align: left;">页内记录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Page 1</td>
+<td style="text-align: left;"><code>(Ashby,25,3000)</code>,
+<code>(Bristow,30,2007)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 2</td>
+<td style="text-align: left;"><code>(Basu,33,4003)</code>,
+<code>(Jones,40,6003)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 3</td>
+<td style="text-align: left;"><code>(Smith,44,3000)</code>,
+<code>(Tracy,44,5004)</code></td>
+</tr>
+</tbody>
+</table>
+<p>此时 <code>age</code> 索引中的 data entry
+顺序与数据页顺序一致，例如索引项按 <code>25,30,33,40,44,44</code>
+排列，而数据文件也按这个顺序存放。这就是 <code>age</code> 上的
+<strong>聚集索引</strong>。如果执行范围查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> age <span class="keyword">BETWEEN</span> <span class="number">30</span> <span class="keyword">AND</span> <span class="number">44</span></span><br></pre></td></tr></table></figure>
+<p>系统通过索引定位到 <code>age=30</code> 后，可以顺着数据文件连续读取
+Page 1、Page 2、Page 3
+中相邻的记录。由于满足条件的记录在物理上大体连续，磁盘 I/O 比较顺。</p>
+<p>如果数据文件没有按照 <code>age</code>
+排序，而是按照插入顺序或其他属性存放：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">数据页</th>
+<th style="text-align: left;">页内记录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Page 1</td>
+<td style="text-align: left;"><code>(Smith,44,3000)</code>,
+<code>(Jones,40,6003)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 2</td>
+<td style="text-align: left;"><code>(Ashby,25,3000)</code>,
+<code>(Tracy,44,5004)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 3</td>
+<td style="text-align: left;"><code>(Bristow,30,2007)</code>,
+<code>(Basu,33,4003)</code></td>
+</tr>
+</tbody>
+</table>
+<p>此时即使 <code>age</code> 索引本身仍然按
+<code>25,30,33,40,44,44</code>
+排序，每个索引项指向的数据记录却分散在不同页中。例如 <code>age=30</code>
+在 Page 3，<code>age=33</code> 也在 Page 3，<code>age=40</code> 在 Page
+1，<code>age=44</code> 分别在 Page 1 和 Page 2。这就是 <code>age</code>
+上的 <strong>非聚集索引</strong>。同样执行
+<code>age BETWEEN 30 AND 44</code> 时，系统可能需要在 Page 3、Page
+1、Page 2 之间跳转访问，随机 I/O 更多。</p>
+<p>因此，<strong>聚集索引与非聚集索引的关键区别不在于索引文件是否有序；索引文件通常都会按键值组织。真正的区别在于数据文件中的记录物理顺序是否也跟着索引键值排列。</strong></p>
+<p><strong>重点内容：一个表通常只能有一个簇聚索引，因为数据文件的物理顺序只能主要按照一种键值组织。</strong>
+但可以有多个非簇聚索引，因为它们只是额外的辅助结构。</p>
+<p>实际系统中，即使建立簇聚索引，也不一定始终保持严格排序。因为频繁插入和删除会使严格维护代价很高，系统可能采用溢出链表，并定期重新整理数据。</p>
+<h2 id="dense-与-sparse-index">2.3 Dense 与 Sparse Index</h2>
+<p><strong>稠密索引（Dense Index）</strong>
+是指表中该属性出现的每个搜索键值，在索引文件中至少有一个 data entry
+与之对应。若 <code>age</code> 出现了
+<code>22,25,30,33,40,44,50</code>，稠密索引中这些键值都需要出现。</p>
+<p><strong>稀疏索引（Sparse Index）</strong>
+通常不是为每个键值都建立索引项，而是每个数据页建立一个 data
+entry，例如记录该页第一条记录的键值和页指针。查询时先通过稀疏索引定位到可能的数据页，再在页内或相邻页继续查找。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">Dense Index</th>
+<th style="text-align: left;">Sparse Index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">索引项覆盖</td>
+<td style="text-align: left;">每个搜索键值至少一个索引项</td>
+<td style="text-align: left;">通常每个数据页一个索引项</td>
+</tr>
+<tr>
+<td style="text-align: left;">空间开销</td>
+<td style="text-align: left;">较大</td>
+<td style="text-align: left;">较小</td>
+</tr>
+<tr>
+<td style="text-align: left;">查询定位</td>
+<td style="text-align: left;">更直接</td>
+<td style="text-align: left;">需要进入数据页后继续查找</td>
+</tr>
+<tr>
+<td style="text-align: left;">与簇聚关系</td>
+<td style="text-align: left;">可簇聚也可非簇聚</td>
+<td style="text-align: left;"><strong>只能用于簇聚索引</strong></td>
+</tr>
+</tbody>
+</table>
+<p>下面继续用按 <code>age</code> 排序的数据文件举例。假设每页放 2
+条记录：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">数据页</th>
+<th style="text-align: left;">页内记录</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Page 1</td>
+<td style="text-align: left;"><code>(Daniels,22,6003)</code>,
+<code>(Ashby,25,3000)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 2</td>
+<td style="text-align: left;"><code>(Bristow,30,2007)</code>,
+<code>(Basu,33,4003)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 3</td>
+<td style="text-align: left;"><code>(Jones,40,6003)</code>,
+<code>(Smith,44,3000)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 4</td>
+<td style="text-align: left;"><code>(Tracy,44,5004)</code>,
+<code>(Cass,50,5004)</code></td>
+</tr>
+</tbody>
+</table>
+<p>如果建立 <code>age</code> 上的
+<strong>稠密索引</strong>，每个出现过的 <code>age</code> 值都至少有一个
+data entry。若采用 <span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>-<em>l</em><em>i</em><em>s</em><em>t</em>⟩</span>
+形式，索引可以写成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">age</th>
+<th style="text-align: left;">rid-list</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;"><code>[r1]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">25</td>
+<td style="text-align: left;"><code>[r2]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">30</td>
+<td style="text-align: left;"><code>[r3]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">33</td>
+<td style="text-align: left;"><code>[r4]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">40</td>
+<td style="text-align: left;"><code>[r5]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">44</td>
+<td style="text-align: left;"><code>[r6,r7]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">50</td>
+<td style="text-align: left;"><code>[r8]</code></td>
+</tr>
+</tbody>
+</table>
+<p>查询 <code>age=44</code> 时，稠密索引可以直接找到键值 <code>44</code>
+对应的 rid-list，再取出 <code>Smith</code> 和 <code>Tracy</code>
+两条记录。它的优点是定位直接，缺点是索引项更多，占用空间更大。</p>
+<p>如果建立 <code>age</code> 上的
+<strong>稀疏索引</strong>，索引不记录每个
+<code>age</code>，而是每个数据页记录一个代表项，通常记录该页第一条记录的键值和页指针：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">索引键</th>
+<th style="text-align: left;">指向的数据页</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">Page 1</td>
+</tr>
+<tr>
+<td style="text-align: left;">30</td>
+<td style="text-align: left;">Page 2</td>
+</tr>
+<tr>
+<td style="text-align: left;">40</td>
+<td style="text-align: left;">Page 3</td>
+</tr>
+<tr>
+<td style="text-align: left;">44</td>
+<td style="text-align: left;">Page 4</td>
+</tr>
+</tbody>
+</table>
+<p>查询 <code>age=33</code> 时，稀疏索引中没有 <code>33</code>
+这个键。系统会找到小于等于 <code>33</code> 的最大索引键
+<code>30</code>，进入 Page 2，再在 Page 2 中查找
+<code>(Basu,33,4003)</code>。查询 <code>age=50</code>
+时，会定位到小于等于 <code>50</code> 的最大索引键 <code>44</code>，进入
+Page 4，再在页内找到 <code>(Cass,50,5004)</code>。</p>
+<p>这个例子也解释了为什么稀疏索引必须依赖聚集索引：只有当<strong>数据文件按
+<code>age</code> 排序</strong>时，看到索引项
+<code>30 -&gt; Page 2</code>，系统才知道 <code>30</code>
+到下一个页起始键 <code>40</code> 之间的值都应该在 Page 2
+附近。如果数据文件乱序，<code>age=33</code>
+可能在任意页中，稀疏索引就无法只靠每页第一个键可靠定位。</p>
+<p><strong>稀疏索引只能建立在簇聚索引之上</strong>，因为只有数据文件按索引键排序时，系统才能根据“某页第一个键值”推断目标值可能在哪个页附近。如果数据文件无序，稀疏索引无法可靠定位。</p>
+<h2 id="primarysecondaryunique-与-duplicates-index">2.4
+Primary、Secondary、Unique 与 Duplicates Index</h2>
+<p>这里提到 Primary Index 有两种常见解释：</p>
+<ul>
+<li>如果索引建立在包含<strong>主键（Primary Key）</strong>
+的属性上，则称为主键索引（Primary Index）。</li>
+<li>也有教材把第一种 data entry <span
+class="math inline"><em>k</em><sup>*</sup></span>
+对应的索引称为主键索引，而将 <span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>⟩</span>
+与 <span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>-<em>l</em><em>i</em><em>s</em><em>t</em>⟩</span>
+称为二级索引。</li>
+</ul>
+<p>更常用的理解是：主索引建立在主键或主要组织键上，二级索引用于支持其他查询属性。</p>
+<p>此外，还要区分：</p>
+<ul>
+<li><strong>唯一索引（Unique Index）：</strong> 不允许两个 data entry
+具有相同搜索键值。</li>
+<li><strong>重复索引（Duplicates Index）：</strong>
+多个记录可以有相同搜索键值，例如多名学生年龄相同、多个员工工资相同。</li>
+</ul>
+<p>下面用学生表举例。假设 <code>sid</code>
+是学生编号，也是主键；<code>name</code> 不是主键；<code>age</code>
+允许重复：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">rid</th>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">age</th>
+<th style="text-align: left;">gpa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">r1</td>
+<td style="text-align: left;">S001</td>
+<td style="text-align: left;">Li Hua</td>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;">3.6</td>
+</tr>
+<tr>
+<td style="text-align: left;">r2</td>
+<td style="text-align: left;">S002</td>
+<td style="text-align: left;">Wang Ming</td>
+<td style="text-align: left;">21</td>
+<td style="text-align: left;">3.2</td>
+</tr>
+<tr>
+<td style="text-align: left;">r3</td>
+<td style="text-align: left;">S003</td>
+<td style="text-align: left;">Zhang Wei</td>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;">3.8</td>
+</tr>
+<tr>
+<td style="text-align: left;">r4</td>
+<td style="text-align: left;">S004</td>
+<td style="text-align: left;">Li Hua</td>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">3.1</td>
+</tr>
+</tbody>
+</table>
+<p>如果在主键 <code>sid</code> 上建立索引：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">rid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">S001</td>
+<td style="text-align: left;">r1</td>
+</tr>
+<tr>
+<td style="text-align: left;">S002</td>
+<td style="text-align: left;">r2</td>
+</tr>
+<tr>
+<td style="text-align: left;">S003</td>
+<td style="text-align: left;">r3</td>
+</tr>
+<tr>
+<td style="text-align: left;">S004</td>
+<td style="text-align: left;">r4</td>
+</tr>
+</tbody>
+</table>
+<p>这个索引可以称为
+<strong>主键索引</strong>，因为它建立在包含主键的属性上。由于
+<code>sid</code> 是主键，每个 <code>sid</code>
+只能对应一条记录，所以它同时也是 <strong>唯一索引</strong>。查询
+<code>sid='S003'</code> 时，系统能通过索引直接定位到
+<code>r3</code>。</p>
+<p>如果在 <code>age</code> 上建立索引：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">age</th>
+<th style="text-align: left;">rid-list</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;"><code>[r1,r3]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">21</td>
+<td style="text-align: left;"><code>[r2]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;"><code>[r4]</code></td>
+</tr>
+</tbody>
+</table>
+<p>这个索引通常称为
+<strong>二级索引</strong>，因为它不是建立在主键上，而是为了支持按年龄查询。它也是
+<strong>重复索引</strong>，因为 <code>age=20</code>
+对应了两条学生记录。查询 <code>age=20</code> 时，系统会得到
+<code>r1</code> 和 <code>r3</code> 两个候选记录。</p>
+<p>如果在 <code>name</code> 上建立索引，也可能是二级索引，而且是否
+unique 取决于业务约束。上表中 <code>Li Hua</code> 出现了两次，因此普通
+<code>name</code>
+索引是重复索引；如果学校规定姓名不能重复并强制唯一约束，那么
+<code>name</code> 索引才可能是 Unique
+Index。实际数据库中，<strong>Primary/Secondary
+关注索引建在哪类属性上，Unique/Duplicates
+关注搜索键值是否允许重复</strong>，这两组概念不是同一个分类维度。</p>
+<h2 id="composite-search-key-索引">2.5 Composite Search Key 索引</h2>
+<p><strong>组合搜索键（Composite Search Key）</strong>
+索引建立在多个属性上，例如 <span
+class="math inline">⟨<em>a</em><em>g</em><em>e</em>, <em>s</em><em>a</em><em>l</em>⟩</span>
+或 <span
+class="math inline">⟨<em>s</em><em>a</em><em>l</em>, <em>a</em><em>g</em><em>e</em>⟩</span>。组合索引的顺序非常重要。</p>
+<p>例如索引 <span
+class="math inline">⟨<em>a</em><em>g</em><em>e</em>, <em>s</em><em>a</em><em>l</em>⟩</span>
+首先按 <code>age</code> 排序，<code>age</code> 相同的记录再按
+<code>sal</code> 排序。因此它特别适合以下查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> age <span class="operator">=</span> <span class="number">12</span> <span class="keyword">AND</span> sal <span class="operator">=</span> <span class="number">20</span></span><br><span class="line"><span class="keyword">WHERE</span> age <span class="operator">=</span> <span class="number">12</span></span><br><span class="line"><span class="keyword">WHERE</span> age <span class="keyword">BETWEEN</span> <span class="number">10</span> <span class="keyword">AND</span> <span class="number">20</span></span><br></pre></td></tr></table></figure>
+<p>但它不一定适合只按 <code>sal</code> 查询，因为 <code>sal</code>
+不是最左侧属性。相反，<span
+class="math inline">⟨<em>s</em><em>a</em><em>l</em>, <em>a</em><em>g</em><em>e</em>⟩</span>
+对按 <code>sal</code> 查找更有利。</p>
+<p>下面用一个小例子说明“属性顺序”的影响。假设员工表中有如下记录：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">rid</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">age</th>
+<th style="text-align: left;">sal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">r1</td>
+<td style="text-align: left;">Bob</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">r2</td>
+<td style="text-align: left;">Cal</td>
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">80</td>
+</tr>
+<tr>
+<td style="text-align: left;">r3</td>
+<td style="text-align: left;">Joe</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">20</td>
+</tr>
+<tr>
+<td style="text-align: left;">r4</td>
+<td style="text-align: left;">Sue</td>
+<td style="text-align: left;">13</td>
+<td style="text-align: left;">75</td>
+</tr>
+</tbody>
+</table>
+<p>如果建立组合索引 <span
+class="math inline">⟨<em>a</em><em>g</em><em>e</em>, <em>s</em><em>a</em><em>l</em>⟩</span>，索引项会先按
+<code>age</code> 排序，<code>age</code> 相同再按 <code>sal</code>
+排序：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">排序位置</th>
+<th style="text-align: left;">组合键 <span
+class="math inline">⟨<em>a</em><em>g</em><em>e</em>, <em>s</em><em>a</em><em>l</em>⟩</span></th>
+<th style="text-align: left;">rid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><span
+class="math inline">⟨11, 80⟩</span></td>
+<td style="text-align: left;">r2</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><span
+class="math inline">⟨12, 10⟩</span></td>
+<td style="text-align: left;">r1</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><span
+class="math inline">⟨12, 20⟩</span></td>
+<td style="text-align: left;">r3</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><span
+class="math inline">⟨13, 75⟩</span></td>
+<td style="text-align: left;">r4</td>
+</tr>
+</tbody>
+</table>
+<p>这个索引适合查询 <code>age=12</code>，因为所有 <code>age=12</code>
+的索引项连续排列在一起；也适合查询
+<code>age=12 AND sal=20</code>，因为系统可以先定位 <code>age=12</code>
+的范围，再进一步比较 <code>sal=20</code>。但如果只查询
+<code>sal=20</code>，这个索引帮助有限，因为 <code>sal</code>
+值不是第一排序字段，不同 <code>sal</code> 的记录不会按 <code>sal</code>
+连续聚集。</p>
+<p>如果建立组合索引 <span
+class="math inline">⟨<em>s</em><em>a</em><em>l</em>, <em>a</em><em>g</em><em>e</em>⟩</span>，排序顺序就变成先按
+<code>sal</code>，再按 <code>age</code>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">排序位置</th>
+<th style="text-align: left;">组合键 <span
+class="math inline">⟨<em>s</em><em>a</em><em>l</em>, <em>a</em><em>g</em><em>e</em>⟩</span></th>
+<th style="text-align: left;">rid</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><span
+class="math inline">⟨10, 12⟩</span></td>
+<td style="text-align: left;">r1</td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><span
+class="math inline">⟨20, 12⟩</span></td>
+<td style="text-align: left;">r3</td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><span
+class="math inline">⟨75, 13⟩</span></td>
+<td style="text-align: left;">r4</td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><span
+class="math inline">⟨80, 11⟩</span></td>
+<td style="text-align: left;">r2</td>
+</tr>
+</tbody>
+</table>
+<p>这个索引适合查询 <code>sal=20</code> 或
+<code>sal BETWEEN 10 AND 75</code>，因为相近工资的索引项在物理上相邻。但如果只查询
+<code>age=12</code>，它不能像 <span
+class="math inline">⟨<em>a</em><em>g</em><em>e</em>, <em>s</em><em>a</em><em>l</em>⟩</span>
+那样直接把 <code>age=12</code> 的记录聚在一起。</p>
+<p>可以把组合索引理解为一本按多级规则排序的字典：<span
+class="math inline">⟨<em>a</em><em>g</em><em>e</em>, <em>s</em><em>a</em><em>l</em>⟩</span>
+是先按年龄分组，再在同年龄中按工资排序；<span
+class="math inline">⟨<em>s</em><em>a</em><em>l</em>, <em>a</em><em>g</em><em>e</em>⟩</span>
+是先按工资分组，再在同工资中按年龄排序。<strong>最左侧属性决定了索引最自然支持的查询入口。</strong></p>
+<p><strong>学习时要牢记：组合索引不是多个单列索引的简单并列，键的排列顺序直接决定它能高效支持哪些查询。</strong></p>
+<h2 id="sql-中索引的定义">2.6 SQL 中索引的定义</h2>
+<p>SQL-92
+标准中没有统一规定索引语句，因为索引属于物理实现层面的结构，不属于关系模型的核心逻辑。但几乎所有商用
+DBMS 都提供索引相关语句。例如这里的示例：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> INDEX IndAgeRating <span class="keyword">on</span> Student</span><br><span class="line">            <span class="keyword">WITH</span> STRUCTURE<span class="operator">=</span>BTREE</span><br><span class="line">                     KEY<span class="operator">=</span>(age,gpa)</span><br></pre></td></tr></table></figure>
+<p>这表示在 <code>Student</code> 表上按照 <code>(age, gpa)</code>
+建立一个 B-tree/B+ tree 风格的索引。不同系统的语法可能不同，例如
+MySQL、PostgreSQL、Oracle 和 SQL Server 都有自己的索引选项。</p>
+<h1 id="树结构索引isam">3 树结构索引：ISAM</h1>
+<p>树结构索引的目标是在磁盘页层面提供高效搜索。材料先介绍
+<strong>ISAM（Indexed Sequential Access
+Method，索引序列访问方法）</strong>，它是一种静态索引结构，适用于数据变化不大的场景。</p>
+<h2 id="从排序文件到二级索引">3.1 从排序文件到二级索引</h2>
+<p>假设数据文件已经按 <code>gpa</code> 排序，现在要执行范围查询：“找
+<code>gpa &gt; 3.0</code>
+的学生”。一种方法是在整个排序文件上做二分查找，找到第一个满足条件的位置，然后从该位置开始顺序读取。</p>
+<p>但直接在大文件上二分查找仍然可能产生多次磁盘 I/O。ISAM
+的基本思想是额外创建一个较小的二级索引文件：对每个数据页，只记录该页第一条记录的键值和指向该页的指针。</p>
+<p>索引项格式可以写成：</p>
+<p><span class="math display">(页中第一个键, 指向该页的指针)</span></p>
+<p>这个二级文件的好处是空间小、查找快：它只取每页一个记录，而且只保留一个属性值和页指针。</p>
+<h2 id="isam-的结构">3.2 ISAM 的结构</h2>
+<p>ISAM
+将“为数据页建立索引”的思想递归应用：如果底层索引文件仍然较大，就再为它建立上一层索引，直到形成多级结构。</p>
+<p>ISAM 的典型结构包括：</p>
+<ul>
+<li><strong>非叶子结点：</strong> 保存键值和指向下层结点的指针。</li>
+<li><strong>叶子结点或主数据页（Primary Page）：</strong> 保存实际数据或
+data entry。</li>
+<li><strong>溢出页（Overflow Page）：</strong>
+当叶子页满后，新插入记录进入溢出链表。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260605110733150.png" alt="image-20260605110725948" style="zoom: 50%;" /></p>
+<p>下面用一个小例子说明 ISAM 的层次结构。假设数据文件已经按搜索键
+<code>age</code> 排序，每个数据页最多存放 3 条记录：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">数据页</th>
+<th style="text-align: left;">记录键值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Page 1</td>
+<td style="text-align: left;"><code>10*</code>, <code>15*</code>,
+<code>20*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 2</td>
+<td style="text-align: left;"><code>27*</code>, <code>33*</code>,
+<code>37*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 3</td>
+<td style="text-align: left;"><code>40*</code>, <code>46*</code>,
+<code>51*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Page 4</td>
+<td style="text-align: left;"><code>55*</code>, <code>63*</code>,
+<code>97*</code></td>
+</tr>
+</tbody>
+</table>
+<p>在 ISAM
+中，叶子层可以保存每个数据页的代表键和页指针。若每个叶子索引页最多保存 2
+个索引项，则叶子层可以组织成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">叶子索引页</th>
+<th style="text-align: left;">索引项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Leaf 1</td>
+<td style="text-align: left;"><code>(10, Page 1)</code>,
+<code>(27, Page 2)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Leaf 2</td>
+<td style="text-align: left;"><code>(40, Page 3)</code>,
+<code>(55, Page 4)</code></td>
+</tr>
+</tbody>
+</table>
+<p>上层根结点只需要保存能够区分两个叶子页的键和指针。例如可以把根结点理解为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">根结点内容</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>P0 -&gt; Leaf 1</code></td>
+<td style="text-align: left;">小于 <code>40</code> 的键进入 Leaf 1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>40</code></td>
+<td style="text-align: left;">分隔键</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>P1 -&gt; Leaf 2</code></td>
+<td style="text-align: left;">大于等于 <code>40</code> 的键进入 Leaf
+2</td>
+</tr>
+</tbody>
+</table>
+<p>查询 <code>age=46</code> 时，系统先在根结点看到
+<code>46 &gt;= 40</code>，于是进入 <code>Leaf 2</code>；再通过
+<code>(40, Page 3)</code> 定位到 Page 3；最后在 Page 3 中找到
+<code>46*</code>。查询 <code>age=33</code> 时，则进入
+<code>Leaf 1</code>，再定位到 Page 2。</p>
+<p>如果后来插入 <code>42*</code>，它应该进入 Page 3，因为 Page 3
+的键值范围大约是 <code>40</code> 到 <code>51</code>。但 Page 3
+已经满了，ISAM 不会像 B+ 树那样分裂并调整上层结点，而是在 Page 3
+后面挂一个 overflow page：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">主数据页</th>
+<th style="text-align: left;">原有记录</th>
+<th style="text-align: left;">溢出页</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Page 3</td>
+<td style="text-align: left;"><code>40*</code>, <code>46*</code>,
+<code>51*</code></td>
+<td style="text-align: left;">Overflow Page: <code>42*</code></td>
+</tr>
+</tbody>
+</table>
+<p>此时根结点和叶子索引页都不变。查询 <code>age=42</code>
+时，系统仍然通过根结点和 Leaf 2 定位到 Page 3，然后发现主数据页中没有
+<code>42*</code>，还要继续沿 overflow page 查找。这个例子体现了 ISAM
+的静态特点：<strong>非叶子层稳定，更新主要通过叶子层的溢出链处理；溢出链短时效率很好，溢出链长时查询会退化。</strong></p>
+<p>ISAM
+的关键特征是：<strong>树的主体结构是静态的，创建后非叶子层基本不变化，只有叶子层的溢出页会随插入和删除变化。</strong></p>
+<h2 id="isam-的基本操作">3.3 ISAM 的基本操作</h2>
+<h3 id="搜索">3.3.1 搜索</h3>
+<p>ISAM
+搜索从根结点开始，根据搜索键逐层选择下一个结点，直到到达叶子页。若存在溢出页，还需要顺着溢出链查找。</p>
+<p>对于单值查询，找到目标键所在页后读取对应记录。对于范围查询，先找到范围起点，再沿着叶子页顺序读取后续记录。</p>
+<h3 id="插入">3.3.2 插入</h3>
+<p>插入时先查找新记录应该属于哪个叶子页。如果该页还有空间，就直接插入；如果页满了，就增加溢出页，把新记录放入溢出链。</p>
+<p>这种策略避免了修改上层索引结构，因此插入实现简单，并发控制也相对容易。但如果大量记录连续插入到同一个叶子页，溢出链会越来越长。</p>
+<h3 id="删除">3.3.3 删除</h3>
+<p>删除时同样先查找目标记录所在叶子页或溢出页，然后删除记录。如果某个溢出页变空，可以释放该溢出页。</p>
+<p>删除不会主动让 ISAM
+的非叶子结构重新平衡，所以长期大量更新后，索引性能可能退化。</p>
+<h2 id="isam-的复杂性与性能直觉">3.4 ISAM 的复杂性与性能直觉</h2>
+<p>这里给出的搜索复杂性为：</p>
+<p><span
+class="math display"><em>O</em>(log<sub><em>F</em></sub><em>N</em>)</span></p>
+<p>其中 <span class="math inline"><em>F</em></span> 是每个结点中 data
+entry 的数量，也可理解为扇出（fan-out），<span
+class="math inline"><em>N</em></span>
+是关系中的记录数。相比内存算法常说的 <span
+class="math inline"><em>O</em>(log<sub>2</sub><em>N</em>)</span>，数据库索引更关心扇出
+<span
+class="math inline"><em>F</em></span>，因为一个磁盘页可以容纳很多索引项，一次
+I/O 就能排除大量数据。</p>
+<p>示例：若有 <span class="math inline">1, 000, 000</span> 条记录，每页
+<span class="math inline">10</span> 条记录，每个索引结点可容纳 <span
+class="math inline">100</span> 个 data entry：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">大致访问代价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">顺序搜索</td>
+<td style="text-align: left;">约 <span
+class="math inline">100, 000</span> 个数据页</td>
+</tr>
+<tr>
+<td style="text-align: left;">直接二分法</td>
+<td style="text-align: left;">约 <span class="math inline">17</span>
+次定位</td>
+</tr>
+<tr>
+<td style="text-align: left;">一层索引加二分</td>
+<td style="text-align: left;">约 <span class="math inline">10</span>
+次</td>
+</tr>
+<tr>
+<td style="text-align: left;">ISAM 多级索引</td>
+<td style="text-align: left;">约 <span class="math inline">3</span>
+次</td>
+</tr>
+</tbody>
+</table>
+<p>这个例子说明，高扇出的多级索引可以把大量数据的查询压缩到很少的页访问。</p>
+<h2 id="isam-的优缺点">3.5 ISAM 的优缺点</h2>
+<p>ISAM
+的优点是结构稳定、查询快、并发控制较简单。由于非叶子结点不随插入删除频繁变化，修改主要限制在叶子层和溢出页，系统维护成本较低。</p>
+<p>它的缺点也来自静态结构：当插入和删除很多时，溢出链可能很长，查询时要在溢出链中顺序查找，性能会下降。常见缓解方法是在创建索引时预留空闲空间，或者定期重组索引。</p>
+<h1 id="动态树索引b-树">4 动态树索引：B+ 树</h1>
+<p><strong>B+ 树（B+ Tree）</strong>
+是数据库中最经典、最常用的动态索引结构。它解决了 ISAM
+静态结构带来的溢出链过长问题，能够在插入和删除过程中保持树的平衡。</p>
+<h2 id="b-树的基本性质">4.1 B+ 树的基本性质</h2>
+<p>这里给出的 <span class="math inline"><em>m</em></span> 阶 B+
+树特点包括：</p>
+<ul>
+<li>每个结点至多有 <span class="math inline"><em>m</em></span>
+棵子树，至少有 <span class="math inline">⌈<em>m</em>/2⌉</span>
+棵子树。</li>
+<li>根结点要么是叶结点，要么至少有两棵子树。</li>
+<li>插入和删除后，树仍保持平衡。</li>
+<li>所有叶结点处在同一层。</li>
+<li>data entry 层通常用双向链表连接，便于顺序访问和范围查询。</li>
+</ul>
+<p>B+
+树的搜索代价主要取决于树高。由于每个结点是一个页，且扇出通常很大，实际数据库中的
+B+ 树高度往往很低。</p>
+<h2 id="b-树结点结构">4.2 B+ 树结点结构</h2>
+<p>B+ 树结点与 ISAM 结点形式相似。一个内部结点通常由 <span
+class="math inline"><em>n</em></span> 个键值和 <span
+class="math inline"><em>n</em> + 1</span> 个指针构成：</p>
+<p><span
+class="math display"><em>P</em><sub>0</sub>, <em>K</em><sub>1</sub>, <em>P</em><sub>1</sub>, <em>K</em><sub>2</sub>, …, <em>K</em><sub><em>n</em></sub>, <em>P</em><sub><em>n</em></sub></span></p>
+<p>指针 <span class="math inline"><em>P</em><sub><em>i</em></sub></span>
+指向某个子树，键值用于决定搜索应该进入哪个子树。材料描述为：<span
+class="math inline"><em>P</em><sub><em>i</em></sub></span>
+指向的子树上的键值 <span class="math inline"><em>k</em></span>
+满足相应区间条件，例如 <span
+class="math inline"><em>K</em><sub><em>i</em></sub> ≤ <em>k</em> ≤ <em>K</em><sub><em>i</em> + 1</sub></span>。</p>
+<p>B+ 树一般使用第二种或第三种 data entry，即 <span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>⟩</span>
+或 <span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>-<em>l</em><em>i</em><em>s</em><em>t</em>⟩</span>。如果
+data entry
+包含完整记录，则叶子层本身就相当于数据文件；否则叶子层是独立的索引文件，通过
+rid 指向数据文件。</p>
+<h2 id="b-树搜索">4.3 B+ 树搜索</h2>
+<p>搜索从根结点开始。如果当前结点是叶子结点，直接返回；否则根据搜索键
+<span class="math inline"><em>K</em></span>
+和当前结点中的键值比较，选择合适指针继续向下。</p>
+<p>材料伪代码的核心逻辑可以概括为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">如果当前结点是叶子，返回该结点；</span><br><span class="line">否则：</span><br><span class="line">  若 K 小于第一个键，进入最左指针 P0；</span><br><span class="line">  若 K 大于最大键，进入最右指针 Pm；</span><br><span class="line">  否则找到满足 Ki &lt;= K &lt; Ki+1 的区间，进入 Pi。</span><br></pre></td></tr></table></figure>
+<p>由于所有叶子在同一层，任何搜索到达叶子的路径长度相同，这就是 B+
+树“平衡”的含义。</p>
+<h2 id="插入分裂与重分配">4.4 插入：分裂与重分配</h2>
+<p>B+ 树插入分为几个步骤：</p>
+<ol type="1">
+<li>从根结点向下搜索，找到新 data entry 应该插入的叶子结点。</li>
+<li>将 data entry 插入叶子结点的有序位置。</li>
+<li>如果结点未满，操作结束。</li>
+<li>如果结点满了，进行<strong>分裂（split）</strong>。</li>
+<li>分裂可能把一个分隔键插入父结点，若父结点也满，则继续向上分裂。</li>
+<li>如果根结点分裂，树高增加一层。</li>
+</ol>
+<p>材料还提到一种优化：如果相邻兄弟结点未满，可以进行<strong>重新分配（redistribution）</strong>，把部分
+data entry
+移到兄弟结点，而不是立刻分裂。这能减少分裂次数，降低更新开销。</p>
+<p>下面用一个小型 B+ 树覆盖插入的主要情况。为了让例子清晰，先约定：</p>
+<ul>
+<li>叶子结点最多存放 3 个 data entry；非根叶子结点至少保留 2 个 data
+entry。</li>
+<li>内部结点最多存放 3 个分隔键；非根内部结点至少保留 1
+个分隔键，即至少有 2 个孩子。</li>
+<li>叶子结点之间用 <code>-&gt;</code> 表示链表连接。</li>
+<li>内部结点中的分隔键采用 B+
+树常见规则：某个右侧孩子的第一个键会出现在父结点中作为分隔键。</li>
+</ul>
+<h3 id="插入情况-1叶子未满直接插入">插入情况 1：叶子未满，直接插入</h3>
+<p>初始树如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 15*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>插入 <code>12*</code> 时，先从根结点定位到中间叶子
+<code>[10*, 15*]</code>。该叶子还有空位，所以直接插入：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 12*, 15*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>这种情况最简单：<strong>只改叶子结点，不影响父结点，也不改变树高。</strong></p>
+<h3 id="插入情况-2叶子满分裂叶子但父结点未满">插入情况
+2：叶子满，分裂叶子，但父结点未满</h3>
+<p>继续插入 <code>18*</code>。目标叶子是
+<code>[10*, 12*, 15*]</code>，已经满了。临时插入后得到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[10*, 12*, 15*, 18*]</span><br></pre></td></tr></table></figure>
+<p>叶子分裂成两个叶子：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[10*, 12*]    [15*, 18*]</span><br></pre></td></tr></table></figure>
+<p>新右叶子的第一个键 <code>15</code>
+被复制到父结点中，作为新的分隔键：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 15 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 12*] -&gt; [15*, 18*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>这里父结点原来有空间，因此只发生叶子分裂，没有继续向上分裂。</p>
+<h3 id="插入情况-3叶子分裂后父结点也满继续向上分裂并产生新根">插入情况
+3：叶子分裂后父结点也满，继续向上分裂并产生新根</h3>
+<p>现在根结点 <code>[10 | 15 | 20]</code> 已经满了。假设右侧叶子为
+<code>[20*, 25*, 30*]</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 15 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 12*] -&gt; [15*, 18*] -&gt; [20*, 25*, 30*]</span><br></pre></td></tr></table></figure>
+<p>插入 <code>22*</code> 时，目标叶子 <code>[20*, 25*, 30*]</code>
+满，临时插入后为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[20*, 22*, 25*, 30*]</span><br></pre></td></tr></table></figure>
+<p>叶子分裂：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[20*, 22*]    [25*, 30*]</span><br></pre></td></tr></table></figure>
+<p>新右叶子的第一个键 <code>25</code>
+要插入父结点。但父结点已满，插入后临时变成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[10 | 15 | 20 | 25]</span><br></pre></td></tr></table></figure>
+<p>内部结点也需要分裂。中间分隔键 <code>20</code>
+上推成为新根，左内部结点保留 <code>[10 | 15]</code>，右内部结点保留
+<code>[25]</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">                Root: [20]</span><br><span class="line">               /          \</span><br><span class="line">       Internal: [10 | 15]  Internal: [25]</span><br><span class="line">       /      |      \       /        \</span><br><span class="line">[1*,5*] [10*,12*] [15*,18*] [20*,22*] [25*,30*]</span><br></pre></td></tr></table></figure>
+<p>这种情况体现了 B+
+树插入的级联特征：<strong>叶子分裂可能导致父结点分裂，父结点分裂可能继续向上传播；如果根结点分裂，树高增加一层。</strong></p>
+<h3 id="插入情况-4兄弟结点有空间先重新分配而不是分裂">插入情况
+4：兄弟结点有空间，先重新分配而不是分裂</h3>
+<p>有些实现会在分裂前尝试和兄弟结点重新分配。假设：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 12*, 15*] -&gt; [20*]</span><br></pre></td></tr></table></figure>
+<p>插入 <code>18*</code> 时，中间叶子满了，但右兄弟 <code>[20*]</code>
+还有空间。可以把临时结果 <code>[10*,12*,15*,18*]</code> 中较大的
+<code>18*</code> 移到右兄弟，让两个叶子保持有序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 18]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 12*, 15*] -&gt; [18*, 20*]</span><br></pre></td></tr></table></figure>
+<p>注意父结点的第二个分隔键要从 <code>20</code> 更新为
+<code>18</code>，因为右兄弟现在的第一个键变成了
+<code>18</code>。这种情况没有增加新叶子，也没有增加父结点的键数。</p>
+<h2 id="删除合并与重分配">4.5 删除：合并与重分配</h2>
+<p>B+ 树删除与插入对称：</p>
+<ol type="1">
+<li>从根结点向下搜索，找到要删除的 data entry。</li>
+<li>在叶子结点中删除该 entry。</li>
+<li>如果结点仍满足最小占用要求，操作结束。</li>
+<li>如果结点过空，则考虑与兄弟结点重新分配。</li>
+<li>若兄弟结点也无法借出
+entry，则进行<strong>合并（merge）</strong>。</li>
+<li>合并可能导致父结点键值减少，必要时继续向上调整。</li>
+</ol>
+<p>调整不仅可能发生在叶子结点，也可能发生在非叶子结点。删除过程的目标是保持
+B+ 树的平衡和结点占用率要求。</p>
+<p>下面的删除例子沿用 4.4 中的小型 B+ 树约定：叶子最多 3 个
+entry、非根叶子至少 2 个 entry，内部结点最多 3
+个分隔键、非根内部结点至少 1 个分隔键。</p>
+<h3 id="删除情况-1删除后叶子仍满足最小占用">删除情况
+1：删除后叶子仍满足最小占用</h3>
+<p>从下面的树删除 <code>12*</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 12*, 15*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>删除后中间叶子变成 <code>[10*, 15*]</code>，仍有 2 个 data
+entry，满足最小占用：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 15*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>这种情况只修改叶子结点。</p>
+<h3 id="删除情况-2删除了叶子第一个键需要更新父结点分隔键">删除情况
+2：删除了叶子第一个键，需要更新父结点分隔键</h3>
+<p>考虑：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[10*, 15*] -&gt; [20*, 25*, 30*]</span><br></pre></td></tr></table></figure>
+<p>删除 <code>20*</code> 后，右叶子变成
+<code>[25*, 30*]</code>，没有过空。在本例采用的约定中，父结点分隔键保存“右孩子的第一个键”，因此右叶子的第一个键从
+<code>20</code> 变成 <code>25</code> 后，父结点分隔键也更新为
+<code>25</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [25]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[10*, 15*] -&gt; [25*, 30*]</span><br></pre></td></tr></table></figure>
+<p>这说明删除不一定导致合并或借位，但仍可能影响父结点中的分隔键。需要注意，不同教材或系统对内部结点分隔键的约定略有差异：如果把
+<code>20</code> 只看作“右子树的下界 fence key”，那么删除叶子里的
+<code>20*</code> 后保留根结点 <code>[20]</code>
+也仍然能正确导航，因为小于 <code>20</code> 的键去左边，大于等于
+<code>20</code>
+的键去右边；但在“父结点保存右孩子最小键”的讲法下，应把它改成
+<code>25</code>。</p>
+<h3 id="删除情况-3叶子过空向左兄弟借一个-entry">删除情况
+3：叶子过空，向左兄弟借一个 entry</h3>
+<p>考虑：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*, 7*] -&gt; [10*, 12*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>删除 <code>12*</code> 后，中间叶子只剩
+<code>[10*]</code>，低于最小占用。左兄弟 <code>[1*,5*,7*]</code> 有 3 个
+entry，可以借出一个最大的 <code>7*</code>。重新分配后：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [7 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [7*, 10*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>父结点中指向中间叶子的分隔键从 <code>10</code> 更新为
+<code>7</code>，因为中间叶子的第一个键变了。</p>
+<h3 id="删除情况-4叶子过空向右兄弟借一个-entry">删除情况
+4：叶子过空，向右兄弟借一个 entry</h3>
+<p>右借是对称情况。考虑：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 12*] -&gt; [20*, 25*, 30*]</span><br></pre></td></tr></table></figure>
+<p>删除 <code>12*</code> 后，中间叶子只剩 <code>[10*]</code>，右兄弟有 3
+个 entry，可以借出最小的 <code>20*</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 25]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 20*] -&gt; [25*, 30*]</span><br></pre></td></tr></table></figure>
+<p>父结点中右兄弟对应的分隔键从 <code>20</code> 更新为
+<code>25</code>，因为右兄弟新的第一个键变成了 <code>25</code>。</p>
+<h3 id="删除情况-5兄弟不能借叶子合并但父结点仍合法">删除情况
+5：兄弟不能借，叶子合并，但父结点仍合法</h3>
+<p>考虑：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [10 | 20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*] -&gt; [10*, 12*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>删除 <code>12*</code> 后，中间叶子只剩
+<code>[10*]</code>，左右兄弟都只有 2 个
+entry，不能借。于是把中间叶子与左兄弟合并：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Root: [20]</span><br><span class="line"></span><br><span class="line">Leaves:</span><br><span class="line">[1*, 5*, 10*] -&gt; [20*, 25*]</span><br></pre></td></tr></table></figure>
+<p>父结点中原来用于指向中间叶子的分隔键 <code>10</code>
+被删除。根结点还剩一个键 <code>[20]</code>，仍然合法。</p>
+<h3 id="删除情况-6叶子合并导致父结点过空继续向上合并最终根收缩">删除情况
+6：叶子合并导致父结点过空，继续向上合并，最终根收缩</h3>
+<p>最后看级联删除。初始树高度为 3：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">                Root: [50]</span><br><span class="line">               /          \</span><br><span class="line">       Internal: [20]      Internal: [70]</span><br><span class="line">       /        \          /        \</span><br><span class="line">[10*,15*]  [20*,25*]  [50*,60*]  [70*,80*]</span><br></pre></td></tr></table></figure>
+<p>删除 <code>25*</code> 后，叶子 <code>[20*,25*]</code> 变成
+<code>[20*]</code>，过空。它的左兄弟 <code>[10*,15*]</code> 也只有 2 个
+entry，不能借，所以两个叶子合并：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[10*,15*] + [20*]  =&gt;  [10*,15*,20*]</span><br></pre></td></tr></table></figure>
+<p>合并后，左侧内部结点 <code>[20]</code>
+失去了一个孩子和分隔键，变成只有一个孩子、没有分隔键，作为非根内部结点已经过空：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">                Root: [50]</span><br><span class="line">               /          \</span><br><span class="line">       Internal: []        Internal: [70]</span><br><span class="line">           |               /        \</span><br><span class="line">[10*,15*,20*]       [50*,60*]  [70*,80*]</span><br></pre></td></tr></table></figure>
+<p>右侧内部兄弟 <code>[70]</code>
+也只有最小数量的孩子，不能借，所以左内部结点、根分隔键
+<code>50</code>、右内部结点合并。合并后根结点没有分隔键了，树高可以下降一层，新的根就是合并得到的内部结点：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">            New Root: [50 | 70]</span><br><span class="line">            /          |          \</span><br><span class="line">[10*,15*,20*]     [50*,60*]     [70*,80*]</span><br></pre></td></tr></table></figure>
+<p>这就是删除中最复杂的情况：<strong>叶子合并可能让父结点过空；父结点过空又可能继续向上合并；如果根结点最后只剩一个孩子，就用这个孩子替代根，树高减少一层。</strong></p>
+<h2 id="重复数据的处理">4.6 重复数据的处理</h2>
+<p>当索引列上存在重复值时，B+ 树需要额外处理。这里给出两种思路：</p>
+<ul>
+<li>使用 <span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>⟩</span>：每条重复记录有一个
+data entry。查询时需要修改算法，例如找到同值记录范围，再逐个取出。</li>
+<li>使用 <span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>-<em>l</em><em>i</em><em>s</em><em>t</em>⟩</span>：一个键值对应一个
+rid 列表，处理重复值更直接，但当重复记录很多时，rid
+列表本身的查询和修改也会变复杂。</li>
+</ul>
+<p>实际系统可能采用不同策略。这里提到 Sybase 使用第三种 data
+entry；DB2、Oracle 8、SQL Server 等系统通过在键中增加 RID
+的方式处理重复数据，使内部排序键保持可区分。</p>
+<h2 id="b-树在实际系统中的优化">4.7 B+ 树在实际系统中的优化</h2>
+<h3 id="索引值压缩">4.7.1 索引值压缩</h3>
+<p>数据库查询代价与 B+ 树高度相关，而高度近似为：</p>
+<p><span class="math display"><em>O</em>(log<sub>fan-out</sub>(#data
+entries))</span></p>
+<p>扇出越大，树越矮；一个结点中能放更多索引项，扇出就越大。因此实际系统会考虑降低键值长度。</p>
+<p>对字符串键，可以使用<strong>前缀压缩（prefix
+compression）</strong>。基本思想是在非叶子结点中不保存完整字符串，而只保存足以区分左右子树的最短前缀。示例中，“David
+Smith”只能压缩成
+“Davi”，因为压缩后的值必须大于左子树所有键，并小于右子树所有键。</p>
+<h3 id="实际系统中的删除">4.7.2 实际系统中的删除</h3>
+<p>实际 DBMS
+删除索引项时不一定马上物理删除。有些系统会先打标记，之后再批量清理或重组。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">系统</th>
+<th style="text-align: left;">删除策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Sybase</td>
+<td style="text-align: left;">可以马上删除，也可以先标记再删除</td>
+</tr>
+<tr>
+<td style="text-align: left;">Oracle 8</td>
+<td style="text-align: left;">先做删除标记，将来再调整</td>
+</tr>
+<tr>
+<td style="text-align: left;">Informix</td>
+<td style="text-align: left;">被删除数据加标签</td>
+</tr>
+<tr>
+<td style="text-align: left;">DB2、SQL Server</td>
+<td style="text-align: left;">被删除数据马上删除</td>
+</tr>
+</tbody>
+</table>
+<p>这体现了数据库实现中的权衡：立即删除能及时回收空间，但可能增加当前操作成本；延迟删除能让当前操作更快，但需要后续维护。</p>
+<h3 id="b-树批量建立">4.7.3 B+ 树批量建立</h3>
+<p>如果已经收集好大量 data entry，再逐条插入 B+
+树会很慢，因为每条记录都可能触发查找、分裂和调整。更高效的方法是<strong>批量建立（bulk
+loading）</strong>：</p>
+<ol type="1">
+<li>收集所有 data entry。</li>
+<li>按搜索键排序。</li>
+<li>将排序后的 data entry 组织成叶子页。</li>
+<li>每页取出一个代表键，逐步建立上层索引结点。</li>
+<li>从左到右构造整棵树，直到根结点形成。</li>
+</ol>
+<p>批量建立利用了数据已经排序的事实，通常比逐条插入快很多，适合离线建索引或大规模数据导入后的建索引。</p>
+<h1 id="基于-hash-的索引结构">5 基于 Hash 的索引结构</h1>
+<p>树索引适合等值查询和范围查询，而 <strong>Hash 索引（Hash
+Index）</strong> 更适合等值查询。Hash 索引通过 Hash
+函数把搜索键映射到某个 bucket，然后在该 bucket 中查找记录。</p>
+<h2 id="hash-索引的基本思想">5.1 Hash 索引的基本思想</h2>
+<p>Hash 索引将键值 <span
+class="math inline"><em>k</em><em>e</em><em>y</em></span> 输入 Hash 函数
+<span class="math inline"><em>h</em></span>，得到一个 bucket 编号：</p>
+<p><span
+class="math display"><em>h</em>(<em>k</em><em>e</em><em>y</em>) mod  <em>N</em></span></p>
+<p>其中 <span class="math inline"><em>N</em></span> 是 bucket 数量。每个
+bucket 通常包含一个 primary bucket page 和若干 overflow
+page。查询时先计算 Hash 值，定位 primary page，再在 primary page 和
+overflow pages 中查找目标记录。</p>
+<p>Hash 索引对等值查询很快，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> age <span class="operator">=</span> <span class="number">25</span></span><br></pre></td></tr></table></figure>
+<p>但它不适合范围查询，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">WHERE</span> age <span class="keyword">BETWEEN</span> <span class="number">20</span> <span class="keyword">AND</span> <span class="number">30</span></span><br></pre></td></tr></table></figure>
+<p>原因是 Hash 函数会打散键值顺序，Hash 相邻的 bucket
+不代表原始键值相邻。</p>
+<h2 id="静态-hashing">5.2 静态 Hashing</h2>
+<p><strong>静态 Hashing（Static Hashing）</strong> 中 primary bucket
+page 的数量固定。每个 bucket 可以带一串 overflow page，以处理 bucket
+满的情况。</p>
+<p>静态 Hashing 的查询、插入和删除都基于 Hash 定位：</p>
+<ul>
+<li>查询：计算 Hash 值，进入对应 bucket，扫描 primary page 和 overflow
+pages。</li>
+<li>插入：先定位 bucket，如果 primary page 满，则插入 overflow
+page。</li>
+<li>删除：先定位 bucket，再删除目标记录。</li>
+</ul>
+<p>Hash 函数选择非常关键。一个好的 Hash 函数应尽量把数据均匀分布到
+bucket 中。这里给出简单形式：</p>
+<p><span
+class="math display"><em>H</em>(<em>v</em><em>a</em><em>l</em><em>u</em><em>e</em>) = <em>a</em> ⋅ <em>v</em><em>a</em><em>l</em><em>u</em><em>e</em> + <em>b</em></span></p>
+<p>实际系统中还需要结合取模、位运算或更复杂的 Hash 方法。</p>
+<p>静态 Hashing 的主要问题是 bucket 数固定：</p>
+<ul>
+<li>数据增加时，overflow page 串变长，查询性能下降。</li>
+<li>数据减少时，primary bucket page 可能浪费空间。</li>
+</ul>
+<p>解决方法包括定期重组，或者采用动态 Hashing。</p>
+<h2 id="可扩充-hashing">5.3 可扩充 Hashing</h2>
+<p><strong>可扩充 Hashing（Extendible Hashing）</strong> 使用一个
+directory 记录 bucket 地址。它会根据数据增长动态扩展 directory，并在
+bucket 满时分裂 bucket，而不是简单增加长溢出链。</p>
+<p>可扩充 Hashing 的关键概念有：</p>
+<ul>
+<li><strong>Directory：</strong> 内存或磁盘中的目录，目录项指向
+bucket。</li>
+<li><strong>Global Depth：</strong> 全局深度，表示当前 directory 使用
+Hash 值的后多少位来寻址。</li>
+<li><strong>Local Depth：</strong> 局部深度，表示某个 bucket
+实际用多少位区分自己。</li>
+<li><strong>Bucket Split：</strong> 当 bucket 满时，将其分裂为两个
+bucket，并根据更多 Hash 位重新分配数据。</li>
+</ul>
+<p>查询时，系统取 Hash 值的最后若干位，按 global depth 在 directory
+中找到 bucket，再在 bucket 内查找。</p>
+<p>如果 bucket 的 local depth 小于 global
+depth，分裂时可能只需要更新部分 directory 指针；如果 local depth 等于
+global depth，则需要 directory 翻倍，使 global depth 加一。</p>
+<p>下面用一个小例子说明可扩充 Hashing 的工作过程。假设 bucket 最多只能放
+2 个 data entry，Hash 值直接用键值的二进制低位表示，初始 global depth 为
+1，因此 directory 只看 Hash 值最后 1 位：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Directory 项</th>
+<th style="text-align: left;">指向 bucket</th>
+<th style="text-align: left;">bucket 内容</th>
+<th style="text-align: left;">local depth</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>0</code></td>
+<td style="text-align: left;">B0</td>
+<td style="text-align: left;">空</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>1</code></td>
+<td style="text-align: left;">B1</td>
+<td style="text-align: left;">空</td>
+<td style="text-align: left;">1</td>
+</tr>
+</tbody>
+</table>
+<p>现在依次插入 <code>4*</code>、<code>12*</code>、<code>5*</code>。因为
+<span class="math inline">4 = (100)<sub>2</sub></span>，<span
+class="math inline">12 = (1100)<sub>2</sub></span>，它们最后 1 位都是
+<code>0</code>，所以进入 B0；<span
+class="math inline">5 = (101)<sub>2</sub></span> 最后 1 位是
+<code>1</code>，所以进入 B1：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Directory 项</th>
+<th style="text-align: left;">指向 bucket</th>
+<th style="text-align: left;">bucket 内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>0</code></td>
+<td style="text-align: left;">B0</td>
+<td style="text-align: left;"><code>4*</code>, <code>12*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>1</code></td>
+<td style="text-align: left;">B1</td>
+<td style="text-align: left;"><code>5*</code></td>
+</tr>
+</tbody>
+</table>
+<p>接着插入 <code>13*</code>。<span
+class="math inline">13 = (1101)<sub>2</sub></span>，最后 1 位是
+<code>1</code>，进入 B1。B1 原来只有
+<code>5*</code>，还能容纳，所以插入后为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Directory 项</th>
+<th style="text-align: left;">指向 bucket</th>
+<th style="text-align: left;">bucket 内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>0</code></td>
+<td style="text-align: left;">B0</td>
+<td style="text-align: left;"><code>4*</code>, <code>12*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>1</code></td>
+<td style="text-align: left;">B1</td>
+<td style="text-align: left;"><code>5*</code>, <code>13*</code></td>
+</tr>
+</tbody>
+</table>
+<p>再插入 <code>20*</code>。<span
+class="math inline">20 = (10100)<sub>2</sub></span>，最后 1 位是
+<code>0</code>，应进入 B0，但 B0 已满。此时 B0 的 local depth 为 1，等于
+global depth 1，因此必须先让 directory 翻倍：global depth 从 1 变成
+2，directory 从 <code>0/1</code> 扩展成 <code>00/01/10/11</code>。然后
+B0 分裂为两个 bucket，按最后 2 位重新分配原数据和新数据：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">键值</th>
+<th style="text-align: left;">二进制</th>
+<th style="text-align: left;">最后 2 位</th>
+<th style="text-align: left;">新 bucket</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><code>00100</code></td>
+<td style="text-align: left;"><code>00</code></td>
+<td style="text-align: left;">B00</td>
+</tr>
+<tr>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;"><code>01100</code></td>
+<td style="text-align: left;"><code>00</code></td>
+<td style="text-align: left;">B00</td>
+</tr>
+<tr>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;"><code>10100</code></td>
+<td style="text-align: left;"><code>00</code></td>
+<td style="text-align: left;">B00</td>
+</tr>
+</tbody>
+</table>
+<p>这里会出现一个很重要的现象：即使 directory
+扩展了，<code>4*</code>、<code>12*</code>、<code>20*</code> 的最后 2
+位仍然都是 <code>00</code>，它们还是落在同一个 bucket 中。如果 bucket
+容量仍然只有 2，则 B00 还会继续溢出，需要再次分裂，并可能继续增加 local
+depth。这个例子说明，<strong>可扩充 Hashing 能动态扩展，但如果 Hash
+低位分布不均匀，directory 和 bucket 分裂可能增长得很快。</strong></p>
+<p>为了看到正常分裂的效果，再假设插入的是 <code>2*</code> 而不是
+<code>20*</code>。<span class="math inline">2 = (10)<sub>2</sub></span>
+的最后 2 位是 <code>10</code>，那么 B0 分裂后可重新分配为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Directory 项</th>
+<th style="text-align: left;">指向 bucket</th>
+<th style="text-align: left;">bucket 内容</th>
+<th style="text-align: left;">local depth</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>00</code></td>
+<td style="text-align: left;">B00</td>
+<td style="text-align: left;"><code>4*</code>, <code>12*</code></td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>10</code></td>
+<td style="text-align: left;">B10</td>
+<td style="text-align: left;"><code>2*</code></td>
+<td style="text-align: left;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>01</code></td>
+<td style="text-align: left;">B1</td>
+<td style="text-align: left;"><code>5*</code>, <code>13*</code></td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>11</code></td>
+<td style="text-align: left;">B1</td>
+<td style="text-align: left;"><code>5*</code>, <code>13*</code></td>
+<td style="text-align: left;">1</td>
+</tr>
+</tbody>
+</table>
+<p>注意 <code>01</code> 和 <code>11</code> 仍然可以指向同一个 B1，因为
+B1 的 local depth 还是 1，它只用最后 1 位区分数据；而 B00、B10 的 local
+depth 已经是 2，它们需要最后 2 位才能区分。查询时，global depth
+决定先看几位进入 directory，local depth 说明某个 bucket
+自己实际被分裂到了多细。</p>
+<p>可扩充 Hashing 的优点是 overflow 链较短，查询性能较好。缺点是当 Hash
+函数不均匀时，directory 可能快速增长，占用较多空间。</p>
+<h2 id="线性-hashing">5.4 线性 Hashing</h2>
+<p><strong>线性 Hashing（Linear Hashing）</strong> 也是动态
+Hashing，但它没有 directory。它通过按顺序分裂 bucket
+来逐步扩展索引，避免可扩充 Hashing 在数据倾斜时 directory
+频繁扩大的问题。</p>
+<p>线性 Hashing 使用一族 Hash 函数：</p>
+<p><span
+class="math display"><em>h</em><sub><em>i</em></sub>(<em>v</em><em>a</em><em>l</em><em>u</em><em>e</em>) = <em>h</em>(<em>v</em><em>a</em><em>l</em><em>u</em><em>e</em>) mod  (2<sup><em>i</em></sup><em>N</em>)</span></p>
+<p>其中 <span class="math inline"><em>N</em></span> 是初始 bucket
+数，<span class="math inline"><em>i</em></span> 表示当前 level。<span
+class="math inline"><em>h</em><sub><em>i</em></sub></span> 的地址范围是
+<span class="math inline"><em>h</em><sub><em>i</em> + 1</sub></span>
+的一半。系统还维护一个 <code>Next</code> 指针，指向下一个要分裂的
+bucket。</p>
+<p>查询时通常先用当前 level 的 Hash 函数 <span
+class="math inline"><em>h</em><sub><em>i</em></sub></span> 定位
+bucket。如果结果对应的 bucket 已经被 <code>Next</code> 指针越过，说明该
+bucket 已分裂，需要使用 <span
+class="math inline"><em>h</em><sub><em>i</em> + 1</sub></span>
+重新定位。</p>
+<p>插入触发分裂时，并不一定分裂当前溢出的 bucket，而是分裂
+<code>Next</code> 指向的 bucket。新分裂出的 bucket 放在 bucket
+序列末尾，<code>Next</code> 向后移动。当 <code>Next</code>
+扫过一轮后，level 增加，<code>Next</code> 回到起点。</p>
+<p>下面用一个例子说明线性 Hashing 的过程。假设初始有 <span
+class="math inline"><em>N</em> = 4</span> 个 bucket，bucket 编号为
+<code>0,1,2,3</code>，每个 bucket 最多放 3 个 data entry。初始
+<code>Level=0</code>，<code>Next=0</code>，使用：</p>
+<p><span
+class="math display"><em>h</em><sub>0</sub>(<em>k</em>) = <em>h</em>(<em>k</em>) mod  4</span></p>
+<p>为了便于计算，假设 <span
+class="math inline"><em>h</em>(<em>k</em>) = <em>k</em></span>。初始状态如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">bucket</th>
+<th style="text-align: left;">内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">0&lt;-Next</td>
+<td style="text-align: left;"><code>32*</code>, <code>44*</code>,
+<code>36*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><code>9*</code>, <code>25*</code>,
+<code>5*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><code>14*</code>, <code>18*</code>,
+<code>10*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><code>31*</code>, <code>35*</code>,
+<code>7*</code></td>
+</tr>
+</tbody>
+</table>
+<p>现在插入 <code>43*</code>。因为 <span
+class="math inline"><em>h</em><sub>0</sub>(43) = 43 mod  4 = 3</span>，所以它应该进入
+bucket 3。但 bucket 3 已满，于是 <code>43*</code> 先进入 bucket 3 的
+overflow page。线性 Hashing 接着触发一次分裂，但<strong>分裂的不是
+bucket 3，而是 <code>Next=0</code> 指向的 bucket 0</strong>。</p>
+<p>分裂 bucket 0 时，新 bucket 会追加到 bucket 序列末尾，编号为
+<code>4</code>。bucket 0 中原来的记录要用下一层 Hash 函数重新分配：</p>
+<p><span
+class="math display"><em>h</em><sub>1</sub>(<em>k</em>) = <em>h</em>(<em>k</em>) mod  8</span></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">记录</th>
+<th style="text-align: left;"><span
+class="math inline"><em>h</em><sub>1</sub>(<em>k</em>)</span></th>
+<th style="text-align: left;">分裂后位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>32*</code></td>
+<td style="text-align: left;"><span
+class="math inline">32 mod  8 = 0</span></td>
+<td style="text-align: left;">bucket 0</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>44*</code></td>
+<td style="text-align: left;"><span
+class="math inline">44 mod  8 = 4</span></td>
+<td style="text-align: left;">bucket 4</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>36*</code></td>
+<td style="text-align: left;"><span
+class="math inline">36 mod  8 = 4</span></td>
+<td style="text-align: left;">bucket 4</td>
+</tr>
+</tbody>
+</table>
+<p>分裂完成后，<code>Next</code> 从 0 移到 1：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">bucket</th>
+<th style="text-align: left;">内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;"><code>32*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">1&lt;-Next</td>
+<td style="text-align: left;"><code>9*</code>, <code>25*</code>,
+<code>5*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;"><code>14*</code>, <code>18*</code>,
+<code>10*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><code>31*</code>, <code>35*</code>,
+<code>7*</code>，overflow: <code>43*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><code>44*</code>, <code>36*</code></td>
+</tr>
+</tbody>
+</table>
+<p>这里要注意：虽然 <code>43*</code> 的插入让 bucket 3
+溢出了，但本轮实际分裂的是 bucket 0。线性 Hashing 通过 <code>Next</code>
+按顺序分裂 bucket，使扩展过程比较平滑。</p>
+<p>接着插入 <code>37*</code>。先算 <span
+class="math inline"><em>h</em><sub>0</sub>(37) = 37 mod  4 = 1</span>，目标是
+bucket 1。bucket 1 已满，于是 <code>37*</code> 进入 bucket 1 的 overflow
+page，并触发分裂。此时 <code>Next=1</code>，所以这次分裂 bucket
+1，并新增 bucket 5。用 <span
+class="math inline"><em>h</em><sub>1</sub>(<em>k</em>) = <em>k</em> mod  8</span>
+重新分配 bucket 1 中的数据：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">记录</th>
+<th style="text-align: left;"><span
+class="math inline"><em>h</em><sub>1</sub>(<em>k</em>)</span></th>
+<th style="text-align: left;">分裂后位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>9*</code></td>
+<td style="text-align: left;"><span
+class="math inline">9 mod  8 = 1</span></td>
+<td style="text-align: left;">bucket 1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>25*</code></td>
+<td style="text-align: left;"><span
+class="math inline">25 mod  8 = 1</span></td>
+<td style="text-align: left;">bucket 1</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>5*</code></td>
+<td style="text-align: left;"><span
+class="math inline">5 mod  8 = 5</span></td>
+<td style="text-align: left;">bucket 5</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>37*</code></td>
+<td style="text-align: left;"><span
+class="math inline">37 mod  8 = 5</span></td>
+<td style="text-align: left;">bucket 5</td>
+</tr>
+</tbody>
+</table>
+<p>分裂后 <code>Next</code> 移到 2：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">bucket</th>
+<th style="text-align: left;">内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;"><code>32*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;"><code>9*</code>, <code>25*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">2&lt;-Next</td>
+<td style="text-align: left;"><code>14*</code>, <code>18*</code>,
+<code>10*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;"><code>31*</code>, <code>35*</code>,
+<code>7*</code>，overflow: <code>43*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">4</td>
+<td style="text-align: left;"><code>44*</code>, <code>36*</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;"><code>5*</code>, <code>37*</code></td>
+</tr>
+</tbody>
+</table>
+<p>查询时也要考虑 <code>Next</code>。例如现在
+<code>Level=0</code>、<code>Next=2</code>。查询 <code>44*</code>
+时，先算 <span
+class="math inline"><em>h</em><sub>0</sub>(44) = 0</span>，但 bucket 0
+已经被分裂过，因为 <code>0 &lt; Next</code>，所以要改用 <span
+class="math inline"><em>h</em><sub>1</sub>(44) = 4</span>，最终到 bucket
+4 查找。查询 <code>18*</code> 时，<span
+class="math inline"><em>h</em><sub>0</sub>(18) = 2</span>，而
+<code>2</code> 没有小于 <code>Next=2</code>，说明 bucket 2
+还没分裂，所以仍在 bucket 2 查找。</p>
+<p>当 <code>Next</code> 依次从 0、1、2、3 扫完整个旧 bucket
+序列后，一轮分裂结束，<code>Level</code> 增加为 1，<code>Next</code>
+回到 0。之后基础 Hash 函数变为 <span
+class="math inline"><em>h</em><sub>1</sub>(<em>k</em>) = <em>k</em> mod  8</span>，下一轮分裂会继续产生更多
+bucket。</p>
+<h2 id="可扩充-hashing-与线性-hashing-的比较">5.5 可扩充 Hashing 与线性
+Hashing 的比较</h2>
+<p>两者都依赖 Hash 函数的质量。当 Hash
+函数均匀时，两者性能差距不大；线性 Hashing 少了一次读取 directory
+的开销。</p>
+<p>当 Hash 函数不均匀时，两者表现不同：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">可扩充 Hashing</th>
+<th style="text-align: left;">线性 Hashing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">是否有 directory</td>
+<td style="text-align: left;">有</td>
+<td style="text-align: left;">无</td>
+</tr>
+<tr>
+<td style="text-align: left;">扩展方式</td>
+<td style="text-align: left;">bucket 满时可能分裂并扩展 directory</td>
+<td style="text-align: left;">按 Next 指针顺序分裂 bucket</td>
+</tr>
+<tr>
+<td style="text-align: left;">查询性能</td>
+<td style="text-align: left;">overflow 链较短，通常较好</td>
+<td style="text-align: left;">可能因 overflow 链较长而较差</td>
+</tr>
+<tr>
+<td style="text-align: left;">空间开销</td>
+<td style="text-align: left;">directory 和 bucket 数可能增长较快</td>
+<td style="text-align: left;">primary bucket 增长较慢，空间较省</td>
+</tr>
+<tr>
+<td style="text-align: left;">数据倾斜时</td>
+<td style="text-align: left;">directory 可能急剧增大</td>
+<td style="text-align: left;">空间较稳，但查询可能退化</td>
+</tr>
+</tbody>
+</table>
+<p><strong>核心权衡：可扩充 Hashing 用更多空间换较短 overflow
+链和更好查询性能；线性 Hashing
+用更平滑的扩展方式节省空间，但可能保留较长 overflow 链。</strong></p>
+<h1 id="多键索引与特殊数据类型索引">6 多键索引与特殊数据类型索引</h1>
+<p>材料最后从更广泛的角度介绍多属性查询和非传统数据类型的索引。它们共同体现一个原则：索引结构必须结合查询模式、数据分布和数据语义来设计。</p>
+<h2 id="多键索引问题">6.1 多键索引问题</h2>
+<p>对于查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> eno</span><br><span class="line"><span class="keyword">FROM</span> employee</span><br><span class="line"><span class="keyword">WHERE</span> ename <span class="operator">=</span> <span class="string">&#x27;liu&#x27;</span> <span class="keyword">AND</span> salary <span class="operator">=</span> <span class="number">600</span></span><br></pre></td></tr></table></figure>
+<p>如果只有单属性索引，DBMS 可能有三种方式：</p>
+<ul>
+<li>使用 <code>ename</code> 索引找出所有 <code>ename='liu'</code>
+的记录，再检查 <code>salary=600</code>。</li>
+<li>使用 <code>salary</code> 索引找出所有 <code>salary=600</code>
+的记录，再检查 <code>ename='liu'</code>。</li>
+<li>分别使用两个索引，取两个结果集合的交集。</li>
+</ul>
+<p>问题是中间结果可能过多。若叫 <code>liu</code> 的人很多，或工资为
+<code>600</code> 的人很多，单属性索引仍然会产生大量候选记录。</p>
+<p>因此，多键索引的目标是同时利用多个属性进行裁剪，尽量减少中间结果。</p>
+<h2 id="网格文件">6.2 网格文件</h2>
+<p><strong>网格文件（Grid File）</strong>
+是一种多维索引思想。它把多个属性的取值空间划分为网格，每个网格单元对应一个
+bucket。查询多个属性条件时，可以定位到对应区域，而不是只靠单个属性过滤。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260605114620411.png" alt="image-20260605114620227" style="zoom:50%;" /></p>
+<p>例如对于姓名和工资两个维度，可以按姓名范围、工资范围划分网格。查询
+<code>ename='liu' AND salary=600</code>
+时，系统可以直接定位到姓名维度和工资维度共同确定的桶。</p>
+<h2 id="分区散列技术">6.3 分区散列技术</h2>
+<p><strong>分区散列技术（Partitioned Hashing）</strong>
+也用于多个属性上的索引。它把复合查询键的各个属性分别映射为 Hash
+位串，再组合成整体 Hash 表示。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260619223736194.png" alt="image-20260619223735932" style="zoom:50%;" /></p>
+<p>示例中，查询键值如 <span
+class="math inline">(<em>S</em>4, <em>C</em>4)</span>、<span
+class="math inline">(<em>S</em>3, <em>C</em>6)</span>、<span
+class="math inline">(<em>S</em>2, <em>C</em>7)</span> 被映射为类似
+<code>0100 0100</code>、<code>0011 0110</code>
+的散列值。这种方式可以在多属性条件下利用不同属性对应的位段，支持更细粒度的定位。</p>
+<h2 id="r-树">6.4 R 树</h2>
+<p><strong>R 树（R-tree）</strong>
+是动态空间数据索引结构，常用于二维或多维空间对象，例如矩形、区域、地理位置和空间数据库。</p>
+<p>R 树的核心思想是用<strong>最小覆盖矩形（Minimum Bounding Rectangle,
+MBR）</strong>
+组织数据。每个内部结点保存若干矩形，每个矩形覆盖其子树中的所有对象。查询时，如果查询区域与某个
+MBR 相交，就需要进入对应子树。</p>
+<p>R 树与 B+ 树不同：B+ 树查询通常只沿一条路径下降，而 R
+树的一次空间查询可能覆盖多条路径，因为多个 MBR
+可能重叠。矩形划分质量直接影响性能。</p>
+<p>下面用二维地图数据举例。假设数据库中存储几个空间对象，每个对象用一个矩形区域表示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">对象</th>
+<th style="text-align: left;">空间范围，格式为 <span
+class="math inline">(<em>x</em><sub>min</sub>, <em>y</em><sub>min</sub>) − (<em>x</em><sub>max</sub>, <em>y</em><sub>max</sub>)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">A 商场</td>
+<td style="text-align: left;"><span
+class="math inline">(1, 1) − (4, 4)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">B 学校</td>
+<td style="text-align: left;"><span
+class="math inline">(5, 1) − (8, 3)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">C 公园</td>
+<td style="text-align: left;"><span
+class="math inline">(2, 6) − (5, 9)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">D 医院</td>
+<td style="text-align: left;"><span
+class="math inline">(6, 6) − (9, 9)</span></td>
+</tr>
+</tbody>
+</table>
+<p>R 树可以把相近的对象分成两组，并为每组建立一个 MBR：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">R 树结点</th>
+<th style="text-align: left;">覆盖对象</th>
+<th style="text-align: left;">MBR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Node 1</td>
+<td style="text-align: left;">A 商场、B 学校</td>
+<td style="text-align: left;"><span
+class="math inline">(1, 1) − (8, 4)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Node 2</td>
+<td style="text-align: left;">C 公园、D 医院</td>
+<td style="text-align: left;"><span
+class="math inline">(2, 6) − (9, 9)</span></td>
+</tr>
+</tbody>
+</table>
+<p>如果用户查询“找出与区域 <span
+class="math inline">(3, 2) − (6, 7)</span>
+相交的对象”，系统先检查查询区域与上层 MBR 是否相交。该查询区域既与 Node
+1 的 MBR 相交，也与 Node 2 的 MBR 相交，因此 R
+树必须同时进入两个子结点继续检查。进入 Node 1 后，发现查询区域与 A
+商场、B 学校都可能相交；进入 Node 2 后，又发现它与 C
+公园相交，但不一定与 D 医院相交。</p>
+<p>这个例子说明了 R
+树的两个特点：第一，内部结点保存的是“覆盖一组对象的矩形”，不是单个排序键；第二，多个
+MBR 可能同时与查询区域相交，所以一次查询可能走多条路径。<strong>R
+树的性能很依赖矩形划分质量，MBR
+重叠越少，查询时需要访问的路径越少。</strong></p>
+<h2 id="kd-树">6.5 KD 树</h2>
+<p><strong>KD 树（K-D Tree, k-dimensional tree）</strong> 是一种用于
+<span class="math inline"><em>k</em></span>
+维数据空间的二叉查找树。它通过不断选择某个维度上的超平面，把数据集合划分为两个子集合。</p>
+<p>构造过程可以理解为：</p>
+<ol type="1">
+<li>选择一个划分维度。</li>
+<li>在该维度上选择划分值。</li>
+<li>将点集分成两个不相交子集。</li>
+<li>对子集递归划分，直到集合足够小或只剩一个点。</li>
+</ol>
+<p>KD
+树适合点数据的空间查找。这里强调它是一棵平衡树，并通过空间划分减少搜索范围。</p>
+<p>下面用二维点数据举例。假设有 6 个位置点：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">点</th>
+<th style="text-align: left;">坐标 <span
+class="math inline">(<em>x</em>, <em>y</em>)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">P1</td>
+<td style="text-align: left;"><span
+class="math inline">(2, 3)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">P2</td>
+<td style="text-align: left;"><span
+class="math inline">(5, 4)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">P3</td>
+<td style="text-align: left;"><span
+class="math inline">(9, 6)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">P4</td>
+<td style="text-align: left;"><span
+class="math inline">(4, 7)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">P5</td>
+<td style="text-align: left;"><span
+class="math inline">(8, 1)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">P6</td>
+<td style="text-align: left;"><span
+class="math inline">(7, 2)</span></td>
+</tr>
+</tbody>
+</table>
+<p>构造 KD 树时，可以在不同层轮流选择划分维度。第一层按 <span
+class="math inline"><em>x</em></span> 维划分，选择中位点附近的 <span
+class="math inline"><em>x</em> = 7</span> 作为根划分：<span
+class="math inline"><em>x</em> &lt; 7</span> 的点进入左子树，<span
+class="math inline"><em>x</em> ≥ 7</span> 的点进入右子树。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">第一层划分</th>
+<th style="text-align: left;">点集合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">左子树：<span
+class="math inline"><em>x</em> &lt; 7</span></td>
+<td style="text-align: left;">P1 <span
+class="math inline">(2, 3)</span>、P2 <span
+class="math inline">(5, 4)</span>、P4 <span
+class="math inline">(4, 7)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">右子树：<span
+class="math inline"><em>x</em> ≥ 7</span></td>
+<td style="text-align: left;">P3 <span
+class="math inline">(9, 6)</span>、P5 <span
+class="math inline">(8, 1)</span>、P6 <span
+class="math inline">(7, 2)</span></td>
+</tr>
+</tbody>
+</table>
+<p>第二层可以改按 <span class="math inline"><em>y</em></span>
+维划分。例如左子树中按 <span class="math inline"><em>y</em></span>
+划分，P2 <span class="math inline">(5, 4)</span> 可作为中间点，<span
+class="math inline"><em>y</em> &lt; 4</span> 的 P1 在其一侧，<span
+class="math inline"><em>y</em> ≥ 4</span> 的 P4 在另一侧；右子树中也按
+<span class="math inline"><em>y</em></span> 划分，P6 <span
+class="math inline">(7, 2)</span> 可把 P5 <span
+class="math inline">(8, 1)</span> 和 P3 <span
+class="math inline">(9, 6)</span> 分开。</p>
+<p>如果查询“找 <span class="math inline"><em>x</em></span> 在 1 到 6 且
+<span class="math inline"><em>y</em></span> 在 2 到 5
+之间的点”，即查询矩形：</p>
+<p><span
+class="math display">1 ≤ <em>x</em> ≤ 6,  2 ≤ <em>y</em> ≤ 5</span></p>
+<p>KD 树会先根据根结点的 <span class="math inline"><em>x</em></span>
+划分判断：查询范围的 <span class="math inline"><em>x</em></span>
+最大值是 6，小于
+7，因此右子树整体可以被剪掉，只需要进入左子树。进入左子树后，再根据
+<span class="math inline"><em>y</em></span> 划分继续过滤，最终 P1 <span
+class="math inline">(2, 3)</span> 和 P2 <span
+class="math inline">(5, 4)</span> 满足条件，P4 <span
+class="math inline">(4, 7)</span> 因为 <span
+class="math inline"><em>y</em> = 7</span> 不满足而被排除。</p>
+<p>这个例子体现了 KD 树的核心：<strong>它不是用 MBR
+包住对象，而是用超平面不断切分空间；查询时根据查询区域与切分平面的关系，尽量剪掉不可能包含结果的子空间。</strong></p>
+<h2 id="图数据索引">6.6 图数据索引</h2>
+<h3 id="图数据库">6.6.1 图数据库</h3>
+<p><strong>图数据库（Graph Database）</strong>
+是一种以“点”和“边”为核心组织数据的数据库。点表示实体，例如用户、论文、城市、商品；边表示实体之间的关系，例如“关注”“引用”“连接”“购买”。如果关系本身比单个实体属性更重要，图数据库通常比普通关系表更自然。</p>
+<p>例如一个社交网络可以表示为图：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">点或边</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">点
+<code>Alice</code>、<code>Bob</code>、<code>Cindy</code>、<code>David</code></td>
+<td style="text-align: left;">用户</td>
+</tr>
+<tr>
+<td style="text-align: left;">边 <code>Alice -&gt; Bob</code></td>
+<td style="text-align: left;">Alice 关注 Bob</td>
+</tr>
+<tr>
+<td style="text-align: left;">边 <code>Bob -&gt; Cindy</code></td>
+<td style="text-align: left;">Bob 关注 Cindy</td>
+</tr>
+<tr>
+<td style="text-align: left;">边 <code>Alice -&gt; David</code></td>
+<td style="text-align: left;">Alice 关注 David</td>
+</tr>
+<tr>
+<td style="text-align: left;">边 <code>David -&gt; Cindy</code></td>
+<td style="text-align: left;">David 关注 Cindy</td>
+</tr>
+</tbody>
+</table>
+<p>在关系数据库中，这些关系可能要放在用户表、关注关系表里，再通过多次
+join 查询；而在图数据库中，查询可以直接沿着边走。例如“找 Alice
+的二跳好友”就是从 <code>Alice</code> 出发，先走到 <code>Bob</code> 和
+<code>David</code>，再继续走到 <code>Cindy</code>。</p>
+<h3 id="图数据索引-1">6.6.2 图数据索引</h3>
+<p><strong>图数据索引（Graph Data Index）</strong>
+是为了加速图查询而建立的辅助结构。普通 B+ 树或 Hash
+索引擅长处理单个属性值，例如
+<code>age=20</code>、<code>sid='S001'</code>；但图查询常常关心的是一段关系模式，例如“谁关注了某人”“是否存在某种路径”“是否包含某个子图”。因此图数据索引通常索引的是路径、邻接关系、频繁子结构或图的规范化表示。</p>
+<p>典型查询模式包括<strong>子图匹配（Subgraph
+Matching）</strong>：判断大图中是否存在与查询图结构相同或相似的子图。</p>
+<p>图索引的构建思路包括：</p>
+<ul>
+<li>基于频繁模式建立索引。</li>
+<li>基于路径建立索引。</li>
+<li>利用图数据的唯一化表示，避免同构图被重复表示。</li>
+</ul>
+<p>下面用两个例子说明图数据索引到底在加速什么。</p>
+<p>第一个例子是<strong>路径索引</strong>。假设论文引用网络中，点表示论文，边
+<code>A -&gt; B</code> 表示论文 A 引用了论文 B：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">引用边</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">P1 -&gt; P2</td>
+<td style="text-align: left;">P1 引用 P2</td>
+</tr>
+<tr>
+<td style="text-align: left;">P2 -&gt; P3</td>
+<td style="text-align: left;">P2 引用 P3</td>
+</tr>
+<tr>
+<td style="text-align: left;">P1 -&gt; P4</td>
+<td style="text-align: left;">P1 引用 P4</td>
+</tr>
+<tr>
+<td style="text-align: left;">P4 -&gt; P3</td>
+<td style="text-align: left;">P4 引用 P3</td>
+</tr>
+</tbody>
+</table>
+<p>如果经常查询“从 P1
+出发，经过两次引用能到达哪些论文”，没有索引时系统需要从 P1
+的邻接边开始逐层遍历。路径索引可以预先保存长度为 2 的可达关系：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">起点</th>
+<th style="text-align: left;">长度为 2 的路径终点</th>
+<th style="text-align: left;">路径</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">P1</td>
+<td style="text-align: left;">P3</td>
+<td style="text-align: left;">P1 -&gt; P2 -&gt; P3</td>
+</tr>
+<tr>
+<td style="text-align: left;">P1</td>
+<td style="text-align: left;">P3</td>
+<td style="text-align: left;">P1 -&gt; P4 -&gt; P3</td>
+</tr>
+</tbody>
+</table>
+<p>这样查询 P1
+的二跳引用结果时，可以直接查路径索引，而不必每次重新遍历所有边。这个思路类似普通索引把“键值到记录位置”的关系提前保存下来，只是这里保存的是“路径模式到匹配位置”。</p>
+<p>第二个例子是<strong>频繁子图索引</strong>。假设化学分子数据库中，每个分子是一张图：原子是点，化学键是边。用户查询“哪些分子中包含苯环结构”。苯环可以看作一个常见的六元环子图。如果没有索引，系统可能要对每个分子做复杂的子图匹配；如果预先把常见结构如“六元环”“羟基”“羧基”建成索引，就可以先快速筛出可能包含苯环的分子，再做精确验证。</p>
+<p>这里的关键是：图索引通常只能先做<strong>候选过滤</strong>，不一定直接给出最终答案。因为图结构可能存在同构、边标签、点标签、方向等复杂条件，索引筛出的候选图还需要进一步匹配确认。</p>
+<p>图索引的难点在于图结构复杂，节点和边没有天然线性顺序，子图匹配本身计算代价较高。因此索引重点是尽快排除不可能匹配的候选图。</p>
+<h2 id="时间序列索引与-isax">6.7 时间序列索引与 iSAX</h2>
+<p>时间序列数据广泛出现在物联网、传感器、金融数据和监控系统中。时间序列索引的主要目标是支持<strong>相似性查询</strong>，即找出与某条时间序列形状相似的数据。</p>
+<p>时间序列可以有多种表示方法，不同表示关注不同特征，例如整体趋势、局部波动、分段均值或符号模式。</p>
+<p>这里介绍了 <strong>iSAX（indexable Symbolic Aggregate
+approXimation）</strong> 的思想：</p>
+<ul>
+<li>支持 <strong>PAA（Piecewise Aggregate
+Approximation，分段聚合近似）</strong>，即把时间序列划分为若干段，并用每段平均值近似表示。</li>
+<li>支持符号序列表示，把数值序列转换为符号串。</li>
+<li>不同段可以有不同基数，例如 <span
+class="math inline">(111, 11, 101, 0) = (7<sub>8</sub>, 3<sub>4</sub>, 5<sub>8</sub>, 0<sub>2</sub>)</span>
+表示各段基数分别为 <span class="math inline">8, 4, 8, 2</span>。</li>
+<li>借鉴 KD 树思想，利用区分能力最强的属性进行划分。</li>
+</ul>
+<p>下面用传感器温度数据举例。假设某个传感器在 8
+个连续时刻记录到如下温度序列：</p>
+<p><span
+class="math display"><em>T</em> = [20, 22, 21, 23, 30, 32, 31, 33]</span></p>
+<p>如果直接比较完整时间序列，系统需要逐点比较 8 个数。PAA
+的第一步是把序列分段，例如每 2 个点一段，共分成 4
+段，然后用每段平均值代表这一段：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">分段</th>
+<th style="text-align: left;">原始数值</th>
+<th style="text-align: left;">PAA 平均值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">第 1 段</td>
+<td style="text-align: left;"><span
+class="math inline">20, 22</span></td>
+<td style="text-align: left;"><span class="math inline">21</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">第 2 段</td>
+<td style="text-align: left;"><span
+class="math inline">21, 23</span></td>
+<td style="text-align: left;"><span class="math inline">22</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">第 3 段</td>
+<td style="text-align: left;"><span
+class="math inline">30, 32</span></td>
+<td style="text-align: left;"><span class="math inline">31</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">第 4 段</td>
+<td style="text-align: left;"><span
+class="math inline">31, 33</span></td>
+<td style="text-align: left;"><span class="math inline">32</span></td>
+</tr>
+</tbody>
+</table>
+<p>于是原始序列可近似表示为：</p>
+<p><span
+class="math display"><em>P</em><em>A</em><em>A</em>(<em>T</em>) = [21, 22, 31, 32]</span></p>
+<p>第二步是把这些数值进一步转换成符号。为了简单说明，假设系统把平均值区间划分成
+4 个符号：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">数值区间</th>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">二进制编码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">[0, 20)</span></td>
+<td style="text-align: left;">a</td>
+<td style="text-align: left;"><code>00</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">[20, 25)</span></td>
+<td style="text-align: left;">b</td>
+<td style="text-align: left;"><code>01</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">[25, 30)</span></td>
+<td style="text-align: left;">c</td>
+<td style="text-align: left;"><code>10</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">[30, ∞)</span></td>
+<td style="text-align: left;">d</td>
+<td style="text-align: left;"><code>11</code></td>
+</tr>
+</tbody>
+</table>
+<p>那么 <span class="math inline">[21, 22, 31, 32]</span>
+会被转换成：</p>
+<p><span
+class="math display">[<em>b</em>, <em>b</em>, <em>d</em>, <em>d</em>]</span></p>
+<p>也可以写成二进制符号序列：</p>
+<p><span class="math display">(01, 01, 11, 11)</span></p>
+<p>这个符号序列就是时间序列的压缩表示。它丢掉了一些细节，例如
+<code>20,22</code> 和 <code>21,21</code>
+都可能落到同一个符号，但保留了整体形状：前半段温度较低，后半段温度较高。</p>
+<p>如果数据库中有很多传感器序列，iSAX
+可以把相似符号前缀组织在同一个索引结点中。例如：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">序列</th>
+<th style="text-align: left;">原始趋势</th>
+<th style="text-align: left;">iSAX 符号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">T1</td>
+<td style="text-align: left;">低、低、高、高</td>
+<td style="text-align: left;"><code>(01,01,11,11)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">T2</td>
+<td style="text-align: left;">低、低、高、高</td>
+<td style="text-align: left;"><code>(01,01,10,11)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">T3</td>
+<td style="text-align: left;">高、高、低、低</td>
+<td style="text-align: left;"><code>(11,11,01,01)</code></td>
+</tr>
+</tbody>
+</table>
+<p>当用户查询“找和 T1 形状相似的时间序列”时，系统不需要一开始就把 T1
+和所有原始序列逐点比较，而是先通过 iSAX 符号找到
+<code>(01,01,*,*)</code> 或更接近 <code>(01,01,11,11)</code>
+的候选序列，例如
+T2，再对候选序列做精确距离计算。这样索引的作用就是<strong>先用粗粒度符号表示快速排除明显不相似的序列。</strong></p>
+<p>这里提到的不同基数可以理解为：某些分段需要更细的区分能力，就用更多
+bit 表示。例如 <code>(111, 11, 101, 0)</code> 中第一段有 3 bit，能区分
+<span class="math inline">2<sup>3</sup> = 8</span> 个符号；第二段有 2
+bit，能区分 <span class="math inline">2<sup>2</sup> = 4</span>
+个符号；最后一段只有 1 bit，只能粗略区分 2 个符号。iSAX
+会优先在区分能力最强、最有助于分开数据的维度上继续划分，这一点和 KD
+树按维度切分空间的思想相似。</p>
+<p>iSAX
+的直觉是：先把长时间序列压缩成较短的符号表示，再用这些符号进行索引，从而支持大规模时间序列相似性查询。</p>
+<h2 id="gist">6.8 GiST</h2>
+<p><strong>GiST（Generalized Search Tree，广义搜索树）</strong> 是
+Berkeley
+提出的通用索引框架。它不是某一种固定索引，而是提供一种构造搜索树索引的抽象方法。</p>
+<p>GiST
+的意义在于：不同数据类型和查询谓词可能需要不同的索引逻辑，例如空间数据、文本、区间、集合等。通过广义搜索树框架，可以把“如何判断进入哪个子树、如何分裂、如何判断匹配”等操作抽象出来，为多种索引结构提供统一实现基础。</p>
+<h1 id="本讲总结与重点内容">7 本讲总结与重点内容</h1>
+<p>本讲的主线是：数据库索引通过组织 data entry
+来快速定位记录；不同索引结构适合不同查询模式和更新场景。树索引强调有序性和范围查询，Hash
+索引强调等值查询，多维和特殊数据索引则进一步结合数据语义设计裁剪方式。</p>
+<h2 id="需要掌握的核心概念">7.1 需要掌握的核心概念</h2>
+<ul>
+<li><strong>data entry 的三种形式：</strong> <span
+class="math inline"><em>k</em><sup>*</sup></span>、<span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>⟩</span>、<span
+class="math inline">⟨<em>k</em>, <em>r</em><em>i</em><em>d</em>-<em>l</em><em>i</em><em>s</em><em>t</em>⟩</span>。</li>
+<li><strong>簇聚索引与非簇聚索引：</strong>
+是否与数据文件物理顺序一致，尤其影响范围查询代价。</li>
+<li><strong>稠密索引与稀疏索引：</strong>
+是否为每个搜索键值建立索引项；稀疏索引必须依赖簇聚顺序。</li>
+<li><strong>主索引、辅助索引、唯一索引、重复索引：</strong>
+分别从索引建立属性和键值是否重复角度分类。</li>
+<li><strong>组合搜索键索引：</strong>
+多属性索引中属性顺序会影响可用查询。</li>
+</ul>
+<h2 id="isam-与-b-树对比">7.2 ISAM 与 B+ 树对比</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">ISAM</th>
+<th style="text-align: left;">B+ 树</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">类型</td>
+<td style="text-align: left;">静态索引结构</td>
+<td style="text-align: left;">动态索引结构</td>
+</tr>
+<tr>
+<td style="text-align: left;">更新方式</td>
+<td style="text-align: left;">非叶子层基本不变，叶子层可接溢出页</td>
+<td
+style="text-align: left;">插入删除后通过分裂、合并、重分配保持平衡</td>
+</tr>
+<tr>
+<td style="text-align: left;">查询性能</td>
+<td style="text-align: left;">初始较好，溢出链过长会退化</td>
+<td style="text-align: left;">长期较稳定</td>
+</tr>
+<tr>
+<td style="text-align: left;">并发控制</td>
+<td style="text-align: left;">相对简单</td>
+<td style="text-align: left;">较复杂</td>
+</tr>
+<tr>
+<td style="text-align: left;">适用场景</td>
+<td style="text-align: left;">数据变化不大</td>
+<td style="text-align: left;">大多数动态数据库场景</td>
+</tr>
+</tbody>
+</table>
+<p><strong>重点理解：ISAM 快而稳定，但怕大量更新；B+
+树维护成本更高，但能长期保持平衡，是实际系统中最常见的索引结构。</strong></p>
+<h2 id="b-树重点内容">7.3 B+ 树重点内容</h2>
+<p>B+ 树要重点掌握以下问题：</p>
+<ul>
+<li>为什么所有叶子结点必须在同一层。</li>
+<li>内部结点中的键值和指针如何引导搜索。</li>
+<li>插入时何时分裂，分裂如何向上传播。</li>
+<li>删除时何时重分配或合并，调整如何影响父结点。</li>
+<li>为什么叶子层链表有利于范围查询。</li>
+<li>为什么增大 fan-out 可以降低树高和 I/O 代价。</li>
+<li>前缀压缩如何通过缩短键值提高 fan-out。</li>
+</ul>
+<h2 id="hash-索引重点内容">7.4 Hash 索引重点内容</h2>
+<p>Hash 索引要重点区分三类：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">类型</th>
+<th style="text-align: left;">关键思想</th>
+<th style="text-align: left;">主要问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">静态 Hashing</td>
+<td style="text-align: left;">固定 bucket 数，溢出页处理增长</td>
+<td style="text-align: left;">数据增长导致 overflow
+链变长，数据减少浪费空间</td>
+</tr>
+<tr>
+<td style="text-align: left;">可扩充 Hashing</td>
+<td style="text-align: left;">使用 directory、global depth、local depth
+动态分裂</td>
+<td style="text-align: left;">directory 可能增长很快</td>
+</tr>
+<tr>
+<td style="text-align: left;">线性 Hashing</td>
+<td style="text-align: left;">无 directory，按 Next 指针逐步分裂</td>
+<td style="text-align: left;">可能保留较长 overflow 链</td>
+</tr>
+</tbody>
+</table>
+<p>同时要记住：<strong>Hash
+索引适合等值查询，不适合范围查询。</strong></p>
+<h2 id="索引结构构建的总体思路">7.5 索引结构构建的总体思路</h2>
+<p>材料最后总结了索引结构构建的主要原则：</p>
+<ul>
+<li>结合用户查询模式，优先优化常见查询。</li>
+<li>结合数据分布，避免索引在倾斜数据上退化。</li>
+<li>结合存储结构，减少页访问次数。</li>
+<li>分析数据语义层次，为空间、图、时间序列等复杂数据选择合适表示。</li>
+<li>尽快裁剪搜索空间，减少候选数据规模。</li>
+</ul>
+<p>从练习和实践角度看，索引设计不是“某种结构永远最好”，而是在查询类型、更新频率、空间开销、数据分布和存储介质之间做权衡。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%B4%A2%E5%BC%95/" rel="tag"># 索引</a>
+              <a href="/tags/B-%E6%A0%91/" rel="tag"># B+树</a>
+              <a href="/tags/Hash%E7%B4%A2%E5%BC%95/" rel="tag"># Hash索引</a>
+              <a href="/tags/ISAM/" rel="tag"># ISAM</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" rel="prev" title="数据的存储结构">
+                  <i class="fa fa-angle-left"></i> 数据的存储结构
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/database_design/%E6%9F%A5%E8%AF%A2%E5%A4%84%E7%90%86/" rel="next" title="查询处理">
+                  查询处理 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>

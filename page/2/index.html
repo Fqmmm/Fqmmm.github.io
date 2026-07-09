@@ -142,18 +142,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives/">
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories/">
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">categories</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags/">
-        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-count">86</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -170,6 +170,3105 @@
     </div>
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/%E4%BB%8EMGD%E5%88%B0Adam/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/07/09/AI/%E4%BB%8EMGD%E5%88%B0Adam/" class="post-title-link" itemprop="url">从MGD到Adam</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:12:29" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>在深度神经网络的参数优化中，基础的随机梯度下降（SGD）算法在每次迭代时仅依赖当前的梯度数值与固定的学习率进行参数更新。这导致了两个直接的数学问题：</p>
+<ul>
+<li>当目标函数的海森矩阵条件数较大时（即不同维度的梯度方差差异极大），参数更新轨迹会在高曲率维度上产生正负交替的数值振荡。</li>
+<li>所有参数共享同一个固定的学习率，算法无法根据每个参数历史更新的数值尺度进行自适应调整。</li>
+</ul>
+<p>从动量梯度下降（Momentum）、RMSProp到Adam的演化，其核心线索是通过引入<strong>历史梯度的指数加权移动平均（Exponential
+Weighted Moving Average,
+EWMA）</strong>，在数学上分别估计梯度的一阶矩（均值）和二阶矩（未中心化的方差），从而逐步解决上述两个问题。</p>
+<p>以下是具体的演化过程：</p>
+<h2 id="动量梯度下降平滑更新方向">1. 动量梯度下降：平滑更新方向</h2>
+<p>为了解决基础梯度下降中的正负振荡问题，Momentum算法引入了<strong>梯度的一阶矩估计</strong>。它不再仅仅依赖当前迭代步的梯度，而是将当前梯度与历史更新向量进行线性组合。</p>
+<ul>
+<li><strong>数学计算</strong>： 计算一阶矩：<span
+class="math inline"><em>m</em><sub><em>t</em></sub> = <em>β</em><em>m</em><sub><em>t</em> − 1</sub> + (1 − <em>β</em>)<em>g</em><sub><em>t</em></sub></span>
+参数更新：<span
+class="math inline"><em>θ</em><sub><em>t</em></sub> = <em>θ</em><sub><em>t</em> − 1</sub> − <em>α</em><em>m</em><sub><em>t</em></sub></span>
+（注：<span class="math inline"><em>g</em><sub><em>t</em></sub></span>
+为当前梯度，<span class="math inline"><em>α</em></span> 为学习率，<span
+class="math inline"><em>β</em></span> 为衰减常数，通常取0.9）</li>
+<li><strong>数学机制与效果</strong>：
+通过指数加权移动平均，该算法对历史梯度进行了累加。对于<strong>梯度符号频繁交替</strong>（即正负不断改变）的维度，历史梯度的累加会发生数学抵消，使得
+<span class="math inline"><em>m</em><sub><em>t</em></sub></span>
+在该维度上的绝对值减小，从而抑制了数值振荡。对于<strong>梯度符号保持一致的维度</strong>，历史数值的累加会使
+<span class="math inline"><em>m</em><sub><em>t</em></sub></span>
+的绝对值增大，从而加速该维度的参数更新。</li>
+</ul>
+<blockquote>
+<p>这里的一阶矩估计是指用 <strong>[历史梯度的指数加权移动平均]</strong>
+来估计梯度的一阶矩 <span
+class="math inline"><em>E</em>[<em>g</em><sub><em>t</em></sub>]</span>，也就是
+<span
+class="math inline"><em>m</em><sub><em>t</em></sub> = <em>β</em><em>m</em><sub><em>t</em> − 1</sub> + (1 − <em>β</em>)<em>g</em><sub><em>t</em></sub></span>
+这个式子。<span
+class="math inline"><em>m</em><sub><em>t</em></sub></span> 即为 <span
+class="math inline"><em>E</em>[<em>g</em><sub><em>t</em></sub>]</span>
+的估计值。</p>
+</blockquote>
+<h2 id="rmsprop逐参数的自适应学习率">2.
+RMSProp：逐参数的自适应学习率</h2>
+<p>Momentum虽然优化了梯度的方向，但依然对所有参数维度使用相同的全局学习率
+<span
+class="math inline"><em>α</em></span>。RMSProp算法的提出是为了解决各个参数维度数值尺度不一致的问题，它引入了<strong>梯度的二阶矩估计</strong>。</p>
+<ul>
+<li><strong>数学计算</strong>： 计算二阶矩：<span
+class="math inline"><em>v</em><sub><em>t</em></sub> = <em>β</em><em>v</em><sub><em>t</em> − 1</sub> + (1 − <em>β</em>)<em>g</em><sub><em>t</em></sub><sup>2</sup></span>
+（其中 <span
+class="math inline"><em>g</em><sub><em>t</em></sub><sup>2</sup></span>
+为对当前梯度的每个元素求平方） 参数更新：<span
+class="math inline">$\theta_t = \theta_{t-1} - \frac{\alpha}{\sqrt{v_t}
++ \epsilon} \odot g_t$</span> （注：<span
+class="math inline"><em>ϵ</em></span> 为极小的常数以防止分母为零，<span
+class="math inline">⊙</span> 为逐元素乘法）</li>
+<li><strong>数学机制与效果</strong>：
+RMSProp计算了历史梯度平方的指数加权平均值，并将其平方根作为参数更新的标量分母。这意味着：如果某个参数维度在历史迭代中的<strong>梯度绝对值一直很大</strong>，其对应的
+<span class="math inline"><em>v</em><sub><em>t</em></sub></span>
+也会很大，分母的增大导致该维度的实际更新幅度（有效学习率）被大幅缩减；反之，<strong>历史梯度绝对值较小</strong>的维度，其实际更新幅度会被相对放大。这使得各参数维度的更新量被数学归一化，消除了不同维度梯度数值尺度差异带来的负面影响。</li>
+</ul>
+<blockquote>
+<p>这里的二阶矩估计是指用 <strong>[历史梯度的指数加权移动平均]</strong>
+来估计梯度的二阶矩 <span
+class="math inline"><em>E</em>[<em>g</em><sub><em>t</em></sub><sup>2</sup>]</span>，也就是
+<span
+class="math inline"><em>v</em><sub><em>t</em></sub> = <em>β</em><em>v</em><sub><em>t</em> − 1</sub> + (1 − <em>β</em>)<em>g</em><sub><em>t</em></sub><sup>2</sup></span>
+这个式子。<span
+class="math inline"><em>v</em><sub><em>t</em></sub></span> 即为
+$E[g_t^2] $ 的估计值。</p>
+</blockquote>
+<p>对比一下 MGD 和 RMSDrop，可以发现与朴素的 SGD 相比，MGD 是把 <span
+class="math inline"><em>g</em><sub><em>t</em></sub></span> 改成 <span
+class="math inline"><em>m</em><sub><em>t</em></sub></span>，对梯度做了文章；而
+RMSDrop 把 <span class="math inline"><em>α</em></span> 改成 <span
+class="math inline">$\frac{\alpha}{\sqrt{v_t}+\epsilon}$</span>，是对学习率做了文章。Adam
+把这两个方法缝合了起来，同时对梯度和学习率做文章。</p>
+<h2 id="adam一阶矩与二阶矩的综合及偏差校正">3.
+Adam：一阶矩与二阶矩的综合及偏差校正</h2>
+<p>Adam算法的本质是<strong>Momentum与RMSProp的数学结合</strong>，它同时使用了梯度的一阶矩（平滑方向）和二阶矩（自适应尺度），并额外引入了针对算法迭代初期的<strong>偏差校正机制</strong>。</p>
+<ul>
+<li><strong>数学计算</strong>： 计算一阶矩：<span
+class="math inline"><em>m</em><sub><em>t</em></sub> = <em>β</em><sub>1</sub><em>m</em><sub><em>t</em> − 1</sub> + (1 − <em>β</em><sub>1</sub>)<em>g</em><sub><em>t</em></sub></span>
+计算二阶矩：<span
+class="math inline"><em>v</em><sub><em>t</em></sub> = <em>β</em><sub>2</sub><em>v</em><sub><em>t</em> − 1</sub> + (1 − <em>β</em><sub>2</sub>)<em>g</em><sub><em>t</em></sub><sup>2</sup></span>
+偏差校正：<span class="math inline">$\hat{m}_t =
+\frac{m_t}{1-\beta_1^t}$</span>， <span class="math inline">$\hat{v}_t =
+\frac{v_t}{1-\beta_2^t}$</span> 参数更新：<span
+class="math inline">$\theta_t = \theta_{t-1} -
+\frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \odot \hat{m}_t$</span></li>
+<li><strong>数学机制与演化意义</strong>：
+<ol type="1">
+<li><strong>综合优势</strong>：Adam的参数更新分子使用了 <span
+class="math inline"><em>m̂</em><sub><em>t</em></sub></span> 而不是单纯的
+<span
+class="math inline"><em>g</em><sub><em>t</em></sub></span>，继承了Momentum消除正负振荡的优势；分母使用了
+<span
+class="math inline">$\sqrt{\hat{v}_t}$</span>，继承了RMSProp逐参数调整学习率的优势。</li>
+<li><strong>偏差校正（Bias
+Correction）</strong>：在Momentum和RMSProp中，由于 <span
+class="math inline"><em>m</em><sub>0</sub></span> 和 <span
+class="math inline"><em>v</em><sub>0</sub></span>
+初始值被设定为零向量，在迭代初期（<span
+class="math inline"><em>t</em></span>
+较小时），指数加权平均的计算结果会带有强烈的向零偏置误差。Adam通过除以
+<span
+class="math inline">(1 − <em>β</em><sup><em>t</em></sup>)</span>，在迭代初期数学放大了一阶矩和二阶矩的估计值，严格修正了由零初始化带来的截断误差。随着
+<span class="math inline"><em>t</em></span> 的增大，<span
+class="math inline">(1 − <em>β</em><sup><em>t</em></sup>)</span>
+趋向于1，校正项自动失效。</li>
+</ol></li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>这一演化路径是一个纯粹的数值分析优化过程。基础SGD直接使用当前梯度
+<span
+class="math inline"><em>g</em><sub><em>t</em></sub></span>；Momentum提取了
+<span
+class="math inline"><em>E</em>[<em>g</em><sub><em>t</em></sub>]</span>（一阶矩）以优化向量方向；RMSProp提取了
+<span
+class="math inline"><em>E</em>[<em>g</em><sub><em>t</em></sub><sup>2</sup>]</span>（二阶矩）以归一化各个维度的数值尺度；Adam则同步计算并校正了
+<span
+class="math inline"><em>E</em>[<em>g</em><sub><em>t</em></sub>]</span>
+与 <span
+class="math inline"><em>E</em>[<em>g</em><sub><em>t</em></sub><sup>2</sup>]</span>，构筑了当前深度学习中最标准的自适应优化算法框架。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/07/09/AI/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" class="post-title-link" itemprop="url">深度学习</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:12:29" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>核心问题：</p>
+<ul>
+<li><p>为什么要深度学习</p></li>
+<li><p>为什么要用神经网络实现深度学习</p></li>
+</ul>
+<h1 id="引入">引入</h1>
+<h2 id="浅层与深层网络">浅层与深层网络</h2>
+<p>SVM 通常只有 1-2
+层非线性映射，属于浅层网络；而有些应用需要多层的特征映射，其优势在于<strong>特征重用</strong>，低层特征通过组合形成高层特征，这种层级结构（类似于投票机制）可以指数级地增加表达能力。</p>
+<p>也正因如此，<strong>只有一个隐藏层（但神经元很多）的MLP，并不等于有很多层的神经网络。</strong>尽管通用近似定理告诉我们，只有一个隐藏层且神经元足够多的网络，可以模拟任何函数；但是，如果要模拟一个复杂的逻辑，单隐藏层的网络可能需要<strong>指数级数量</strong>的神经元。而深层网络通过层级结构，可以用<strong>极少数量</strong>的神经元实现同样的复杂度。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260314143328632.png" alt="image-20260314143328585" style="zoom:33%;" /></p>
+<h2 id="特征">特征</h2>
+<p>人脸识别、语音识别、OCR、自然语言处理等任务的共同难点在于，原始数据（像素、波形）很难直接处理，必须转化为有效的<strong>特征</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260314144058471.png" alt="image-20260314144058380" style="zoom: 33%;" /></p>
+<p>在手写数字识别中，模型学到了每个数字的笔画模式。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260314143920958.png" alt="image-20260314143920891" style="zoom: 33%;" /></p>
+<p>在人脸识别任务中，低层只学到了边缘轮廓；中层学到了眼睛、鼻子、耳朵等器官；高层学到了整张人脸。</p>
+<h1 id="何以深度">何以深度</h1>
+<h2 id="深度信念网络2006hinton">深度信念网络（2006，Hinton）</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260314145816869.png" alt="image-20260314145816812" style="zoom: 33%;" /></p>
+<h2 id="受限玻尔兹曼机rbm">受限玻尔兹曼机（RBM）</h2>
+<p>RBM 有两层神经元：</p>
+<ul>
+<li><strong>可见层</strong>用来接收我们输入的原始数据。比如输入一张猫的图片，这层的节点就代表图片的像素。</li>
+<li><strong>隐藏层</strong>用来提取数据的潜在特征（latent
+variables）。比如这一层某个节点亮起，可能代表图片里有“猫耳朵”或“胡须”的特征。</li>
+</ul>
+<p>所谓“受限”，是指层内无连接，层间全连接（即二分图）。</p>
+<h3 id="重构">重构</h3>
+<p>RBM
+的训练是无监督的，它基于一种叫做“重构”的机制，下面定义一些符号：</p>
+<ul>
+<li><strong><span class="math inline"><em>v</em></span>
+(Visible)：</strong> 可见层向量（即输入数据，比如图片的像素值）。</li>
+<li><strong><span class="math inline"><em>h</em></span>
+(Hidden)：</strong> 隐藏层向量（即提取的特征）。</li>
+<li><strong><span class="math inline"><em>W</em></span>
+(Weight)：</strong> 连接可见层和隐藏层的权重矩阵。<span
+class="math inline"><em>W</em><sub><em>i</em><em>j</em></sub></span>
+表示可见层节点 <span class="math inline"><em>i</em></span> 和隐藏层节点
+<span class="math inline"><em>j</em></span> 之间的权重。</li>
+<li><strong><span class="math inline"><em>a</em></span> 和 <span
+class="math inline"><em>b</em></span>：</strong> 偏置项（Bias）。<span
+class="math inline"><em>a</em><sub><em>i</em></sub></span>
+是可见层的偏置，<span
+class="math inline"><em>b</em><sub><em>j</em></sub></span>
+是隐藏层的偏置。</li>
+<li><strong><span
+class="math inline"><em>σ</em>(<em>x</em>)</span>：</strong>
+激活函数（通常是 Sigmoid 函数 <span class="math inline">$\sigma(x) =
+\frac{1}{1 + e^{-x}}$</span>），它的作用是把计算结果压缩到 0 到 1
+之间，当作<strong>概率</strong>来看待。</li>
+</ul>
+<ol type="1">
+<li>正向传播</li>
+</ol>
+<p>给定输入数据 <span
+class="math inline"><em>v</em></span>，隐藏层某个神经元 <span
+class="math inline"><em>h</em><sub><em>j</em></sub></span>
+被激活（即取值为 1）的概率是：</p>
+<p><span
+class="math display"><em>P</em>(<em>h</em><sub><em>j</em></sub> = 1|<em>v</em>) = <em>σ</em>(<em>b</em><sub><em>j</em></sub> + ∑<sub><em>i</em></sub><em>v</em><sub><em>i</em></sub><em>W</em><sub><em>i</em><em>j</em></sub>)</span></p>
+<ol start="2" type="1">
+<li>反向传播（解码 / 重构数据）</li>
+</ol>
+<p>现在我们有了隐藏层的特征 <span
+class="math inline"><em>h</em></span>。假设我们<strong>只看这些特征，反推</strong>可见层某个像素
+<span class="math inline"><em>v</em><sub><em>i</em></sub></span>
+亮起（即取值为
+1）的概率是多少？这就是<strong>重构</strong>。公式极其对称：</p>
+<p><span
+class="math display"><em>P</em>(<em>v</em><sub><em>i</em></sub> = 1|<em>h</em>) = <em>σ</em>(<em>a</em><sub><em>i</em></sub> + ∑<sub><em>j</em></sub><em>h</em><sub><em>j</em></sub><em>W</em><sub><em>i</em><em>j</em></sub>)</span>
+这里的损失函数可以定义为<strong>重构误差</strong>，即 <span
+class="math inline"><em>v</em> − <em>v</em><sup>′</sup></span>。RBM
+训练的目的，就是通过不断修改权重 <span
+class="math inline"><em>W</em></span>，让这个误差越来越小，最终使得
+<span class="math inline"><em>v</em><sup>′</sup></span> 无限接近 <span
+class="math inline"><em>v</em></span>。</p>
+<p>“重构”有什么用？神经网络通过这种“自己尝试恢复自己”的过程，<strong>自动学会了识别什么是重要的特征。</strong></p>
+<p>此外有一个有趣的事实：训练过程理论上有无数多训练样本。因为模型不需要知道输入的图片长什么样，只需要尽可能让反向生成的图片和原始图片长得差不多就可以了，这样便能<strong>学习到有用的特征</strong>。</p>
+<h2 id="autoencoder2006bengio">Autoencoder（2006，Bengio）</h2>
+<p>与RBM类似，autoencoder的主要目的也是为了学习数据的有效特征表示。它的隐藏层节点数量通常远远小于输入层，强行把高维度的数据塞进一个低维度的空间里。这个过程被称为降维。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260314151500854.png" alt="image-20260314151500798" style="zoom: 33%;" /></p>
+<h2 id="逐层训练">逐层训练</h2>
+<p>在2006年之前，整个AI界对“多层神经网络”是绝望的。只要层数一深，反向传播算法就会失效（梯度消失），网络根本学不到东西。SVM是当时的主流。而
+RBM 和 Autoencoder
+指出，既然直接一起训练深层网络行不通，那我们就一层一层地“预训练”（<strong>贪婪逐层无监督预训练</strong>）。它向学术界证明了：深层神经网络是可以被有效训练的，而且深层提取的特征确实比浅层更好。</p>
+<p>RBM 和 Autoencoder 解决了“深层网络怎么训练”的问题，让人们树立了
+<strong>“Deeper is Better”</strong>
+的信仰。一旦这个信仰被确立，同时配合了GPU和大数据（例如imagenet），网络的架构设计迅速从简单的线性堆叠，演变成了
+<strong>GoogLeNet</strong> 这种极其宏大、复杂、精密的网络。</p>
+<h1 id="深度学习三要素">深度学习三要素</h1>
+<ul>
+<li>目标函数/损失函数</li>
+<li>网络架构</li>
+<li>学习规则</li>
+</ul>
+<h1 id="损失函数">损失函数</h1>
+<ul>
+<li>回归问题一般使用均方误差 <span class="math inline">$Error =
+\frac{1}{2} \sum (t_i - y(x_i))^2$</span></li>
+<li>分类问题一般使用交叉熵误差 <span
+class="math inline"><em>E</em><em>r</em><em>r</em><em>o</em><em>r</em> = −∑<em>t</em><sub><em>i</em></sub>ln <em>y</em>(<em>x</em><sub><em>i</em></sub>)</span></li>
+</ul>
+<h1 id="分类问题">分类问题</h1>
+<h2 id="交叉熵误差的数学解释">交叉熵误差的数学解释</h2>
+<p>以二分类问题为例，解释一下为什么要用交叉熵。这里要用到极大似然估计。</p>
+<p>假设有一个数据集 <span
+class="math inline">{<strong>x</strong><sub><em>i</em></sub>, <em>t</em><sub><em>i</em></sub>}<sub><em>i</em> = 1</sub><sup><em>n</em></sup></span>，其中
+<span
+class="math inline"><em>t</em><sub><em>i</em></sub> ∈ {0, 1}</span>。现在观测到样本
+<span
+class="math inline"><em>t</em> = {<em>t</em><sub>1</sub>, <em>t</em><sub>2</sub>, …, <em>t</em><sub><em>n</em></sub>}</span>。似然函数可以写为
+<span class="math display">$$
+\prod \limits_{i=1}^n y(\mathbf{x}_i)^{t_i} (1 - y(\mathbf{x}_i))^{(1 -
+t_i)}
+$$</span> 这个函数不便于求导，考虑加个负对数： <span
+class="math display">$$
+-\sum \limits_{i=1}^n t_i \ln y(\mathbf{x}_i)+(1-t_i) \ln
+(1-y(\mathbf{x}_i))
+$$</span> 然后把后一项去掉，简化为“模型预测为类别1的概率”： <span
+class="math display">$$
+-\sum \limits_{i=1}^n t_i \ln y(\mathbf{x}_i)
+$$</span></p>
+<h2 id="logistic-分类">Logistic 分类</h2>
+<p>那么分类问题的模型本身长什么样呢？ <span class="math display">$$
+y(\mathbf{x}_i) = \frac{1}{1 +
+\exp(-f_\boldsymbol{\theta}(\mathbf{x}_i))}
+$$</span></p>
+<p>这就是sigmoid函数（也成为逻辑斯蒂函数，logistic）。其中 <span
+class="math inline"><em>f</em><sub><em>θ</em></sub></span>
+是一个线性函数 <span
+class="math inline"><em>f</em><sub><strong>θ</strong></sub>(<strong>x</strong>) = <em>θ</em><sub>0</sub> + <em>θ</em><sub>1</sub><em>x</em><sub>1</sub> + ... + <em>θ</em><sub><em>d</em></sub><em>x</em><sub><em>d</em></sub></span>。</p>
+<p>设logistics函数的反函数为 <span
+class="math inline"><em>g</em></span>，易得 <span
+class="math inline">$g(z)=\ln \frac{z}{1-z}$</span>。易得 <span
+class="math inline"><em>g</em>(<em>y</em>(<strong>x</strong><sub><em>i</em></sub>)) = <em>f</em><sub><em>θ</em></sub>(<strong>x</strong><sub><em>i</em></sub>)</span>。<strong>Actually,
+we model the logit by the linear function.</strong></p>
+<h1 id="一般的分类问题">一般的分类问题</h1>
+<p>见笔记</p>
+<h1 id="正则化与权重衰减">正则化与权重衰减</h1>
+<h2 id="区别">区别</h2>
+<ul>
+<li><p>（维基百科）在数学与计算机科学中，尤其是在机器学习和逆问题领域中，正则化是指为解决适定性问题或过拟合而加入额外信息的过程。在机器学习和逆问题的优化过程中，正则项往往被加在目标函数当中，例如
+L1 惩罚项、L2 惩罚项。</p></li>
+<li><p><strong>权重衰减</strong>
+是一个具体操作，它是指在每一次更新参数时，直接让权重乘以一个略小于 1
+的系数（比如 0.99），强制让权重变得更小。</p></li>
+</ul>
+<p>但在现实中，这两个概念经常被混用，因为在标准的随机梯度下降中，L2
+正则化和权重衰减在数学上是完全等价的。</p>
+<p>我们在原来的损失函数 <span
+class="math inline"><em>L</em><sub><em>d</em><em>a</em><em>t</em><em>a</em></sub></span>
+后面加上 L2 惩罚项：</p>
+<p><span class="math display">$$
+Loss = L_{data} + \frac{1}{2} \lambda w^2
+$$</span></p>
+<p>求导后的梯度为： <span
+class="math display">∇<em>L</em><em>o</em><em>s</em><em>s</em> = ∇<em>L</em><sub><em>d</em><em>a</em><em>t</em><em>a</em></sub> + <em>λ</em><em>w</em></span>
+参数更新公式为： <span
+class="math display"><em>w</em><sub><em>n</em><em>e</em><em>w</em></sub> = <em>w</em><sub><em>o</em><em>l</em><em>d</em></sub> − <em>α</em>(∇<em>L</em><sub><em>d</em><em>a</em><em>t</em><em>a</em></sub> + <em>λ</em><em>w</em><sub><em>o</em><em>l</em><em>d</em></sub>)</span></p>
+<p>提取公因式变形一下： <span
+class="math display"><em>w</em><sub><em>n</em><em>e</em><em>w</em></sub> = (1 − <em>α</em><em>λ</em>)<em>w</em><sub><em>o</em><em>l</em><em>d</em></sub> − <em>α</em>∇<em>L</em><sub><em>d</em><em>a</em><em>t</em><em>a</em></sub></span></p>
+<p>这个公式的第一项 <span
+class="math inline">(1 − <em>α</em><em>λ</em>)<em>w</em><sub><em>o</em><em>l</em><em>d</em></sub></span>
+正是权重衰减的定义。每次更新时，权重 <span
+class="math inline"><em>w</em></span> 自己先缩小了一点点（因为 <span
+class="math inline"><em>α</em><em>λ</em></span>
+是个很小的正数），然后再减去原本的梯度。</p>
+<p>因为这个等价关系，很多深度学习框架（比如早期的 PyTorch
+甚至现在的一些文档）在 API 里把设置 L2 正则化系数的参数直接命名为
+<code>weight_decay</code>。</p>
+<h2 id="为什么需要正则化">为什么需要正则化</h2>
+<p>正则化本质上是为了防止过拟合。我们通过一个拟合正弦函数的例子说明这一点。</p>
+<p>我们要通过 <span class="math inline"><em>M</em></span>
+阶多项式拟合一个正弦函数，损失函数选择均方误差，即 <span
+class="math display">$$
+y(x, \mathbf{w}) = w_0 + w_1 x + w_2 x^2 + \cdots + w_M x^M =
+\sum_{j=0}^M w_j x^j \\
+E(\mathbf{w}) = \frac{1}{2} \sum_{n=1}^N (y(x_n, \mathbf{w}) - t_n )^2
+$$</span> 以下是不同的 <span class="math inline"><em>M</em></span>
+对应的拟合情况以及参数 <span
+class="math inline"><strong>w</strong></span> 的取值：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260324172928208.png" style="zoom: 33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260324173008229.png" alt="image-20260324173008137" style="zoom: 33%;" /></p>
+<p>可以看到 <span class="math inline"><em>M</em> = 0, 1</span>
+欠拟合，<span class="math inline"><em>M</em> = 3</span> 正好，<span
+class="math inline"><em>M</em> = 9</span>
+过拟合。通过右表可以看到过拟合（<span
+class="math inline"><em>M</em> = 9</span>）时参数的 scale
+很大。因此，要控制过拟合，一个有效的方法是减小参数的
+scale，而我们可以通过加入惩罚项减小参数的 scale。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260324173306528.png" alt="image-20260324173306427" style="zoom: 33%;" /></p>
+<p>参数 <span class="math inline"><em>λ</em></span> 表示惩罚的力度。如果
+<span class="math inline"><em>λ</em></span>
+太小，约束过松，还是会过拟合；如果 <span
+class="math inline"><em>λ</em></span> 太大，约束过强，也会欠拟合。</p>
+<h2 id="正则化的数学解释">正则化的数学解释</h2>
+<p>先定义一些符号：</p>
+<ul>
+<li><span class="math inline"><em>N</em></span>: 训练样本的数量。</li>
+<li><span
+class="math inline"><strong>x</strong><sub><em>n</em></sub></span>: 第
+<span class="math inline"><em>n</em></span>
+个输入特征向量（样本）。<span
+class="math inline"><strong>X</strong></span> 代表所有输入的集合。</li>
+<li><span class="math inline"><em>t</em><sub><em>n</em></sub></span>: 第
+<span class="math inline"><em>n</em></span>
+个样本对应的真实目标值。<span
+class="math inline"><strong>t</strong></span> 代表所有真实值的向量集合
+<span
+class="math inline">[<em>t</em><sub>1</sub>, <em>t</em><sub>2</sub>, ..., <em>t</em><sub><em>N</em></sub>]<sup><em>T</em></sup></span>。</li>
+<li><span class="math inline"><strong>w</strong></span>:
+模型的权重参数向量 <span
+class="math inline">[<em>w</em><sub>0</sub>, <em>w</em><sub>1</sub>, ..., <em>w</em><sub><em>M</em></sub>]<sup><em>T</em></sup></span>。假设共有
+<span class="math inline"><em>M</em> + 1</span>
+个参数，包含偏置项。</li>
+<li><span
+class="math inline"><em>y</em>(<strong>x</strong><sub><em>n</em></sub>, <strong>w</strong>)</span>:
+模型给出的预测值。</li>
+<li><span
+class="math inline">𝒩(<em>μ</em>, <em>σ</em><sup>2</sup>)</span>: 均值为
+<span class="math inline"><em>μ</em></span>，方差为 <span
+class="math inline"><em>σ</em><sup>2</sup></span>
+的高斯（正态）分布。</li>
+<li><span class="math inline"><em>β</em></span>: <strong>数据噪声的精度
+(Precision)</strong>。定义为方差的倒数，即 <span
+class="math inline">$\beta = \frac{1}{\sigma^2}$</span>。<span
+class="math inline"><em>β</em></span>
+越大，数据噪声越小（第二页图中的蓝线越瘦高）。</li>
+<li><span class="math inline"><em>α</em></span>:
+<strong>参数先验分布的精度</strong>。控制我们允许参数波动的范围。</li>
+</ul>
+<p>假设我们观测到的真实值 <span
+class="math inline"><em>t</em><sub><em>n</em></sub></span>，是模型预测值
+<span
+class="math inline"><em>y</em>(<strong>x</strong><sub><em>n</em></sub>, <strong>w</strong>)</span>
+加上一个高斯噪声 <span class="math inline"><em>ϵ</em></span> 产生的。即
+<span
+class="math inline"><em>t</em><sub><em>n</em></sub> = <em>y</em>(<em>x</em><sub><em>n</em></sub>, <strong>w</strong>) + <em>ϵ</em></span>，其中
+<span
+class="math inline"><em>ϵ</em> ∼ 𝒩(0, <em>β</em><sup>−1</sup>)</span>。因此，给定输入
+<span class="math inline"><strong>x</strong><sub><em>n</em></sub></span>
+和参数 <span
+class="math inline"><strong>w</strong></span>，观测到单一样本 <span
+class="math inline"><em>t</em><sub><em>n</em></sub></span> 的概率为：
+<span
+class="math display"><em>p</em>(<em>t</em><sub><em>n</em></sub>|<em>x</em><sub><em>n</em></sub>, <strong>w</strong>, <em>β</em>) = 𝒩(<em>t</em><sub><em>n</em></sub>|<em>y</em>(<em>x</em><sub><em>n</em></sub>, <strong>w</strong>), <em>β</em><sup>−1</sup>)</span></p>
+<p>假设所有 <span class="math inline"><em>N</em></span>
+个样本是独立同分布的 (i.i.d)，那么整个数据集 <span
+class="math inline"><strong>t</strong></span>
+的似然函数就是所有单个概率的乘积： <span class="math display">$$
+p(\mathbf{t}|\mathbf{X}, \mathbf{w}, \beta) = \prod_{n=1}^{N}
+\mathcal{N}(t_n|y(x_n, \mathbf{w}), \beta^{-1})
+$$</span>
+如果只最大化上面的似然函数，模型会拼命拟合每一个噪声点，导致参数 <span
+class="math inline"><strong>w</strong></span>
+变得极大，发生过拟合。为了限制参数的 scale
+太大，贝叶斯学派引入了先验概率。</p>
+<p>在没看任何数据之前，我们假设好的模型应该尽量简单，即权重参数 <span
+class="math inline"><strong>w</strong></span> 应该在 <span
+class="math inline">0</span> 附近徘徊。我们假设参数 <span
+class="math inline"><strong>w</strong></span> 服从一个均值为 <span
+class="math inline"><strong>0</strong></span>，协方差矩阵为 <span
+class="math inline"><em>α</em><sup>−1</sup><strong>I</strong></span>
+的多维高斯分布（<span class="math inline"><strong>I</strong></span>
+是单位矩阵）：</p>
+<p><span class="math display">$$
+p(\mathbf{w}|\alpha) = \mathcal{N}(\mathbf{w}|\mathbf{0},
+\alpha^{-1}\mathbf{I}) = \left(\frac{\alpha}{2\pi}\right)^{(M+1)/2}
+\exp(-\frac{\alpha}{2}\mathbf{w}^T\mathbf{w})
+$$</span></p>
+<p>根据贝叶斯定理：后验概率 <span class="math inline">∝</span> 似然
+<span class="math inline">×</span> 先验，参数 <span
+class="math inline"><strong>w</strong></span> 的后验概率可以写为：</p>
+<p><span
+class="math display"><em>p</em>(<strong>w</strong>|<strong>X</strong>, <strong>t</strong>, <em>α</em>, <em>β</em>) ∝ <em>p</em>(<strong>t</strong>|<strong>X</strong>, <strong>w</strong>, <em>β</em>) ⋅ <em>p</em>(<strong>w</strong>|<em>α</em>)</span></p>
+<p>我们的目标是找到一组参数 <span
+class="math inline"><strong>w</strong></span>，使得这个后验概率最大化，即
+<span
+class="math display">max <em>p</em>(<strong>w</strong>|<strong>X</strong>, <strong>t</strong>, <em>α</em>, <em>β</em>)</span>
+为了方便求导和计算，我们对后验概率取 <span
+class="math inline">−ln </span>，此时最大化后验概率，等价于最小化其负对数。</p>
+<p>$$ () = -</p>
+<p>= -p(|, , ) -p(|) $$</p>
+<p>我们分别把步骤 1 和步骤 2 的公式代入展开： <span
+class="math display">$$
+\text{Loss}(\mathbf{w}) = \frac{\beta}{2}\sum_{n=1}^{N}
+\{y(\mathbf{x}_n, \mathbf{w}) - t_n\}^2 +
+\frac{\alpha}{2}\mathbf{w}^T\mathbf{w}
+$$</span></p>
+<p>为了形式上的统一，我们将整个目标函数乘以一个常数 <span
+class="math inline">$\frac{1}{\beta}$</span>： <span
+class="math display">$$
+\widetilde{E}(\mathbf{w}) = \frac{1}{2}\sum_{n=1}^{N} \{y(x_n,
+\mathbf{w}) - t_n\}^2 + \frac{\alpha}{2\beta}\mathbf{w}^T\mathbf{w}
+$$</span></p>
+<p>令正则化系数 <span class="math inline">$\lambda =
+\frac{\alpha}{\beta}$</span>，并且由于 <span
+class="math inline"><strong>w</strong><sup><em>T</em></sup><strong>w</strong></span>
+就是向量的 L2 范数平方 <span
+class="math inline">∥<strong>w</strong>∥<sup>2</sup></span>，我们得到了最终经典的损失函数公式：</p>
+<p><span class="math display">$$
+\widetilde{E}(\mathbf{w}) = \underbrace{\frac{1}{2}\sum_{n=1}^{N}
+\{y(x_n, \mathbf{w}) - t_n\}^2}_{\text{误差项}} +
+\underbrace{\frac{\lambda}{2}\|\mathbf{w}\|^2}_{\text{L2 正则化项 }}
+$$</span></p>
+<p>下面总结一下： 1. 在机器学习中加上 L2 正则化（<span
+class="math inline">$\frac{\lambda}{2}\|\mathbf{w}\|^2$</span>）来防止过拟合，在数学本质上，等同于假设模型的权重参数服从均值为
+0 的高斯分布。 2. <span class="math inline"><em>λ</em></span>
+越大，意味着我们更看重先验（<span class="math inline"><em>α</em></span>
+大）而不太信任数据（<span class="math inline"><em>β</em></span>
+小），这就导致模型受到的惩罚更重，参数会被压得更小，红线更平滑。</p>
+<h1 id="卷积">卷积</h1>
+<h2 id="mlp在图像数据上的局限性">MLP在图像数据上的局限性</h2>
+<ul>
+<li>MLP
+处理图像数据时，通常把图像拉平，变成一个向量，作为神经网络的输入。但是，这丢弃了像素之间的邻接关系。无论是用原始图像进行训练，还是把原始图像的像素重新随机排列，然后送入神经网络进行训练，我们都会得到相同的结果，因为神经网络具有对称性。</li>
+<li>假设图像有 <span class="math inline"><em>n</em></span>
+个像素输入且第一个隐藏层有 <span class="math inline"><em>n</em></span>
+个单元。如果输入层和第一个隐藏层完全连接，则意味着网络有 <span
+class="math inline"><em>n</em><sup>2</sup></span>
+个权重；对于一个典型的百万像素 RGB 图像，它的权重将有 9
+万亿个。如此庞大的参数空间意味着需要大量的训练图像和庞大的计算预算来运行训练算法。</li>
+</ul>
+<h2 id="一维卷积">一维卷积</h2>
+<p>假设向量 <span
+class="math inline"><strong>k</strong> ∈ ℝ<sup><em>l</em></sup></span>
+为卷积核，向量 <span class="math inline"><strong>x</strong></span>
+为输入的向量，那么卷积操作可以表示为： <span class="math display">$$
+z_i=\sum \limits_{j=1}^l k_jx_{j+i-(l+1)/2}
+$$</span> 用人话说，就是第 <span class="math inline"><em>i</em></span>
+个位置的输出为核 <span class="math inline"><strong>k</strong></span> 与
+<span class="math inline"><strong>x</strong></span> 中以 <span
+class="math inline"><em>x</em><sub><em>i</em></sub></span>
+为中心、宽度为 <span class="math inline"><em>l</em></span>
+的片段的内积。</p>
+<p>例如，向量 <span
+class="math inline"><strong>x</strong> = (5, 6, 6, 2, 5, 6, 5)<sup><em>T</em></sup></span>，卷积核
+<span
+class="math inline"><strong>k</strong> = (1, −1, 1)</span>，那么卷积的结果如下：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328214705878.png" alt="image-20260328214705717" style="zoom: 33%;" /></p>
+<p>该过程也可以用矩阵乘法表示： <span class="math display">$$
+\begin{pmatrix}
++1 &amp; -1 &amp; +1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; +1 &amp; -1 &amp; +1 &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; +1 &amp; -1 &amp; +1
+\end{pmatrix}
+\begin{pmatrix}
+5 \\
+6 \\
+6 \\
+2 \\
+5 \\
+6 \\
+5
+\end{pmatrix}
+=
+\begin{pmatrix}
+5 \\
+9 \\
+4
+\end{pmatrix}
+$$</span></p>
+<h2 id="二维卷积">二维卷积</h2>
+<h3 id="基本操作">基本操作</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328220858293.png" alt="image-20260328220858089" style="zoom: 10%;" /></p>
+<p>假设输入大小为 <span
+class="math inline"><em>n</em><sub><em>h</em></sub> × <em>n</em><sub><em>w</em></sub></span>，卷积核大小为
+<span
+class="math inline"><em>k</em><sub><em>w</em></sub> × <em>k</em><sub><em>w</em></sub></span>，那么输出大小为
+<span
+class="math inline">(<em>n</em><sub><em>h</em></sub> + <em>k</em><sub><em>w</em></sub> − 1) × (<em>n</em><sub><em>w</em></sub> + <em>k</em><sub><em>w</em></sub> − 1)</span>。</p>
+<h3 id="感受野">感受野</h3>
+<p>神经元的感受野是指感觉输入中能够影响神经元激活状态的部分。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328220539146.png" alt="image-20260328220538982" style="zoom:33%;" /></p>
+<p>例如这个网络，第二层红色神经元的感受野是5，因为它接收了输入层五个神经元的信息。</p>
+<h3 id="填充">填充</h3>
+<p><strong>为什么需要 Padding？</strong></p>
+<ol type="1">
+<li><strong>保持输出尺寸</strong>：不加 padding
+时，每次卷积输出尺寸都会缩小（输出 = 输入 - 卷积核 +
+1）。在深层网络中，经过多次卷积后特征图会越来越小，甚至完全消失。padding
+可以让输出保持与输入相同的尺寸。</li>
+<li><strong>保留边缘信息</strong>：没有 padding
+时，边缘像素被卷积核扫过的次数比中心像素少得多，导致边缘信息容易丢失。padding
+让边缘像素也能被充分处理。</li>
+<li><strong>设计灵活性</strong>：保持输入输出尺寸相同（称为 same
+padding）可以简化网络架构设计，更容易堆叠多层卷积。</li>
+</ol>
+<p><strong>什么是 Padding？</strong></p>
+<p>卷积层常常丢失边缘像素。
+解决这个问题的简单方法即为<em>填充</em>（padding）：在输入图像的边界填充元素（通常填充元素是0）。
+例如，我们将3*3输入填充到5*5，那么它的输出就增加为4*4。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328221233995.png" alt="image-20260328221233823" style="zoom:33%;" /></p>
+<p>通常，如果我们添加 <span
+class="math inline"><em>p</em><sub><em>h</em></sub></span>
+行填充（大约一半在顶部，一半在底部）和 <span
+class="math inline"><em>p</em><sub><em>w</em></sub></span>
+列填充（左侧大约一半，右侧一半），则输出形状将为</p>
+<p><span
+class="math display">(<em>n</em><sub><em>h</em></sub> − <em>k</em><sub><em>h</em></sub> + <em>p</em><sub><em>h</em></sub> + 1) × (<em>n</em><sub><em>w</em></sub> − <em>k</em><sub><em>w</em></sub> + <em>p</em><sub><em>w</em></sub> + 1).</span></p>
+<p>这意味着输出的高度和宽度将分别增加 <span
+class="math inline"><em>p</em><sub><em>h</em></sub></span> 和 <span
+class="math inline"><em>p</em><sub><em>w</em></sub></span>。</p>
+<p>在许多情况下，我们需要设置 <span
+class="math inline"><em>p</em><sub><em>h</em></sub> = <em>k</em><sub><em>h</em></sub> − 1</span>
+和 <span
+class="math inline"><em>p</em><sub><em>w</em></sub> = <em>k</em><sub><em>w</em></sub> − 1</span>，使输入和输出具有相同的高度和宽度。这样可以在构建网络时更容易地预测每个图层的输出形状。假设
+<span class="math inline"><em>k</em><sub><em>h</em></sub></span>
+是奇数，我们将在高度的两侧填充 <span
+class="math inline"><em>p</em><sub><em>h</em></sub>/2</span> 行。如果
+<span class="math inline"><em>k</em><sub><em>h</em></sub></span>
+是偶数，则一种可能性是在输入顶部填充 <span
+class="math inline"><em>p</em><sub><em>h</em></sub>/2</span>
+行，在底部填充 <span
+class="math inline"><em>p</em><sub><em>h</em></sub>/2</span>
+行。同理，我们填充宽度的两侧。</p>
+<p>卷积神经网络中卷积核的高度和宽度通常为奇数。这样做的的好处是，保持空间维度的同时，我们可以在顶部和底部填充相同数量的行，在左侧和右侧填充相同数量的列。</p>
+<h3 id="步幅">步幅</h3>
+<p><strong>为什么需要 Stride？</strong></p>
+<ol type="1">
+<li><strong>下采样/降维</strong>：增大步幅可以减少输出特征图的尺寸，从而减少计算量和参数量。例如
+stride=2 可以将特征图尺寸减半。</li>
+<li><strong>增大感受野</strong>：更大的步幅让后续卷积层能”看到”输入图像更大范围的区域，有助于捕获更宏观的特征。</li>
+<li><strong>替代池化层</strong>：现代网络架构（如 ResNet、VGG）常用
+stride=2 的卷积直接进行下采样，替代传统的池化层，效果往往更好。</li>
+</ol>
+<p><strong>什么是 Stride？</strong></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328221642267.png" alt="image-20260328221642087" style="zoom: 33%;" /></p>
+<p>默认情况下，卷积核每次移动一个像素（stride=1）。当 stride &gt; 1
+时，卷积核每次跳过多个像素，从而产生更小的输出。</p>
+<p>通常，当垂直步幅为 <span
+class="math inline"><em>s</em><sub><em>h</em></sub></span>、水平步幅为
+<span class="math inline"><em>s</em><sub><em>w</em></sub></span>
+时，输出形状为</p>
+<p><span
+class="math display">[(<em>n</em><sub><em>h</em></sub> − <em>k</em><sub><em>h</em></sub> + <em>p</em><sub><em>h</em></sub> + <em>s</em><sub><em>h</em></sub>)/<em>s</em><sub><em>h</em></sub>] × [(<em>n</em><sub><em>w</em></sub> − <em>k</em><sub><em>w</em></sub> + <em>p</em><sub><em>w</em></sub> + <em>s</em><sub><em>w</em></sub>)/<em>s</em><sub><em>w</em></sub>].</span></p>
+<p>如果我们设置了 <span
+class="math inline"><em>p</em><sub><em>h</em></sub> = <em>k</em><sub><em>h</em></sub> − 1</span>
+和 <span
+class="math inline"><em>p</em><sub><em>w</em></sub> = <em>k</em><sub><em>w</em></sub> − 1</span>，则输出形状将简化为</p>
+<p><span
+class="math display">[(<em>n</em><sub><em>h</em></sub> + <em>s</em><sub><em>h</em></sub> − 1)/<em>s</em><sub><em>h</em></sub>] × [(<em>n</em><sub><em>w</em></sub> + <em>s</em><sub><em>w</em></sub> − 1)/<em>s</em><sub><em>w</em></sub>].</span></p>
+<p>更进一步，如果输入的高度和宽度可以被垂直和水平步幅整除，则输出形状将为
+<span
+class="math inline">(<em>n</em><sub><em>h</em></sub>/<em>s</em><sub><em>h</em></sub>) × (<em>n</em><sub><em>w</em></sub>/<em>s</em><sub><em>w</em></sub>)</span>。</p>
+<h3 id="多输入多输出通道">多输入多输出通道</h3>
+<p>多输入通道：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328221851597.png" alt="image-20260328221851403" style="zoom: 33%;" /></p>
+<p>多输出通道：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328221921766.png" alt="image-20260328221921588" style="zoom: 33%;" /></p>
+<p>用 <span class="math inline"><em>c</em><sub><em>i</em></sub></span>
+和 <span class="math inline"><em>c</em><sub><em>o</em></sub></span>
+分别表示输入和输出通道的数目，并让 <span
+class="math inline"><em>k</em><sub><em>h</em></sub></span> 和 <span
+class="math inline"><em>k</em><sub><em>w</em></sub></span>
+为卷积核的高度和宽度。为了获得多个通道的输出，我们可以为每个输出通道创建一个形状为
+<span
+class="math inline"><em>c</em><sub><em>i</em></sub> × <em>k</em><sub><em>h</em></sub> × <em>k</em><sub><em>w</em></sub></span>
+的卷积核张量，这样卷积核的形状是 <span
+class="math display"><em>c</em><sub><em>o</em></sub> × <em>c</em><sub><em>i</em></sub> × <em>k</em><sub><em>h</em></sub> × <em>k</em><sub><em>w</em></sub></span>
+在互相关运算中，每个输出通道先获取所有输入通道，再以对应该输出通道的卷积核计算出结果。</p>
+<h3 id="池化层">池化层</h3>
+<p><strong>为什么需要池化层？</strong></p>
+<ol type="1">
+<li><strong>降维/减少计算量</strong>：池化层通过下采样减少特征图的空间尺寸，从而减少后续层的计算量和参数量。</li>
+<li><strong>平移不变性</strong>：池化操作对输入的微小位移具有一定的容忍度。例如，图像中的物体稍微移动几个像素，池化后的特征仍然相似，有助于模型识别不同位置的同一物体。</li>
+<li><strong>防止过拟合</strong>：通过减少参数量和特征图尺寸，池化层可以帮助防止模型过拟合。</li>
+<li><strong>增大感受野</strong>：池化后每个神经元对应的原始输入区域变大，有助于捕获更全局的特征。</li>
+</ol>
+<p><strong>常见池化类型：</strong></p>
+<ul>
+<li><strong>最大池化（Max
+Pooling）</strong>：取池化窗口内的最大值。能保留最显著的特征，对噪声有一定抑制作用。</li>
+<li><strong>平均池化（Average
+Pooling）</strong>：取池化窗口内的平均值。保留整体特征信息，但可能模糊重要特征。</li>
+<li><strong>全局池化（Global
+Pooling）</strong>：对整个特征图进行池化，输出一个标量。常用于网络末端替代全连接层。</li>
+</ul>
+<p><strong>为什么最大池化通常优于平均池化？</strong></p>
+<ol type="1">
+<li><strong>保留显著特征</strong>：最大池化只保留窗口内最强的激活值（即最显著的特征），而平均池化会将强激活值与弱激活值”稀释”在一起。</li>
+<li><strong>对噪声更鲁棒</strong>：窗口内如果有一个重要特征和几个噪声，最大池化只保留重要特征；平均池化会让噪声拉低整体输出。</li>
+<li><strong>稀疏性保持</strong>：ReLU 激活后很多值是
+0，最大池化能保留非零的有用特征；平均池化把 0
+也算进去，进一步稀释有效信息。</li>
+<li><strong>实验验证</strong>：在 ImageNet
+等图像分类任务中，最大池化普遍表现更好。LeNet、AlexNet、VGG
+等经典网络都主要使用最大池化。</li>
+</ol>
+<p><strong>平均池化的适用场景：</strong>
+全局平均池化（GAP）在网络末端很常用，用于替代全连接层；某些需要保留整体信息的场景（如纹理分类）也适合使用平均池化。</p>
+<p><strong>池化 vs Stride 卷积：</strong></p>
+<p>现代网络（如 ResNet）越来越多地使用 stride &gt; 1
+的卷积来替代池化层，因为： - 带步幅的卷积是可学习的，而池化是固定操作 -
+减少了信息损失 - 但池化的计算成本更低，且提供了更强的平移不变性</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328222007219.png" alt="image-20260328222007059" style="zoom: 67%;" /></p>
+<h2 id="实例lenet">实例：LeNet</h2>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260328225033885.png"
+alt="image-20260328225033685" />
+<figcaption aria-hidden="true">image-20260328225033685</figcaption>
+</figure>
+<p>S2-&gt;C3的卷积操作：</p>
+<p>LeCun 规定了如下的连接规则表（横轴是 C3 的 16 个输出通道，纵轴是 S2
+的 6 个输入通道，“X”表示相连）：</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+<col style="width: 5%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;">S2通道  C3通道</th>
+<th style="text-align: center;">0</th>
+<th style="text-align: center;">1</th>
+<th style="text-align: center;">2</th>
+<th style="text-align: center;">3</th>
+<th style="text-align: center;">4</th>
+<th style="text-align: center;">5</th>
+<th style="text-align: center;">6</th>
+<th style="text-align: center;">7</th>
+<th style="text-align: center;">8</th>
+<th style="text-align: center;">9</th>
+<th style="text-align: center;">10</th>
+<th style="text-align: center;">11</th>
+<th style="text-align: center;">12</th>
+<th style="text-align: center;">13</th>
+<th style="text-align: center;">14</th>
+<th style="text-align: center;">15</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;"><strong>0</strong></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>1</strong></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>2</strong></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>3</strong></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>4</strong></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+</tr>
+<tr>
+<td style="text-align: center;"><strong>5</strong></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+<td style="text-align: center;">X</td>
+</tr>
+</tbody>
+</table>
+<p><strong>规律解析：</strong> C3 层的 16 个输出特征图被分成了 4
+组不同的组合方式： 1. <strong>前 6 个特征图（0~5）：</strong> 每个只与
+S2 中<strong>相邻的 3 个</strong>特征图相连。 2. <strong>接下来的 6
+个特征图（6~11）：</strong> 每个与 S2 中<strong>相邻的 4
+个</strong>特征图相连。 3. <strong>接下来的 3
+个特征图（12~14）：</strong> 每个与 S2 中<strong>不相邻的 4
+个</strong>特征图相连。 4. <strong>最后 1 个特征图（15）：</strong> 与
+S2 中<strong>所有的 6 个</strong>特征图相连。</p>
+<h3 id="它是如何计算的以-c3-的第-0-个通道为例">它是如何计算的？（以 C3
+的第 0 个通道为例）</h3>
+<p>根据表格，C3 的通道 <code>0</code> 只与 S2 的通道
+<code>0, 1, 2</code> 相连。 1. 系统会准备 <strong>3 个</strong>不同的
+<span class="math inline">5 × 5</span> 卷积核。 2. 分别对 S2 的通道
+<code>0, 1, 2</code> 进行卷积计算，得到 3 个中间结果。 3. 将这 3
+个中间结果按位置<strong>相加</strong>。 4.
+最后加上一个偏置项（Bias），并通过激活函数，就得到了 C3 的第 0
+个特征图。</p>
+<h2 id="三维卷积">三维卷积</h2>
+<p>搞一个三维的卷积核</p>
+<h2 id="隐马尔可夫模型">隐马尔可夫模型</h2>
+<p>模型本身见笔记本，这里只写HMM的经典应用：语音识别。</p>
+<h3 id="数据预处理">数据预处理</h3>
+<p>HMM 只能处理离散的观测序列（<span
+class="math inline"><em>O</em> = {<em>O</em><sub>1</sub>, <em>O</em><sub>2</sub>, ..., <em>O</em><sub><em>T</em></sub>}</span>）。但是人类说话的声音是连续的机械波，HMM
+根本不认识，因此需要通过预处理，把音频转化成HMM看得懂的观测序列。</p>
+<ul>
+<li><p>沿着时间轴，每隔极短的时间（比如 10
+毫秒）切一刀（FFT），对这一小段声音做傅里叶变换。</p></li>
+<li><p>傅里叶变换的结果是一个向量，也就是说，每个<span
+class="math inline"><em>O</em><sub><em>t</em></sub></span>都是一个向量。比如向量的第一个数字代表20Hz的能量有多大，第二个数字代表40Hz的能量有多大，以此类推。下图中格子的颜色深浅，代表某个频率对应的能量大小。</p></li>
+<li><p>这一个个按时间顺序排列的向量，就是 <strong>HMM 的观测序列 <span
+class="math inline"><em>O</em> = {<em>O</em><sub>1</sub>, <em>O</em><sub>2</sub>, ..., <em>O</em><sub><em>T</em></sub>}</span></strong></p></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260404123058565.png" style="zoom: 33%;" /></p>
+<h3 id="用-hmm-搭建语音识别网络">用 HMM 搭建语音识别网络</h3>
+<p>这里 <span
+class="math inline"><em>p</em><sub><em>i</em><em>j</em></sub></span>
+就是状态转移概率，<span
+class="math inline"><em>d</em><sub><em>j</em><em>t</em></sub></span>
+就是发射概率。当然这里的发射概率和之前的定义不太一样，之前的发射取决于当前状态和下一个状态，这里的发射只取决于当前状态。</p>
+<p>那么这里的隐藏状态是什么呢？ppt下方写着：“Unit: phoneme, syllable,
+word”</p>
+<p><strong>选择 1：以“词”（Word）为基础单位（大号积木）</strong> *
+<strong>怎么做：</strong> 我直接建一个包含 10 个状态的 HMM，这整个 HMM
+就代表 “apple” 这个词。再建一个 HMM 代表 “banana”。 *
+<strong>适用场景：</strong>
+早期的声控电话，或者银行的自动语音服务（“按1请说查账，按2请说转账”）。词汇量极小（比如只有
+10 个数字和几个命令），直接拿一整个词当一个状态模型，简单粗暴。</p>
+<p><strong>选择 2：以“音节”（Syllable）为基础单位（中号积木）</strong> *
+<strong>怎么做：</strong> 中文有几百个基本音节（比如 ba, bo, bi,
+bu）。我给每个音节建一个 HMM。当我要识别“爸爸”（ba-ba）时，我就把两个
+“ba” 的 HMM 连起来。 * <strong>适用场景：</strong>
+中文等以音节为鲜明特征的语言。</p>
+<p><strong>选择
+3：以“音素”（Phoneme）为基础单位（最小的微型积木）</strong> ——
+<strong>这是现代语音识别的绝对主流！</strong> *
+<strong>怎么做：</strong> 英语有 44 个音素，我就只训练 44 个基础
+HMM（就像图 3 画的那样，每个音素用 3 个状态表示）。 *
+<strong>怎么拼成词：</strong> 当我要识别 “cat”
+时，我不需要专门去训练一个叫 “cat” 的模型。我只需要去词典里查到 “cat”
+的发音是 [k]-[æ]-[t]，然后把 [k] 的 HMM、[æ] 的 HMM、[t] 的 HMM
+像拼积木一样<strong>串联</strong>起来，就临时组装成了一个 “cat” 的巨型
+HMM！</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260404131104132.png" style="zoom:33%;" /></p>
+<blockquote>
+<p>这个图确实比较抽象，因为它是以计算机数据结构（链表和指针）的形式来展示的。</p>
+<p>不用担心，我们可以把它想象成一个<strong>“探险家在迷宫里留下路标”</strong>的故事。</p>
+<p>图里的核心是在讲：<strong>当语音结束时，我们如何通过“倒推”来知道刚才到底识别出了哪几个词。</strong></p>
+<p>我们分两步来拆解你的疑惑：</p>
+<h3 id="中间两个带-s-的格子是啥">1. 中间两个带 <code>s</code>
+的格子是啥？</h3>
+<ul>
+<li><strong><code>s</code> 代表 Token（令牌/探险家）</strong>：你可以把
+<code>s</code> 想象成一个在各个单词模型（one, two,
+three）里穿梭的探险家。</li>
+<li><strong>这两个格子的动作代表“跨越词边界并打卡”</strong>：
+<ul>
+<li><strong>上面的 <code>s</code>
+格子</strong>：探险家刚刚走完了一个词（比如走完了
+“one”），他站在终点线上。此时，他手里拿着一根线，这根线连着他<strong>以前</strong>走过的所有路标。</li>
+<li><strong>下面的 <code>s</code>
+格子</strong>：探险家准备进入下一个新词了。在跨出这一步之前，他必须做一件事：<strong>原地放下一个新的路标（也就是下面那一排方块，WLR）</strong>。</li>
+<li><strong>旁边那段英文</strong> (<code>path id changed to...</code>)
+的意思就是：探险家把这个新路标和以前的旧路标连起来，然后把自己的“导盲犬（指针）”指向这个最新放下的路标。</li>
+</ul></li>
+<li><strong>总结</strong>：这两个 <code>s</code>
+格子展示的是一个<strong>瞬间动作</strong>——Token
+在离开上一个词、进入下一个词的间隙，生成了一条<strong>词链接记录（Word
+Link Record, WLR）</strong>。</li>
+</ul>
+<hr />
+<h3 id="下方的链表到底谁在前谁在后">2. 下方的链表到底谁在前谁在后？</h3>
+<p>简单来说：<strong>链表的生成顺序是从左到右的，但我们读取它（解码）的时候是从右向左“倒推”的。</strong></p>
+<p>我们来看看链表里的一个小方块（路标）里都有什么（看最右边大括号的解释）：
+* <code>score</code>: 走到这里的得分 *
+<strong><code>path id</code></strong>:
+一根指向“上一个路标”的线（图中的虚线箭头） *
+<strong><code>time</code></strong>: 打卡的时间（比如 <span
+class="math inline"><em>t</em>, <em>t</em> − 1, <em>t</em> − 2</span>，<span
+class="math inline"><em>t</em></span> 是最新时间，<span
+class="math inline"><em>t</em> − 3</span> 是最老时间） *
+<strong><code>model id</code></strong>: 刚走完的单词是什么</p>
+<p>现在，让我们顺着图中的虚线箭头，玩一次<strong>“案件重演（回溯
+Backtracking）”</strong>：</p>
+<p>假设现在录音结束了（当前时间是 <span
+class="math inline"><em>t</em></span>），我们找到了得分最高的那个探险家（右下角的那个虚线箭头指向的源头）。</p>
+<ol type="1">
+<li><strong>第一步（看最右边的格子）</strong>：
+<ul>
+<li>我们看他最新放下的路标：时间是 <strong><span
+class="math inline"><em>t</em></span></strong>，刚走完的词是
+<strong>“one”</strong>。</li>
+<li>这个路标上的
+<code>path id</code>（虚线箭头）指向了左边一个格子。</li>
+</ul></li>
+<li><strong>第二步（向左顺藤摸瓜）</strong>：
+<ul>
+<li>顺着箭头来到前一个路标：时间是 <strong><span
+class="math inline"><em>t</em> − 1</span></strong>，刚走完的词是
+<strong>“one”</strong>。</li>
+<li>它的箭头又指向了更左边。</li>
+</ul></li>
+<li><strong>第三步（继续向左）</strong>：
+<ul>
+<li>来到时间 <strong><span
+class="math inline"><em>t</em> − 2</span></strong>，刚走完的词是
+<strong>“three”</strong>。</li>
+</ul></li>
+<li><strong>第四步（继续向左）</strong>：
+<ul>
+<li>来到时间 <strong><span
+class="math inline"><em>t</em> − 3</span></strong>，刚走完的词是
+<strong>“two”</strong>。</li>
+</ul></li>
+</ol>
+<p><strong>结论出来啦！</strong> 按照我们倒推的顺序，最后走完的是
+“one”，前面是 “one”，再前面是 “three”，最前面是 “two”。
+把它们<strong>反转过来</strong>变成正常的时间顺序，这句话说的就是：<strong>“two
+<span class="math inline">→</span> three <span
+class="math inline">→</span> one <span class="math inline">→</span>
+one”</strong>。</p>
+<h3 id="一个隐藏的小细节进阶理解">💡 一个隐藏的小细节（进阶理解）</h3>
+<p>你有没有注意到，指向 <code>t-2(three)</code> 和 <code>t-3(two)</code>
+这两个格子的虚线箭头<strong>不止一根</strong>？
+这说明在识别的过程中，有很多个不同的探险家（Token）在前期都走过 “two
+<span class="math inline">→</span> three” 这条路。只不过随着时间推移到
+<span class="math inline"><em>t</em></span>
+时刻，只有我们追踪的这一个探险家（走出了 one <span
+class="math inline">→</span>
+one）获得了最高分，赢得了比赛。这种结构在计算机里叫“树（Tree）”，它可以极大地节省内存。</p>
+</blockquote>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260406210227520.png" style="zoom: 33%;" /></p>
+<h3 id="局限性">局限性</h3>
+<p>假设你要识别单词 “rib” 还是 “rob”。</p>
+<ul>
+<li><p>状态1 只有<strong>唯一</strong>一条出路（去状态2）。</p></li>
+<li><p>状态4 也只有<strong>唯一</strong>一条出路（去状态5）。</p></li>
+<li><p><strong>问题所在（局部归一化）</strong>：在传统的马尔可夫模型中，要求<strong>每个节点的所有出边概率相加必须等于
+1</strong>。因为状态1只有一条出路，不管输入什么特征，它去状态2的概率<strong>被迫变成了
+1.0</strong>。</p></li>
+<li><p>这就导致了<strong>“偏置（Bias）”</strong>：模型会盲目地偏好那些“出路少”的状态（因为它们的转移概率被集中了，很容易接近1.0），而惩罚那些“出路多”的状态（出路多，概率就被平摊了，每条路分数都很低）。</p></li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260406211103397.png" style="zoom:33%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260406211204007.png" style="zoom: 33%;" /></p>
+<p>上面是HMM，下面是CRF，CRF做对了</p>
+<h2
+id="crf条件随机场conditional-random-fields">CRF（条件随机场，Conditional
+Random Fields）</h2>
+<h3 id="基本要素">基本要素</h3>
+<ol type="1">
+<li><p>BEIS标注体系</p>
+<ul>
+<li><p><strong>B</strong> (Begin): 词的开头</p></li>
+<li><p><strong>E</strong> (End): 词的结尾</p></li>
+<li><p><strong>I</strong> (Inside): 词的中间</p></li>
+<li><p><strong>S</strong> (Single): 单字成词</p></li>
+</ul></li>
+<li><p>特征模板：机器的观察视角</p>
+<ul>
+<li><strong><span
+class="math inline"><em>C</em><sub>0</sub></span></strong>：意思是“只看当前这个字是什么”。(<span
+class="math inline"><em>C</em></span>代表字，0代表当前位置)</li>
+<li><strong><span
+class="math inline"><em>S</em><sub>−1</sub><em>S</em><sub>0</sub></span></strong>（这张图新增的）：意思是“不仅看当前，还要看<strong>前一个字的状态（<span
+class="math inline"><em>S</em><sub>−1</sub></span>）</strong>和<strong>当前字的状态（<span
+class="math inline"><em>S</em><sub>0</sub></span>）</strong>之间的搭配关系”。这叫做<strong>状态转移特征</strong>。</li>
+</ul></li>
+</ol>
+<ul>
+<li><p>Features
+(特征/规则)：这是机器通过看左边的语料库（Corpus）学到的<strong>“加分规则”</strong>。等号后面的数字就是<strong>“加多少分”</strong>。</p>
+<ul>
+<li><span
+class="math inline"><em>f</em>(<em>S</em><sub>0</sub> = <em>S</em>, <em>C</em><sub>0</sub> = <em>他</em>) = 1</span>：如果当前字是“他”，并且你猜它是状态
+<strong>S</strong>，加 <strong>1</strong> 分。</li>
+<li><span
+class="math inline"><em>f</em>(<em>S</em><sub>−1</sub> = <em>S</em>, <em>S</em><sub>0</sub> = <em>S</em>) = 2</span>：如果前一个字的状态是
+<strong>S</strong>，当前字的状态也是
+<strong>S</strong>（即连续两个S），加 <strong>2</strong>
+分。（因为语料库里“S S
+S”连续出现了，模型认为这种搭配很靠谱，给的分很高）。</li>
+<li><span
+class="math inline"><em>f</em>(<em>S</em><sub>−1</sub> = <em>N</em><em>I</em><em>L</em>, <em>S</em><sub>0</sub> = <em>S</em>) = 1</span>：如果这是句子的开头（前面没有状态，叫
+NIL），并且当前状态是 <strong>S</strong>，加 <strong>1</strong>
+分。</li>
+</ul></li>
+</ul>
+<h3 id="例子">例子</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260404132938979.png" style="zoom: 33%;" /></p>
+<p><strong>右下角矩阵的每个值，表示某个词属于某个标注时，从句子开头到这个词能得到的最大总分。</strong></p>
+<p>“他”</p>
+<ul>
+<li>如果是B/E/I，则不符合任意一条特征，得分为0</li>
+<li>如果是S，符合特征 <span
+class="math inline"><em>f</em>(<em>S</em><sub>0</sub> = <em>S</em>, <em>C</em><sub>0</sub> = <em>他</em>)</span>，得1分</li>
+</ul>
+<p>“爱”</p>
+<ul>
+<li>这个词没有出现在corpus中，不触发任何规则。其得分均为1，回溯指针都指向S</li>
+</ul>
+<p>“她”</p>
+<ul>
+<li>如果是B/E/I，则不符合任意一条特征，新增得分为0，总得分仍为1。回溯指针选择第一个，B。</li>
+<li>如果是S，则触发 <span
+class="math inline"><em>f</em>(<em>S</em><sub>0</sub> = <em>S</em>, <em>C</em><sub>0</sub> = <em>她</em>)</span>，得一分，变成2/B</li>
+</ul>
+<p>最终回溯判断的时候取最高，比如“她”属于S的时候得分最高；回溯到B，然后再回溯到S，得到最终序列SBS。</p>
+<p><strong>但显然是错误的。</strong></p>
+<p>如果加一个特征模板 <span
+class="math inline"><em>S</em><sub>−1</sub><em>S</em><sub>0</sub></span>，就会变得好一点：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260404133752864.png" style="zoom: 33%;" /></p>
+<p>“他”</p>
+<ul>
+<li>如果是 B/E/I，不触发任何规则，得分为0</li>
+<li>如果是S，触发第1，5条规则，得两分</li>
+</ul>
+<p>“爱”</p>
+<ul>
+<li>如果是B/E/I，不触发任何规则，继承“他=S”的2分</li>
+<li>如果是S，触发新规则（第四条），加2分，总共4分</li>
+</ul>
+<p>“她”</p>
+<ul>
+<li>如果是B/E/I，不触发任何规则，得4分</li>
+<li>如果是S，触发新规则（第四条+第三条），加3分，总共7分</li>
+</ul>
+<p>于是虽然没有在corpus中见过”爱“这个词，CRF还是能够正确地分词。</p>
+<h3 id="更长的例子">更长的例子</h3>
+<p>假设当前看的词为“就”，可以有以下特征：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260404134521662.png" style="zoom: 33%;" /></p>
+<h3 id="训练">训练</h3>
+<p><img src="/assets/image-20260404134621266.png" alt="image-20260404134621266" style="zoom: 33%;" /></p>
+<p>但CRF的问题在于特征模板太多了（zxq上课翻出来一个神秘文档，其中展示的特征模板有五六页）</p>
+<h1 id="rnn">RNN</h1>
+<p><span
+class="math inline"><em>h</em><sub><em>t</em></sub> = <em>σ</em>(<em>V</em><em>h</em><sub><em>t</em> − 1</sub> + <em>U</em><em>x</em><sub><em>t</em></sub> + <em>b</em>)</span></p>
+<p>$ y_t=W h_t$</p>
+<p><span
+class="math inline"><em>L</em><sub><em>t</em></sub> = (<em>y</em><sub><em>t</em></sub> − <em>o</em><sub><em>t</em></sub>)<sup>2</sup></span></p>
+<p><span class="math inline">$L=\sum \limits_{t=1}^T L_t$</span></p>
+<p>反向传播：<span class="math inline"><em>L</em></span>对<span
+class="math inline"><em>h</em><sub><em>t</em></sub></span>求偏导，就要先对<span
+class="math inline"><em>h</em><sub><em>t</em> − 1</sub></span>求偏导；要对<span
+class="math inline"><em>h</em><sub><em>t</em> − 1</sub></span>求偏导，就要先对<span
+class="math inline"><em>h</em><sub><em>t</em> − 2</sub></span>求偏导…</p>
+<p>BPTT会面临梯度爆炸/梯度消失：</p>
+<ul>
+<li><strong>梯度消失 (Vanishing Gradient):</strong> 如果权重矩阵 <span
+class="math inline"><em>V</em></span> 的特征值小于 1，且激活函数的导数
+<span class="math inline"><em>f</em><sup>′</sup>(<em>z</em>)</span> （如
+tanh 导数最大为 1，sigmoid 为
+0.25）也较小，连乘结果会呈指数级衰减，趋近于
+0。这意味着网络无法学习到长距离的依赖关系。</li>
+<li><strong>梯度爆炸 (Blow up / Exploding Gradient):</strong>
+如果权重矩阵 <span class="math inline"><em>V</em></span> 的特征值大于
+1，连乘结果会呈指数级增长，导致数值溢出，训练崩溃。</li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 35%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr>
+<th>特性</th>
+<th>BPTT (随时间反向传播)</th>
+<th>RTRL (实时循环学习)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>计算方向</strong></td>
+<td>先从前向后算完，再从后向前算梯度</td>
+<td>从前向后算状态的同时，顺便算出梯度</td>
+</tr>
+<tr>
+<td><strong>权重更新时机</strong></td>
+<td>序列结束（或截断点）后批量更新</td>
+<td>每个时间步都可以实时更新</td>
+</tr>
+<tr>
+<td><strong>空间复杂度 (内存)</strong></td>
+<td><code>O(T⋅N)O(T⋅N)</code>，随序列长度 <code>TT</code> 线性增长</td>
+<td><code>O(N3)O(N3)</code>，与序列长度无关，但随网络大小立方级增长</td>
+</tr>
+<tr>
+<td><strong>时间复杂度 (算力)</strong></td>
+<td>每个时间步 <code>O(N2)O(N2)</code>，相对较快</td>
+<td>每个时间步 <code>O(N4)O(N4)</code>，<strong>极度缓慢</strong></td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>大多数现代 NLP、时间序列任务</td>
+<td>无限长序列、需要极度实时的场景 (现在多用近似算法)</td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/AI/%E8%BF%9E%E6%8E%A5%E4%B8%BB%E4%B9%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/07/09/AI/%E8%BF%9E%E6%8E%A5%E4%B8%BB%E4%B9%89/" class="post-title-link" itemprop="url">连接主义</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:12:29" itemprop="dateCreated datePublished" datetime="2026-07-09T15:12:29+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/" itemprop="url" rel="index"><span itemprop="name">人工智能</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h2 id="神经元">神经元</h2>
+<h3 id="人工神经元">人工神经元</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260313105806643.png" alt="image-20260313105806568" style="zoom:33%;" /></p>
+<p><span class="math inline">$\sigma = \sum \limits_{i=1}^n w_i
+x_i$</span></p>
+<p><span
+class="math inline"><em>y</em> = <em>f</em>(<em>σ</em>)</span></p>
+<p>其中 <span class="math inline"><em>f</em></span>
+是一个阈值函数，大于等于阈值取1，小于阈值取-1。</p>
+<blockquote>
+<p>这里的符号定义比较奇怪，<span class="math inline">$\sigma=\sum
+\limits_{i=1}^n w_i x_i$</span>， <span
+class="math inline"><em>f</em></span> 是激活函数</p>
+</blockquote>
+<h3 id="mcculloch-pitts模型">McCulloch-Pitts模型</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260313105919117.png" alt="image-20260313105919046" style="zoom:33%;" /></p>
+这两个神经元分别实现了与逻辑和或逻辑。激活函数使用符号函数 <span
+class="math inline">sign</span>： $$ (x) =
+<p>$$</p>
+<h2 id="感知机">感知机</h2>
+<p>上面两个神经元的局限性在于，权重都是人工设定的，而无法通过大量的数据学习出来（自动调整）。Rosenblatt感知机解决了权重“自动调整”的问题。</p>
+<h3 id="rosenblatt感知机">Rosenblatt感知机</h3>
+<p>我们有一个训练样本 <span
+class="math inline">(<em>x</em>, <em>d</em>)</span>，其中 <span
+class="math inline"><em>d</em></span> 是期望输出（target），取值 <span
+class="math inline">+1</span> 或 <span class="math inline">−1</span>。
+当前感知机输出是 <span class="math inline"><em>y</em></span>​。如果 <span
+class="math inline"><em>y</em> = <em>d</em></span>，说明分类正确，不需要调整权重；如果
+<span
+class="math inline"><em>y</em> ≠ <em>d</em></span>，说明分类错误，需要调整权重。我们希望调整权重，使得下次遇到同样输入时，<span
+class="math inline"><em>y</em></span> 更接近 <span
+class="math inline"><em>d</em></span>。</p>
+<p>情况 1：<span class="math inline"><em>d</em> = +1</span>，但 <span
+class="math inline"><em>y</em> = −1</span></p>
+<ul>
+<li>当前 <span class="math inline">$\sum \limits_{i=1}^n w_i x_i &lt;
+0$</span>，我们希望它变大，变成 <span
+class="math inline"> ≥ 0</span>。</li>
+<li>增加权重的方向是：如果 <span
+class="math inline"><em>x</em><sub><em>i</em></sub> &gt; 0</span>，就增加
+<span class="math inline"><em>w</em><sub><em>i</em></sub></span>；如果
+<span
+class="math inline"><em>x</em><sub><em>i</em></sub> &lt; 0</span>，就减少
+<span
+class="math inline"><em>w</em><sub><em>i</em></sub></span>（因为负的输入乘负的权重会使总和变小）。</li>
+<li>统一表达：<span
+class="math inline"><em>Δ</em><em>w</em><sub><em>i</em></sub> ∝ (+1) ⋅ <em>x</em><sub><em>i</em></sub></span>，即
+<span
+class="math inline"><em>Δ</em><em>w</em><sub><em>i</em></sub> = <em>η</em> ⋅ <em>x</em><sub><em>i</em></sub></span>。</li>
+</ul>
+<p>情况 2：<span class="math inline"><em>d</em> = −1</span>，但 <span
+class="math inline"><em>y</em> = +1</span></p>
+<ul>
+<li>当前 <span class="math inline">$\sum \limits_{i=1}^n w_i x_i \geq
+0$</span>，我们希望它变小，变成 <span
+class="math inline"> &lt; 0</span>。</li>
+<li>减少权重的方向是：如果 <span
+class="math inline"><em>x</em><sub><em>i</em></sub> &gt; 0</span>，就减少
+<span class="math inline"><em>w</em><sub><em>i</em></sub></span>；如果
+<span
+class="math inline"><em>x</em><sub><em>i</em></sub> &lt; 0</span>，就增加
+<span class="math inline"><em>w</em><sub><em>i</em></sub></span>。</li>
+<li>统一表达：<span
+class="math inline"><em>Δ</em><em>w</em><sub><em>i</em></sub> ∝ (−1) ⋅ <em>x</em><sub><em>i</em></sub></span>，即
+<span
+class="math inline"><em>Δ</em><em>w</em><sub><em>i</em></sub> = −<em>η</em> ⋅ <em>x</em><sub><em>i</em></sub></span>。</li>
+</ul>
+<p>Rosenblatt 用的公式是：</p>
+<p><span class="math display">$$
+\Delta w_i = r \cdot (d - \text{sign}(\sum \limits_{i=1}^n w_i x_i))
+\cdot x_i
+$$</span> 这里 <span class="math inline"><em>d</em> − <em>y</em></span>
+取值可能是 <span
+class="math inline">−2, 0, +2</span>，所以实际上相当于：</p>
+<p><span class="math display">$$
+\Delta w_i =
+\begin{cases}
+0 &amp; \text{if } d = y \\
++2r x_i &amp; \text{if } d = +1, y = -1 \\
+-2r x_i &amp; \text{if } d = -1, y = +1
+\end{cases}
+$$</span> 常系数 2 可以并入学习率 <span
+class="math inline"><em>r</em></span>，所以通常写作：</p>
+<p><span
+class="math display"><em>Δ</em><em>w</em><sub><em>i</em></sub> = <em>r</em>(<em>d</em> − <em>y</em>)<em>x</em><sub><em>i</em></sub></span>
+其中 <span class="math inline">$y = \text{sign}(\sum \limits_{i=1}^n w_i
+x_i)$</span>。</p>
+<p>这个更新规则的<strong>直觉</strong>是：</p>
+<ul>
+<li>如果输出太小（应该 <span class="math inline">+1</span> 却得到 <span
+class="math inline">−1</span>），就加大权重，方向与输入相同；</li>
+<li>如果输出太大（应该 <span class="math inline">−1</span> 却得到 <span
+class="math inline">+1</span>），就减小权重，方向与输入相反；</li>
+<li>权重调整的大小与输入值成正比（输入越大，影响越大）。</li>
+</ul>
+<h3 id="感知机的局限性">感知机的局限性</h3>
+<table>
+<thead>
+<tr>
+<th><span class="math inline"><em>x</em><sub>1</sub></span></th>
+<th><span class="math inline"><em>x</em><sub>2</sub></span></th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>这是异或逻辑的真值表。如果用感知机来建模，会得到： <span
+class="math display">$$
+w_1 \times0+w_2 \times 0 &lt; t\\
+w_1 \times0+w_2 \times 1 &gt; t\\
+w_1 \times1+w_2 \times 0 &gt; t\\
+w_1 \times1+w_2 \times 1 &lt; t
+$$</span> 其中 <span class="math inline"><em>t</em></span>
+是符号函数的阈值。显然这个不等式组是无解的。</p>
+<p>事实上，单个感知机本质上是一个线性分类器。在二维特征空间中，它的决策边界是一条直线；在
+<span class="math inline"><em>D</em></span> 维特征空间中，则表现为 <span
+class="math inline"><em>D</em> − 1</span>
+维的线性超平面。单个感知机只能处理线性可分问题，无法解决异或等线性不可分问题。</p>
+<h2 id="多层感知机">多层感知机</h2>
+<p>为了克服线性不可分的限制，引入了sigmoid函数和隐藏层。一般而言，隐藏层神经元个数=输入层神经元个数的
+1.2-1.5 倍</p>
+<h3 id="sigmoid函数">sigmoid函数</h3>
+<p><span class="math display">$$
+f(x)=\frac{1}{1+e^{-x}}
+$$</span></p>
+<p>性质：<span
+class="math inline"><em>f</em><sup>′</sup>(<em>x</em>) = <em>f</em>(<em>x</em>)(1 − <em>f</em>(<em>x</em>))</span>，便于求导</p>
+<h3 id="隐藏层的本质">隐藏层的本质</h3>
+<p>在传统的线性模型中，如果你发现数据不是线性的，你必须手动去构建特征（特征工程）。例如想预测房价，但房价和面积是平方关系，你得手动在模型里加一个
+<span class="math inline"><em>x</em><sup>2</sup></span>。这里的 <span
+class="math inline"><em>x</em><sup>2</sup></span> 就是基函数 <span
+class="math inline"><em>ϕ</em></span>。</p>
+<p>但这种基函数是<strong>人工硬编码</strong>进去的。如果问题很复杂（比如识别人脸），人类根本不知道该写出什么样的数学公式来表达“眼睛”或“鼻子”的特征。</p>
+<p>而神经网络将把隐藏层看作是基函数。每个神经元都在尝试对原始输入进行某种变换。因为权重
+<span class="math inline"><em>w</em></span>
+是可以学习的，神经网络会根据数据自己去调整这些变换方案。它会自己学会：第一层提取线条，第二层组合成形状，第三层组合成五官。</p>
+<h3 id="痛点">痛点</h3>
+<p>数学上可以证明，如果隐藏层的神经元足够多，就可以拟合任何函数（通用近似定理）。但问题在于，“拟合任何函数”当且仅当“学习到最合适的权重”。但“学习到最合适的权重”是一种奢望，因为梯度下降法对初始值敏感，且很容易陷入局部最小值，更会受到鞍点的影响。</p>
+<h2 id="神经网络的数学性质">神经网络的数学性质</h2>
+<h3 id="神经网络的对称性">神经网络的对称性</h3>
+<p>假设一个隐藏层有两个神经元：A 和 B。如果我们把指向 A 的所有权重和从 A
+发出的权重，与 B
+的权重完全交换，神经网络输出的结果不变，因为计算的逻辑是一模一样的。</p>
+<h3 id="为什么损失函数大都是非凸的">为什么损失函数大都是非凸的</h3>
+<p>这里我们采用反证法，从直觉上说明这一问题。</p>
+<p>设原始神经网络为 <span
+class="math inline"><em>N</em><sub>1</sub></span>，交换中间两个神经元后为
+<span class="math inline"><em>N</em><sub>2</sub></span>。由对称性可知
+<span class="math inline"><em>N</em><sub>1</sub></span> 和 <span
+class="math inline"><em>N</em><sub>2</sub></span> 等价。<span
+class="math inline"><em>N</em><sub>1</sub></span> 和 <span
+class="math inline"><em>N</em><sub>2</sub></span>
+两个网络参数取平均值得到 <span
+class="math inline"><em>N</em><sub>3</sub></span>。</p>
+<p>直观上 <span class="math inline"><em>N</em><sub>3</sub></span>
+的建模能力比 <span class="math inline"><em>N</em><sub>1</sub></span> 和
+<span class="math inline"><em>N</em><sub>2</sub></span> 都差。例如，在
+<span class="math inline"><em>N</em><sub>1</sub></span> 中，神经元 A
+负责识别“横线”，神经元 B 负责识别“竖线”。在 <span
+class="math inline"><em>N</em><sub>2</sub></span> 中，变成 A
+识别“竖线”，B 识别“横线”。在 <span
+class="math inline"><em>N</em><sub>3</sub></span> 中，现在的 A
+变成了“（横线+竖线）/ 2”，B 也变成了“（横线+竖线）/
+2”。原本两个分工明确的专家（一个看横，一个看竖），变成了两个“平庸”的神经元（两个都看模糊的斜线或十字）。这种由于参数平均化导致的“特征模糊”，会让网络失去原有的判别能力。所以，<strong><span
+class="math inline"><em>N</em><sub>3</sub></span>
+的预测效果大概率会变差，导致它的损失函数 <span
+class="math inline"><em>L</em>(<em>N</em><sub>3</sub>)</span>
+变得很大。</strong></p>
+<p>因此，存在 <span class="math inline"><em>N</em><sub>1</sub></span> 和
+<span class="math inline"><em>N</em><sub>2</sub></span> 的中间点 <span
+class="math inline"><em>N</em><sub>3</sub></span>，使得 <span
+class="math inline"><em>L</em>(<em>N</em><sub>3</sub>) &gt; <em>L</em>(<em>N</em><sub>2</sub>) = <em>L</em>(<em>N</em><sub>1</sub>)</span>，违背凸函数的定义。</p>
+<h2 id="经典应用">经典应用</h2>
+<h3 id="nettalk">NETtalk</h3>
+<p>每个字母的读音可能随着上下文的变化而变化，例如apple和cake中a的读音不一样。NETtalk
+构建了一个神经网络，解决了这一问题。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260314132256519.png" alt="image-20260314132256415" style="zoom:50%;" /></p>
+<ul>
+<li>输入：7*29，29=26个字母+逗号+句号+空格，7=前三个字母+当前字母+后三个字母</li>
+<li>输出：当前字母的读音。
+<ul>
+<li>21个发音特征单元代表人类产生声音时的生理特征，例如舌头的位置、嘴唇的形状、声带是否振动（清音
+vs 浊音）</li>
+<li>5个重音和音节边界单元处理语音的韵律信息，例如哪个音节需要重读</li>
+</ul></li>
+</ul>
+<h3 id="解决异或问题">解决异或问题</h3>
+<p><img src="/assets/image-20260314132010144.png" alt="image-20260314132010144" style="zoom:50%;" /></p>
+<p>这里用了残差连接（类似于何恺明的那个残差连接的思想），使得模型更容易学习到恒等映射，从数学上简化了非线性曲面的优化难度。</p>
+<h2 id="反向传播算法">反向传播算法</h2>
+<p>见笔记本</p>
+<h2 id="为什么梯度下降法能够下降">为什么梯度下降法能够下降</h2>
+<p>设损失函数为 <span class="math inline"><em>L</em></span>，它在 <span
+class="math inline"><em>θ</em></span> 处的一阶 Taylor 展开为： <span
+class="math display"><em>L</em>(<em>θ</em> + <em>Δ</em><em>θ</em>) = <em>L</em>(<em>θ</em>) + ∇<em>L</em>(<em>θ</em>)<em>Δ</em><em>θ</em> + <em>o</em>(||<em>Δ</em><em>θ</em>||)</span>
+令 <span
+class="math inline"><em>Δ</em><em>θ</em> = −<em>η</em>∇<em>L</em>(<em>θ</em>)</span>，得
+<span
+class="math inline"><em>L</em>(<em>θ</em> + <em>Δ</em><em>θ</em>) = <em>L</em>(<em>θ</em>) − <em>η</em>||∇<em>L</em>(<em>θ</em>)||<sup>2</sup> &lt; <em>L</em>(<em>θ</em>)</span>。当然我们把
+<span class="math inline"><em>o</em>(||<em>Δ</em><em>θ</em>||)</span>
+省略了； 只要步长 <span class="math inline"><em>η</em></span>
+足够小，高阶无穷小项就可以忽略。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content=" | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/2026/07/09/computer_organization/%E4%BA%92%E8%BF%9E%E5%8F%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E7%BB%84%E7%BB%87/" class="post-title-link" itemprop="url">互连及输入输出组织</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+      
+
+      <time title="Created: 2026-07-09 14:51:22 / Modified: 14:57:48" itemprop="dateCreated datePublished" datetime="2026-07-09T14:51:22+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机组成与体系结构</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h1 id="目录">目录</h1>
+<ul>
+<li>I/O 系统概述：性能、功能与操作系统角色</li>
+<li>I/O 设备模型与磁盘存储器</li>
+<li>磁盘性能、DMA 读盘流程与 RAID</li>
+<li>总线、系统互连与 I/O 接口</li>
+<li>I/O 端口与设备寻址</li>
+<li>I/O 传输方式：轮询、中断、DMA</li>
+<li>I/O 子系统的软件层次与驱动程序</li>
+<li>重点梳理</li>
+</ul>
+<h1 id="io-系统概述">1 I/O 系统概述</h1>
+<h2 id="io-系统的性能指标">1.1 I/O 系统的性能指标</h2>
+<p>I/O
+系统讨论的是计算机怎样与外部世界交换信息。这里的“外部世界”既包括键盘、鼠标、显示器、打印机等人机交互设备，也包括磁盘、网卡、声卡、A/D、D/A
+等机器可读设备。衡量 I/O
+系统时，需要关注两个核心性能指标：<strong>吞吐率</strong>和<strong>响应时间</strong>。</p>
+<p><strong>吞吐率（Throughput, I/O
+bandwidth）</strong>表示单位时间内系统完成了多少数据传输，或单位时间内完成了多少次
+I/O 操作。视频播放、文件服务器、Web
+服务器等场景很重视吞吐率，因为系统要持续不断地搬运大量数据。</p>
+<p><strong>响应时间（Response time, latency）</strong>表示一次 I/O
+请求从发出到完成所经历的时间。事务处理系统、交互式终端、银行存取款等更关心响应时间，因为用户感受到的是“等了多久”。</p>
+<p>这两个指标不是完全独立的。某些设计提高吞吐率时，可能会牺牲单个请求的等待时间；而过分追求短延迟，也可能降低批量传输效率。需要能根据应用场景判断主要矛盾：多媒体连续流更看重带宽，交互事务更看重延迟，服务器通常两者都要兼顾。</p>
+<h2 id="io-系统的功能">1.2 I/O 系统的功能</h2>
+<p>输入/输出系统的基本功能是：<strong>解决各种形式信息在主机与外设之间的输入和输出问题</strong>。用户输入文字、图像、声音、视频，计算机处理后再输出显示、打印、声音或网络数据，这些都要依靠
+I/O 系统完成。</p>
+<p>为了实现这个功能，计算机系统必须解决一组具体问题：</p>
+<ul>
+<li>怎样在
+<strong>CPU、主存和外设</strong>之间建立高效的信息传输通路。</li>
+<li>怎样把用户或程序提出的 I/O 请求转换成设备能够理解的命令。</li>
+<li>怎样给外设或 I/O 端口编址，使 CPU 能找到要访问的设备。</li>
+<li>怎样读取设备状态，判断设备是否就绪、是否出错。</li>
+<li>I/O 硬件和操作系统如何协同完成数据传送。</li>
+</ul>
+<p>因此，本章不是单纯讲“外设有哪些”，而是围绕三条主线展开：<strong>设备如何连接、设备如何寻址、数据如何传输</strong>。</p>
+<h2 id="操作系统在-io-系统中的角色">1.3 操作系统在 I/O 系统中的角色</h2>
+<p>需要强调：I/O 系统不能只靠用户程序直接控制，操作系统（Operating
+System, OS）在其中非常关键。原因主要有三个。</p>
+<p>第一，I/O
+设备具有<strong>共享性</strong>。多个进程可能同时请求同一块磁盘、同一台打印机或同一个网络接口，必须由
+OS 统一调度和管理，否则会造成冲突。</p>
+<p>第二，I/O
+设备具有<strong>复杂性</strong>。不同设备的控制寄存器、状态位、命令格式、错误处理方式各不相同。用户程序不应该直接面对这些细节，而应通过
+OS 提供的设备驱动程序访问设备。</p>
+<p>第三，I/O
+常常依赖<strong>中断机制</strong>。外设完成任务或发生异常时，会通过外部中断请求
+CPU
+处理。中断会导致处理器进入内核态，因此必须由操作系统中的中断服务程序处理。</p>
+<p>OS 在 I/O 中的职责可以概括为：<strong>权限管理、设备驱动、I/O
+中断处理、共享资源调度</strong>。从用户程序角度看，调用
+<code>printf()</code>、<code>scanf()</code>、<code>read()</code>、<code>write()</code>
+等函数似乎很简单；但底层会经历用户态到内核态的切换、设备驱动程序执行、中断或
+DMA 配合等一系列过程。</p>
+<h1 id="io-设备模型与磁盘存储器">2 I/O 设备模型与磁盘存储器</h1>
+<h2 id="外设分类">2.1 外设分类</h2>
+<p>从交互方式看，外设可分为两类。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">分类</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">人机交互设备</td>
+<td style="text-align: left;">输入/输出信息是人可直接理解的</td>
+<td style="text-align: left;">键盘、鼠标、扫描仪、显示器、打印机</td>
+</tr>
+<tr>
+<td style="text-align: left;">机器可读设备</td>
+<td style="text-align: left;">信息主要供机器处理，人不能直接读取</td>
+<td
+style="text-align: left;">网络接口、Modem、D/A、A/D、磁盘、声音输入设备</td>
+</tr>
+</tbody>
+</table>
+<p>从功能行为看，也可分为两类。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">分类</th>
+<th style="text-align: left;">主要作用</th>
+<th style="text-align: left;">典型特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">输入/输出设备</td>
+<td style="text-align: left;">完成信息输入或输出</td>
+<td style="text-align: left;">多数是字符型设备，如键盘、打印机</td>
+</tr>
+<tr>
+<td style="text-align: left;">外部存储设备</td>
+<td style="text-align: left;">保存大量信息</td>
+<td style="text-align: left;">多数按块传送，如磁盘、磁带、光盘</td>
+</tr>
+</tbody>
+</table>
+<p>字符型设备通常一次传输一个字符或少量数据，速度较慢，适合轮询或中断方式。块设备通常一次传输一个扇区或一批数据，速度较快，适合
+DMA 方式。</p>
+<h2 id="外部设备的通用模型">2.2 外部设备的通用模型</h2>
+<p>虽然外设种类很多，但
+可以用一个统一抽象模型来描述。一个外设通常包含以下部分：</p>
+<ul>
+<li><strong>I/O
+接口或电缆</strong>：在设备和主机之间传送控制、状态、数据信号。</li>
+<li><strong>控制逻辑</strong>：根据主机给出的控制信息驱动设备动作，并检测设备状态。</li>
+<li><strong>缓冲器</strong>：暂存主机与设备之间交换的数据，用来缓和速度不匹配。</li>
+<li><strong>变换器</strong>：在计算机内部电信号与设备实际信号之间转换，例如磁盘中的磁-电、电-磁转换。</li>
+<li><strong>设备本体与环境</strong>：真正执行输入、输出或存储动作的物理设备。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141406253.png" alt="image-20260615141406098" style="zoom: 33%;" /></p>
+<p>所有设备传输的信息都可以抽象为三类：<strong>控制信息、状态信息、数据信息</strong>。CPU
+向设备发控制命令，设备向 CPU
+返回状态，双方再通过数据缓冲完成数据交换。后面讲 I/O 控制器、I/O
+端口、轮询、中断和 DMA 时，本质上都围绕这三类信息展开。</p>
+<h2 id="磁盘的信息存储原理">2.3 磁盘的信息存储原理</h2>
+<p>磁盘是一种典型的外部存储设备。磁盘片表面被划分为许多同心圆，每个同心圆称为<strong>磁道</strong>；每个磁道又被划分为若干段，每段称为<strong>扇区</strong>。传统扇区大小长期为
+512 字节，后来逐渐迁移到 4096 字节的高级格式化扇区。</p>
+<p>磁盘读写依赖磁头与盘片表面的磁化状态。写入时，线圈通以不同方向的电流，使磁介质呈现不同磁化状态，用来表示二进制
+<span class="math inline">0</span> 和 <span
+class="math inline">1</span>。读取时，盘片旋转，磁化单元经过磁头，在磁头线圈中产生不同极性的感应电压，从而判断读出的比特。</p>
+<p>磁盘地址通常由三部分组成：<strong>柱面号或磁道号、磁头号或盘面号、扇区号</strong>。读写一个扇区时，硬盘的大致流程是：</p>
+<ol type="1">
+<li>所有磁头同步寻道，移动到指定柱面。</li>
+<li>选择目标磁头，即确定盘面。</li>
+<li>等待目标扇区旋转到磁头下方。</li>
+<li>对该扇区进行读或写。</li>
+</ol>
+<p>这也解释了为什么磁盘访问比主存访问慢得多：磁盘不仅要传输数据，还要等待机械寻道和盘片旋转。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141604772.png" alt="image-20260615141604611" style="zoom: 33%;" /></p>
+<h2 id="如何提高磁盘容量">2.4 如何提高磁盘容量</h2>
+<p>提高磁盘片容量的核心是提高信息记录密度。主要有两个方向：</p>
+<ul>
+<li><strong>增加磁道数目</strong>，即提高磁道密度。</li>
+<li><strong>增加扇区数目</strong>，即提高位密度，并采用可变扇区数。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615141707097.png" alt="image-20260615141706931" style="zoom: 33%;" /></p>
+<p>早期磁盘所有磁道扇区数相同，这会导致内圈与外圈记录密度不均。现代磁盘通常使不同磁道上的位密度更接近一致，因此外圈磁道可以放更多扇区，从而提高整个盘片容量。</p>
+<h1 id="磁盘性能dma-读盘流程与-raid">3 磁盘性能、DMA 读盘流程与
+RAID</h1>
+<h2 id="磁盘平均存取时间">3.1 磁盘平均存取时间</h2>
+<p>磁盘以扇区为单位读写。平均存取时间通常写为：</p>
+<p><span
+class="math display"><em>T</em> = 平均寻道时间 + 平均旋转等待时间 + 数据传输时间</span></p>
+<p>其中，<strong>平均寻道时间</strong>是磁头移动到指定磁道所需的平均时间，典型数量级约为
+<span class="math inline">5
+ms</span>。<strong>平均旋转等待时间</strong>是目标扇区转到磁头下方所需的平均时间，典型值约为
+<span class="math inline">4 ∼ 6
+ms</span>。<strong>数据传输时间</strong>通常远小于前两项，例如每扇区约
+<span class="math inline">0.01
+ms</span>，所以很多估算中可以近似忽略。</p>
+<p>如果转速为 <span class="math inline">5400
+RPM</span>，则每秒转数为：</p>
+<p><span class="math display">5400/60 = 90 RPS</span></p>
+<p>平均旋转等待时间约为半圈时间：</p>
+<p><span class="math display">$$
+\frac{0.5}{90}\text{ s} \approx 5.5\text{ ms}
+$$</span></p>
+<p>在一个例题中，若寻道时间为 <span class="math inline">12
+ms</span>，数据传输率为 <span class="math inline">4
+MB/s</span>，扇区大小为 <span class="math inline">512
+B</span>，控制器开销为 <span class="math inline">1
+ms</span>，不考虑排队时间，则：</p>
+<p><span class="math display">$$
+\begin{aligned}
+T &amp;= 12\text{ ms} + 5.5\text{ ms} + 0.1\text{ ms} + 1\text{ ms} \\
+  &amp;= 18.6\text{ ms}
+\end{aligned}
+$$</span></p>
+<p>如果实际寻道时间因访问局部性降为 <span class="math inline">12/3 = 4
+ms</span>，总时间约为 <span class="math inline">10.6
+ms</span>，此时旋转等待占比接近一半。因此，<strong>磁盘转速对机械硬盘性能非常重要</strong>。</p>
+<h2 id="硬盘存储器的组成">3.2 硬盘存储器的组成</h2>
+<p>硬盘存储器主要由三部分组成：</p>
+<ul>
+<li><strong>磁记录介质</strong>：保存信息的盘片表面。</li>
+<li><strong>磁盘驱动器</strong>：包含读写电路、读写转换开关、读写磁头、磁头定位伺服系统等。</li>
+<li><strong>磁盘控制器</strong>：连接主机与磁盘驱动器，包含控制逻辑、时序电路、并串/串并转换、数据缓存器、控制寄存器和状态寄存器等。</li>
+</ul>
+<p>磁盘控制器通常连接在 I/O 总线上，I/O
+总线再通过桥接器与系统总线、存储器总线相连。由于磁盘按扇区成批读写，且数据量较大，所以磁盘通常采用
+<strong>DMA（Direct Memory
+Access，直接存储器访问）</strong>方式在外设与主存之间传输数据。</p>
+<h2 id="读一个磁盘扇区的三步过程">3.3 读一个磁盘扇区的三步过程</h2>
+<p>读一个磁盘扇区的典型流程可以概括为：</p>
+<ol type="1">
+<li><strong>CPU 初始化磁盘控制器</strong>：CPU
+向磁盘控制器写入读命令、磁盘逻辑块号、主存起始地址等参数，然后启动磁盘驱动器工作。</li>
+<li><strong>磁盘控制器读取扇区并 DMA
+送主存</strong>：磁盘控制器找到相应扇区后，按 DMA
+方式把数据直接送入主存，数据不经过 CPU 寄存器搬运。</li>
+<li><strong>DMA 结束中断</strong>：传输完成后，磁盘控制器向 CPU 发出 DMA
+结束中断请求，CPU
+再执行后处理，例如检查状态、校验数据、唤醒等待进程。</li>
+</ol>
+<p>这里要抓住一个关键点：<strong>CPU
+负责发起和收尾，真正的大批量数据搬运由 DMA 控制器完成</strong>。</p>
+<h2 id="raid-的基本思想">3.4 RAID 的基本思想</h2>
+<p>RAID（Redundant Arrays of Inexpensive
+Disk，冗余磁盘阵列）的背景是：处理器和主存性能提升很快，而单个磁盘性能提升较慢，成为系统瓶颈。RAID
+的基本思想是把多个独立磁盘组织成一个磁盘阵列，在操作系统看来像一个逻辑磁盘。</p>
+<p>RAID 通过三种方式改善系统：</p>
+<ul>
+<li><strong>提高容量</strong>：多个物理磁盘组合成更大的逻辑存储空间。</li>
+<li><strong>提高性能</strong>：把数据分布在多个磁盘上，多盘并行读写，类似主存多体交叉。</li>
+<li><strong>提高可靠性</strong>：用冗余校验或镜像技术，在磁盘损坏时恢复数据。</li>
+</ul>
+<p>RAID 的共同特性是：一组物理磁盘在 OS
+下被视为一个逻辑驱动器；数据分布在多个物理盘上；部分 RAID
+级别使用冗余信息恢复故障数据。注意 RAID 0
+不具备冗余，不满足第三个特性。</p>
+<h2 id="raid-级别对比">3.5 RAID 级别对比</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">RAID 级别</th>
+<th style="text-align: left;">组织方式</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">缺点或适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RAID 0</td>
+<td style="text-align: left;">数据条带化，无冗余</td>
+<td style="text-align: left;">容量利用率高，读写性能好</td>
+<td
+style="text-align: left;">无容错能力，适合非关键高速数据，如视频编辑</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 1</td>
+<td style="text-align: left;">镜像盘，一对一冗余</td>
+<td style="text-align: left;">可靠性高，恢复简单；读可选更快磁盘</td>
+<td style="text-align: left;">成本高，写性能受较慢盘限制</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 2</td>
+<td style="text-align: left;">小条区交叉，海明码校验</td>
+<td style="text-align: left;">多盘并行，读性能高</td>
+<td
+style="text-align: left;">校验盘数量与数据盘成比例，开销大，已基本不用</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 3</td>
+<td style="text-align: left;">小条区交叉，单独奇偶校验盘</td>
+<td style="text-align: left;">大容量连续 I/O 传输率高</td>
+<td style="text-align: left;">小请求响应差，校验盘参与频繁</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 4</td>
+<td style="text-align: left;">块级交叉，独立访问，单独校验盘</td>
+<td style="text-align: left;">可同时响应多个读请求</td>
+<td style="text-align: left;">写操作会使校验盘成为瓶颈</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 5</td>
+<td style="text-align: left;">块级交叉，校验块分布在各盘</td>
+<td
+style="text-align: left;">避免单校验盘瓶颈，成本和性能平衡，应用广</td>
+<td style="text-align: left;">小写仍有校验更新开销</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 6</td>
+<td style="text-align: left;">类似 RAID 5，但有两种冗余校验</td>
+<td style="text-align: left;">可容忍双盘故障，可靠性更高</td>
+<td style="text-align: left;">控制器复杂，写入速度较慢</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 7</td>
+<td style="text-align: left;">在 RAID 基础上结合 Cache</td>
+<td style="text-align: left;">传输率和响应速度提高</td>
+<td style="text-align: left;">依赖缓存与控制器设计</td>
+</tr>
+</tbody>
+</table>
+<h3 id="raid-4-的少量写损失">3.5.1 RAID 4 的少量写损失</h3>
+<p>RAID 4 的典型要点是少量写的校验更新。设四个数据盘上的对应位为 <span
+class="math inline"><em>X</em><sub>0</sub>(<em>i</em>), <em>X</em><sub>1</sub>(<em>i</em>), <em>X</em><sub>2</sub>(<em>i</em>), <em>X</em><sub>3</sub>(<em>i</em>)</span>，校验位为：</p>
+<p><span
+class="math display"><em>p</em>(<em>i</em>) = <em>X</em><sub>3</sub>(<em>i</em>) ⊕ <em>X</em><sub>2</sub>(<em>i</em>) ⊕ <em>X</em><sub>1</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub>(<em>i</em>)</span></p>
+<p>如果只把 <span
+class="math inline"><em>X</em><sub>0</sub>(<em>i</em>)</span> 改成 <span
+class="math inline"><em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span>，新校验位为：</p>
+<p><span
+class="math display"><em>p</em><sup>′</sup>(<em>i</em>) = <em>X</em><sub>3</sub>(<em>i</em>) ⊕ <em>X</em><sub>2</sub>(<em>i</em>) ⊕ <em>X</em><sub>1</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span></p>
+<p>由于 <span
+class="math inline"><em>X</em><sub>0</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub>(<em>i</em>) = 0</span>，可化简为：</p>
+<p><span
+class="math display"><em>p</em><sup>′</sup>(<em>i</em>) = <em>p</em>(<em>i</em>) ⊕ <em>X</em><sub>0</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span></p>
+<p>因此，更新一个小数据块时必须先读旧校验 <span
+class="math inline"><em>p</em>(<em>i</em>)</span> 和旧数据 <span
+class="math inline"><em>X</em><sub>0</sub>(<em>i</em>)</span>，再写新数据
+<span
+class="math inline"><em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span>
+和新校验 <span
+class="math inline"><em>p</em><sup>′</sup>(<em>i</em>)</span>。也就是<strong>一次少量写包含两次读和两次写</strong>，这就是写损失。</p>
+<h2 id="固态硬盘-ssd">3.6 固态硬盘 SSD</h2>
+<p>SSD（Solid State Disk，固态硬盘）不是磁表面存储器，而是基于 NAND
+闪存的外部存储系统。它与 U 盘在原理上类似，但容量更大、性能更好。SSD
+使用区块写入和擦除方式，读操作通常快于写操作；由于没有机械寻道和旋转等待，其内部传输速率远高于传统机械硬盘。</p>
+<p>SSD 在接口规范和使用方法上与传统硬盘类似，可通过 USB、SATA、IDE
+等标准磁盘接口与 I/O 总线互连。SSD 内部有<strong>闪存翻译层</strong>，把
+CPU
+发出的逻辑块读写请求转换为底层闪存物理操作。这个翻译层在功能上相当于磁盘控制器。</p>
+<p>需要注意的是，闪存擦写次数有限，频繁写入会影响使用寿命。</p>
+<h1 id="总线系统互连与-io-接口">4 总线、系统互连与 I/O 接口</h1>
+<h2 id="总线的分类">4.1 总线的分类</h2>
+<p><strong>总线</strong>是在计算机系统不同层次上提供部件连接和信息交换的通路。总线可分为三类：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">总线类型</th>
+<th style="text-align: left;">连接对象</th>
+<th style="text-align: left;">特点与例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">芯片内总线</td>
+<td style="text-align: left;">CPU 芯片内部部件</td>
+<td style="text-align: left;">连接寄存器、ALU、指令部件等</td>
+</tr>
+<tr>
+<td style="text-align: left;">系统总线</td>
+<td style="text-align: left;">CPU、主存、I/O 控制器等主要部件</td>
+<td style="text-align: left;">可为单总线或多总线结构</td>
+</tr>
+<tr>
+<td style="text-align: left;">通信总线</td>
+<td style="text-align: left;">主机与 I/O 设备之间，或计算机系统之间</td>
+<td style="text-align: left;">多为电缆式总线，如
+SCSI、RS-232、USB、PS/2</td>
+</tr>
+</tbody>
+</table>
+<p>系统总线中，又可以区分处理器-存储器总线和 I/O
+总线。处理器-存储器总线通常短而快，只需匹配 CPU 与内存；I/O
+总线通常长而慢，要适应多种设备和标准接口。</p>
+<h2 id="系统总线的组成">4.2 系统总线的组成</h2>
+<p>系统总线通常由三组信号线构成：</p>
+<ul>
+<li><strong>数据线（Data
+Bus）</strong>：承载源部件与目的部件之间传送的信息，宽度决定一次能传送多少位。</li>
+<li><strong>地址线（Address Bus）</strong>：给出主存单元或 I/O
+端口地址，宽度决定最大寻址空间。</li>
+<li><strong>控制线（Control
+Bus）</strong>：传递定时信号和命令信息，控制数据线和地址线的使用。</li>
+</ul>
+<p>典型控制信号包括时钟、复位、总线请求、总线允许、中断请求、中断回答、存储器读写、I/O
+读写、传输确认等。</p>
+<p>有些总线没有单独地址线，而是让地址和数据共享同一组线，这称为<strong>地址/数据复用</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615143203730.png" alt="image-20260615143203551" style="zoom: 33%;" /></p>
+<h2 id="总线的基本概念">4.3 总线的基本概念</h2>
+<p><strong>总线裁决</strong>解决的是多个设备同时想使用共享总线时，谁先使用的问题。早期共享总线需要裁决；现代高速互连多采用点对点传输，裁决问题相对弱化。</p>
+<p><strong>总线定时</strong>定义总线事务中每一步何时开始、何时结束。同步总线用统一时钟控制；异步总线用握手信号控制；半同步总线结合二者。</p>
+<p><strong>并行传输</strong>一次在多个数据线上传多位，但位与位之间要保持同步，高速时困难较大。<strong>串行传输</strong>一次只传一位，不需要多位之间同步，现代高速总线反而常采用串行方式。发展趋势是：<strong>点对点、异步、串行</strong>。</p>
+<h2 id="总线性能指标">4.4 总线性能指标</h2>
+<p>总线性能主要看三个指标：</p>
+<ul>
+<li><strong>总线宽度</strong>：数据线条数，决定每次传输的信息位数。</li>
+<li><strong>总线工作频率</strong>：单位时间内完成数据传送的次数。现代总线可能一个时钟周期传送
+2 次或 4 次数据。</li>
+<li><strong>总线带宽</strong>：最大数据传输率。</li>
+</ul>
+<p>对于同步总线，带宽公式为：</p>
+<p><span
+class="math display"><em>B</em> = <em>W</em> × <em>F</em>/<em>N</em></span></p>
+<p>其中 <span class="math inline"><em>W</em></span> 是总线宽度，<span
+class="math inline"><em>F</em></span> 是总线时钟频率，<span
+class="math inline"><em>N</em></span>
+是完成一次数据传送所需的时钟周期数。<span
+class="math inline"><em>F</em>/<em>N</em></span>
+实际上就是总线工作频率。</p>
+<p>总线传送方式分为<strong>非突发传送</strong>和<strong>突发传送</strong>。非突发传送每个事务都传地址，一个地址对应一次数据传送；突发传送先传一个地址，之后连续传多个数据，后续地址默认自动递增，适合成块数据传输。</p>
+<h2 id="处理器总线存储器总线与-io-总线">4.5 处理器总线、存储器总线与 I/O
+总线</h2>
+<p>早期 Intel 架构中，前端总线（Front Side Bus, FSB）位于 CPU
+与北桥芯片之间，采用并行、同步传输。从 Pentium Pro 起，FSB 使用 quad
+pumped 技术，即一个总线时钟周期传送 4 次数据。例如工作频率 <span
+class="math inline">1333 MT/s</span>、宽度 64 位时，带宽为：</p>
+<p><span class="math display">1333 MT/s × 8 B ≈ 10.5 GB/s</span></p>
+<p>QPI（Quick Path
+Interconnect）是高速点对点串行互连。它基于包交换，可用于 CPU 核之间、CPU
+芯片之间、CPU 与 I/O Hub 之间互连。若 QPI 速度为 <span
+class="math inline">4.8 GT/s</span>，每次有效数据宽度约 <span
+class="math inline">2 B</span>，双向传输，则带宽为：</p>
+<p><span class="math display">4.8 G × 2 B × 2 = 19.2 GB/s</span></p>
+<p>I/O 总线为系统中各种 I/O 设备提供输入输出通道。主板扩展槽可看作 I/O
+总线的物理形式。I/O 总线的发展大致为：</p>
+<ul>
+<li>第一代：ISA/EISA、VESA，已淘汰。</li>
+<li>第二代：PCI、AGP、PCI-X，逐渐淘汰。</li>
+<li>第三代：PCI-Express，串行总线，主流。</li>
+</ul>
+<p>PCI-Express
+使用链路（link）连接设备，每个链路含多条通路（lane）。PCIe <span
+class="math inline">×<em>n</em></span> 表示有 <span
+class="math inline"><em>n</em></span> 条通路。以 PCIe 1.0
+为例，每条通路发送和接收速率均为 <span class="math inline">2.5
+Gb/s</span>，每个数据字节编码为 10 位传输，因此带宽为：</p>
+<p><span class="math display">2.5 Gb/s × 2 × <em>n</em>/10 = 0.5
+GB/s × <em>n</em></span></p>
+<p>所以 PCIe <span class="math inline">×16</span> 的双向总带宽可达 <span
+class="math inline">8 GB/s</span>。</p>
+<h2 id="io-总线io-控制器与-io-设备的关系">4.6 I/O 总线、I/O 控制器与 I/O
+设备的关系</h2>
+<p>这些关系可以概括为：</p>
+<ul>
+<li>I/O 设备通常通过<strong>通信总线或电缆</strong>连接到 I/O
+控制器。</li>
+<li>I/O 控制器，也称 I/O 接口，可通过扩展卡或南桥芯片连接到 I/O
+总线。</li>
+<li>I/O 总线再通过桥接芯片与 CPU、内存所在的更高速互连结构相连。</li>
+</ul>
+<p>因此要区分两个“连接层次”：主板内部的 PCIe 等是 I/O 总线；设备外部的
+USB、SATA、PS/2、网线等常体现为设备侧通信总线或连接接口。</p>
+<h1 id="io-接口端口与设备寻址">5 I/O 接口、端口与设备寻址</h1>
+<h2 id="io-接口的含义与分类">5.1 I/O 接口的含义与分类</h2>
+<p>本课程把 <strong>I/O 控制器和插座合起来称为 I/O
+接口</strong>。例如网卡、显卡、键盘适配器、磁盘控制器，以及它们对应的连接器，都可视为
+I/O 接口的一部分。I/O
+接口包括插头/插座形式、通信规程、电气特性和控制逻辑。</p>
+<p>I/O 接口可按多个角度分类：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">分类角度</th>
+<th style="text-align: left;">类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">数据传输方式</td>
+<td
+style="text-align: left;">串行接口（一次只传输1位）、并行接口（多位一起进行传输）</td>
+</tr>
+<tr>
+<td style="text-align: left;">是否能连接多个设备</td>
+<td
+style="text-align: left;">总线式接口（可连接多个设备）、独占式接口（只能连接1个设备）</td>
+</tr>
+<tr>
+<td style="text-align: left;">是否符合标准</td>
+<td style="text-align: left;">标准接口、专用接口</td>
+</tr>
+<tr>
+<td style="text-align: left;">功能是否可灵活选择</td>
+<td style="text-align: left;">可编程接口、不可编程接口</td>
+</tr>
+</tbody>
+</table>
+<h2 id="io-控制器的职能">5.2 I/O 控制器的职能</h2>
+<p>I/O
+控制器承担主机与设备之间的转换、缓冲和控制工作。它的主要职能包括：</p>
+<ul>
+<li><strong>数据缓冲</strong>：用数据缓冲寄存器匹配主机和外设速度。</li>
+<li><strong>状态或错误检测</strong>：用状态寄存器保存就绪、忙、出错等信息。</li>
+<li><strong>控制和定时</strong>：接受系统总线来的控制定时信号，并按设备要求产生控制动作。</li>
+<li><strong>数据格式转换</strong>：例如串并转换、并串转换、电平或编码转换。</li>
+<li><strong>主机与设备通信</strong>：在主机侧接收 CPU
+命令，在设备侧驱动外设动作。</li>
+</ul>
+<p>CPU
+通过写控制寄存器向设备发命令，通过读状态寄存器了解设备状态，通过读写数据寄存器交换数据。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144027592.png" alt="image-20260615144027420" style="zoom: 50%;" /></p>
+<h2 id="io-端口的概念">5.3 I/O 端口的概念</h2>
+<p>I/O 控制器中 CPU 能够访问的各类寄存器称为 <strong>I/O
+端口</strong>。常见端口包括：</p>
+<ul>
+<li>数据端口：用于读写设备数据。</li>
+<li>状态端口：用于读取设备状态和错误标志。</li>
+<li>控制端口：用于写入命令或控制字。</li>
+</ul>
+<p>对外设的访问，本质上就是对这些 I/O
+端口进行读写：向端口发命令、读状态、读数据或写数据。一个 I/O
+控制器可能占有多个端口地址，因此必须给 I/O 端口编号，CPU
+才能访问它们。</p>
+<h2 id="io-设备寻址方式">5.4 I/O 设备寻址方式</h2>
+<p>I/O 设备寻址方式就是 I/O
+端口的编号方式。有两种基本方案：<strong>统一编址</strong>和<strong>独立编址</strong>。</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方式</th>
+<th style="text-align: left;">又称</th>
+<th style="text-align: left;">地址空间</th>
+<th style="text-align: left;">指令特点</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">统一编址</td>
+<td style="text-align: left;">内存映射 I/O</td>
+<td style="text-align: left;">I/O 端口与主存统一编址</td>
+<td style="text-align: left;">用普通访存指令访问 I/O 端口</td>
+<td style="text-align: left;">RISC 机器、Motorola 处理器等</td>
+</tr>
+<tr>
+<td style="text-align: left;">独立编址</td>
+<td style="text-align: left;">特殊 I/O 指令方式</td>
+<td style="text-align: left;">I/O 端口有独立地址空间</td>
+<td style="text-align: left;">需要专门 I/O 指令，如
+<code>IN</code>、<code>OUT</code></td>
+<td style="text-align: left;">Intel、Zilog 处理器</td>
+</tr>
+</tbody>
+</table>
+<p>统一编址方式下，I/O 端口被映射到主存地址空间的一部分。CPU 不需要专门
+I/O 指令，只要用普通读写内存指令访问特定地址范围，就能读写 I/O
+端口。它的优点是指令系统简单，访存机制统一；缺点是会占用部分主存地址空间，且需要通过地址范围区分访问对象。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144233124.png" alt="image-20260615144232953" style="zoom:50%;" /></p>
+<p>独立编址方式下，I/O 地址空间与主存地址空间分开。CPU
+通过不同控制信号区分 I/O 读写和存储器读写，例如 IOR、IOW 与
+MEMR、MEMW。由于 I/O
+端口数量通常远少于存储器单元，端口寻址只需较少地址线。缺点是指令系统必须提供专门
+I/O 指令。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144314765.png" alt="image-20260615144314614" style="zoom:50%;" /></p>
+<p>奔腾机采用独立编址方式，I/O 地址空间由 <span
+class="math inline">2<sup>16</sup></span> 个 8 位端口组成，即 64K
+个端口。两个连续 8 位端口可组成 16 位端口，四个连续 8 位端口可组成 32
+位端口。</p>
+<h1 id="io-传输方式">6 I/O 传输方式</h1>
+<h2 id="三种基本数据交换方式">6.1 三种基本数据交换方式</h2>
+<p>I/O 设备与主机之间的数据交换有三种基本方式：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方式</th>
+<th style="text-align: left;">核心机制</th>
+<th style="text-align: left;">CPU 参与程度</th>
+<th style="text-align: left;">适用设备</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">程序直接控制方式</td>
+<td style="text-align: left;">CPU 主动查询或按时序传送</td>
+<td style="text-align: left;">很高，CPU 常处于等待状态</td>
+<td style="text-align: left;">简单慢速设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">中断 I/O 方式</td>
+<td style="text-align: left;">外设完成或需要服务时主动中断 CPU</td>
+<td style="text-align: left;">中等，CPU 执行中断服务程序传数据</td>
+<td style="text-align: left;">低速或中速设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">DMA 方式</td>
+<td style="text-align: left;">DMA
+控制器控制总线，外设与主存直接传送</td>
+<td style="text-align: left;">很低，CPU 主要负责初始化和结束处理</td>
+<td style="text-align: left;">磁盘等高速块设备</td>
+</tr>
+</tbody>
+</table>
+<p>这三种方式的根本区别是：<strong>数据传送由谁完成，以及 CPU
+是否需要持续等待</strong>。</p>
+<h2 id="程序直接控制或轮询方式">6.2 程序直接控制或轮询方式</h2>
+<p>程序直接控制方式是最简单的 I/O
+方式。它可以是无条件传送，也可以是条件传送。条件传送又称
+<strong>轮询（Polling）</strong>或程序查询方式。</p>
+<p>轮询的基本思想是：I/O 设备把自己的状态放到状态寄存器中，OS
+或驱动程序反复读取状态寄存器，检查特定位是否表示“就绪”。如果未就绪，就继续查询；如果就绪，就进行下一步数据传送或发送控制命令。</p>
+<p>以打印机为例，“就绪”通常表示打印控制器的数据缓冲区已经空，可以接受新的打印字符。CPU
+执行 I/O 指令把字符送到数据端口，再检查状态位、发送启动信号。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615144554094.png" alt="image-20260615144553935" style="zoom: 33%;" /></p>
+<h3 id="打印输出标准子程序例子">6.2.1 打印输出标准子程序例子</h3>
+<p>下面这个采用程序查询方式打印 <code>AL</code> 寄存器中字符的 8086
+风格子程序，很好地说明了轮询 I/O
+的三个动作：<strong>写数据端口、读状态端口、写控制端口启动设备</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">PRINT PROC NEAR</span><br><span class="line">      PUSH AX        ; 保护 AX，避免子程序破坏调用者现场</span><br><span class="line">      PUSH DX        ; 保护 DX，因为后面要用 DX 保存 I/O 端口地址</span><br><span class="line">      MOV  DX, 378H  ; 378H 是打印机数据锁存器端口地址</span><br><span class="line">      OUT  DX, AL    ; 将 AL 中待打印字符输出到数据端口</span><br><span class="line">      MOV  DX, 379H  ; 379H 是打印机状态寄存器端口地址</span><br><span class="line">WAIT: IN   AL, DX    ; 从状态端口读入打印机状态字</span><br><span class="line">      TEST AL, 80H   ; 检查状态字中的忙碌位</span><br><span class="line">      JE   WAIT      ; 若打印机仍忙，则继续轮询等待</span><br><span class="line">      MOV  DX, 37AH  ; 37AH 是打印机控制寄存器端口地址</span><br><span class="line">      MOV  AL, 0DH   ; 准备控制字：置选通位为 1</span><br><span class="line">      OUT  DX, AL    ; 输出控制字，使选通位置 1</span><br><span class="line">      MOV  AL, 0CH   ; 准备控制字：置选通位为 0</span><br><span class="line">      OUT  DX, AL    ; 输出控制字，使选通位置 0，形成一次选通信号</span><br><span class="line">      POP  DX        ; 恢复 DX</span><br><span class="line">      POP  AX        ; 恢复 AX</span><br><span class="line">      RET            ; 返回调用程序</span><br><span class="line">PRINT ENDP</span><br></pre></td></tr></table></figure>
+<p>这段程序开始用 <code>PUSH AX</code> 和 <code>PUSH DX</code>
+保护现场，因为子程序会改写 <code>AX</code> 和 <code>DX</code>。随后
+<code>MOV DX, 378H</code>
+把打印机<strong>数据锁存器端口地址</strong>送入
+<code>DX</code>，<code>OUT DX, AL</code>
+将待打印字符写入数据端口。这里的 <code>OUT</code> 就是访问 I/O
+端口的输出指令。</p>
+<p>接着程序把 <code>DX</code> 改为
+<code>379H</code>，这是打印机<strong>状态寄存器端口地址</strong>。标号
+<code>WAIT</code> 处反复执行 <code>IN AL, DX</code> 和
+<code>TEST AL, 80H</code>：前者从状态端口读入打印机状态，后者检查状态字中的忙碌位。如果检测结果表示打印机仍忙，<code>JE WAIT</code>
+就跳回继续查询；只有状态满足要求时，程序才退出等待循环。因此，这几条指令正体现了程序查询方式的“踏步”特征：CPU
+没有停机，但它一直在执行读状态、测试、条件跳转。</p>
+<p>最后程序把 <code>DX</code> 改为
+<code>37AH</code>，即<strong>控制寄存器端口地址</strong>，先输出
+<code>0DH</code> 使选通位置 1，再输出 <code>0CH</code> 使选通位置
+0。这个 1 到 0
+的变化相当于向打印控制器发出一次启动或选通信号，通知设备开始处理刚才写入的数据。末尾用
+<code>POP DX</code>、<code>POP AX</code> 恢复现场并返回。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615145524578.png" alt="image-20260615145524426" style="zoom:50%;" /></p>
+<p>程序直接控制方式的优点是<strong>简单、控制容易、接口硬件少</strong>。缺点也很明显：CPU
+与外设串行工作，效率低；查询期间 CPU
+不停执行类似“读状态、测试、跳转”的指令，形成所谓的<strong>踏步现象</strong>。如果一直独占查询，CPU
+几乎 100% 时间都在为 I/O 服务。</p>
+<h2 id="中断-io-方式">6.3 中断 I/O 方式</h2>
+<p>中断 I/O 的基本思想是：CPU
+启动外设后，不必一直等待。外设完成任务或需要 CPU 干预时，主动向 CPU
+发中断请求。CPU
+响应后暂停当前程序，转入操作系统中的中断服务程序；处理结束后，再返回被中断程序继续执行。</p>
+<p>中断方式下，外设工作期间 CPU 可以执行其他程序，所以 CPU
+与外设具有一定并行性。与轮询相比，它显著降低了 CPU
+无意义等待的时间。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615145704691.png" alt="image-20260615145704524" style="zoom:50%;" /></p>
+<h3 id="中断响应条件">6.3.1 中断响应条件</h3>
+<p>中断响应是硬件过程，指 CPU
+发现外部中断请求、中止现行程序并调出中断服务程序。需要满足三个条件：</p>
+<ol type="1">
+<li>CPU 处于开中断状态。</li>
+<li>当前指令执行完毕。</li>
+<li>至少存在一个未被屏蔽的中断请求。</li>
+</ol>
+<p>外部中断通常在指令执行结束时响应；而内部异常发生在指令执行过程中，不能简单等到指令结束后再处理。这是中断与异常处理时点的重要区别。</p>
+<h3 id="中断响应过程">6.3.2 中断响应过程</h3>
+<p>中断响应由处理器硬件完成，可看作执行一条“中断隐指令”。它主要完成三件事：</p>
+<ul>
+<li><strong>关中断</strong>：清除中断允许标志，防止响应过程本身被打断。</li>
+<li><strong>保护断点和程序状态</strong>：保存 PC 和
+PSW，常保存到堆栈或特殊寄存器，如 EPC、EPSWR。</li>
+<li><strong>识别中断源并转入服务程序</strong>：获得中断服务程序入口地址和初始状态，装入
+PC 和 PSW。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155923859.png" alt="image-20260615155923684" style="zoom: 33%;" /></p>
+<p>识别中断源有两种方法：</p>
+<ul>
+<li><strong>软件识别</strong>：进入统一异常/中断处理入口后，由 OS
+查询异常原因寄存器或中断请求状态。例如 MIPS 可通过 Cause
+寄存器识别异常原因。</li>
+<li><strong>硬件识别或向量中断</strong>：中断控制器通过优先级电路得到中断类型号，CPU
+根据中断类型号查中断向量表，取得服务程序入口地址。例如 8086/8088
+的中断向量表有 256 项，每项 4 字节，向量地址为“中断类型号 <span
+class="math inline">×4</span>”。</li>
+</ul>
+<p>以 8086/8088
+为例，中断向量表也称<strong>中断入口地址表</strong>或<strong>异常表</strong>，位于物理地址
+<code>0000H~03FFH</code>。这段空间一共 <span
+class="math inline">1024</span> 字节，被划分为 <span
+class="math inline">256</span> 组，每组占 <span
+class="math inline">4</span>
+字节，用来保存一个中断服务程序的入口地址。8086/8088 的程序入口地址由
+<code>CS:IP</code> 表示，因此每个中断向量表项保存的就是对应服务程序的
+<code>CS:IP</code>。</p>
+<p>中断类型号和中断向量表地址之间的关系非常直接：</p>
+<p><span class="math display">向量地址 = 中断类型号 × 4</span></p>
+<p>例如，除法错的中断类型号为 <span
+class="math inline">0</span>，所以它的向量地址为 <span
+class="math inline">0 × 4 = 0</span>，对应中断向量表的
+<code>00H~03H</code>。单步中断类型号为 <span
+class="math inline">1</span>，对应 <code>04H~07H</code>。NMI
+的中断类型号为 <span class="math inline">2</span>，所以向量地址为 <span
+class="math inline">2 × 4 = 8</span>，对应 <code>08H~0BH</code>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615150257438.png" alt="image-20260615150257277" style="zoom:50%;" /></p>
+<p>因此，向量中断的完整思路是：<strong>硬件先得到中断类型号，再用“类型号
+<span class="math inline">×4</span>”查中断向量表，取出
+<code>CS:IP</code>，最后转到相应中断服务程序执行</strong>。进一步的问题是“中断类型号怎么得到”。这正好引出后面的中断控制器：中断控制器通过请求锁存、屏蔽和优先级编码，向
+CPU 提供中断类型号。</p>
+<h2 id="中断控制器与-8259a">6.4 中断控制器与 8259A</h2>
+<p>中断控制器负责接收多个外设的中断请求，进行屏蔽和优先级判断，并向 CPU
+提供最高优先级中断的信息。其基本部件包括：</p>
+<ul>
+<li>中断请求寄存器：记录来自不同外设的请求。</li>
+<li>屏蔽寄存器：由 CPU 通过 I/O 指令设置，用来屏蔽部分中断。</li>
+<li>判优线路：从未屏蔽请求中选择优先级最高者。</li>
+<li>中断类型号形成线路：生成中断类型号并送到数据线上。</li>
+</ul>
+<p>8259A
+是典型可编程中断控制器。它支持中断请求锁存、中断屏蔽、优先级排队、中断优先权编码；既支持程序查询式中断，也支持向量式中断；单片支持
+8 级中断，多片级联最多可构成 64 级中断。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615150419492.png" alt="image-20260615150419300" style="zoom:50%;" /></p>
+<h2 id="中断处理过程与多重中断">6.5 中断处理过程与多重中断</h2>
+<p>中断全过程可分为<strong>中断响应</strong>和<strong>中断处理</strong>。中断响应由硬件完成；中断处理是执行中断服务程序，由软件完成。</p>
+<p>典型多重中断服务程序可分为三段：</p>
+<ul>
+<li><strong>先行段或准备阶段</strong>：保护现场和旧屏蔽字，查明原因，设置新屏蔽字，开中断。该阶段通常禁止被打断。</li>
+<li><strong>本体段</strong>：进行具体 I/O
+处理。此时可允许更高处理优先级的中断打断。</li>
+<li><strong>结束段或恢复阶段</strong>：关中断，恢复现场和旧屏蔽字，清除中断请求，开中断并中断返回。该阶段也不允许被打断。</li>
+</ul>
+<p><strong>多重中断</strong>指在处理某个中断时，又发生新的更高优先级中断请求，CPU
+暂停当前中断服务程序，转去处理新中断，处理完后再返回原中断服务程序。</p>
+<p>这里要区分两个优先级：</p>
+<ul>
+<li><strong>中断响应优先级</strong>：多个中断同时请求时，硬件或查询程序先响应谁。</li>
+<li><strong>中断处理优先级</strong>：通过中断屏蔽字动态设定，决定一个中断服务程序执行期间允许哪些中断打断它。</li>
+</ul>
+<p>响应优先级是“同时来时先接谁”，处理优先级是“正在处理时谁能插队”。</p>
+<h2 id="例题中断优先权的动态分配">6.6 例题：中断优先权的动态分配</h2>
+<p>一道典型例题可以用来说明<strong>响应优先级</strong>和<strong>处理优先级</strong>不是同一件事。</p>
+<p>题设如下：某中断系统有四个中断源，响应优先级固定为：</p>
+<p><span class="math display">1 &gt; 2 &gt; 3 &gt; 4</span></p>
+<p>在用户程序执行时，<span class="math inline">1</span>、<span
+class="math inline">3</span>、<span class="math inline">4</span>
+级中断请求同时发生；当 CPU 正在执行 <span class="math inline">3</span>
+级中断服务程序时，又发生 <span class="math inline">2</span>
+级中断请求。要求分别写出处理优先级为 <span
+class="math inline">1 &gt; 2 &gt; 3 &gt; 4</span> 和 <span
+class="math inline">1 &gt; 4 &gt; 3 &gt; 2</span> 时，各中断的屏蔽字以及
+CPU 完成中断处理的过程。</p>
+<p>这里约定：<strong>屏蔽字中 1 表示屏蔽，0
+表示开放</strong>。某一级中断服务程序开始执行后，会设置本级对应的屏蔽字；若某个新中断源对应位为
+0，并且系统处于开中断状态，它就可能打断当前中断服务程序。</p>
+<h3 id="处理优先级为-1234">6.6.1 处理优先级为 <span
+class="math inline">1 &gt; 2 &gt; 3 &gt; 4</span></h3>
+<p>当处理优先级与响应优先级相同，即：</p>
+<p><span class="math display">1 &gt; 2 &gt; 3 &gt; 4</span></p>
+<p>屏蔽字可写为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">正在执行的中断服务程序级别</th>
+<th style="text-align: left;">1 级</th>
+<th style="text-align: left;">2 级</th>
+<th style="text-align: left;">3 级</th>
+<th style="text-align: left;">4 级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">第 1 级</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 2 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 3 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 4 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+</tr>
+</tbody>
+</table>
+<p>这张表的含义是：正在处理某一级中断时，比它<strong>优先级更高</strong>的中断开放，比它<strong>优先级相同或更低</strong>的中断屏蔽。例如执行
+3 级中断服务程序时，1 级和 2 级开放，3 级和 4 级屏蔽，所以 2
+级中断可以打断 3 级中断。</p>
+<p>CPU 的处理过程如下：</p>
+<ol type="1">
+<li>用户程序执行时，1、3、4 级中断同时请求。由于响应优先级为 <span
+class="math inline">1 &gt; 2 &gt; 3 &gt; 4</span>，CPU 首先响应 1
+级中断。</li>
+<li>1 级中断服务程序的屏蔽字为
+<code>1111</code>，执行期间屏蔽所有中断，故 3、4 级只能等待。</li>
+<li>1 级中断处理结束后，待处理请求中还有 3、4 级。按响应优先级，CPU 响应
+3 级中断。</li>
+<li>执行 3 级中断服务程序时，屏蔽字为 <code>0011</code>，即 1、2
+级开放，3、4 级屏蔽。此时发生 2 级中断请求，由于 2
+级开放且处理优先级高于 3 级，所以 2 级中断打断 3 级中断。</li>
+<li>2 级中断服务程序执行完后，CPU 返回被打断的 3
+级中断服务程序继续执行。</li>
+<li>3 级中断结束后，最后处理等待中的 4 级中断。</li>
+</ol>
+<p>因此，这种情况下的主要处理顺序可概括为：</p>
+<p><span
+class="math display">主程序 → 1 → 3 → 2 → 3 → 4 → 主程序</span></p>
+<p>如果只看各级中断完成的先后顺序，则是：</p>
+<p><span class="math display">1, 2, 3, 4</span></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615151348183.png" alt="image-20260615151347997" style="zoom:50%;" /></p>
+<h3 id="处理优先级为-1432">6.6.2 处理优先级为 <span
+class="math inline">1 &gt; 4 &gt; 3 &gt; 2</span></h3>
+<p>第二种情况中，响应优先级仍然是：</p>
+<p><span class="math display">1 &gt; 2 &gt; 3 &gt; 4</span></p>
+<p>但处理优先级被动态设置为：</p>
+<p><span class="math display">1 &gt; 4 &gt; 3 &gt; 2</span></p>
+<p>此时屏蔽字变为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">正在执行的中断服务程序级别</th>
+<th style="text-align: left;">1 级</th>
+<th style="text-align: left;">2 级</th>
+<th style="text-align: left;">3 级</th>
+<th style="text-align: left;">4 级</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">第 1 级</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 2 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 3 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">0</td>
+</tr>
+<tr>
+<td style="text-align: left;">第 4 级</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">1</td>
+</tr>
+</tbody>
+</table>
+<p>这张表要按<strong>处理优先级</strong>来读。例如执行 3
+级中断服务程序时，1 级和 4 级比 3 级处理优先级高，所以开放；2 级比 3
+级处理优先级低，所以屏蔽。这正是动态分配中断处理优先权的意义：响应优先级决定先响应谁，但进入某个服务程序后，能不能被打断由屏蔽字决定。</p>
+<p>CPU 的处理过程如下：</p>
+<ol type="1">
+<li>用户程序执行时，1、3、4
+级中断同时请求。由于<strong>响应优先级</strong>固定为 <span
+class="math inline">1 &gt; 2 &gt; 3 &gt; 4</span>，CPU 仍然首先响应 1
+级中断。</li>
+<li>1 级中断服务程序屏蔽所有中断，处理结束后返回。</li>
+<li>待处理请求中还有 3、4 级。虽然处理优先级中 4 高于 3，但此时 CPU
+选择响应哪个未处理请求仍按响应优先级，所以先响应 3 级中断。</li>
+<li>进入 3 级中断服务程序后，屏蔽字为 <code>0110</code>，即 1、4
+级开放，2、3 级屏蔽。因此原本等待的 4 级中断可以打断 3 级中断。</li>
+<li>CPU 转去执行 4 级中断服务程序。4 级的屏蔽字为
+<code>0111</code>，只开放 1 级，屏蔽 2、3、4 级。</li>
+<li>4 级中断结束后，CPU 返回 3 级中断服务程序继续执行。执行 3
+级服务程序期间发生的 2 级中断因被屏蔽，不能打断 3 级，只能等待。</li>
+<li>3 级中断结束后，CPU 再处理等待中的 2 级中断。</li>
+</ol>
+<p>因此，这种情况下的主要处理顺序可概括为：</p>
+<p><span
+class="math display">主程序 → 1 → 3 → 4 → 3 → 2 → 主程序</span></p>
+<p>如果只看各级中断完成的先后顺序，则是：</p>
+<p><span class="math display">1, 4, 3, 2</span></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615151615210.png" alt="image-20260615151615022" style="zoom:50%;" /></p>
+<p>这道题的分析关键是：<strong>响应优先级决定“多个请求同时出现时先响应谁”，处理优先级通过屏蔽字决定“服务程序执行过程中谁能打断谁”</strong>。所以第二种情况下，3
+级会先于 4 级被响应，但 4 级又会在 3 级执行期间打断 3 级；2
+级虽然响应优先级高于 3、4，但处理优先级最低，若在 3
+级服务程序中出现，会被屏蔽到后面再处理。</p>
+<h2 id="轮询方式与中断方式比较">6.7 轮询方式与中断方式比较</h2>
+<p>设某设备输出一批数据：主机把一个数据送到接口输出缓冲 OBR 需 <span
+class="math inline">1<em>μ</em><em>s</em></span>，OBR 输出到设备需 <span
+class="math inline">1 ms</span>，每条指令 <span
+class="math inline">1<em>μ</em><em>s</em></span>。</p>
+<p>程序直接控制方式中，若查询程序有 10 条，第 5
+条为启动设备指令，则每个数据周期约：</p>
+<p><span
+class="math display">1000<em>μ</em><em>s</em> + 5<em>μ</em><em>s</em> = 1005<em>μ</em><em>s</em></span></p>
+<p>数据传输率约为：</p>
+<p><span class="math display">$$
+\frac{1}{1005\mu s}\approx 995\text{ 个数据/秒}
+$$</span></p>
+<p>但 CPU 一直查询，主机占用率为 <span
+class="math inline">100%</span>。</p>
+<p>中断方式中，若中断服务程序有 30 条，第 20
+条启动设备，则数据传输率约为：</p>
+<p><span class="math display">$$
+\frac{1}{1000+1+20}\mu s \approx 979\text{ 个数据/秒}
+$$</span></p>
+<p>主机占用率为：</p>
+<p><span class="math display">$$
+\frac{1+30}{1000+1+20}\approx 3\%
+$$</span></p>
+<p>所以中断方式的传输率可能略低，因为中断服务程序有保存现场、设置屏蔽字等额外开销；但
+CPU 占用率大幅下降，系统整体效率更高。</p>
+<h1 id="dma-方式">7 DMA 方式</h1>
+<h2 id="为什么引入-dma">7.1 为什么引入 DMA</h2>
+<p>DMA（Direct Memory
+Access，直接存储器访问）用于解决高速设备与主存之间的大批量数据传送问题。</p>
+<p>程序直接控制方式受踏步现象限制，CPU
+等待严重，不适合高速设备。中断方式虽然让 CPU
+与外设部分并行，但每传一个数据都可能需要一次中断，存在中断响应、保护现场、恢复现场等开销，且数据传送由
+CPU 执行软件完成，速度仍然不够。</p>
+<p>DMA 的基本思想是：<strong>高速外设和主存之间直接传送数据，由专门硬件
+DMA 控制器控制总线，CPU 不参与逐字节或逐字的数据搬运</strong>。</p>
+<p>DMA
+适合高速设备和成批数据交换，例如磁盘、光盘等。一旦启动，数据会连续读写，数据间隔时间短，必须及时传送，否则可能丢失。</p>
+<h2 id="dma-与中断的配合">7.2 DMA 与中断的配合</h2>
+<p>DMA 并不是完全不需要中断，而是与中断配合使用。以磁盘为例：</p>
+<ul>
+<li>寻道阶段：可用中断通知 CPU 操作完成。</li>
+<li>旋转查找扇区阶段：可用中断通知 CPU。</li>
+<li>连续读写阶段：使用 DMA 方式传送数据。</li>
+<li>结束和校验阶段：用 DMA 结束中断通知 CPU 后处理。</li>
+</ul>
+<p>因此，DMA 的含义不是“没有中断”，而是<strong>大批量数据传送期间 CPU
+不搬运数据</strong>。</p>
+<h2 id="dma-数据传送的三种控制方式">7.3 DMA 数据传送的三种控制方式</h2>
+<p>DMA 传送时，真正搬运数据的是 DMA
+控制器，但数据最终要进出主存。问题在于：<strong>CPU
+执行程序也要访问主存，DMA
+控制器传数据也要访问主存</strong>。两者共享主存和系统总线，就可能出现争用。三种控制方式本质上是在回答同一个问题：当
+DMA 要访问主存时，CPU 应该怎样让出主存和总线。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方式</th>
+<th style="text-align: left;">做法</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">缺点或适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">CPU 停止法</td>
+<td style="text-align: left;">DMA 传输一块数据期间，CPU
+脱离总线，停止访问主存</td>
+<td style="text-align: left;">控制简单，适合很高速外设成组传送</td>
+<td style="text-align: left;">CPU 基本停止，主存周期利用不充分</td>
+</tr>
+<tr>
+<td style="text-align: left;">周期挪用法</td>
+<td style="text-align: left;">DMA
+每次只窃取一个总线或存储周期，传一个数据后释放总线</td>
+<td style="text-align: left;">能及时响应 I/O，又较好发挥 CPU
+和主存效率</td>
+<td
+style="text-align: left;">每次传送都要申请和释放总线，控制开销较大</td>
+</tr>
+<tr>
+<td style="text-align: left;">交替分时访问法</td>
+<td style="text-align: left;">每个存储周期分成两个时间片，一个给
+CPU，一个给 DMA</td>
+<td style="text-align: left;">CPU 与 DMA 可规则交替访问</td>
+<td style="text-align: left;">需要存储系统支持固定分时</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cpu-停止法一次让出一整块传输时间">7.3.1 CPU
+停止法：一次让出一整块传输时间</h3>
+<p><strong>CPU 停止法</strong>也叫<strong>成组传送方式</strong>。当 DMA
+开始传输一块数据时，CPU 脱离总线，停止访问主存；DMA
+控制器独占总线和主存，把这一整块数据传完后，CPU
+才重新取得总线控制权。</p>
+<p>可以把它理解成：CPU 对 DMA
+说“这一段时间总线都归你，你把这一块数据一次搬完”。因此它的控制逻辑最简单，DMA
+不需要每传一个字都重新申请总线。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615153623971.png" alt="image-20260615153623791" style="zoom:50%;" /></p>
+<p>这种方式的优点是<strong>控制简单，适合传输率很高的外设进行成组数据传送</strong>。缺点是
+CPU 受影响很大：DMA 访存期间 CPU
+基本不能访问主存，很多情况下只能等待。更细一点说，即使 I/O
+设备已经算“高速”，两个数据准备好之间通常仍会有间隔，而这个间隔往往大于一个主存周期；如果
+CPU 被整块暂停，就会导致一些主存周期空闲，主存没有被充分利用。</p>
+<p>有两种弥补 CPU 停止法缺点的思路：</p>
+<ul>
+<li><strong>在 DMA 接口中引入缓冲器</strong>：让外设先和 DMA
+接口里的小容量半导体缓冲器交换数据，再由缓冲器与主存成批交换。这样 DMA
+真正占用系统总线的时间变短，CPU 等待时间也会减少。</li>
+<li><strong>改用周期挪用法</strong>：DMA
+不再一次占住总线直到一整块传完，而是每次只挪用一个存储周期，传完一个数据就释放总线。</li>
+</ul>
+<h3 id="周期挪用法一次只抢一个主存周期">7.3.2
+周期挪用法：一次只抢一个主存周期</h3>
+<p><strong>周期挪用法</strong>也叫<strong>周期窃取法</strong>或<strong>单字传送方式</strong>。当外设准备好一个数据时，DMA
+控制器向 CPU 请求总线；CPU 让出一个总线事务周期，由 DMA
+控制器访问主存，传送一个字或一个数据单位。传完后，DMA 立即释放总线，CPU
+可以继续访存。等外设准备好下一个数据时，DMA 再发起下一次请求。</p>
+<p>它的关键思想是：<strong>不让 DMA 长时间霸占总线，而是在 CPU
+执行过程中“插空”拿走一个主存周期</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615153755820.png" alt="image-20260615153755641" style="zoom:50%;" /></p>
+<p>周期挪用法的优点是：既能及时响应 I/O 请求，又能较好发挥 CPU
+和主存效率。外设准备下一个数据时，CPU
+可以继续使用主存；只有真正要传送一个数据时，DMA
+才短暂占用一个周期。因此，它适合 <strong>I/O
+设备读写周期大于主存周期</strong>的情况。换句话说，外设并不是每个主存周期都能给出数据，CPU
+可以利用外设准备数据的空隙继续执行程序。</p>
+<p>它的缺点是控制开销比 CPU 停止法大。因为每传一个数据，DMA
+都要经历申请总线、获得总线、传送数据、释放总线这一小轮流程。如果数据量很大、每个数据都这么申请，控制过程本身也会消耗时间。</p>
+<p>周期挪用法需要区分三种可能情况：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">DMA 请求发生时的 CPU 状态</th>
+<th style="text-align: left;">是否冲突</th>
+<th style="text-align: left;">处理方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">CPU 暂时不需要访问主存</td>
+<td style="text-align: left;">不冲突</td>
+<td style="text-align: left;">DMA 可直接访问主存，两者在功能上并行</td>
+</tr>
+<tr>
+<td style="text-align: left;">CPU 正在访问主存</td>
+<td style="text-align: left;">暂时冲突</td>
+<td style="text-align: left;">等当前存储周期结束后，CPU 让出总线，DMA
+再访存</td>
+</tr>
+<tr>
+<td style="text-align: left;">CPU 也正准备访问主存</td>
+<td style="text-align: left;">发生访存竞争</td>
+<td style="text-align: left;">DMA 优先，先窃取一个主存周期，CPU
+延迟访存</td>
+</tr>
+</tbody>
+</table>
+<p>第三种情况最能体现“周期挪用”的名字：DMA 像是从 CPU
+手里临时借走一个主存周期。为什么 DMA
+优先？因为高速外设的数据缓冲可能很小，如果不及时传送，后续数据到来时可能覆盖旧数据，造成数据丢失；CPU
+延迟一个主存周期通常只是性能下降，不会直接丢数据。</p>
+<h3 id="交替分时访问法把每个存储周期分成两份">7.3.3
+交替分时访问法：把每个存储周期分成两份</h3>
+<p><strong>交替分时访问法</strong>的思想更规则：把每个存储周期划分成两个时间片，一个固定给
+CPU，一个固定给 DMA。这样在每个存储周期内，CPU 和 DMA
+都有自己的访问机会，不需要每次都临时争抢。</p>
+<p>可以理解成：CPU 和 DMA
+不是“谁急谁抢”，而是事先约定好轮流使用主存。例如一个周期的前半段 CPU
+访问主存，后半段 DMA 访问主存；或者按硬件规定的节拍交替进行。这样 CPU
+不会像 CPU 停止法中那样长时间被停住，DMA
+也不必像周期挪用法那样每次都重新申请总线。</p>
+<p>它的优点是访问节奏稳定，CPU 和 DMA
+都能规律地使用主存；缺点是对硬件时序要求较高，需要存储系统支持这种固定分时安排。如果某一方暂时不需要访存，它分到的时间片可能浪费；如果某一方特别急，也不能随意多占时间片。</p>
+<h3 id="三种方式的梳理对比">7.3.4 三种方式的梳理对比</h3>
+<p>可以按“DMA 一次占用主存多久”来记：</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">控制方式</th>
+<th style="text-align: left;">DMA 一次占用粒度</th>
+<th style="text-align: left;">CPU 受影响程度</th>
+<th style="text-align: left;">总线控制开销</th>
+<th style="text-align: left;">适合场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">CPU 停止法</td>
+<td style="text-align: left;">一整块数据传送期间</td>
+<td style="text-align: left;">最大，CPU 基本停止访存</td>
+<td style="text-align: left;">最小</td>
+<td style="text-align: left;">传输率很高、适合成组传送，且允许 CPU
+短暂停顿</td>
+</tr>
+<tr>
+<td style="text-align: left;">周期挪用法</td>
+<td style="text-align: left;">一个主存周期或一个数据单位</td>
+<td style="text-align: left;">中等，只延迟部分访存周期</td>
+<td style="text-align: left;">较大</td>
+<td style="text-align: left;">外设读写周期大于主存周期，常见 DMA
+方式</td>
+</tr>
+<tr>
+<td style="text-align: left;">交替分时访问法</td>
+<td style="text-align: left;">固定时间片</td>
+<td style="text-align: left;">较稳定，不长时间阻塞</td>
+<td style="text-align: left;">中等，依赖硬件时序</td>
+<td style="text-align: left;">CPU 与 DMA
+都需要规律访存、硬件支持分时</td>
+</tr>
+</tbody>
+</table>
+<p>一句话总结：<strong>CPU
+停止法是“整块让路”，周期挪用法是“临时借一个周期”，交替分时访问法是“预先排班轮流用”。</strong></p>
+<h2 id="dma-控制器的功能">7.4 DMA 控制器的功能</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615154431634.png" alt="image-20260615154431432" style="zoom: 33%;" /></p>
+<p>DMA 接口也称 DMA 控制器。它要能完成以下功能：</p>
+<ul>
+<li>接收外设发来的 DMA 请求，并向 CPU 发总线请求。</li>
+<li>在 CPU 发出总线响应后，接管总线控制权。</li>
+<li>在地址线上给出主存地址，并自动修改主存地址。</li>
+<li>根据传送方向在控制线上给出正确读写控制信号。</li>
+<li>记录和判断传送数据个数。</li>
+<li>传送结束时发出 DMA 结束信号，引起 DMA 中断，进入后处理。</li>
+</ul>
+<p>典型 DMA
+控制器中会有地址寄存器、字计数器、设备地址寄存器、控制寄存器、状态逻辑和总线控制逻辑等。</p>
+<h2 id="dma-操作步骤">7.5 DMA 操作步骤</h2>
+<p>DMA 操作可分为三个阶段：</p>
+<ol type="1">
+<li><strong>DMA 控制器初始化，由软件实现</strong><br />
+OS
+或设备驱动准备内存缓冲区，设置内存首址、字计数值、传送方向、设备地址等参数，并启动外设。</li>
+<li><strong>DMA 数据传送，由硬件实现</strong><br />
+外设准备好数据或准备好接收数据后发出 DMA 请求；DMA 控制器向 CPU
+申请总线；CPU 完成当前机器周期后让出总线；DMA
+控制器控制总线完成读写，自动修改地址并递减计数。</li>
+<li><strong>DMA 结束处理，由软件实现</strong><br />
+当计数值为 0 时，DMA 控制器发出 DMA 结束信号，引起中断。CPU
+执行中断服务程序，完成数据校验、状态检查、唤醒进程等后处理。</li>
+</ol>
+<h3 id="dma-控制器初始化的详细步骤">7.5.1 DMA
+控制器初始化的详细步骤</h3>
+<p>DMA 初始化也叫 <strong>DMA
+控制器预置</strong>，由软件完成，通常是操作系统中的设备驱动程序执行。它的目的不是传数据本身，而是先把
+DMA 控制器“配置好”，让它后面能独立完成硬件传输。</p>
+<p>第一步是<strong>准备内存区</strong>。如果是输入操作，例如从磁盘读数据到主存，驱动程序要先在主存中准备好接收数据的缓冲区；如果是输出操作，例如把主存中的一块数据写到外设，驱动程序要先把待输出数据放到内存缓冲区中。也就是说，DMA
+传输前必须先明确：数据要从哪里来、要到哪里去。</p>
+<p>第二步是<strong>设置传送参数</strong>。驱动程序通过 I/O 指令访问 DMA
+控制器的端口，先测试外设状态，再把关键参数写入 DMA
+控制器内部寄存器：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">写入位置</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">内存首址</td>
+<td style="text-align: left;">地址寄存器</td>
+<td style="text-align: left;">指出 DMA 传输在主存中的起始地址</td>
+</tr>
+<tr>
+<td style="text-align: left;">字计数值</td>
+<td style="text-align: left;">字计数器</td>
+<td
+style="text-align: left;">指出本次要传送多少个字、字节或数据单位</td>
+</tr>
+<tr>
+<td style="text-align: left;">传送方向</td>
+<td style="text-align: left;">控制寄存器</td>
+<td style="text-align: left;">指出是外设到主存，还是主存到外设</td>
+</tr>
+<tr>
+<td style="text-align: left;">设备地址</td>
+<td style="text-align: left;">设备地址寄存器</td>
+<td
+style="text-align: left;">指出要与哪个外设或哪个设备端口交换数据</td>
+</tr>
+</tbody>
+</table>
+<p>这些参数对应 DMA
+控制器后续硬件动作：地址寄存器决定每次访问主存的位置，字计数器决定何时结束，控制寄存器决定发读命令还是写命令，设备地址寄存器决定连接哪个外设。</p>
+<p>第三步是<strong>启动外设</strong>。驱动程序向设备或 DMA
+控制器发送启动命令后，CPU
+不再逐字搬运数据，而是可以去执行其他程序。之后等外设准备好数据，DMA
+控制器就会进入“DMA 请求、总线请求、总线响应、DMA 传送”的硬件流程。</p>
+<h2 id="dma-传输过程细化">7.6 DMA 传输过程细化</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615154854647.png" alt="image-20260615154854456" style="zoom:50%;" /></p>
+<p>DMA 传输过程可整理为：</p>
+<ol type="1">
+<li>外设准备好数据或准备好接收数据，发出选通信号，使数据进入数据缓冲寄存器，同时
+DMA 请求触发器置 1。</li>
+<li>DMA 请求触发器向控制/状态端口发 Ready 信号，并向 DMA 控制器发 DMA
+请求。</li>
+<li>DMA 控制器向 CPU 发总线请求。</li>
+<li>CPU 完成当前机器周期后响应 DMA 请求，发出总线响应。DMA 控制器发 DMA
+响应，使请求触发器复位，CPU 浮动总线并让出控制权。</li>
+<li>DMA 控制器给出内存地址和读写命令，在数据总线上完成数据传输。</li>
+<li>DMA 控制器修改主存地址、计数值减 1。若采用 CPU
+停止法，则循环传到计数为
+0；若采用周期挪用法，则传一个数据后释放总线，下一次再重新请求。</li>
+</ol>
+<h2 id="dma-与中断方式的区别">7.7 DMA 与中断方式的区别</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">对比点</th>
+<th style="text-align: left;">中断方式</th>
+<th style="text-align: left;">DMA 方式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">数据传送者</td>
+<td style="text-align: left;">CPU 执行中断服务程序，用软件传送</td>
+<td style="text-align: left;">DMA 控制器用硬件传送</td>
+</tr>
+<tr>
+<td style="text-align: left;">请求含义</td>
+<td style="text-align: left;">请求 CPU 暂停当前程序并执行服务程序</td>
+<td style="text-align: left;">请求总线控制权或主存访问权</td>
+</tr>
+<tr>
+<td style="text-align: left;">是否中止现行程序</td>
+<td style="text-align: left;">需要保存断点和现场</td>
+<td style="text-align: left;">数据传送期间通常不需中止程序</td>
+</tr>
+<tr>
+<td style="text-align: left;">能否处理异常</td>
+<td style="text-align: left;">可以处理外设事件和异常情况</td>
+<td style="text-align: left;">不能处理异常，只负责数据搬运</td>
+</tr>
+<tr>
+<td style="text-align: left;">响应时点</td>
+<td style="text-align: left;">一条指令周期结束后</td>
+<td style="text-align: left;">一个总线周期或机器周期后</td>
+</tr>
+<tr>
+<td style="text-align: left;">适用设备</td>
+<td style="text-align: left;">低速、慢速或中速设备</td>
+<td style="text-align: left;">高速块设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">并行度</td>
+<td style="text-align: left;">外设与 CPU 有一定并行性，但数据传送仍由
+CPU 做</td>
+<td style="text-align: left;">外设与 CPU 并行度高，CPU 开销小</td>
+</tr>
+</tbody>
+</table>
+<h2 id="中断与-dma-的-cpu-开销例题">7.8 中断与 DMA 的 CPU 开销例题</h2>
+<p>题设：CPU 频率 <span class="math inline">500
+MHz</span>，硬盘控制器数据缓存 <span class="math inline">16
+B</span>，磁盘传输率 <span class="math inline">4 MB/s</span>，忽略 CPU
+访存和 DMA 访存冲突。</p>
+<h3 id="中断方式">7.8.1 中断方式</h3>
+<p>硬盘每次中断传 <span class="math inline">16 B</span>，若磁盘以 <span
+class="math inline">4 MB/s</span> 传输，则每秒中断次数为：</p>
+<p><span class="math display">4 MB/s/16 B = 250 k 次/s</span></p>
+<p>每次中断开销 500 个时钟周期，则每秒用于中断的时钟周期数为：</p>
+<p><span class="math display">250
+k × 500 = 125 × 10<sup>6</sup></span></p>
+<p>CPU 每秒总时钟周期为：</p>
+<p><span class="math display">500 × 10<sup>6</sup></span></p>
+<p>若硬盘一直传输，则 CPU 用在 I/O 上的比例为：</p>
+<p><span class="math display">$$
+\frac{125\times 10^6}{500\times 10^6}=25\%
+$$</span></p>
+<p>若硬盘只有 5% 时间在传输，则 CPU 用在 I/O 上的比例为：</p>
+<p><span class="math display">25% × 5% = 1.25%</span></p>
+<h3 id="dma-方式-1">7.8.2 DMA 方式</h3>
+<p>每次 DMA 传送 <span class="math inline">8000
+B</span>，传输时间为：</p>
+<p><span class="math display">8000 B/(4 MB/s) ≈ 2 × 10<sup>−3</sup>
+s</span></p>
+<p>所以每秒约有：</p>
+<p><span class="math display">1/(2 × 10<sup>−3</sup>) = 500</span></p>
+<p>次 DMA 传送。每次 DMA 初始化 1000 个时钟，结束中断处理 500
+个时钟，每秒 CPU 开销为：</p>
+<p><span
+class="math display">(1000 + 500) × 500 = 750 × 10<sup>3</sup></span></p>
+<p>CPU 占用率为：</p>
+<p><span class="math display">$$
+\frac{750\times 10^3}{500\times 10^6}=1.5\times 10^{-3}=0.15\%
+$$</span></p>
+<p>这个例子说明：<strong>DMA 的核心优势不是让设备本身变快，而是显著减少
+CPU 为 I/O 付出的时间</strong>。</p>
+<h1 id="io-子系统的软件层次与驱动程序">8 I/O
+子系统的软件层次与驱动程序</h1>
+<h2 id="io-子系统的层次结构">8.1 I/O 子系统的层次结构</h2>
+<p>高级语言运行时通常提供 I/O 函数，例如 C 的
+<code>printf()</code>、<code>scanf()</code>，C++
+的输入输出操作符。用户程序通过这些函数提出 I/O 请求，但真正完成 I/O
+需要多层软件和硬件协同。</p>
+<p>I/O 软件从高到低可分为四层：</p>
+<ol type="1">
+<li><strong>用户层 I/O 软件</strong>：如标准库函数、运行时库。</li>
+<li><strong>与设备无关的操作系统 I/O
+软件</strong>：提供统一文件、缓冲、权限、调度等抽象。</li>
+<li><strong>设备驱动程序</strong>：直接控制具体设备控制器，访问 I/O
+端口。</li>
+<li><strong>I/O 中断处理程序</strong>：响应外设中断或 DMA
+完成中断。</li>
+</ol>
+<p>层次越低，越接近设备，越远离用户程序。大部分 I/O
+软件属于操作系统内核态程序，但最初 I/O 请求来自用户态。</p>
+<p>从用户态切换到内核态的关键机制是<strong>异常机制中的系统调用或自陷</strong>。例如
+Linux 中，<code>printf()</code> 最终会调用
+<code>write()</code>，再通过系统调用入口进入内核，找到
+<code>sys_write()</code>
+服务例程执行。系统调用处理程序根据<strong>系统调用号</strong>决定转向哪个内核服务例程。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155332588.png" alt="image-20260615155332406" style="zoom:50%;" /></p>
+<h2 id="三种方式在驱动程序中的体现">8.2 三种方式在驱动程序中的体现</h2>
+<p>程序查询方式下，驱动程序把用户数据复制到内核缓冲区后，对每个字符循环执行：读状态端口，等待设备
+Ready；写数据端口；写控制端口启动设备。当前进程在内核态“干等”，CPU
+被持续占用。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155447502.png" alt="image-20260615155447325" style="zoom:50%;" /></p>
+<p>中断方式下，驱动程序启动第一次 I/O
+后阻塞当前用户进程，调度其他进程运行。设备完成一个字符或一段任务后发中断，中断服务程序继续送下一个字符或做相应处理。CPU
+与外设可并行工作。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155559542.png" alt="image-20260615155559351" style="zoom:50%;" /></p>
+<p>DMA 方式下，驱动程序初始化 DMA
+控制器，设置缓冲区地址、长度、方向等参数，然后启动 DMA
+传送并阻塞当前进程。DMA 控制器完成全部数据传输后发 DMA
+结束中断，中断服务程序做校验、清除中断、唤醒进程等后处理。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155642682.png" alt="image-20260615155642477" style="zoom:50%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260615155832335.png" alt="image-20260615155832126" style="zoom:50%;" /></p>
+<h2 id="中断服务程序在不同方式中的任务">8.3
+中断服务程序在不同方式中的任务</h2>
+<p>中断控制方式和 DMA 控制方式都需要中断服务程序，但任务不同：</p>
+<ul>
+<li>在中断 I/O
+中，中断服务程序通常要执行实际数据传送，例如从数据缓冲器取数或把数据写入数据缓冲器，并再次启动外设。</li>
+<li>在 DMA I/O
+中，中断服务程序主要做结束处理，例如数据校验、清除中断请求、唤醒等待进程；实际数据搬运已经由
+DMA 控制器完成。</li>
+</ul>
+<p>I/O
+指令、开中断、关中断等都是特权指令，只能在操作系统内核程序中使用。这也是用户程序不能随意直接控制硬件设备的重要原因。</p>
+<h1 id="重点梳理">9 重点梳理</h1>
+<h2 id="本章核心概念">9.1 本章核心概念</h2>
+<ul>
+<li><strong>I/O
+系统性能</strong>：吞吐率看单位时间传多少，响应时间看一次请求等多久。</li>
+<li><strong>I/O
+系统任务</strong>：建立通路、设备寻址、发送命令、读取状态、传输数据。</li>
+<li><strong>外设通用模型</strong>：控制信息、状态信息、数据信息三类信号。</li>
+<li><strong>磁盘访问时间</strong>：寻道时间 + 旋转等待时间 +
+数据传输时间。</li>
+<li><strong>RAID</strong>：多个物理盘组成一个逻辑盘，通过条带化提高性能，通过冗余提高可靠性。</li>
+<li><strong>总线组成</strong>：数据线、地址线、控制线。</li>
+<li><strong>总线趋势</strong>：点对点、异步、串行。</li>
+<li><strong>I/O
+控制器</strong>：主机与外设之间的缓冲、控制、状态检测、格式转换部件。</li>
+<li><strong>I/O 端口</strong>：I/O 控制器中 CPU 可访问的寄存器。</li>
+<li><strong>I/O 寻址</strong>：统一编址用普通访存指令，独立编址用专门
+I/O 指令。</li>
+<li><strong>三种 I/O 传输方式</strong>：轮询靠 CPU
+查，中断靠外设通知，DMA 靠硬件搬数据。</li>
+</ul>
+<h2 id="易混点对比">9.2 易混点对比</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">易混概念</th>
+<th style="text-align: left;">区别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">I/O 总线 vs 通信总线</td>
+<td style="text-align: left;">I/O 总线通常在主板内部连接 I/O
+控制器；通信总线常连接 I/O 控制器和外部设备</td>
+</tr>
+<tr>
+<td style="text-align: left;">I/O 控制器 vs I/O 接口</td>
+<td style="text-align: left;">本课程常把控制器和插座合称 I/O
+接口；严格说控制器偏逻辑，接口还包括连接器、电气规范等</td>
+</tr>
+<tr>
+<td style="text-align: left;">响应优先级 vs 处理优先级</td>
+<td
+style="text-align: left;">响应优先级决定多个请求同时来时先响应谁；处理优先级由屏蔽字动态决定谁能打断谁</td>
+</tr>
+<tr>
+<td style="text-align: left;">中断方式 vs DMA 方式</td>
+<td style="text-align: left;">中断方式由 CPU 执行服务程序传数据；DMA
+方式由 DMA 控制器硬件传数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">DMA 请求 vs 中断请求</td>
+<td style="text-align: left;">DMA 请求要总线或主存访问权；中断请求要 CPU
+转去执行服务程序</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 4 vs RAID 5</td>
+<td style="text-align: left;">RAID 4 有专门校验盘，写时易成瓶颈；RAID 5
+校验块分布在各盘</td>
+</tr>
+</tbody>
+</table>
+<h2 id="常考公式与计算">9.3 常考公式与计算</h2>
+<p>磁盘平均访问时间：</p>
+<p><span
+class="math display"><em>T</em> = <em>T</em><sub>seek</sub> + <em>T</em><sub>rotation</sub> + <em>T</em><sub>transfer</sub> + <em>T</em><sub>controller</sub> + <em>T</em><sub>queue</sub></span></p>
+<p>平均旋转等待时间：</p>
+<p><span class="math display">$$
+T_{\text{rotation}}=\frac{0.5}{\text{RPS}}
+$$</span></p>
+<p>同步总线带宽：</p>
+<p><span
+class="math display"><em>B</em> = <em>W</em> × <em>F</em>/<em>N</em></span></p>
+<p>PCIe 1.0 <span class="math inline">×<em>n</em></span> 双向带宽：</p>
+<p><span class="math display"><em>B</em> = 2.5
+Gb/s × 2 × <em>n</em>/10 = 0.5 GB/s × <em>n</em></span></p>
+<p>RAID 4 少量写校验更新：</p>
+<p><span
+class="math display"><em>p</em><sup>′</sup>(<em>i</em>) = <em>p</em>(<em>i</em>) ⊕ <em>X</em><sub>0</sub>(<em>i</em>) ⊕ <em>X</em><sub>0</sub><sup>′</sup>(<em>i</em>)</span></p>
+<p>CPU 占用率常用思路：</p>
+<p><span class="math display">$$
+\text{CPU 占用率}=\frac{\text{单位时间用于 I/O 的 CPU
+周期数}}{\text{单位时间 CPU 总周期数}}
+$$</span></p>
+<h2 id="学习建议">9.4 学习建议</h2>
+<p>学习本章时，可以按“谁控制数据传输”来串起来：</p>
+<ol type="1">
+<li><strong>轮询</strong>：CPU 一直主动查状态，最简单但最浪费 CPU。</li>
+<li><strong>中断</strong>：外设完成后通知 CPU，CPU
+通过服务程序处理，减少等待。</li>
+<li><strong>DMA</strong>：CPU 设置参数，DMA
+控制器直接在外设和主存间搬数据，CPU 开销最低。</li>
+</ol>
+<p>再按“设备如何被找到”理解 I/O 端口和编址：CPU
+并不是直接“找到打印机”，而是访问打印机控制器中的数据端口、状态端口、控制端口。统一编址把这些端口放进主存地址空间，独立编址则给它们单独的
+I/O 地址空间。</p>
+<p>最后按“通路如何构成”理解总线：CPU、主存、I/O
+控制器通过不同层次的总线和桥接器连接；高速互连越来越倾向于点对点、串行、异步；低层设备还会通过
+USB、SATA、PS/2、网线等通信接口连接到具体外设。</p>
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -6473,795 +9572,6 @@ class="math inline">∝</span> 似然函数 <span class="math inline">×</span>
 MLE 这一重要本质。 2. 共轭先验：通过选择与似然函数匹配的特定先验分布（如
 Beta-二项、Gamma-泊松、正态-正态），使得后验分布保持相同的函数形式，从而将复杂的概率积分转化为简单的参数更新。</p>
 <p>归根结底，贝叶斯估计体现了数据与信念的动态折中。当数据不足时，先验知识能防止模型走偏；当数据充足时，观测事实则会主导结果。这是现代统计学习中处理不确定性和防止过拟合的数学基石。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Fqmmm">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/11/data_structure/%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E3%80%81AVL%E6%A0%91%E3%80%81%E4%BC%B8%E5%B1%95%E6%A0%91%E3%80%81%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%81B%E6%A0%91%E3%80%81B+%E6%A0%91/" class="post-title-link" itemprop="url">二叉搜索树、AVL树、伸展树、红黑树、B树、B+树</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-01-11 19:07:48 / Modified: 19:16:25" itemprop="dateCreated datePublished" datetime="2026-01-11T19:07:48+08:00">2026-01-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>本文档将深入解析二叉搜索树、AVL树、伸展树、红黑树、B树、B+树的查找、插入、删除操作。本文档并不涉及代码，而仅仅是从数学的角度展现这些过程。</p>
-<h2 id="二叉搜索树">二叉搜索树</h2>
-<p>英文名BST。这是最简单的一种搜索树。节点左子树的所有元素都比节点小，右子树的所有元素都比节点大。</p>
-<h3 id="查找">查找</h3>
-<p>没什么好说的，比它小就往左走，比它大就往右走，直到找到/遇到空指针为止。</p>
-<h3 id="插入">插入</h3>
-<p>也没有什么好说的，比它小就往左走，比它大就往右走。如果遇到了相同元素，就不能插入，直接返回；如果遇到空指针，说明这棵树里原来没有这个要插入的元素，于是直接插入即可。</p>
-<h3 id="删除">删除</h3>
-<ul>
-<li><p>如果要删除的节点是叶节点，直接删除即可</p></li>
-<li><p>如果不是叶节点</p>
-<ul>
-<li><p>如果只有一个孩子，那么让孩子代替要删除的节点，成为新子树的根节点。例如删除60，直接删除即可。</p>
-<p><img src="/assets/image-20251205112905213.png" alt="image-20251205112905213" style="zoom: 50%;" /><img src="/assets/image-20251205112912062.png" alt="image-20251205112912062" style="zoom:50%;" /></p></li>
-<li><p>如果有两个孩子，那么让该节点的直接前驱/直接后继代替这个节点，然后删除直接前驱/直接后继。例如要删除50，就让50的直接后继60代替50，然后把60原来的右子树挂到66下。</p>
-<p><img src="/assets/image-20251205113138641.png" alt="image-20251205113138641" style="zoom:50%;" /><img src="/assets/image-20251205113127687.png" alt="image-20251205113127687" style="zoom:50%;" /></p></li>
-</ul></li>
-</ul>
-<h2 id="avl树">AVL树</h2>
-<p>BST树有一个重大的问题：不平衡。例如，根据数字序列1，2，3，4，5，6构建一颗BST树，那么2会挂到1右边，3会挂到2右边……依次下去，这棵树本质上是一个链表，查找的时间复杂度退化为
-<span
-class="math inline"><em>O</em>(<em>n</em>)</span>。究其根本，是因为这个树右边太重，左边太轻，不平衡。</p>
-<p>于是AVL树应运而生。它在插入后会进行旋转操作，确保这棵树是平衡的。那么究竟什么是”平衡“？怎样量化一棵树的”平衡程度“？</p>
-<h3 id="平衡因子">平衡因子</h3>
-<p>平衡因子就是量化平衡程度的一个指标。它的定义如下： <span
-class="math display"><em>节</em><em>点</em><em>的</em><em>平</em><em>衡</em><em>因</em><em>子</em> = <em>左</em><em>子</em><em>树</em><em>高</em><em>度</em> − <em>右</em><em>子</em><em>树</em><em>高</em><em>度</em></span></p>
-<blockquote>
-<p>殷人昆的书上定义为<span
-class="math inline"><em>右</em><em>子</em><em>树</em><em>高</em><em>度</em> − <em>左</em><em>子</em><em>树</em><em>高</em><em>度</em></span>，但是无伤大雅。</p>
-</blockquote>
-<p>一棵树中，如果每个节点的平衡因子的绝对值都小于等于1，那么就说这棵树是平衡的；否则，这棵树就是不平衡的。</p>
-<h3 id="查找-1">查找</h3>
-<p>同BST树。</p>
-<h3 id="插入-1">插入</h3>
-<p>首先按照BST的插入方式进行插入。但是这可能导致树不平衡。为此，要进行<strong>旋转</strong>操作。旋转的关键在于找到<strong>“爷爷-爸爸-孙子”对</strong>（我自创的名词，哈哈）。下面通过实例说明。</p>
-<ul>
-<li><p>初始状态</p>
-<p><img src="/assets/image-20251205114210297.png" alt="image-20251205114210297" style="zoom:50%;" /></p></li>
-<li><p>插入90，此时66不平衡。不平衡的原因（90）来源于66<strong>右</strong>孩子的<strong>右</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是66-68-70。于是进行<strong>RR型</strong>旋转：把66围绕68左旋，然后调整各子树。LL型旋转同理，不再赘述。</p>
-<p><img src="/assets/image-20251205114858520.png" alt="image-20251205114858520" style="zoom: 50%;" /></p></li>
-<li><p>插入63，此时50不平衡。不平衡的原因（63）来源于50<strong>右</strong>孩子的<strong>左</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是50-68-66。于是进行<strong>RL型</strong>旋转：先把68围绕66右旋，再把50围绕66左旋。最后调整各子树。</p>
-<p><img src="/assets/image-20251205115326673.png" alt="image-20251205115326673" style="zoom:33%;" /><img src="/assets/image-20251205115411665.png" alt="image-20251205115411665" style="zoom:33%;" /><img src="/assets/image-20251205115346215.png" alt="image-20251205115346215" style="zoom:33%;" /></p></li>
-<li><p>插入57，此时66不平衡。不平衡的原因（57）来源于66<strong>左</strong>孩子的<strong>右</strong>子树。<strong>“爷爷-爸爸-孙子”对</strong>是66-50-60。于是进行<strong>LR型</strong>旋转：选把50围绕60左旋，再把66围绕60右旋。最后调整各子树。（中间状态未给出）</p>
-<p><img src="/assets/image-20251205115901873.png" alt="image-20251205115901873" style="zoom:50%;" /></p></li>
-</ul>
-<p>说了这么多可能有点晕。但实际做题的时候只需要：找到<strong>“爷爷-爸爸-孙子”对</strong>，然后根据三个节点的元素值进行重排，找到第二大的节点作为root，然后瞎几巴调整一通就可以了。<strong>人不像计算机，人是有上帝视角的。</strong></p>
-<p>以最后一个LR旋转为例。50&lt;60&lt;66，60是第二大的节点，因此作为根节点，左孩子是50，右孩子是66。然后把原来的子树连到50和66上就可以了。</p>
-<h3 id="删除-1">删除</h3>
-<p>按照BST树的删除方式进行删除即可（分为三种情况），最后检查一下是否平衡，如果不平衡就旋转。</p>
-<h2 id="伸展树">伸展树</h2>
-<p>伸展树的基本思想和缓存类似，即“这次访问的东西在不久的未来很可能要再访问一次”。具体来说，</p>
-<ul>
-<li>如果这次访问了x，那么访问完之后就要把x<strong>搞到根节点上去</strong>（多么激进啊）</li>
-<li>如果这次插入了x，那么插入完之后就要把x<strong>搞到根节点上去</strong>（多么激进啊）</li>
-<li>如果这次删除了x，那么删除完之后就要被x的爸爸<strong>搞到根节点上去</strong>（多么激进啊）</li>
-</ul>
-<p>那么怎么搞到根节点上去呢？关键也是找到<strong>“爷爷-爸爸-孙子”对</strong>。但和AVL树不同，AVL在寻找“爷爷-爸爸-孙子”对的时候，是从爷爷开始往下找的。但伸展树是<strong>从孙子开始往上找</strong>的。</p>
-<p>找到“爷爷-爸爸-孙子”对后，</p>
-<ul>
-<li><p>zig-zig型：孙子当爷爷，爷爷当孙子，倒反天罡。然后调整子树。</p></li>
-<li><p>zig-zag型：以第二大的元素为根节点，左孩子连最小，右孩子连最大，然后调整子树。</p></li>
-<li><p>zig型：<strong>退化为“爸爸-儿子”对</strong>，儿子当爸爸，爸爸当儿子，倒反天罡。然后调整子树。</p></li>
-</ul>
-<p><strong>这两种旋转的根本目的，是把孙子搞到上面去。</strong>下图中，一开始X在最底下，旋转完之后就跑到最上面去了。</p>
-<p><img src="/assets/image-20251205121623430.png" alt="image-20251205121623430" style="zoom: 50%;" /></p>
-<p>下面具体说明。</p>
-<h3 id="查找-2">查找</h3>
-<p>同BST树。随后进行“把访问的节点搞到根节点”的操作。</p>
-<ul>
-<li>查找1，想把1搞到根节点。
-<ul>
-<li>3-2-1是zig-zig型的<strong>“爷爷-爸爸-孙子”对</strong>，于是孙子当爷爷，爷爷当孙子，1上移两层。</li>
-<li>但1还没有到根节点，于是继续。5-4-1是zig-zig型的<strong>“爷爷-爸爸-孙子”对</strong>，于是孙子当爷爷，爷爷当孙子，1上移两层。</li>
-<li>但1还没有到根节点，于是继续。6-1是zig型的<strong>“爸爸-儿子”对</strong>，于是把6转下来，1成为root。</li>
-</ul></li>
-</ul>
-<p><img src="/assets/image-20251205121641384.png" alt="image-20251205121641384" style="zoom:50%;" /></p>
-<ul>
-<li><p>查找3，想把3搞到根节点。</p>
-<ul>
-<li><p>3-2-4是zig-zag型的<strong>“爷爷-爸爸-孙子”对</strong>，3为中间元素，于是6左子树的新root为3，3上移两层。</p></li>
-<li><p>但3还没有到根节点，于是继续。1-6-3是zig-zag型的<strong>“爷爷-爸爸-孙子”对</strong>，于是孙子当爷爷，爷爷当孙子，3上移两层。此时3成为root，结束。</p>
-<p><img src="/assets/image-20251205122306276.png" alt="image-20251205122306276" style="zoom:50%;" /></p></li>
-</ul></li>
-</ul>
-<h3 id="插入-2">插入</h3>
-<p>同BST插入，然后按“查找”中的方法把插入的节点搞到根节点去。</p>
-<ul>
-<li>插入11</li>
-</ul>
-<p><img src="/assets/image-20251205154449574.png" alt="image-20251205154449574" style="zoom:50%;" /></p>
-<ul>
-<li>插入4</li>
-</ul>
-<p><img src="/assets/image-20251205154539976.png" alt="image-20251205154539976" style="zoom:50%;" /></p>
-<h3 id="删除-2">删除</h3>
-<p>先按照BST的删除，然后把被删节点的爸爸搞到根节点即可。</p>
-<ul>
-<li>删除3</li>
-</ul>
-<p><img src="/assets/image-20251205154634962.png" alt="image-20251205154634962" style="zoom:50%;" /></p>
-<h2 id="红黑树">红黑树</h2>
-<p>红黑树具有以下性质：</p>
-<ul>
-<li>根节点和所有外部节点都是黑色</li>
-<li>根节点到所有外部节点的路径上没有两个连续红色</li>
-<li>根节点到所有外部节点的路径上的黑色节点个数相同</li>
-</ul>
-<blockquote>
-<p>把一些红色节点随机插到满二叉树里，可以得到一棵红黑树。</p>
-</blockquote>
-<p>画红黑树的时候，一般要把叶子节点的nullptr给画出来。</p>
-<h3 id="插入-3">插入</h3>
-<ul>
-<li>新插入的节点为红色</li>
-<li>如果根节点为红色，则改成黑色</li>
-<li>如果爸爸是黑色，则结束</li>
-<li>如果爸爸是红色
-<ul>
-<li>如果叔叔是红色，则将爸爸、叔叔、爷爷颜色反转</li>
-<li>如果叔叔是黑色，则旋转（LL，RR，LR，RL）后，<strong>最后一次旋转的旋转中心和旋转点颜色反转</strong>（本质上还是要找到<strong>“爷爷-爸爸-孙子”对</strong>）</li>
-</ul></li>
-</ul>
-<p>下面举一个例子：依次插入10，20，30，15，25，12，5，3，8（图中省略了黑色的nullptr）</p>
-<ul>
-<li>插入10，初始为红色。由于10是根节点，所以变成黑色。（图中省略了红变黑的过程）</li>
-<li>插入20，标为红色，不违反规则。</li>
-<li>插入30，出现两个连续红色20，30。30的叔叔是黑色（nullptr），所以需要旋转。把10绕着20左旋，并把10，20颜色反转。</li>
-</ul>
-<p><img src="/assets/image-20251205155348284.png" alt="image-20251205155348284" style="zoom:50%;" /></p>
-<ul>
-<li>插入15，出现两个连续红色10，15。15的叔叔30是红色，因此把10，30，20颜色翻转。但翻转后根节点20为红色，违反规则，于是再把20变成黑色。</li>
-<li>插入25，没毛病。</li>
-</ul>
-<figure>
-<img src="/assets/image-20251205155629482.png"
-alt="image-20251205155629482" />
-<figcaption aria-hidden="true">image-20251205155629482</figcaption>
-</figure>
-<ul>
-<li>插入12，出现两个连续红色12，15。12的叔叔是黑色，需要旋转。<strong>“爷爷-爸爸-孙子”对</strong>是10-15-12。最后一次旋转是10绕着12左旋，于是把10和12颜色反转。</li>
-</ul>
-<p><img src="/assets/image-20251205155813125.png" alt="image-20251205155813125" style="zoom:50%;" /></p>
-<ul>
-<li>插入5，出现两个连续红色10，5。5的叔叔15是红色，于是把12，10，15颜色翻转。</li>
-</ul>
-<p><img src="/assets/image-20251205160045121.png" alt="image-20251205160045121" style="zoom:50%;" /></p>
-<ul>
-<li>插入3，出现两个连续红色5，3。3的叔叔是黑色，因此需要旋转。“爷爷-爸爸-孙子”对是10-5-3。最后一次旋转是10绕着5右旋，因此5，10颜色反转。</li>
-</ul>
-<p><img src="/assets/image-20251205160147007.png" alt="image-20251205160147007" style="zoom:50%;" /></p>
-<ul>
-<li>插入8，出现两个连续红色10，8。8的叔叔3是红色，因此将3，10，5颜色翻转。但此时5，12是连续红色，把5视作插入的节点。5的叔叔30是黑色，需要旋转。<strong>“爷爷-爸爸-孙子”对</strong>是20-12-5。最后一次旋转是20绕着12右旋，因此12，20颜色反转。</li>
-</ul>
-<p><img src="/assets/image-20251205160418451.png" alt="image-20251205160418451" style="zoom:50%;" /></p>
-<h3 id="删除-3">删除</h3>
-<p>删除操作比较复杂，这里不做讨论。</p>
-<h2 id="b树">B树</h2>
-<p>B树是一种多叉排序树。为了保证查找效率，<span
-class="math inline"><em>m</em></span>
-叉排序树需保证：<strong>除了根节点之外，任何节点至少要有 <span
-class="math inline">$\lceil \frac{m}{2} \rceil$</span> 个分叉，即至少有
-<span class="math inline">$\lceil \frac{m}{2} \rceil-1$</span>
-个关键字。例如，5叉排序树除了根节点外，每个节点至少有3个分叉，2个关键字。</strong></p>
-<p><img src="/assets/image-20251205171215631.png" alt="image-20251205171215631" style="zoom:50%;" /></p>
-<h3 id="插入-4">插入</h3>
-<p>先按照BST的思路正常插入。如果插入时上溢出，那么需要进行裂变。</p>
-<p>下面举例说明插入操作。</p>
-<ul>
-<li><p>插入25，38，49，60：<img src="/assets/image-20251205171413149.png" alt="image-20251205171413149" style="zoom: 50%;" /></p></li>
-<li><p>插入80，此时超出了一个节点的最大容量。取中间位置（<span
-class="math inline">$\lceil \frac{m}{2}
-\rceil$</span>）处的关键字，将节点<strong>裂变</strong>为两部分。</p></li>
-</ul>
-<p><img src="/assets/image-20251205171540853.png" alt="image-20251205171540853" style="zoom:50%;" /><img src="/assets/image-20251205171551075.png" alt="image-20251205171551075" style="zoom:50%;" /></p>
-<ul>
-<li><p>插入90，99：<img src="/assets/image-20251205171645909.png" alt="image-20251205171645909" style="zoom: 33%;" /></p></li>
-<li><p>插入88，节点溢出，取出中间元素88进行裂变。</p></li>
-</ul>
-<p><img src="/assets/image-20251205171815540.png" alt="image-20251205171815540" style="zoom:50%;" /><img src="/assets/image-20251205171827963.png" alt="image-20251205171827963" style="zoom: 33%;" /></p>
-<ul>
-<li><p>插入83，87：<img src="/assets/image-20251205171859725.png" alt="image-20251205171859725" style="zoom:33%;" /></p></li>
-<li><p>插入70：<img src="/assets/image-20251205171932809.png" alt="image-20251205171932809" style="zoom:33%;" /><img src="/assets/image-20251205171945643.png" alt="image-20251205171945643" style="zoom:33%;" /></p></li>
-<li><p>插入93，94，99：</p>
-<p><img src="/assets/image-20251205172022677.png" alt="image-20251205172022677" style="zoom: 40%;" /><img src="/assets/image-20251205172036945.png" alt="image-20251205172036945" style="zoom: 50%;" /></p></li>
-<li><p>插入73，74，75，根节点也需要裂变</p></li>
-</ul>
-<p><img src="/assets/image-20251205172202912.png" alt="image-20251205172202912" style="zoom: 50%;" /></p>
-<p><img src="/assets/image-20251205172217099.png" alt="image-20251205172217099" style="zoom:50%;" /></p>
-<p><img src="/assets/image-20251205172228174.png" alt="image-20251205172228174" style="zoom:50%;" /></p>
-<h3 id="删除-4">删除</h3>
-<ul>
-<li>若被删数字在叶子节点，则直接删除</li>
-<li>若被删数字在内部节点，则用它的前驱/后继代替</li>
-<li>最后检查是否下溢出（节点元素个数小于<span
-class="math inline">$\lceil \frac{m}{2} \rceil-1$</span>）
-<ul>
-<li>兄弟够借，则问兄弟借一个，然后调整</li>
-<li>兄弟不够借，则与兄弟合并，然后调整</li>
-</ul></li>
-</ul>
-<p>下面举例说明。</p>
-<ul>
-<li>初始状态</li>
-</ul>
-<p><img src="/assets/image-20251205172529190.png" alt="image-20251205172529190" style="zoom: 50%;" /></p>
-<ul>
-<li>删除60，60在叶节点，直接删除</li>
-</ul>
-<p><img src="/assets/image-20251205172558887.png" alt="image-20251205172558887" style="zoom: 50%;" /></p>
-<ul>
-<li>删除80，80不在叶节点，于是选择80的前驱77/后继82代替80，这里选择77</li>
-</ul>
-<p><img src="/assets/image-20251205172801137.png" alt="image-20251205172801137" style="zoom:50%;" /></p>
-<ul>
-<li>删除77，77不在叶节点，于是选择77的前驱76/后继82代替77，这里选择82</li>
-</ul>
-<p><img src="/assets/image-20251205172853568.png" alt="image-20251205172853568" style="zoom:50%;" /></p>
-<ul>
-<li>删除38，直接删除后左下角节点下溢出。兄弟节点70，71，72够借。但不能直接借，否则不符合查找树定义。于是49下去，70上来。</li>
-</ul>
-<p><img src="/assets/image-20251205173143914.png" alt="image-20251205173143914" style="zoom:50%;" /></p>
-<p><img src="/assets/image-20251205173224050.png" alt="image-20251205173224050" style="zoom:50%;" /></p>
-<ul>
-<li>删除90，发生下溢出。右兄弟不够借，但左兄弟够借，于是问左兄弟借。88下去，87上来。</li>
-</ul>
-<p><img src="/assets/image-20251205173348391.png" alt="image-20251205173348391" style="zoom:50%;" /></p>
-<p><img src="/assets/image-20251205173411478.png" alt="image-20251205173411478" style="zoom:50%;" /></p>
-<ul>
-<li>删除49，但是兄弟不够借。于是与兄弟合并，同时70下来。</li>
-</ul>
-<p><img src="/assets/image-20251205173514245.png" alt="image-20251205173514245" style="zoom:50%;" /></p>
-<ul>
-<li>但此时73所在节点下溢出，右兄弟不够借，于是与右兄弟合并，同时82下来，根节点消失。</li>
-</ul>
-<p><img src="/assets/image-20251205173610657.png" alt="image-20251205173610657" style="zoom:50%;" /></p>
-<h2 id="b树-1">B+树</h2>
-<figure>
-<img src="/assets/image-20251205174724488.png"
-alt="image-20251205174724488" />
-<figcaption aria-hidden="true">image-20251205174724488</figcaption>
-</figure>
-<p>与B树最大的不同是，<strong>B树的指针是插在数字的缝隙里的，而B+树的指针是连在数字上的。</strong></p>
-<p>此外，每个格存储的是它的孩子的<strong>最大值</strong>。</p>
-<p>同时，叶子节点串成一个链表，可以看作数据库的<strong>“索引”</strong>；而非叶子节点可以看作<strong>“索引的索引”</strong>。</p>
-<h3 id="查找-3">查找</h3>
-<p>注意与BST的不同即可。</p>
-<p>插入与删除过于复杂，不作要求。</p>
-<h2 id="总结">总结</h2>
-<p>纵观这六种树形结构，我们可以清晰地看到数据结构演进的内在逻辑：<strong>一切都是为了在不同场景下实现更高效的查找</strong>。</p>
-<ul>
-<li><strong>BST</strong>
-是万物之源，提供了最基本的二分查找思想，但由于缺乏约束，在极端情况下难以对抗退化。</li>
-<li><strong>AVL树、伸展树、红黑树</strong>
-是在内存中对二叉树的改良。它们的核心手段都是<strong>旋转</strong>。
-<ul>
-<li>AVL追求<strong>极致的平衡</strong>（严格的高度限制）；</li>
-<li>伸展树追求<strong>访问的局部性</strong>（类似缓存，把热点数据搞上去）；</li>
-<li>红黑树追求<strong>统计意义上的平衡</strong>（通过颜色约束），是前两者在性能与维护成本上的折中方案。</li>
-<li><strong>做题心法</strong>：无论旋转规则多复杂，核心永远是精准定位<strong>“爷爷-爸爸-孙子”</strong>对，然后发挥人类的<strong>“上帝视角”</strong>直接重构局部连接。</li>
-</ul></li>
-<li><strong>B树、B+树</strong>
-则是为了应对海量数据和磁盘I/O而生的<strong>多叉树</strong>。它们不再局限于二叉，而是通过<strong>节点裂变</strong>（上溢）与<strong>合并</strong>（下溢）来维持树的“矮胖”形态，从而最大限度减少访问层级。</li>
-</ul>
-<p>掌握这些树，本质上就是掌握<strong>“如何通过动态调整结构，让数据在逻辑上始终保持有序和平衡”</strong>的艺术。希望本文档能帮你从数学和图形的角度，看清这些指针乱飞背后的规律。</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/01/11/DCD/%E6%94%B9%E9%80%A0%E6%88%91%E4%BB%AC%E7%9A%84%E8%AE%A1%E6%95%B0%E5%99%A8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Fqmmm">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/11/DCD/%E6%94%B9%E9%80%A0%E6%88%91%E4%BB%AC%E7%9A%84%E8%AE%A1%E6%95%B0%E5%99%A8/" class="post-title-link" itemprop="url">改造我们的计数器</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-01-11 17:31:56 / Modified: 18:06:40" itemprop="dateCreated datePublished" datetime="2026-01-11T17:31:56+08:00">2026-01-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/DCD/" itemprop="url" rel="index"><span itemprop="name">DCD</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>标准的计数器，例如4位计数器，只能从0数到15，然后归0。但是在某些条件下，我们希望它数到一个小于16的数就归0。例如模12计数器，它从0数到11，然后归0。在其它条件下，我们希望它能数到很大的数，例如256，这时候需要把两个4位计数器串联，<span
-class="math inline">2<sup>8</sup> = 256</span>。因此，我们需要改造我们的计数器。</p>
-<h2 id="反馈清零法">反馈清零法</h2>
-<p>74LS161是异步清零的，74LS163是同步清零的。因此，对于下面两张图，前者是模9计数器，当<span
-class="math inline"><em>Q</em><sub>3</sub><em>Q</em><sub>2</sub><em>Q</em><sub>1</sub><em>Q</em><sub>0</sub> = 1001</span>是会立刻触发reset，然后立即回到<span
-class="math inline">0000</span>。而后者是模10计数器，当<span
-class="math inline"><em>Q</em><sub>3</sub><em>Q</em><sub>2</sub><em>Q</em><sub>1</sub><em>Q</em><sub>0</sub> = 1001</span>时，下一个时钟上升沿到来时才会归零。</p>
-<p><img src="/assets/image-20260101163912330.png" alt="image-20260101163912330" style="zoom: 25%;" /></p>
-<p><img src="/assets/image-20260101163950205.png" alt="image-20260101163950205" style="zoom:25%;" /></p>
-<h2 id="反馈置数法">反馈置数法</h2>
-<p>把输入数据事先设成0，这样达到1001的时候就可以采用load代替reset了</p>
-<p><img src="/assets/image-20260101164449725.png" alt="image-20260101164449725" style="zoom:25%;" /></p>
-<h2 id="计数器的串联">计数器的串联</h2>
-<p>计数器串联后可以数到更大的数。</p>
-<p><img src="/assets/image-20260101164651401.png" alt="image-20260101164651401" style="zoom:25%;" /></p>
-<p>CO是carry
-output的意思，如果低位计数器溢出了，那么高位计数器就会开始工作。·</p>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/01/11/DCD/%E6%B1%89%E6%98%8E%E7%A0%81/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Fqmmm">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/11/DCD/%E6%B1%89%E6%98%8E%E7%A0%81/" class="post-title-link" itemprop="url">深入理解汉明码</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-01-11 17:31:56 / Modified: 18:27:58" itemprop="dateCreated datePublished" datetime="2026-01-11T17:31:56+08:00">2026-01-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/DCD/" itemprop="url" rel="index"><span itemprop="name">DCD</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>书上216页对于汉明码的讲解过于勾史，所以特意写了一份文档，深入解析汉明码的工作原理。</p>
-<h2 id="为什么需要汉明码">为什么需要汉明码</h2>
-<p>在计算机通信或内存存储（如ECC内存）中，数据以二进制（0和1）形式传输。由于电磁干扰等原因，原本的“0”可能会变成“1”，或者“1”变成“0”。已有一些检错机制，例如奇偶校验，但是奇偶校验只能检测传输过程中是否发生错误，但是无法指出错误发生在哪一位。而汉明码解决了这一问题，它不仅能检测出错误，还能指出错误发生在哪一位。</p>
-<h2 id="汉明码的工作原理">汉明码的工作原理</h2>
-<p>利用汉明码检错时，可以分为两个过程：编码过程和检错过程。编码过程在原始二进制序列加入若干校验位后变成汉明码；检错过程接受传输过来的汉明码，并检查是否有传输错误。</p>
-<p>下面通过一个例子讲解这一过程：我们要传输 11000100 的二进制序列。</p>
-<h3
-id="编码过程原始二进制序列汉明码">编码过程：原始二进制序列→汉明码</h3>
-<p>首先，我们将 <span class="math inline"><em>k</em> = 4</span>
-个校验位插入 <span class="math inline"><em>n</em> = 8</span>
-个数据位中，最终形成 <span
-class="math inline"><em>k</em> + <em>n</em> = 12</span>
-位汉明码。在最终的12位汉明码中，第1，2，4，8（2的幂次）位是新插入的校验位，其它位是原始的二进制数。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">index 1 2 3 4 5 6 7 8</span><br><span class="line">value 1 1 0 0 0 1 0 0</span><br><span class="line">		   ↓</span><br><span class="line">index 1  2  3 4  5 6 7 8  9 10 11 12</span><br><span class="line">value P1 P2 1 P4 1 0 0 P8 0  1  0  0</span><br></pre></td></tr></table></figure>
-<p>然后分别计算 <span class="math inline"><em>P</em><sub>1</sub></span>,
-<span class="math inline"><em>P</em><sub>2</sub></span>, <span
-class="math inline"><em>P</em><sub>4</sub></span>, <span
-class="math inline"><em>P</em><sub>8</sub></span>的值。<span
-class="math inline"><em>P</em><sub><em>i</em></sub></span>
-的计算方式是：</p>
-<ul>
-<li>找出 <span class="math inline"><em>k</em> = 4</span>
-位二进制数中，右边第 <span
-class="math inline"><em>l</em><em>o</em><em>g</em><sub>2</sub><em>i</em></span>
-位（从0开始数）是 1 的数（这个数大于 <span
-class="math inline"><em>i</em></span>，且不超过汉明码的位数 <span
-class="math inline"><em>n</em> + <em>k</em></span>），把这个数加入集合
-<span class="math inline"><em>S</em></span>。</li>
-<li><span
-class="math inline"><em>P</em><sub><em>n</em></sub> = Xor(<em>P</em><sub><em>i</em></sub>), <em>i</em> ∈ <em>S</em></span>。</li>
-</ul>
-<p>例如，计算 <span
-class="math inline"><em>P</em><sub>2</sub></span>。我们要找到右边第 1
-位（从0开始数）是 1 的数。这些数包括</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">3=0011</span><br><span class="line">6=0110</span><br><span class="line">7=0111</span><br><span class="line">10=1010</span><br><span class="line">11=1011</span><br><span class="line">(14=1110，15=1111都大于12)</span><br></pre></td></tr></table></figure>
-<p>于是 <span class="math inline"><em>S</em> = 3, 6, 7, 10, 11</span>，
-<span
-class="math inline"><em>P</em><sub>2</sub> = Xor(<em>P</em><sub>3</sub>, <em>P</em><sub>6</sub>, <em>P</em><sub>7</sub>, <em>P</em><sub>10</sub>, <em>P</em><sub>11</sub>)</span>。</p>
-<p>通过这一算法，我们可以算出 <span
-class="math inline"><em>P</em><sub>1</sub>, <em>P</em><sub>2</sub>, <em>P</em><sub>4</sub>, <em>P</em><sub>8</sub></span>
-的值： <span class="math display">$$
-\begin {aligned}
-P_1&amp;=\text{Xor}(P_3,P_5, P_7, P_9, P_{11})=0    \\\\
-P_2&amp;=\text{Xor}(P_3,P_6, P_7, P_{10}, P_{11})=0 \\\\
-P_4&amp;=\text{Xor}(P_5,P_6, P_7, P_{12})=1 \\\\
-P_8&amp;=\text{Xor}(P_9,P_{10}, P_{11}, P_{12})=1
-\end {aligned}
-$$</span> 因此，最终得到的 <span
-class="math inline"><em>k</em> + <em>n</em> = 12</span> 位汉明码为：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">index 1 2 3 4 5 6 7 8 9 10 11 12</span><br><span class="line">value 0 0 1 1 1 0 0 1 0 1  0  0</span><br></pre></td></tr></table></figure>
-<h3 id="检错过程汉明码错误位">检错过程：汉明码→错误位</h3>
-<p>接收到二进制序列后，我们需要检查它们是否有误。检查规则如下：</p>
-<p><span class="math display">$$
-\begin {aligned}
-C_1&amp;=\text{Xor}(P_1, P_3,P_5, P_7, P_9, P_{11}) \\\\
-C_2&amp;=\text{Xor}(P_2, P_3,P_6, P_7, P_10, P_{11}) \\\\
-C_4&amp;=\text{Xor}(P_4, P_5, P_6, P_7,P_{12}) \\\\
-C_8&amp;=\text{Xor}(P_8, P_9, P_{10}, P_{11}, P_{12})
-\end {aligned}
-$$</span></p>
-<p>也就是</p>
-<p><span class="math display">$$
-\begin {aligned}
-C_1&amp;=\text{Xor}(P_1, P_1^{'})   \\\\
-C_2&amp;=\text{Xor}(P_2, P_2^{'}) \\\\
-C_4&amp;=\text{Xor}(P_4, P_4^{'}) \\\\
-C_8&amp;=\text{Xor}(P_8, P_8^{'})
-\end {aligned}
-$$</span> 其中 <span
-class="math inline"><em>P</em><sub><em>i</em></sub><sup>′</sup>, <em>i</em><em>为</em>2<em>的</em><em>幂</em><em>次</em></span>
-表示接收到的二进制序列的校验位的<strong>“实然值”</strong>，<span
-class="math inline"><em>P</em><sub><em>i</em></sub>, <em>i</em><em>为</em>2<em>的</em><em>幂</em><em>次</em></span>
-表示校验位的<strong>“应然值”</strong>。如果应然值=实然值（即<span
-class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub> = 0000</span>），那么信息传输没有出错。</p>
-<p>那么传输出错时会发生什么呢？看一个例子。</p>
-<p><img src="/assets/image-20251220151134679.png" alt="image-20251220151134679" style="zoom:50%;" /></p>
-<p>假设第1位出错，那么 <span
-class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub> = 0001</span>，<span
-class="math inline">0001 = 1</span>；</p>
-<p>假设第5为出错，那么 <span
-class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub> = 0101</span>，<span
-class="math inline">0101 = 5</span>。</p>
-<p>为什么有这种巧妙的映射关系？这正来源于汉明码的精巧设计。</p>
-<p>我们以第 5 位出错为例。在编码过程中，位置 5
-的信息实际流向了两个部分：<span
-class="math inline"><em>P</em><sub>1</sub></span> 和 <span
-class="math inline"><em>P</em><sub>4</sub></span>。<span
-class="math inline"><em>P</em><sub>1</sub></span> 和 <span
-class="math inline"><em>P</em><sub>4</sub></span> 正是 5（0101）中为 1
-的两位。在计算 <span
-class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub></span>
-的时候，我们发现 <span
-class="math inline"><em>C</em><sub>1</sub> = 1</span>，说明传输错误出现在3，5，7，9，11位；我们还发现
-<span
-class="math inline"><em>C</em><sub>4</sub> = 1</span>，说明传输错误出现在5，6，7，12位。两者的交集是5，所以第
-5 位出现了传输错误。</p>
-<h3 id="n-和-k-的关系"><span class="math inline"><em>n</em></span> 和
-<span class="math inline"><em>k</em></span> 的关系</h3>
-<p>让我们追本溯源。为什么 <span
-class="math inline"><em>n</em> = 8</span> 位二进制序列需要 <span
-class="math inline"><em>k</em> = 4</span>
-个校验位呢？更普遍的问题是，如何根据 <span
-class="math inline"><em>n</em></span> 确定 <span
-class="math inline"><em>k</em></span>？<span
-class="math inline"><em>n</em></span> 和 <span
-class="math inline"><em>k</em></span> 有什么关系？</p>
-<p>这里的核心逻辑是，<span
-class="math inline"><em>C</em><sub><em>k</em></sub><em>C</em><sub><em>k</em> − 1</sub>...<em>C</em><sub>2</sub><em>C</em><sub>1</sub></span>
-要能够表示所有的错误情况。而全 0 代表没有出错，所以 <span
-class="math inline"><em>C</em><sub><em>k</em></sub><em>C</em><sub><em>k</em> − 1</sub>...<em>C</em><sub>2</sub><em>C</em><sub>1</sub></span>
-最多能表示 <span class="math inline">2<sup><em>k</em></sup> − 1</span>
-种错误。而 <span class="math inline"><em>n</em> + <em>k</em></span>
-位汉明码最多出现 <span
-class="math inline"><em>n</em> + <em>k</em></span> 种错误，因此
-<strong><span
-class="math inline">2<sup><em>k</em></sup> − 1 ≥ <em>n</em> + <em>k</em></span></strong>。这就是
-<span class="math inline"><em>n</em></span> 和 <span
-class="math inline"><em>k</em></span> 的关系。</p>
-<p>因此，在确定校验位个数 <span class="math inline"><em>k</em></span>
-的时候，我们需要找到使 <span
-class="math inline">2<sup><em>k</em></sup> − 1 ≥ <em>n</em> + <em>k</em></span>
-成立的最小 <span
-class="math inline"><em>k</em></span>。下表列出了一些常见情况：</p>
-<p><img src="/assets/image-20251220152752175.png" alt="image-20251220152752175" style="zoom: 50%;" /></p>
-<h3 id="校验位错了怎么办">校验位错了怎么办</h3>
-<p>如果数据传输的过程中，出错的不是数据位，而是校验位怎么办？这样 <span
-class="math inline"><em>P</em><sub><em>i</em></sub>, <em>i</em><em>为</em>2<em>的</em><em>幂</em><em>次</em></span>
-就不是校验位的“使然值”了，算法还正确吗？</p>
-<p>答案是肯定的：<strong>在汉明码看来，校验位和数据位是“平等”的。如果校验位本身在传输中出错了，汉明码同样能准确地定位到它，并把它纠正回来。</strong></p>
-<p>例如，<span class="math inline"><em>P</em><sub>1</sub></span>
-出错，<span
-class="math inline"><em>C</em><sub>8</sub><em>C</em><sub>4</sub><em>C</em><sub>2</sub><em>C</em><sub>1</sub> = 0001</span>，表示第一位出错（其实上面也有写）</p>
-<h3 id="异或的真面目">异或的真面目</h3>
-<p>我们也许对于“异或”操作有些疑惑。为什么偏偏是异或呢？为什么不能是与、或、同或，甚至其它运算呢？</p>
-<p>书上有一行不起眼的字：<strong>“异或运算执行检‘奇’功能，当变量中1的个数为奇数时，结果为1；为偶数个1时，结果为0”。</strong></p>
-<p>实际上，“异或”检查的是一串数中为1的个数。<strong>如果1有偶数个，那么异或出来就是0；如果1有奇数个，那么异或出来就是1。</strong>说白了，还是和奇偶校验有关。</p>
-<p>所以在实际做题的时候，我们没有必要老老实实地做异或运算，只需要数一数1有几个就可以了。</p>
-<blockquote>
-<p><strong>定理</strong> 设 <span
-class="math inline"><em>x</em><sub>1</sub>, <em>x</em><sub>2</sub>, ..., <em>x</em><sub><em>k</em></sub></span>
-是一个二进制数序列，<span
-class="math inline"><em>x</em><sub><em>i</em></sub> ∈ {0, 1}</span>。则
-<span class="math display">$$
-\text{Xor}(x_1, x_2, ...,x_k)=
-\begin{cases}
-1 &amp; x_1, x_2, ...,x_k中有奇数个1 \\\\
-0 &amp; x_1, x_2, ...,x_k中有偶数个1
-\end{cases}
-$$</span></p>
-</blockquote>
-<h2 id="汉明码的局限">汉明码的局限</h2>
-<p>虽然汉明码不担心校验位出错，但它有一个硬伤：<strong>它默认二进制序列只有一个位出错</strong>。如果有两个甚至多个位出错，汉明码检测不出来。因此，现代
-ECC 内存通常使用
-<strong>SEC-DED</strong>（扩展汉明码）。它在最后多加了一位“全总校验位”（全总校验位=前面所有位的异或），可以实现：</p>
-<ul>
-<li>如果是 1 位错：定位并修好它。</li>
-<li>如果是 2
-位错：总校验位会发现异常，大喊“错得太多了，我修不了，但我知道数据坏了”，从而避免系统读入错误数据。</li>
-</ul>
-
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2026/01/11/DCD/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95%E4%B8%8E%E5%AD%97%E6%89%A9%E5%B1%95/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Fqmmm">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content=" | Fqmmm's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/2026/01/11/DCD/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E4%BD%8D%E6%89%A9%E5%B1%95%E4%B8%8E%E5%AD%97%E6%89%A9%E5%B1%95/" class="post-title-link" itemprop="url">改造我们的存储器</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">Posted on</span>
-      
-
-      <time title="Created: 2026-01-11 17:31:56 / Modified: 18:06:40" itemprop="dateCreated datePublished" datetime="2026-01-11T17:31:56+08:00">2026-01-11</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">In</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/DCD/" itemprop="url" rel="index"><span itemprop="name">DCD</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <h3 id="存储器的位扩展">存储器的位扩展</h3>
-<figure>
-<img src="/assets/image-20260101153436918.png"
-alt="image-20260101153436918" />
-<figcaption aria-hidden="true">image-20260101153436918</figcaption>
-</figure>
-<figure>
-<img src="/assets/image-20260101153556716.png"
-alt="image-20260101153556716" />
-<figcaption aria-hidden="true">image-20260101153556716</figcaption>
-</figure>
-<h3 id="存储器的字扩展">存储器的字扩展</h3>
-<figure>
-<img src="/assets/image-20260101153649870.png"
-alt="image-20260101153649870" />
-<figcaption aria-hidden="true">image-20260101153649870</figcaption>
-</figure>
-<p>如果有多个RAM，那么需要一个译码器，选择读取哪个RAM的数据</p>
-<figure>
-<img src="/assets/image-20260101153736662.png"
-alt="image-20260101153736662" />
-<figcaption aria-hidden="true">image-20260101153736662</figcaption>
-</figure>
-<figure>
-<img src="/assets/image-20260101153836375.png"
-alt="image-20260101153836375" />
-<figcaption aria-hidden="true">image-20260101153836375</figcaption>
-</figure>
-<h3 id="位扩展字扩展">位扩展+字扩展</h3>
-<figure>
-<img src="/assets/image-20260101153911010.png"
-alt="image-20260101153911010" />
-<figcaption aria-hidden="true">image-20260101153911010</figcaption>
-</figure>
-<p>往右为字扩展，纸面向内为位扩展</p>
-<p>（或者，位扩展往右画，字扩展往下画，这样形成一个二维矩阵，似乎更加直观）</p>
 
       
     </div>

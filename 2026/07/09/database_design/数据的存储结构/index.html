@@ -1,0 +1,2298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"example.com","root":"/","images":"/images","scheme":"Mist","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"i18n":{"placeholder":"Searching...","empty":"We didn't find any results for the search: ${query}","hits_time":"${hits} results found in ${time} ms","hits":"${hits} results found"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="目录  存储介质与存储层次 磁盘的数据存储原理 Flash Memory 与第三级存储器 RAID 磁盘系统 DBMS 的磁盘空间管理与缓冲区管理 文件组织方式 文件组织的代价模型 页格式与记录格式 重点内容与易混点  1 存储介质与存储层次 1.1 为什么数据库系统要关心存储结构 数据库管理系统（DBMS）不仅负责逻辑层面的 SQL、关系模型和事务管理，也必须处理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数据的存储结构">
+<meta property="og:url" content="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/index.html">
+<meta property="og:site_name" content="Fqmmm&#39;s Blog">
+<meta property="og:description" content="目录  存储介质与存储层次 磁盘的数据存储原理 Flash Memory 与第三级存储器 RAID 磁盘系统 DBMS 的磁盘空间管理与缓冲区管理 文件组织方式 文件组织的代价模型 页格式与记录格式 重点内容与易混点  1 存储介质与存储层次 1.1 为什么数据库系统要关心存储结构 数据库管理系统（DBMS）不仅负责逻辑层面的 SQL、关系模型和事务管理，也必须处理">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2026-07-09T07:16:58.857Z">
+<meta property="article:modified_time" content="2026-07-09T07:16:58.858Z">
+<meta property="article:author" content="Fqmmm">
+<meta property="article:tag" content="RAID">
+<meta property="article:tag" content="存储结构">
+<meta property="article:tag" content="文件组织">
+<meta property="article:tag" content="缓冲区管理">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"en","comments":true,"permalink":"http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/","path":"2026/07/09/database_design/数据的存储结构/","title":"数据的存储结构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>数据的存储结构 | Fqmmm's Blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Fqmmm's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="Search" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E4%BB%8B%E8%B4%A8%E4%B8%8E%E5%AD%98%E5%82%A8%E5%B1%82%E6%AC%A1"><span class="nav-number">2.</span> <span class="nav-text">1 存储介质与存储层次</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B3%BB%E7%BB%9F%E8%A6%81%E5%85%B3%E5%BF%83%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84"><span class="nav-number">2.1.</span> <span class="nav-text">1.1
+为什么数据库系统要关心存储结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E4%BB%8B%E8%B4%A8%E7%9A%84%E5%B1%82%E6%AC%A1%E7%BB%93%E6%9E%84"><span class="nav-number">2.2.</span> <span class="nav-text">1.2 存储介质的层次结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%9A%84%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E5%8E%9F%E7%90%86"><span class="nav-number">3.</span> <span class="nav-text">2 磁盘的数据存储原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%9A%84%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="nav-number">3.1.</span> <span class="nav-text">2.1 磁盘的基本结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4"><span class="nav-number">3.2.</span> <span class="nav-text">2.2 磁盘访问时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E8%AF%BB%E5%86%99%E5%8D%95%E4%BD%8D%E4%B8%8E-dbms-%E6%80%A7%E8%83%BD"><span class="nav-number">3.3.</span> <span class="nav-text">2.3 磁盘读写单位与 DBMS 性能</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E6%8E%A7%E5%88%B6%E5%99%A8%E6%A0%A1%E9%AA%8C%E4%B8%8E%E8%AE%B0%E5%BD%95%E8%B7%A8%E5%9D%97"><span class="nav-number">3.4.</span> <span class="nav-text">2.4 磁盘控制器、校验与记录跨块</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#flash-memory-%E4%B8%8E%E7%AC%AC%E4%B8%89%E7%BA%A7%E5%AD%98%E5%82%A8%E5%99%A8"><span class="nav-number">4.</span> <span class="nav-text">3 Flash Memory 与第三级存储器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#flash-memory-%E7%9A%84%E7%89%B9%E7%82%B9"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 Flash Memory 的特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%AC%E4%B8%89%E7%BA%A7%E5%AD%98%E5%82%A8%E5%99%A8"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 第三级存储器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#raid-%E7%A3%81%E7%9B%98%E7%B3%BB%E7%BB%9F"><span class="nav-number">5.</span> <span class="nav-text">4 RAID 磁盘系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#raid-%E7%9A%84%E5%8A%A8%E6%9C%BA"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 RAID 的动机</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%9D%A1%E5%B8%A6"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 数据条带</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%86%97%E4%BD%99%E4%B8%8E%E6%A0%A1%E9%AA%8C"><span class="nav-number">5.3.</span> <span class="nav-text">4.3 数据冗余与校验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%B7%E6%98%8E%E7%A0%81%E7%9B%B4%E8%A7%89"><span class="nav-number">5.3.1.</span> <span class="nav-text">4.3.1 海明码直觉</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#raid-level-%E5%AF%B9%E6%AF%94"><span class="nav-number">5.4.</span> <span class="nav-text">4.4 RAID Level 对比</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#read-modify-write-cycle"><span class="nav-number">5.4.1.</span> <span class="nav-text">4.4.1 Read-Modify-Write Cycle</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dbms-%E7%9A%84%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86%E4%B8%8E%E7%BC%93%E5%86%B2%E5%8C%BA%E7%AE%A1%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">5 DBMS
+的磁盘空间管理与缓冲区管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A3%81%E7%9B%98%E7%A9%BA%E9%97%B4%E7%AE%A1%E7%90%86"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 磁盘空间管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#page-%E7%9A%84%E5%90%AB%E4%B9%89%E4%B8%8E%E5%B1%82%E6%AC%A1%E5%85%B3%E7%B3%BB"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 Page 的含义与层次关系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pageblocksector-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">6.2.1.</span> <span class="nav-text">5.2.1 Page、Block、Sector 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88-dbms-%E4%B8%8D%E6%8C%89%E5%8D%95%E6%9D%A1%E8%AE%B0%E5%BD%95%E8%AF%BB%E5%86%99"><span class="nav-number">6.2.2.</span> <span class="nav-text">5.2.2 为什么 DBMS
+不按单条记录读写</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%93%E5%86%B2%E5%8C%BA%E7%AE%A1%E7%90%86%E5%99%A8%E4%B8%8E-buffer-pool"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 缓冲区管理器与 Buffer Pool</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#frame-%E7%9A%84%E5%85%B3%E9%94%AE%E7%8A%B6%E6%80%81pin_count-%E4%B8%8E-dirty"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 Frame
+的关键状态：pin_count 与 dirty</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#buffer-replacement-policy"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 Buffer Replacement Policy</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#lru"><span class="nav-number">6.5.1.</span> <span class="nav-text">5.5.1 LRU</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clock"><span class="nav-number">6.5.2.</span> <span class="nav-text">5.5.2 Clock</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#buffer-pool-%E4%B8%8E%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">6.6.</span> <span class="nav-text">5.6 Buffer Pool
+与虚拟内存的区别</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%84%E7%BB%87%E6%96%B9%E5%BC%8F"><span class="nav-number">7.</span> <span class="nav-text">6 文件组织方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E9%A1%B5%E4%B8%8E%E8%AE%B0%E5%BD%95%E6%A0%87%E8%AF%86%E7%AC%A6"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 文件、页与记录标识符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%96%87%E4%BB%B6"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 堆文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B5%E9%93%BE%E8%A1%A8"><span class="nav-number">7.2.1.</span> <span class="nav-text">6.2.1 页链表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%93%8D%E4%BD%9C"><span class="nav-number">7.2.1.1.</span> <span class="nav-text">6.2.1.1 插入操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%93%8D%E4%BD%9C"><span class="nav-number">7.2.1.2.</span> <span class="nav-text">6.2.1.2 删除操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">7.2.1.3.</span> <span class="nav-text">6.2.1.3 优缺点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B5%E5%AD%97%E5%85%B8"><span class="nav-number">7.2.2.</span> <span class="nav-text">6.2.2 页字典</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%93%8D%E4%BD%9C-1"><span class="nav-number">7.2.2.1.</span> <span class="nav-text">6.2.2.1 插入操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%93%8D%E4%BD%9C-1"><span class="nav-number">7.2.2.2.</span> <span class="nav-text">6.2.2.2 删除操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9-1"><span class="nav-number">7.2.2.3.</span> <span class="nav-text">6.2.2.3 优缺点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%BA%E5%BA%8F%E6%96%87%E4%BB%B6"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 顺序文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%80%BC%E6%9F%A5%E8%AF%A2%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9B%B4%E5%BF%AB"><span class="nav-number">7.3.1.</span> <span class="nav-text">6.3.1 等值查询为什么更快</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8C%83%E5%9B%B4%E6%9F%A5%E8%AF%A2%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9B%B4%E9%80%82%E5%90%88%E9%A1%BA%E5%BA%8F%E6%96%87%E4%BB%B6"><span class="nav-number">7.3.2.</span> <span class="nav-text">6.3.2
+范围查询为什么更适合顺序文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E4%B8%BA%E4%BB%80%E4%B9%88%E9%BA%BB%E7%83%A6"><span class="nav-number">7.3.3.</span> <span class="nav-text">6.3.3 插入为什么麻烦</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B9%9F%E8%A6%81%E7%BB%B4%E6%8A%A4%E9%A1%BA%E5%BA%8F%E7%BB%93%E6%9E%84"><span class="nav-number">7.3.4.</span> <span class="nav-text">6.3.4
+删除为什么也要维护顺序结构</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6"><span class="nav-number">7.4.</span> <span class="nav-text">6.4 聚集文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E5%AD%A6%E7%94%9F%E8%A1%A8%E5%92%8C%E9%80%89%E8%AF%BE%E8%A1%A8%E7%90%86%E8%A7%A3%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6"><span class="nav-number">7.4.1.</span> <span class="nav-text">6.4.1
+从学生表和选课表理解聚集文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6%E4%BC%98%E5%8C%96%E7%9A%84%E6%98%AF%E5%93%AA%E7%B1%BB%E6%9F%A5%E8%AF%A2"><span class="nav-number">7.4.2.</span> <span class="nav-text">6.4.2 聚集文件优化的是哪类查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6%E5%92%8C%E9%A1%BA%E5%BA%8F%E6%96%87%E4%BB%B6%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">7.4.3.</span> <span class="nav-text">6.4.3 聚集文件和顺序文件的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">7.4.4.</span> <span class="nav-text">6.4.4 聚集文件的优点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%BA%E7%82%B9"><span class="nav-number">7.4.5.</span> <span class="nav-text">6.4.5 聚集文件的缺点</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6"><span class="nav-number">7.5.</span> <span class="nav-text">6.5 哈希文件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E5%AD%A6%E7%94%9F%E8%A1%A8%E7%90%86%E8%A7%A3%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6"><span class="nav-number">7.5.1.</span> <span class="nav-text">6.5.1 用学生表理解哈希文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%80%BC%E6%9F%A5%E8%AF%A2%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BF%AB"><span class="nav-number">7.5.2.</span> <span class="nav-text">6.5.2 等值查询为什么快</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%A6%82%E4%BD%95%E8%BF%9B%E8%A1%8C"><span class="nav-number">7.5.3.</span> <span class="nav-text">6.5.3 插入如何进行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%A2%E5%87%BA%E9%97%AE%E9%A2%98"><span class="nav-number">7.5.4.</span> <span class="nav-text">6.5.4 溢出问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%8C%83%E5%9B%B4%E6%9F%A5%E8%AF%A2%E4%B8%8D%E9%80%82%E5%90%88%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6"><span class="nav-number">7.5.5.</span> <span class="nav-text">6.5.5
+为什么范围查询不适合哈希文件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%BB%84%E7%BB%87%E7%9A%84%E4%BB%A3%E4%BB%B7%E6%A8%A1%E5%9E%8B"><span class="nav-number">8.</span> <span class="nav-text">7 文件组织的代价模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%AC%A6%E5%8F%B7"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 基本符号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 基本操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A0%86%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 堆文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 排序文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6%E7%9A%84%E4%BB%A3%E4%BB%B7"><span class="nav-number">8.5.</span> <span class="nav-text">7.5 哈希文件的代价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%A7%8D%E6%96%87%E4%BB%B6%E7%BB%84%E7%BB%87%E6%96%B9%E5%BC%8F%E6%80%BB%E8%A1%A8"><span class="nav-number">8.6.</span> <span class="nav-text">7.6 三种文件组织方式总表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A1%B5%E6%A0%BC%E5%BC%8F%E4%B8%8E%E8%AE%B0%E5%BD%95%E6%A0%BC%E5%BC%8F"><span class="nav-number">9.</span> <span class="nav-text">8 页格式与记录格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A1%B5%E6%A0%BC%E5%BC%8F"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 页格式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E9%95%BF%E8%AE%B0%E5%BD%95"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 定长记录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#packed-%E4%B8%8E-unpacked"><span class="nav-number">9.2.1.</span> <span class="nav-text">8.2.1 Packed 与 Unpacked</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%95%BF%E8%AE%B0%E5%BD%95"><span class="nav-number">9.3.</span> <span class="nav-text">8.3 变长记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#slot-%E5%AD%97%E5%85%B8"><span class="nav-number">9.4.</span> <span class="nav-text">8.4 Slot 字典</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%98%E9%95%BF%E5%AD%97%E6%AE%B5%E7%9A%84%E4%B8%A4%E7%A7%8D%E5%AD%98%E6%94%BE%E6%96%B9%E6%B3%95"><span class="nav-number">9.5.</span> <span class="nav-text">8.5 变长字段的两种存放方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E9%9A%94%E7%AC%A6%E5%AD%98%E6%94%BE%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">9.5.1.</span> <span class="nav-text">8.5.1 分隔符存放的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E9%92%88%E5%81%8F%E7%A7%BB%E5%AD%98%E6%94%BE%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">9.5.2.</span> <span class="nav-text">8.5.2 指针&#x2F;偏移存放的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%8F%98%E9%95%BF%E5%AD%97%E6%AE%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E9%BA%BB%E7%83%A6"><span class="nav-number">9.5.3.</span> <span class="nav-text">8.5.3 修改变长字段为什么麻烦</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E5%86%85%E5%AE%B9%E4%B8%8E%E6%98%93%E6%B7%B7%E7%82%B9"><span class="nav-number">10.</span> <span class="nav-text">9 重点内容与易混点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BF%85%E9%A1%BB%E6%8E%8C%E6%8F%A1%E7%9A%84%E4%B8%BB%E7%BA%BF"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 必须掌握的主线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E6%A6%82%E5%BF%B5%E9%80%9F%E8%AE%B0"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 重点概念速记</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%93%E6%B7%B7%E7%82%B9%E8%BE%A8%E6%9E%90"><span class="nav-number">10.3.</span> <span class="nav-text">9.3 易混点辨析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#sectorblockpage-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.1.</span> <span class="nav-text">9.3.1 Sector、Block、Page 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lru-%E4%B8%8E-clock-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.2.</span> <span class="nav-text">9.3.2 LRU 与 Clock 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dirty-%E4%B8%8E-pin_count-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">10.3.3.</span> <span class="nav-text">9.3.3 Dirty 与 pin_count 的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A0%86%E6%96%87%E4%BB%B6%E6%8E%92%E5%BA%8F%E6%96%87%E4%BB%B6%E5%93%88%E5%B8%8C%E6%96%87%E4%BB%B6%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">10.3.4.</span> <span class="nav-text">9.3.4
+堆文件、排序文件、哈希文件的选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#packed-%E5%88%A0%E9%99%A4%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E5%BD%B1%E5%93%8D-rid"><span class="nav-number">10.3.5.</span> <span class="nav-text">9.3.5 Packed 删除为什么会影响
+rid</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AC%E5%BC%8F%E6%B1%87%E6%80%BB"><span class="nav-number">10.4.</span> <span class="nav-text">9.4 公式汇总</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%BB%BA%E8%AE%AE"><span class="nav-number">10.5.</span> <span class="nav-text">9.5 学习建议</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Fqmmm</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">86</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Fqmmm">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="数据的存储结构 | Fqmmm's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数据的存储结构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">Posted on</span>
+
+      <time title="Created: 2026-07-09 15:16:58" itemprop="dateCreated datePublished" datetime="2026-07-09T15:16:58+08:00">2026-07-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">In</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93%E8%AE%BE%E8%AE%A1/" itemprop="url" rel="index"><span itemprop="name">数据库设计</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="目录">目录</h1>
+<ol type="1">
+<li>存储介质与存储层次</li>
+<li>磁盘的数据存储原理</li>
+<li>Flash Memory 与第三级存储器</li>
+<li>RAID 磁盘系统</li>
+<li>DBMS 的磁盘空间管理与缓冲区管理</li>
+<li>文件组织方式</li>
+<li>文件组织的代价模型</li>
+<li>页格式与记录格式</li>
+<li>重点内容与易混点</li>
+</ol>
+<h1 id="存储介质与存储层次">1 存储介质与存储层次</h1>
+<h2 id="为什么数据库系统要关心存储结构">1.1
+为什么数据库系统要关心存储结构</h2>
+<p>数据库管理系统（DBMS）不仅负责逻辑层面的
+SQL、关系模型和事务管理，也必须处理底层数据怎样放在物理介质上的问题。原因很直接：<strong>数据库中的数据通常远大于内存，且必须持久化保存</strong>。因此，DBMS
+的很多性能瓶颈不是来自 CPU 计算，而是来自磁盘或其他 I/O 设备的读写。</p>
+<p>从应用角度看，数据库系统至少有两个基本需求：</p>
+<ul>
+<li><strong>持久化存储</strong>：数据不能因为程序退出或断电就丢失，因此必须存放在磁盘、SSD、磁带等非易失介质中。</li>
+<li><strong>高效、可靠访问</strong>：数据不仅要能保存，还要能以较低代价被读取、修改和恢复。</li>
+</ul>
+<p>这里强调，“性能”不是单一指标。数据库内核的很多优化都是
+trade-off：例如为了提高可靠性可能牺牲空间利用率，为了提高顺序读速度可能让随机写更复杂。不存在适用于所有场景的
+one fits all 方案。</p>
+<h2 id="存储介质的层次结构">1.2 存储介质的层次结构</h2>
+<p>计算机系统中的存储通常按速度、容量、价格和持久性形成层次结构：</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">层次</th>
+<th style="text-align: left;">典型介质</th>
+<th style="text-align: left;">速度</th>
+<th style="text-align: left;">容量</th>
+<th style="text-align: left;">是否持久</th>
+<th style="text-align: left;">主要用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">第一级存储器（Primary Storage）</td>
+<td style="text-align: left;">高速缓存、内存</td>
+<td style="text-align: left;">最快</td>
+<td style="text-align: left;">较小</td>
+<td style="text-align: left;">通常不持久</td>
+<td style="text-align: left;">CPU 直接访问、DBMS Buffer Pool</td>
+</tr>
+<tr>
+<td style="text-align: left;">第二级存储器（Secondary Storage）</td>
+<td style="text-align: left;">Flash/SSD、磁盘</td>
+<td style="text-align: left;">中等</td>
+<td style="text-align: left;">大</td>
+<td style="text-align: left;">持久</td>
+<td style="text-align: left;">数据库文件、索引、日志</td>
+</tr>
+<tr>
+<td style="text-align: left;">第三级存储器（Tertiary Storage）</td>
+<td style="text-align: left;">光盘、磁带、胶片</td>
+<td style="text-align: left;">慢</td>
+<td style="text-align: left;">很大</td>
+<td style="text-align: left;">持久</td>
+<td style="text-align: left;">归档、备份、冷数据</td>
+</tr>
+</tbody>
+</table>
+<p>分级存储存在的原因主要有三点：</p>
+<ol type="1">
+<li><strong>价格因素</strong>：越快的存储越贵。主存价格通常远高于磁盘，因此不能把所有数据库数据都放在内存中。</li>
+<li><strong>寻址能力限制</strong>：例如 32 位机器可直接寻址的主存空间受
+<span class="math inline">2<sup>32</sup></span> 限制。</li>
+<li><strong>持久化需求</strong>：内存断电后数据会丢失，数据库必须依赖非易失存储保存数据。</li>
+</ol>
+<p>数据库系统的核心思想之一就是：<strong>把当前需要处理的页从磁盘调入内存，在内存中操作，再按需要写回磁盘</strong>。这正是后面
+Buffer Pool 和 Replacement Policy 要解决的问题。</p>
+<h1 id="磁盘的数据存储原理">2 磁盘的数据存储原理</h1>
+<h2 id="磁盘的基本结构">2.1 磁盘的基本结构</h2>
+<p>传统机械磁盘由盘片、磁道、扇区、磁头和磁盘臂等部分组成。理解这些结构有助于解释为什么随机
+I/O 昂贵、顺序 I/O 相对便宜。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">盘片（Platter）</td>
+<td
+style="text-align: left;">实际存放数据的圆形盘面，一个磁盘可以有多个盘片</td>
+</tr>
+<tr>
+<td style="text-align: left;">磁道（Track）</td>
+<td style="text-align: left;">盘面上的同心圆轨道</td>
+</tr>
+<tr>
+<td style="text-align: left;">柱面（Cylinder）</td>
+<td style="text-align: left;">多个盘面上半径相同的磁道集合</td>
+</tr>
+<tr>
+<td style="text-align: left;">扇区（Sector）</td>
+<td
+style="text-align: left;">硬件上的最小存储单位，是硬件不可变属性</td>
+</tr>
+<tr>
+<td style="text-align: left;">块（Block）</td>
+<td style="text-align: left;">数据存储和传输的基本单位，通常由若干
+sector 构成</td>
+</tr>
+<tr>
+<td style="text-align: left;">磁头（Head）</td>
+<td
+style="text-align: left;">读写盘面数据的部件，每个盘面通常有一个磁头</td>
+</tr>
+</tbody>
+</table>
+<p>磁盘容量可估算为：</p>
+<p><span class="math display">$$
+\text{容量} =
+\text{盘面数}
+\times \frac{\text{磁道数}}{\text{盘面}}
+\times \frac{\text{盘块数}}{\text{磁道}}
+\times \frac{\text{字节数}}{\text{盘块}}
+$$</span></p>
+<p>这里的图示主要表达两类机械动作：</p>
+<ul>
+<li><strong>盘片转动</strong>：让目标扇区转到磁头下面。</li>
+<li><strong>磁头伸缩/磁盘臂移动</strong>：让磁头移动到目标磁道。</li>
+</ul>
+<p>因此，“找数据”并不是 CPU
+里一次寻址那么简单，而是包含机械定位过程。这也是机械磁盘随机访问慢的根本原因。</p>
+<h2 id="磁盘访问时间">2.2 磁盘访问时间</h2>
+<p>磁盘读取一个块的时间通常由三部分组成：</p>
+<p><span class="math display">Access Time = Seek Time + Rotational
+Delay + Transfer Time</span></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">组成部分</th>
+<th style="text-align: left;">中文含义</th>
+<th style="text-align: left;">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Seek Time</td>
+<td style="text-align: left;">寻道时间</td>
+<td style="text-align: left;">磁头移动到目标磁道所需时间</td>
+</tr>
+<tr>
+<td style="text-align: left;">Rotational Delay</td>
+<td style="text-align: left;">旋转延迟</td>
+<td style="text-align: left;">等目标扇区转到磁头下方所需时间</td>
+</tr>
+<tr>
+<td style="text-align: left;">Transfer Time</td>
+<td style="text-align: left;">传输时间</td>
+<td style="text-align: left;">数据真正从磁盘传到内存所需时间</td>
+</tr>
+</tbody>
+</table>
+<p>在机械磁盘中，寻道和旋转延迟通常比实际传输更昂贵。所以 DBMS
+会尽量把经常一起访问的数据放在物理上接近的位置，例如同一个 block、track
+或 cylinder 上。这样可以减少机械移动，提高顺序读写性能。</p>
+<h2 id="磁盘读写单位与-dbms-性能">2.3 磁盘读写单位与 DBMS 性能</h2>
+<p>DBMS
+在操作数据时，真正执行计算的是内存中的数据；磁盘和内存之间交换数据的单位通常是
+<strong>Block</strong> 或 DBMS 逻辑上的
+<strong>Page</strong>。一次磁盘页传输可以看作一次 I/O 操作。</p>
+<p>材料特别强调：</p>
+<p><strong>DBMS 的很多代价模型都以页 I/O 次数为单位，而不是以 CPU
+指令数为单位。</strong></p>
+<p>原因是传统磁盘 I/O 比内存计算慢得多。例如这里给出的量级是：</p>
+<ul>
+<li>读写一页时间 <span class="math inline"><em>D</em> ≈ 15</span>
+毫秒。</li>
+<li>处理一条记录或执行 Hash 函数的时间 <span
+class="math inline"><em>C</em>, <em>H</em> ≈ 100</span> 纳秒。</li>
+</ul>
+<p>两者相差多个数量级，所以在数据库内核课程中，估算查询代价时通常优先关注“读写了多少页”。</p>
+<h2 id="磁盘控制器校验与记录跨块">2.4 磁盘控制器、校验与记录跨块</h2>
+<p>磁盘控制器负责执行底层操作，例如移动磁头、定位块、传输数据等。为了检测数据读写是否正确，磁盘系统会使用
+<strong>Checksum</strong>：写入时计算校验值，读取时重新计算并比较，以发现传输或存储错误。</p>
+<p>记录在磁盘块中的存放方式有两类：</p>
+<ul>
+<li><strong>不跨块方式</strong>：一条记录必须完整放在一个块中，实现简单，读取一条记录最多访问一个块，但可能造成块内空间浪费。</li>
+<li><strong>跨块方式</strong>：一条记录可以跨多个块，空间利用率更高，但读取和维护更复杂。</li>
+</ul>
+<h1 id="flash-memory-与第三级存储器">3 Flash Memory 与第三级存储器</h1>
+<h2 id="flash-memory-的特点">3.1 Flash Memory 的特点</h2>
+<p>Flash Memory 是一种电可擦可编程只读存储器（EEPROM）。SSD 就是基于
+Flash Memory 的常见存储设备。</p>
+<p>Flash 的关键特点是：</p>
+<ul>
+<li><strong>Page 是读写操作单位</strong>，典型大小如 2KB。</li>
+<li>写操作只能把 bit 从 <span class="math inline">1</span> 改成 <span
+class="math inline">0</span>。</li>
+<li>如果要把 bit 从 <span class="math inline">0</span> 改回 <span
+class="math inline">1</span>，必须擦除整个区域。</li>
+<li>擦除单位是固定大小的区域，称为 erase unit、erase block 或
+block，典型值如 128KB。</li>
+</ul>
+<p>这说明 Flash
+与机械磁盘的性能瓶颈不同。机械磁盘的主要问题是机械移动；Flash
+没有磁头寻道，但有“先擦除再写入”的限制。因此 Flash/SSD
+的随机读通常较好，但写入、擦除、磨损均衡等问题需要专门管理。</p>
+<h2 id="第三级存储器">3.2 第三级存储器</h2>
+<p>第三级存储器主要用于备份、归档和冷数据存储。材料列举了：</p>
+<ul>
+<li>光盘：CD、DVD、WORM。</li>
+<li>磁带：价格便宜、容量大，但通常顺序读取。</li>
+<li>胶片等其他长期归档介质。</li>
+</ul>
+<p>其中磁带的典型特点是<strong>顺序访问</strong>。如果要读取中间某段数据，往往要先经过前面的数据，因此不适合频繁随机查询，但适合长期备份和批量恢复。</p>
+<h1 id="raid-磁盘系统">4 RAID 磁盘系统</h1>
+<h2 id="raid-的动机">4.1 RAID 的动机</h2>
+<p>磁盘长期是数据库系统性能瓶颈。这里给出趋势：微处理器速度提升很快，而磁盘访问速度提升较慢，这使得
+CPU 与 I/O 之间的差距越来越大。</p>
+<p><strong>RAID（Redundant Array of Independent Disks）</strong>
+的基本思想是把多个磁盘组织成一个整体：</p>
+<ul>
+<li>通过 <strong>数据条带（Data Striping）</strong>
+把数据分布到多个磁盘上，利用并行性提高读写吞吐。</li>
+<li>通过 <strong>冗余（Redundancy）</strong>
+保存校验或副本，提高可靠性。</li>
+</ul>
+<p>也就是说，RAID 同时关注两个目标：<strong>性能</strong> 和
+<strong>可靠性</strong>。</p>
+<h2 id="数据条带">4.2 数据条带</h2>
+<p>数据条带是把数据切分成等长分区，并分布到多个磁盘上。每个分区大小称为
+<strong>条带单元（striping unit）</strong>。</p>
+<p>举例来说，如果有 4 块盘，数据页可以轮流放到 Disk 1、Disk 2、Disk
+3、Disk
+4。这样读取连续数据时，多个磁盘可以并行工作，提高整体吞吐量。</p>
+<p>条带大小会影响性能：</p>
+<ul>
+<li>条带较小：更容易利用并行性，但管理开销较大。</li>
+<li>条带较大：连续访问效率高，但小请求可能只落在少数磁盘上，并行性不足。</li>
+</ul>
+<h2 id="数据冗余与校验">4.3 数据冗余与校验</h2>
+<p>仅仅把数据分散到多个磁盘会降低可靠性，因为任意一个磁盘损坏都可能破坏整个磁盘组的数据。RAID
+通过冗余提升可靠性，关键问题包括：</p>
+<ul>
+<li>冗余信息放在哪里。</li>
+<li>冗余信息怎样计算。</li>
+</ul>
+<p>这里提到的冗余方法包括：</p>
+<ul>
+<li><strong>奇偶校验（Parity）</strong>。</li>
+<li><strong>海明码（Hamming Code）</strong>。</li>
+<li><strong>Reed-Solomon Code</strong>。</li>
+</ul>
+<h3 id="海明码直觉">4.3.1 海明码直觉</h3>
+<p>海明码是一种可以纠正一位错误的编码方法。其基本思想是：在 <span
+class="math inline"><em>k</em></span> 位信息位之外增加 <span
+class="math inline"><em>r</em></span> 位冗余位，形成 <span
+class="math inline"><em>n</em> = <em>k</em> + <em>r</em></span>
+位码字。接收或读取时通过若干监督关系式计算校正因子，从而判断是否出错以及哪一位出错。</p>
+<p>以这里的 4 位数据为例：</p>
+<p><span
+class="math display"><em>d</em><sub>3</sub> <em>d</em><sub>2</sub> <em>d</em><sub>1</sub> <em>r</em><sub>2</sub> <em>d</em><sub>0</sub> <em>r</em><sub>1</sub> <em>r</em><sub>0</sub> = <em>b</em><sub>7</sub> <em>b</em><sub>6</sub> <em>b</em><sub>5</sub> <em>b</em><sub>4</sub> <em>b</em><sub>3</sub> <em>b</em><sub>2</sub> <em>b</em><sub>1</sub></span></p>
+<p>其中冗余位通过异或计算：</p>
+<ul>
+<li><span class="math inline"><em>b</em><sub>1</sub></span> 是 <span
+class="math inline"><em>b</em><sub>3</sub>, <em>b</em><sub>5</sub>, <em>b</em><sub>7</sub></span>
+的异或。</li>
+<li><span class="math inline"><em>b</em><sub>2</sub></span> 是 <span
+class="math inline"><em>b</em><sub>3</sub>, <em>b</em><sub>6</sub>, <em>b</em><sub>7</sub></span>
+的异或。</li>
+<li><span class="math inline"><em>b</em><sub>4</sub></span> 是 <span
+class="math inline"><em>b</em><sub>5</sub>, <em>b</em><sub>6</sub>, <em>b</em><sub>7</sub></span>
+的异或。</li>
+</ul>
+<p>验证方程为：</p>
+<p><span
+class="math display"><em>G</em><sub>1</sub> = <em>b</em><sub>1</sub> ⊕ <em>b</em><sub>3</sub> ⊕ <em>b</em><sub>5</sub> ⊕ <em>b</em><sub>7</sub></span></p>
+<p><span
+class="math display"><em>G</em><sub>2</sub> = <em>b</em><sub>2</sub> ⊕ <em>b</em><sub>3</sub> ⊕ <em>b</em><sub>6</sub> ⊕ <em>b</em><sub>7</sub></span></p>
+<p><span
+class="math display"><em>G</em><sub>3</sub> = <em>b</em><sub>4</sub> ⊕ <em>b</em><sub>5</sub> ⊕ <em>b</em><sub>6</sub> ⊕ <em>b</em><sub>7</sub></span></p>
+<p>如果所有 <span
+class="math inline"><em>G</em><sub><em>i</em></sub></span> 都为
+0，说明没有检测到错误；如果不为
+0，则这些校验结果组合起来可以定位一位错误。练习中通常不要求复杂推导，但要理解：<strong>海明码用额外冗余位换取错误定位和纠错能力</strong>。</p>
+<h2 id="raid-level-对比">4.4 RAID Level 对比</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">RAID Level</th>
+<th style="text-align: left;">核心思想</th>
+<th style="text-align: left;">冗余方式</th>
+<th style="text-align: left;">空间利用率/代价</th>
+<th style="text-align: left;">适用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RAID 0</td>
+<td style="text-align: left;">只做条带化</td>
+<td style="text-align: left;">无冗余</td>
+<td style="text-align: left;">空间利用率 100%，可靠性差</td>
+<td
+style="text-align: left;">追求低成本和高写性能，但不能容忍故障的场景较少</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 1</td>
+<td style="text-align: left;">镜像</td>
+<td style="text-align: left;">每块盘有备份</td>
+<td style="text-align: left;">空间利用率约 50%，成本最高</td>
+<td style="text-align: left;">可靠性要求高、小型系统</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 0+1</td>
+<td style="text-align: left;">条带化 + 镜像</td>
+<td style="text-align: left;">镜像冗余</td>
+<td style="text-align: left;">性能类似 RAID 1，利用条带提升并行性</td>
+<td style="text-align: left;">小型系统或大量写场景</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 2</td>
+<td style="text-align: left;">位级条带 + 海明码</td>
+<td style="text-align: left;">Hamming Code</td>
+<td style="text-align: left;">校验盘数量约为数据盘数量的对数</td>
+<td style="text-align: left;">现在较少使用</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 3</td>
+<td style="text-align: left;">位级条带 + 奇偶校验</td>
+<td style="text-align: left;">单校验盘</td>
+<td style="text-align: left;">一个 check disk</td>
+<td style="text-align: left;">大规模连续读写，优于 RAID 2</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 4</td>
+<td style="text-align: left;">块级条带 + 奇偶校验</td>
+<td style="text-align: left;">单校验盘</td>
+<td style="text-align: left;">写入时 check disk 容易成为瓶颈</td>
+<td style="text-align: left;">被 RAID 5 改进</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 5</td>
+<td style="text-align: left;">块级条带 + 分布式奇偶校验</td>
+<td style="text-align: left;">校验信息分布到不同磁盘</td>
+<td style="text-align: left;">避免单个 check disk 瓶颈</td>
+<td style="text-align: left;">综合性能较好，优于 RAID 4</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID 6</td>
+<td style="text-align: left;">RAID 5 + 双重冗余</td>
+<td style="text-align: left;">Reed-Solomon 等 P+Q 冗余</td>
+<td style="text-align: left;">可容忍两个磁盘同时故障，冗余代价更高</td>
+<td style="text-align: left;">高可靠性系统</td>
+</tr>
+</tbody>
+</table>
+<h3 id="read-modify-write-cycle">4.4.1 Read-Modify-Write Cycle</h3>
+<p>RAID 2、4 等级别中，写操作可能遵循 <strong>read-modify-write
+cycle</strong>。其直觉是：如果只修改一个数据块，系统不能简单覆盖数据，还必须更新对应校验信息。因此需要读取旧数据和旧校验，计算新校验，再写回新数据和新校验。</p>
+<p>这解释了为什么某些 RAID level 的写性能不如读性能，也解释了为什么 RAID
+5 要把校验信息分散到不同磁盘上：<strong>避免所有写操作都争用同一个 check
+disk</strong>。</p>
+<h1 id="dbms-的磁盘空间管理与缓冲区管理">5 DBMS
+的磁盘空间管理与缓冲区管理</h1>
+<h2 id="磁盘空间管理">5.1 磁盘空间管理</h2>
+<p>磁盘空间管理位于 DBMS
+结构的最底层，主要负责以页为单位组织数据库文件。其基本操作包括：</p>
+<ul>
+<li>读页。</li>
+<li>写页。</li>
+<li>申请新页。</li>
+<li>释放页。</li>
+</ul>
+<p>它还需要记录哪些块或页正在使用、每一页的位置，以及哪些页仍有空闲空间。常见方法包括：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">空闲块链表</td>
+<td style="text-align: left;">把空闲块串成链表</td>
+<td
+style="text-align: left;">实现简单，但查找满足特定空间大小的页可能不够高效</td>
+</tr>
+<tr>
+<td style="text-align: left;">空闲块位图</td>
+<td style="text-align: left;">用 bitmap 标记块是否空闲</td>
+<td style="text-align: left;">查询和统计更方便，适合规则管理</td>
+</tr>
+</tbody>
+</table>
+<p>DBMS 管理磁盘空间有两种实现路线：</p>
+<ul>
+<li><strong>利用操作系统文件系统</strong>：跨平台和实现成本较好，但某些底层控制能力受限。</li>
+<li><strong>DBMS
+自己实现磁盘访问</strong>：可以获得更强控制能力，但实现复杂、跨平台成本高。</li>
+</ul>
+<p>选择时要考虑跨平台需求、操作系统是否提供所需功能、DBMS
+对性能和可靠性的控制要求等因素。</p>
+<h2 id="page-的含义与层次关系">5.2 Page 的含义与层次关系</h2>
+<p>在 DBMS
+中，<strong>页（page）是数据库在磁盘和内存之间搬运数据的基本单位</strong>。查询语句看到的是表、记录和属性，但
+DBMS 内核真正读写磁盘时，通常不是一条记录一条记录地搬，而是以 page
+为单位把一整块数据库数据读入内存。</p>
+<p>可以把一个数据库文件想成下面这样的层次：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">数据库文件</span><br><span class="line">  -&gt; Page 1</span><br><span class="line">      -&gt; Record 1</span><br><span class="line">      -&gt; Record 2</span><br><span class="line">      -&gt; Record 3</span><br><span class="line">      -&gt; free space</span><br><span class="line">  -&gt; Page 2</span><br><span class="line">      -&gt; Record 4</span><br><span class="line">      -&gt; Record 5</span><br><span class="line">      -&gt; free space</span><br></pre></td></tr></table></figure>
+<p>也就是说，一个 page 里通常会放多条记录。比如一页大小是
+8KB，一条学生记录平均 100B，那么一个 page 大约可以放几十条记录。DBMS
+读入这一页后，页内的多条记录都已经在内存中，后续访问同页记录时就不需要再次访问磁盘。</p>
+<p>Page 的作用可以从三个角度理解：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">角度</th>
+<th style="text-align: left;">Page 的作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">磁盘 I/O</td>
+<td style="text-align: left;">DBMS 以页为单位从磁盘读入、写回数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">Buffer Pool</td>
+<td style="text-align: left;">Buffer Pool 中的一个 frame 通常容纳一个
+page</td>
+</tr>
+<tr>
+<td style="text-align: left;">记录定位</td>
+<td style="text-align: left;">一条记录常用
+<code>(page id, slot number)</code> 定位</td>
+</tr>
+</tbody>
+</table>
+<p>因此，记录标识符 rid 通常写成：</p>
+<p><span class="math display">rid = (page id, slot number)</span></p>
+<p>例如 <code>rid = (17, 2)</code> 表示：这条记录在第 17 页的第 2 个
+slot 中。这里的 <code>page id</code>
+先定位到哪一页，<code>slot number</code> 再定位到页内哪条记录。</p>
+<h3 id="pageblocksector-的区别">5.2.1 Page、Block、Sector 的区别</h3>
+<p>Page 容易和 block、sector
+混在一起。它们的关键区别是所属层次不同：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">所属层次</th>
+<th style="text-align: left;">谁主要使用</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Sector</td>
+<td style="text-align: left;">磁盘硬件层</td>
+<td style="text-align: left;">硬盘硬件</td>
+<td style="text-align: left;">硬件最小物理存储单位</td>
+</tr>
+<tr>
+<td style="text-align: left;">Block</td>
+<td style="text-align: left;">磁盘/文件系统层</td>
+<td style="text-align: left;">文件系统、磁盘 I/O</td>
+<td
+style="text-align: left;">操作系统或存储设备一次分配、读写的连续空间单位</td>
+</tr>
+<tr>
+<td style="text-align: left;">Page</td>
+<td style="text-align: left;">DBMS 层</td>
+<td style="text-align: left;">数据库系统</td>
+<td style="text-align: left;">数据库组织文件、缓存数据和估算 I/O
+代价的单位</td>
+</tr>
+</tbody>
+</table>
+<p>一个常见关系是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">多个 sector 组成一个 block</span><br><span class="line">一个或多个 block 对应一个 DBMS page</span><br></pre></td></tr></table></figure>
+<p>例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sector = 512B 或 4KB</span><br><span class="line">block  = 4KB</span><br><span class="line">page   = 8KB</span><br></pre></td></tr></table></figure>
+<p>在这个例子中，一个 DBMS page 可能对应两个 4KB 的 block。实际系统里
+page 和 block
+的大小可能相同，也可能不同。课程中如果说“磁盘以块为单位读写”，偏底层硬件/文件系统；如果说“DBMS
+以页为单位组织数据”，偏数据库内核。</p>
+<h3 id="为什么-dbms-不按单条记录读写">5.2.2 为什么 DBMS
+不按单条记录读写</h3>
+<p>DBMS 使用 page 而不是单条记录作为 I/O
+单位，主要是因为磁盘访问的固定开销很高。一次随机读通常包含寻道、旋转延迟和传输时间，其中前两项与读取多少字节没有完全线性关系。既然已经付出了定位成本，一次多读一些相邻数据通常更划算。</p>
+<p>这也符合数据库访问的局部性：</p>
+<ul>
+<li>如果正在顺序扫描一个表，同一页里的下一条记录很可能马上会被访问。</li>
+<li>如果通过索引找到某条记录，页内附近记录也可能属于相近键值范围。</li>
+<li>如果一个 page 被放进 Buffer
+Pool，后续访问同一页记录时可以直接命中内存。</li>
+</ul>
+<p>所以可以这样记：</p>
+<p><strong>Page 是 DBMS 眼里的“一块数据”；Block
+是文件系统或存储设备眼里的“一块数据”；Sector
+是硬件眼里的“一小格数据”。</strong></p>
+<h2 id="缓冲区管理器与-buffer-pool">5.3 缓冲区管理器与 Buffer Pool</h2>
+<p>缓冲区管理器负责把磁盘上的页读入内存，并在需要时写回磁盘。它管理的一片内存区域称为
+<strong>Buffer Pool</strong>。Buffer Pool 中每个可容纳一页的单位称为
+<strong>Frame</strong>。</p>
+<p>如果表有 100 个页，而 Buffer Pool 只有 10 个 frame，那么扫描表时 DBMS
+不可能把所有页同时放入内存。它必须不断决定：</p>
+<ul>
+<li>请求的页是否已经在 Buffer Pool 中。</li>
+<li>如果不在，应该读入哪个 frame。</li>
+<li>如果 Buffer Pool 满了，应该替换哪个已有页。</li>
+<li>被替换的页如果修改过，是否需要先写回磁盘。</li>
+</ul>
+<p>决定哪些页被替换的策略称为 <strong>Replacement Policy</strong>。</p>
+<h2 id="frame-的关键状态pin_count-与-dirty">5.4 Frame
+的关键状态：pin_count 与 dirty</h2>
+<p>每个 frame 至少需要维护两个重要信息：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">字段</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>pin_count</code></td>
+<td style="text-align: left;">正在访问该 frame 的事务/操作个数</td>
+<td style="text-align: left;"><code>pin_count &gt; 0</code>
+表示该页正在被使用，不能被替换</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>dirty</code></td>
+<td style="text-align: left;">该 frame 中的数据是否被修改过</td>
+<td style="text-align: left;">dirty frame 被替换前必须写回磁盘</td>
+</tr>
+</tbody>
+</table>
+<p>请求处理流程可以概括为：</p>
+<ol type="1">
+<li>查看 Buffer Pool 中是否已有目标页。</li>
+<li>如果已有，增加该 frame 的 <code>pin_count</code>，返回 frame
+地址。</li>
+<li>如果没有，寻找一个 <code>pin_count=0</code> 的可替换 frame。</li>
+<li>如果该 frame 是 dirty，则先写回磁盘。</li>
+<li>将目标页从磁盘读入该 frame。</li>
+<li>设置元数据并返回 frame 地址。</li>
+</ol>
+<p>如果没有任何 <code>pin_count=0</code> 的 frame，说明所有 frame
+都正在被使用，此时新的请求只能等待。</p>
+<h2 id="buffer-replacement-policy">5.5 Buffer Replacement Policy</h2>
+<h3 id="lru">5.5.1 LRU</h3>
+<p><strong>LRU（Least Recently Used，最近最少使用）</strong>
+的思想是：最近使用过的页未来可能还会被使用，而最久没有被使用的页更适合淘汰。</p>
+<p>在 Buffer Pool 中，一个页只有在 <code>pin_count=0</code>
+时才成为可替换候选。LRU 会优先替换最早变成“可选择”的页。</p>
+<p>举个例子，假设 Buffer Pool 只有 3 个 frame，当前有 Page A、Page
+B、Page C，最近访问顺序是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">最久未使用                         最近使用</span><br><span class="line">A              -&gt; B              -&gt; C</span><br></pre></td></tr></table></figure>
+<p>如果现在要读入 Page D，Buffer Pool 已满，并且 A、B、C 的
+<code>pin_count</code> 都是 0，那么 LRU 会淘汰 Page
+A，因为它最长时间没有被访问：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">淘汰前：A -&gt; B -&gt; C</span><br><span class="line">淘汰后：B -&gt; C -&gt; D</span><br></pre></td></tr></table></figure>
+<p>如果之后又访问了 Page B，那么 Page B 会移动到“最近使用”的位置：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">访问 B 前：B -&gt; C -&gt; D</span><br><span class="line">访问 B 后：C -&gt; D -&gt; B</span><br></pre></td></tr></table></figure>
+<p>所以下一次需要替换时，LRU 会优先考虑 Page C。</p>
+<p>还要注意 <code>pin_count</code> 的限制。如果当前顺序是
+<code>A -&gt; B -&gt; C</code>，但 Page A 的
+<code>pin_count=1</code>，说明它正在被使用，即使 A
+最久未访问也不能淘汰。此时 LRU 会跳过 A，选择下一个最久未使用且
+<code>pin_count=0</code> 的页，例如 Page B。</p>
+<blockquote>
+<p>简单记忆：<strong>LRU 不是淘汰“最早放进 Buffer Pool
+的页”，而是淘汰“最长时间没有再被访问、且当前没有被 pin
+住的页”。</strong></p>
+</blockquote>
+<h3 id="clock">5.5.2 Clock</h3>
+<p>Clock 策略可以看作 LRU
+的近似实现，可以想象成一个“带第二次机会的缓存淘汰算法”。它把所有 frame
+排成一个环，并维护一个指针扫描这些 frame。每个 frame 有一个
+<code>referenced</code> 标志。</p>
+<p>规则很简单：</p>
+<ol type="1">
+<li>新访问过的页：referenced = true</li>
+<li>要找页替换时，指针开始转</li>
+<li>如果遇到 pin_count &gt; 0 的页：正在被用，跳过</li>
+<li>如果遇到 pin_count = 0 且 referenced = true 的页：给它一次机会，把
+referenced 改成 false，跳过</li>
+<li>如果遇到 pin_count = 0 且 referenced = false 的页：淘汰它</li>
+</ol>
+<p>举个小例子。假设 Buffer Pool 有 4 个 frame：</p>
+<table>
+<thead>
+<tr>
+<th>Frame</th>
+<th>Page</th>
+<th>pin_count</th>
+<th>referenced</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F1</td>
+<td>A</td>
+<td>0</td>
+<td>true</td>
+</tr>
+<tr>
+<td>F2</td>
+<td>B</td>
+<td>0</td>
+<td>true</td>
+</tr>
+<tr>
+<td>F3</td>
+<td>C</td>
+<td>1</td>
+<td>true</td>
+</tr>
+<tr>
+<td>F4</td>
+<td>D</td>
+<td>0</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<p>现在要读入新页 E，但 Buffer Pool 满了。Clock 指针从 F1 开始：</p>
+<ul>
+<li>F1：没被 pin，但 referenced=true，说明最近用过，改成
+false，跳过。</li>
+<li>F2：同理，改成 false，跳过。</li>
+<li>F3：pin_count=1，正在被使用，不能淘汰，跳过。</li>
+<li>F4：pin_count=0 且 referenced=false，淘汰 D，把 E 放进 F4。</li>
+</ul>
+<p>所以 Clock
+的核心直觉是：<strong>最近访问过的页先不给淘汰；如果转了一圈后它还没再被访问，就说明它可能没那么重要，可以淘汰。</strong></p>
+<p>Clock 的好处是实现成本低，不必像精确 LRU 那样维护复杂的访问顺序。</p>
+<p>DB2 和 SQL Server 使用 clock 或类似策略；Sybase、Informix、Oracle
+等系统使用 LRU 或类似策略。不同系统还可能支持单个或多个 Buffer
+Pool。</p>
+<h2 id="buffer-pool-与虚拟内存的区别">5.6 Buffer Pool
+与虚拟内存的区别</h2>
+<p>Buffer Pool
+看起来像操作系统虚拟内存中的页缓存，但数据库缓冲区管理有一个重要优势：<strong>DBMS
+更了解数据访问模式</strong>。</p>
+<p>数据库页访问不是随机发生的，它往往由上层查询计划决定。例如顺序扫描会连续访问大量页，索引查找会访问根节点、内部节点和叶子节点。DBMS
+可以利用这些信息做：</p>
+<ul>
+<li><strong>Prefetching（预取）</strong>：提前把将要访问的页读入 Buffer
+Pool。</li>
+<li><strong>Dirty frame
+强制写盘</strong>：在合适时机提前写回脏页，减少替换时等待。</li>
+</ul>
+<p>这也是为什么数据库系统通常自己管理 Buffer
+Pool，而不是完全依赖操作系统页缓存。</p>
+<h1 id="文件组织方式">6 文件组织方式</h1>
+<h2 id="文件页与记录标识符">6.1 文件、页与记录标识符</h2>
+<p>在 DBMS 中：</p>
+<ul>
+<li>一个文件包含多个页。</li>
+<li>每个页包含多条记录。</li>
+<li>每条记录有唯一标识符 <strong>rid（record id）</strong>。</li>
+</ul>
+<p>这里 rid 通常包括：</p>
+<p><span class="math display">rid = (page id, slot number)</span></p>
+<p>即 rid 对应的数据在【page id】页的第【slot number】个槽上。5.2
+节举了一个例子，这里不再赘述。不同数据库系统对 rid
+的具体定义可能略有不同，但核心作用相同：<strong>用一个稳定标识定位某条记录</strong>。</p>
+<p>牢记在心：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">数据库文件</span><br><span class="line">  -&gt; Page 1</span><br><span class="line">      -&gt; Record 1</span><br><span class="line">      -&gt; Record 2</span><br><span class="line">      -&gt; Record 3</span><br><span class="line">      -&gt; free space</span><br><span class="line">  -&gt; Page 2</span><br><span class="line">      -&gt; Record 4</span><br><span class="line">      -&gt; Record 5</span><br><span class="line">      -&gt; free space</span><br></pre></td></tr></table></figure>
+<h2 id="堆文件">6.2 堆文件</h2>
+<p><strong>堆文件（Heap File）</strong>
+是最简单的文件组织方式：记录在文件中无序存储。它通常支持：</p>
+<ul>
+<li>创建文件。</li>
+<li>删除文件。</li>
+<li>插入记录。</li>
+<li>删除记录。</li>
+</ul>
+<p>堆文件的关键问题不是“顺序”，而是<strong>怎样找到有空闲空间的页</strong>。尤其是变长记录场景中，不同页剩余空间大小不同，插入一条记录前必须找到足够大的空闲区域。</p>
+<p><strong>这里的“堆文件”和数据结构中的“大根堆/小根堆”不是同一个概念。</strong>数据结构里的堆强调堆序性质，例如大根堆要求父节点不小于子节点，小根堆要求父节点不大于子节点，常用于优先队列和堆排序。数据库里的堆文件反而强调<strong>无序存放</strong>：记录不按某个
+key 排序，只是被放到有空间的页中。</p>
+<p>例如学生表中有几条记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">S1 Wang 20</span><br><span class="line">S2 Liu  21</span><br><span class="line">S3 Chen 22</span><br><span class="line">S4 Ma   19</span><br></pre></td></tr></table></figure>
+<p>在堆文件中，它们可能被放成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Page 1</span><br><span class="line">  slot 1: S2 Liu 21</span><br><span class="line">  slot 2: S4 Ma 19</span><br><span class="line"></span><br><span class="line">Page 2</span><br><span class="line">  slot 1: S1 Wang 20</span><br><span class="line">  slot 2: S3 Chen 22</span><br></pre></td></tr></table></figure>
+<p>这里既没有按照学号排序，也没有按照年龄排序。<code>S1</code>
+不一定在最前面，年龄最大或最小的记录也不会自动处在某个特殊位置。所以可以把数据库中的
+heap
+理解成<strong>“随便堆在一起的一组记录”</strong>。正因为没有顺序结构，堆文件<strong>插入很方便</strong>，但如果没有索引，按条件查找通常只能扫描页。</p>
+<p>堆文件有两种实现方式：页链表和页字典。（其实更准确地说应该是管理空闲页的方式）</p>
+<h3 id="页链表">6.2.1 页链表</h3>
+<p>页链表是一种管理堆文件中数据页的简单方法。它的核心思想是：<strong>不要让
+DBMS
+每次插入记录时都从头扫描整个文件，而是在文件头维护一些指针，直接找到可能有空闲空间的页</strong>。</p>
+<p>一种常见做法是让文件头页（header page）记录两条链表的起点：</p>
+<ul>
+<li>含空闲空间的页链表。</li>
+<li>不含空闲空间的页链表。</li>
+</ul>
+<p>可以画成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Header Page</span><br><span class="line">  free_page_list -&gt; Page 3 -&gt; Page 8 -&gt; Page 10</span><br><span class="line">  full_page_list -&gt; Page 1 -&gt; Page 2 -&gt; Page 5 -&gt; Page 7</span><br></pre></td></tr></table></figure>
+<p>这里的含义是：</p>
+<ul>
+<li><code>free_page_list</code> 指向仍有空闲空间的数据页。</li>
+<li><code>full_page_list</code>
+指向已经没有空闲空间，或者空闲空间不足以继续插入常规记录的数据页。</li>
+<li>每个数据页内部除了保存记录，还会保存“下一页”的指针，从而把多个页串成链表。</li>
+</ul>
+<h4 id="插入操作">6.2.1.1 插入操作</h4>
+<p>插入记录时，DBMS 可以先看 <code>free_page_list</code>：</p>
+<ol type="1">
+<li>从文件头找到含空闲空间链表的第一个页，比如 Page 3。</li>
+<li>检查 Page 3 是否能放下新记录。</li>
+<li>如果能放下，就把记录插入 Page 3 的某个空闲 slot。</li>
+<li>插入后如果 Page 3 仍有空闲空间，它继续留在
+<code>free_page_list</code>。</li>
+<li>如果 Page 3 被插满，就把它从 <code>free_page_list</code> 移到
+<code>full_page_list</code>。</li>
+</ol>
+<p>举个例子，假设每页最多放 3 条定长记录。当前堆文件是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Header Page</span><br><span class="line">  free_page_list -&gt; Page 2 -&gt; Page 4</span><br><span class="line">  full_page_list -&gt; Page 1 -&gt; Page 3</span><br><span class="line"></span><br><span class="line">Page 1: [S1, S2, S3]        已满</span><br><span class="line">Page 2: [S4, S5, 空]        有空闲 slot</span><br><span class="line">Page 3: [S6, S7, S8]        已满</span><br><span class="line">Page 4: [S9, 空, 空]        有空闲 slot</span><br></pre></td></tr></table></figure>
+<p>现在插入新记录 <code>S10</code>，DBMS 不需要从 Page 1
+开始逐页找空位，而是直接通过 <code>free_page_list</code> 找到 Page
+2：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Page 2: [S4, S5, S10]</span><br></pre></td></tr></table></figure>
+<p>插入后 Page 2 满了，所以链表要调整为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Header Page</span><br><span class="line">  free_page_list -&gt; Page 4</span><br><span class="line">  full_page_list -&gt; Page 2 -&gt; Page 1 -&gt; Page 3</span><br></pre></td></tr></table></figure>
+<h4 id="删除操作">6.2.1.2 删除操作</h4>
+<p>删除记录时，情况反过来。如果从一个满页中删除一条记录，这个页又重新有了空闲空间，就应该把它从
+<code>full_page_list</code> 移回 <code>free_page_list</code>。例如删除
+Page 1 中的 <code>S2</code> 后：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Page 1: [S1, 空, S3]</span><br></pre></td></tr></table></figure>
+<p>Page 1 不再是满页，因此可以进入含空闲空间链表：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Header Page</span><br><span class="line">  free_page_list -&gt; Page 1 -&gt; Page 4</span><br><span class="line">  full_page_list -&gt; Page 2 -&gt; Page 3</span><br></pre></td></tr></table></figure>
+<h4 id="优缺点">6.2.1.3 优缺点</h4>
+<p>页链表的优点是实现简单，插入时能较快找到“可能有空位”的页。但它的缺点也很明显：<strong>链表通常只告诉我们某页有没有空闲空间，却不一定告诉我们空闲空间有多大</strong>。对于定长记录，这个问题不严重，因为只要有一个空
+slot 就能插入；但对于变长记录就麻烦了。</p>
+<p>例如 Page 3 只剩 20B 空间，Page 8 剩 200B 空间，它们都在
+<code>free_page_list</code> 中。如果要插入一条 150B 的变长记录，DBMS
+可能先访问 Page 3，发现放不下，再继续沿链表找 Page 8。这会增加额外
+I/O。因此，对于变长记录，后面的<strong>页字典</strong>通常更合适，因为它会记录每个页的空闲空间大小。</p>
+<h3 id="页字典">6.2.2 页字典</h3>
+<p>另一种管理堆文件空闲空间的方法是 <strong>页字典（page
+directory）</strong>。它和页链表的目标相同：都是为了让 DBMS
+在插入记录时尽快找到合适的数据页。但页字典不是简单地把页串成链表，而是用一个目录结构记录每个数据页的状态，尤其是<strong>每个页还剩多少空闲空间</strong>。</p>
+<p>可以把页字典理解成一本“页目录”：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Header Page / Directory Page</span><br><span class="line">  Page 1: free space = 0B</span><br><span class="line">  Page 2: free space = 120B</span><br><span class="line">  Page 3: free space = 20B</span><br><span class="line">  Page 4: free space = 300B</span><br><span class="line">  Page 5: free space = 80B</span><br></pre></td></tr></table></figure>
+<p>数据页本身仍然存放记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Page 1: [S1, S2, S3]             free = 0B</span><br><span class="line">Page 2: [S4, S5, ...]            free = 120B</span><br><span class="line">Page 3: [S6, ...]                free = 20B</span><br><span class="line">Page 4: [S7, ...]                free = 300B</span><br><span class="line">Page 5: [S8, S9, ...]            free = 80B</span><br></pre></td></tr></table></figure>
+<p>页字典中的每一项通常至少包含：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">字段</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Page id</td>
+<td style="text-align: left;">数据页编号</td>
+</tr>
+<tr>
+<td style="text-align: left;">Free space</td>
+<td style="text-align: left;">该页剩余空闲空间大小</td>
+</tr>
+<tr>
+<td style="text-align: left;">Page pointer</td>
+<td style="text-align: left;">指向该数据页的位置或偏移</td>
+</tr>
+</tbody>
+</table>
+<h4 id="插入操作-1">6.2.2.1 插入操作</h4>
+<p>插入记录时，DBMS 可以先读页字典，而不是逐个访问数据页：</p>
+<ol type="1">
+<li>假设要插入一条长度为 100B 的记录。</li>
+<li>DBMS 查看页字典，发现 Page 2 剩 120B，Page 4 剩 300B。</li>
+<li>Page 2 和 Page 4 都能放下记录，可以选择其中一个，例如 Page 2。</li>
+<li>将记录插入 Page 2。</li>
+<li>更新页字典中 Page 2 的空闲空间信息，例如从 120B 改成 20B。</li>
+</ol>
+<p>插入前：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Directory</span><br><span class="line">  Page 1: free = 0B</span><br><span class="line">  Page 2: free = 120B</span><br><span class="line">  Page 3: free = 20B</span><br><span class="line">  Page 4: free = 300B</span><br></pre></td></tr></table></figure>
+<p>插入一条 100B 记录到 Page 2 后：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Directory</span><br><span class="line">  Page 1: free = 0B</span><br><span class="line">  Page 2: free = 20B</span><br><span class="line">  Page 3: free = 20B</span><br><span class="line">  Page 4: free = 300B</span><br></pre></td></tr></table></figure>
+<p>如果要插入的是一条 200B 的变长记录，DBMS 就不会选择 Page 2，因为 Page
+2 只有 120B。它可以直接根据字典选择 Page 4：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">要插入记录大小 = 200B</span><br><span class="line"></span><br><span class="line">Page 2: free = 120B   不够</span><br><span class="line">Page 3: free = 20B    不够</span><br><span class="line">Page 4: free = 300B   可以放</span><br></pre></td></tr></table></figure>
+<p>这就是页字典比页链表更适合变长记录的原因。页链表通常只能告诉
+DBMS“这个页有空闲空间”，但不能直接说明“空间够不够”。页字典则把空闲空间大小记录下来，DBMS
+可以更精确地挑选页面。</p>
+<h4 id="删除操作-1">6.2.2.2 删除操作</h4>
+<p>删除记录时，页字典也要同步更新。假设从 Page 1 删除一条 90B
+的记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">删除前：+</span><br><span class="line">Directory</span><br><span class="line">  Page 1: free = 0B</span><br><span class="line"></span><br><span class="line">删除后：</span><br><span class="line">Directory</span><br><span class="line">  Page 1: free = 90B</span><br></pre></td></tr></table></figure>
+<p>这样下一次插入记录时，Page 1 又会被视为候选页。</p>
+<h4 id="优缺点-1">6.2.2.3 优缺点</h4>
+<p>页字典的优点是：</p>
+<ul>
+<li>字典相对数据部分较小，通常读入字典的代价比扫描大量数据页低。</li>
+<li>能记录每个页的空闲空间大小，因此能更精确地选择有足够空间的页。</li>
+<li>对变长记录更友好，减少“访问了某页才发现放不下”的无效 I/O。</li>
+</ul>
+<p>页字典的缺点是：</p>
+<ul>
+<li>每次插入、删除或记录长度变化后，都要维护字典信息。</li>
+<li>如果文件非常大，字典本身也可能占多个页，需要进一步管理目录页。</li>
+<li>字典记录的是“页级别”的空闲空间，不一定能完全反映页内碎片是否连续，因此有时还要结合页内部的
+slot 字典或空闲空间整理。</li>
+</ul>
+<blockquote>
+<p>简单记忆：<strong>页链表像是只说“哪些页可能有空位”；页字典像是额外写清楚“每页具体还剩多少空间”。</strong></p>
+</blockquote>
+<h2 id="顺序文件">6.3 顺序文件</h2>
+<p><strong>顺序文件（Sorted/Sequential File）</strong>
+是另一种文件组织方式。它和堆文件最大的区别是：堆文件中的记录无序存放，而顺序文件会根据某个
+<strong>查找键（search key）</strong> 的值，把记录按顺序组织起来。</p>
+<p>这里的 search key
+不一定是主键，它只是文件用来排序或组织记录的属性。例如学生表可以按学号
+<code>sid</code> 排序，也可以按姓名 <code>name</code> 排序，还可以按年龄
+<code>age</code> 排序。选择哪个属性作为 search
+key，取决于系统希望优化哪类查询。</p>
+<p>假设学生记录按学号 <code>sid</code> 排序：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">S1 Wang 20</span><br><span class="line">S2 Liu  21</span><br><span class="line">S3 Chen 22</span><br><span class="line">S4 Ma   19</span><br><span class="line">S5 Zhou 23</span><br></pre></td></tr></table></figure>
+<p>这些记录在文件中的逻辑顺序就是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S1 -&gt; S2 -&gt; S3 -&gt; S4 -&gt; S5</span><br></pre></td></tr></table></figure>
+<p>如果每页最多放 2 条记录，可能组织成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Page 1</span><br><span class="line">  slot 1: S1 Wang 20</span><br><span class="line">  slot 2: S2 Liu  21</span><br><span class="line">  next -&gt; Page 2</span><br><span class="line"></span><br><span class="line">Page 2</span><br><span class="line">  slot 1: S3 Chen 22</span><br><span class="line">  slot 2: S4 Ma   19</span><br><span class="line">  next -&gt; Page 3</span><br><span class="line"></span><br><span class="line">Page 3</span><br><span class="line">  slot 1: S5 Zhou 23</span><br><span class="line">  slot 2: 空</span><br><span class="line">  next -&gt; null</span><br></pre></td></tr></table></figure>
+<p>这里的 <code>next</code>
+表示页或记录之间可以用指针维持顺序。这里说“每个记录有一个指针，按键值大小创建链表”，意思就是：即使物理页不一定严格连续，DBMS
+也能通过指针按 search key 的顺序访问下一条记录。</p>
+<h3 id="等值查询为什么更快">6.3.1 等值查询为什么更快</h3>
+<p>如果查询条件正好用的是 search key，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> sid <span class="operator">=</span> <span class="string">&#x27;S3&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>顺序文件可以利用“按 <code>sid</code>
+有序”这个性质查找。直觉上类似在有序数组中查找元素：不需要从头到尾扫描所有记录，而是可以通过二分查找或类似方法先定位到目标页，再在页内找目标记录。</p>
+<p>例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Page 1: S1, S2</span><br><span class="line">Page 2: S3, S4</span><br><span class="line">Page 3: S5</span><br></pre></td></tr></table></figure>
+<p>要找 <code>S3</code>，DBMS
+可以较快判断目标应该在中间附近，而不必像堆文件那样从 Page 1
+一路扫到最后。</p>
+<p>但注意：这个优势只对<strong>排序属性</strong>明显。如果文件按
+<code>sid</code> 排序，而查询是：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> age <span class="operator">=</span> <span class="number">20</span>;</span><br></pre></td></tr></table></figure>
+<p>那么 <code>age</code> 不是排序键，顺序文件就不能直接利用
+<code>sid</code> 的顺序，仍可能需要扫描很多页。</p>
+<h3 id="范围查询为什么更适合顺序文件">6.3.2
+范围查询为什么更适合顺序文件</h3>
+<p>顺序文件特别适合范围查询，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student</span><br><span class="line"><span class="keyword">WHERE</span> sid <span class="keyword">BETWEEN</span> <span class="string">&#x27;S2&#x27;</span> <span class="keyword">AND</span> <span class="string">&#x27;S4&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>因为记录按 <code>sid</code> 排序，DBMS 可以先定位到
+<code>S2</code>，然后顺着文件向后读，直到超过 <code>S4</code> 为止：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">S1 -&gt; S2 -&gt; S3 -&gt; S4 -&gt; S5</span><br><span class="line">      ^---------^</span><br><span class="line">       需要读取的范围</span><br></pre></td></tr></table></figure>
+<p>这比堆文件高效得多。堆文件中记录无序，<code>S2</code>、<code>S3</code>、<code>S4</code>
+可能分散在任意页里。即使找到了 <code>S2</code>，也不能保证后面就是
+<code>S3</code> 和 <code>S4</code>，所以通常还要扫描整个文件。</p>
+<p>顺序文件的优势是：</p>
+<ul>
+<li>按排序属性做等值查找或范围查找时效率较高。</li>
+<li>适合经常按某个键顺序扫描的数据。</li>
+</ul>
+<h3 id="插入为什么麻烦">6.3.3 插入为什么麻烦</h3>
+<p>顺序文件的代价主要体现在插入和删除。因为记录必须保持 search key
+顺序，不能像堆文件那样随便找个有空位的页放进去。</p>
+<p>还是以上面的文件为例：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Page 1: [S1, S2]</span><br><span class="line">Page 2: [S3, S4]</span><br><span class="line">Page 3: [S5, 空]</span><br></pre></td></tr></table></figure>
+<p>现在插入一条新记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S2.5 Tang 20</span><br></pre></td></tr></table></figure>
+<p>它的正确位置应该在 <code>S2</code> 和 <code>S3</code> 之间：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S1 -&gt; S2 -&gt; S2.5 -&gt; S3 -&gt; S4 -&gt; S5</span><br></pre></td></tr></table></figure>
+<p>如果 Page 1 已经满了，就不能直接塞进去。DBMS 可能需要：</p>
+<ul>
+<li>插入时要找到正确位置。</li>
+<li>需要申请空闲空间。</li>
+<li>需要维护链表或顺序结构。</li>
+<li>如果要求物理连续存放，插入删除可能引发大量数据移动。</li>
+</ul>
+<p>一种可能的结果是申请新页或使用溢出页（overflow page）：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Page 1: [S1, S2]</span><br><span class="line">Overflow Page: [S2.5]</span><br><span class="line">Page 2: [S3, S4]</span><br><span class="line">Page 3: [S5, 空]</span><br><span class="line"></span><br><span class="line">逻辑顺序：</span><br><span class="line">S1 -&gt; S2 -&gt; S2.5 -&gt; S3 -&gt; S4 -&gt; S5</span><br></pre></td></tr></table></figure>
+<p>这样虽然保持了逻辑顺序，但文件结构变复杂了。如果溢出页越来越多，顺序扫描时就会频繁跳转，性能会下降。因此实际系统可能需要定期重组文件，把溢出页重新整理回主数据页。</p>
+<h3 id="删除为什么也要维护顺序结构">6.3.4
+删除为什么也要维护顺序结构</h3>
+<p>删除记录看起来比插入简单，因为删除不会破坏顺序。但删除后会产生空洞，也可能需要维护指针。</p>
+<p>例如删除 <code>S3</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">删除前：</span><br><span class="line">S1 -&gt; S2 -&gt; S3 -&gt; S4 -&gt; S5</span><br><span class="line"></span><br><span class="line">删除后：</span><br><span class="line">S1 -&gt; S2 -&gt; S4 -&gt; S5</span><br></pre></td></tr></table></figure>
+<p>如果记录之间有指针，那么 <code>S2</code> 的 next 指针需要从
+<code>S3</code> 改成 <code>S4</code>。如果页内留下空
+slot，还要记录这个空闲位置，方便后续插入使用。如果系统要求物理空间紧凑，还可能移动记录，但这样又可能影响
+rid 的稳定性。</p>
+<p>所以顺序文件的典型 trade-off 是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">表现</th>
+<th style="text-align: left;">原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Scan</td>
+<td style="text-align: left;">好</td>
+<td style="text-align: left;">数据按顺序组织，适合连续读取</td>
+</tr>
+<tr>
+<td style="text-align: left;">Equality Search</td>
+<td style="text-align: left;">对 search key 好</td>
+<td style="text-align: left;">可以利用有序性快速定位</td>
+</tr>
+<tr>
+<td style="text-align: left;">Range Search</td>
+<td style="text-align: left;">很好</td>
+<td style="text-align: left;">定位起点后顺序向后读即可</td>
+</tr>
+<tr>
+<td style="text-align: left;">Insert</td>
+<td style="text-align: left;">较差</td>
+<td style="text-align: left;">必须找到正确位置并维护顺序</td>
+</tr>
+<tr>
+<td style="text-align: left;">Delete</td>
+<td style="text-align: left;">较差</td>
+<td style="text-align: left;">要维护指针、空洞或物理紧凑性</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>简单记忆：<strong>顺序文件用“维护有序”的成本，换取按 search key
+查询，尤其是范围查询的效率。</strong></p>
+</blockquote>
+<h2 id="聚集文件">6.4 聚集文件</h2>
+<p><strong>聚集文件（Clustered File）</strong>
+是一种把多个关系中“经常一起访问”的记录放得很近的文件组织方式。这里的定义是：<strong>一个文件中存储多个关系中的元组，并根据某个键属性进行数据组织</strong>。</p>
+<p>它的核心思想不是“单个表内部按某个属性排序”，而是：<strong>把不同表中有联系的记录放在同一个文件里，甚至放在相邻
+page 或同一个 page 中</strong>，这样做连接查询时可以减少磁盘 I/O。</p>
+<h3 id="从学生表和选课表理解聚集文件">6.4.1
+从学生表和选课表理解聚集文件</h3>
+<p>假设有两个关系：</p>
+<p>学生表 <code>S</code>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">name</th>
+<th style="text-align: left;">age</th>
+<th style="text-align: left;">gender</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">S1</td>
+<td style="text-align: left;">Wang</td>
+<td style="text-align: left;">20</td>
+<td style="text-align: left;">M</td>
+</tr>
+<tr>
+<td style="text-align: left;">S2</td>
+<td style="text-align: left;">Liu</td>
+<td style="text-align: left;">21</td>
+<td style="text-align: left;">F</td>
+</tr>
+<tr>
+<td style="text-align: left;">S3</td>
+<td style="text-align: left;">Chen</td>
+<td style="text-align: left;">22</td>
+<td style="text-align: left;">M</td>
+</tr>
+</tbody>
+</table>
+<p>选课表 <code>SC</code>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">sid</th>
+<th style="text-align: left;">cid</th>
+<th style="text-align: left;">grade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">S1</td>
+<td style="text-align: left;">C1</td>
+<td style="text-align: left;">80</td>
+</tr>
+<tr>
+<td style="text-align: left;">S1</td>
+<td style="text-align: left;">C2</td>
+<td style="text-align: left;">70</td>
+</tr>
+<tr>
+<td style="text-align: left;">S3</td>
+<td style="text-align: left;">C1</td>
+<td style="text-align: left;">90</td>
+</tr>
+<tr>
+<td style="text-align: left;">S3</td>
+<td style="text-align: left;">C2</td>
+<td style="text-align: left;">85</td>
+</tr>
+<tr>
+<td style="text-align: left;">S3</td>
+<td style="text-align: left;">C3</td>
+<td style="text-align: left;">95</td>
+</tr>
+</tbody>
+</table>
+<p>如果不使用聚集文件，两个关系通常分别存放：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">S 文件：</span><br><span class="line">Page S1: [S1 Wang 20 M, S2 Liu 21 F]</span><br><span class="line">Page S2: [S3 Chen 22 M]</span><br><span class="line"></span><br><span class="line">SC 文件：</span><br><span class="line">Page SC1: [S1 C1 80, S1 C2 70]</span><br><span class="line">Page SC2: [S3 C1 90, S3 C2 85]</span><br><span class="line">Page SC3: [S3 C3 95]</span><br></pre></td></tr></table></figure>
+<p>现在如果查询：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line"><span class="keyword">FROM</span> S, SC</span><br><span class="line"><span class="keyword">WHERE</span> S.sid <span class="operator">=</span> SC.sid</span><br><span class="line">  <span class="keyword">AND</span> S.sid <span class="operator">=</span> <span class="string">&#x27;S3&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>DBMS 需要先在 <code>S</code> 文件里找到
+<code>S3 Chen 22 M</code>，再去 <code>SC</code> 文件里找所有
+<code>sid='S3'</code> 的选课记录。这涉及两个文件，可能访问多个
+page。</p>
+<p>聚集文件的做法是，把同一个学生的基本信息和他的选课记录组织在一起：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Clustered File, clustered by sid</span><br><span class="line"></span><br><span class="line">Group S1:</span><br><span class="line">  S  record:  S1 Wang 20 M</span><br><span class="line">  SC record: S1 C1 80</span><br><span class="line">  SC record: S1 C2 70</span><br><span class="line"></span><br><span class="line">Group S2:</span><br><span class="line">  S  record:  S2 Liu 21 F</span><br><span class="line"></span><br><span class="line">Group S3:</span><br><span class="line">  S  record:  S3 Chen 22 M</span><br><span class="line">  SC record: S3 C1 90</span><br><span class="line">  SC record: S3 C2 85</span><br><span class="line">  SC record: S3 C3 95</span><br></pre></td></tr></table></figure>
+<p>如果按 page 来想，可能是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Page 1</span><br><span class="line">  S1 Wang 20 M</span><br><span class="line">  S1 C1 80</span><br><span class="line">  S1 C2 70</span><br><span class="line">  S2 Liu 21 F</span><br><span class="line"></span><br><span class="line">Page 2</span><br><span class="line">  S3 Chen 22 M</span><br><span class="line">  S3 C1 90</span><br><span class="line">  S3 C2 85</span><br><span class="line">  S3 C3 95</span><br></pre></td></tr></table></figure>
+<p>这样查询 <code>S3</code> 及其所有选课记录时，DBMS 读到 Page 2
+后，很可能同时拿到学生基本信息和相关选课信息，减少了额外访问其他文件或其他页的次数。</p>
+<h3 id="聚集文件优化的是哪类查询">6.4.2 聚集文件优化的是哪类查询</h3>
+<p>聚集文件特别适合频繁做连接查询、且连接条件稳定的场景。例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> S.name, SC.cid, SC.grade</span><br><span class="line"><span class="keyword">FROM</span> S <span class="keyword">JOIN</span> SC <span class="keyword">ON</span> S.sid <span class="operator">=</span> SC.sid</span><br><span class="line"><span class="keyword">WHERE</span> S.sid <span class="operator">=</span> <span class="string">&#x27;S3&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>这个查询的访问模式是：找到一个学生，再找他的所有选课记录。因为
+<code>S</code> 和 <code>SC</code> 经常通过 <code>sid</code>
+一起访问，所以把它们按 <code>sid</code> 聚集在一起是有意义的。</p>
+<p>再比如，如果应用经常查询：</p>
+<ul>
+<li>某个订单及其所有订单明细。</li>
+<li>某个部门及其所有员工。</li>
+<li>某个帖子及其所有评论。</li>
+</ul>
+<p>那么也可以考虑把主表记录和从表记录按共同 key 聚集存放。</p>
+<h3 id="聚集文件和顺序文件的区别">6.4.3 聚集文件和顺序文件的区别</h3>
+<p>聚集文件容易和顺序文件混淆。它们都可能“按某个 key
+组织”，但重点不同：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">文件组织</th>
+<th style="text-align: left;">重点</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">顺序文件</td>
+<td style="text-align: left;">一个关系内部按 search key 有序</td>
+<td style="text-align: left;">学生表 <code>S</code> 内部按
+<code>sid</code> 排序</td>
+</tr>
+<tr>
+<td style="text-align: left;">聚集文件</td>
+<td style="text-align: left;">多个关系中相关元组放在一起</td>
+<td style="text-align: left;"><code>S</code> 中的 <code>S3</code> 和
+<code>SC</code> 中所有 <code>S3</code> 选课记录放在附近</td>
+</tr>
+</tbody>
+</table>
+<p>也就是说，顺序文件主要优化<strong>单表按键查找和范围查询</strong>；聚集文件主要优化<strong>多个关系之间的连接访问</strong>。</p>
+<h3 id="聚集文件的优点">6.4.4 聚集文件的优点</h3>
+<p>聚集文件的主要优点是减少 I/O。因为相关记录存放得近，DBMS 一次读入一个
+page 时，可能同时读到多个查询需要的记录。</p>
+<p>以上面的 <code>S</code> 和 <code>SC</code> 为例：</p>
+<ul>
+<li>非聚集存放：可能先读 <code>S</code> 文件的 page，再读
+<code>SC</code> 文件的多个 page。</li>
+<li>聚集存放：读到包含 <code>S3</code> 的 page 时，附近就有
+<code>S3</code> 的选课记录。</li>
+</ul>
+<p>这对连接查询很有帮助，尤其是“一对多”关系中经常查询“一的一方 +
+多的一方”的全部相关记录。</p>
+<h3 id="聚集文件的缺点">6.4.5 聚集文件的缺点</h3>
+<p>聚集文件的缺点是维护复杂，而且高度依赖访问模式。</p>
+<ul>
+<li>插入、删除和更新更复杂。</li>
+<li>如果访问模式变化，聚集方式可能不再适合。</li>
+<li>一个文件中混合多个关系，管理难度更高。</li>
+</ul>
+<p>具体来说：</p>
+<ol type="1">
+<li><strong>插入复杂</strong>：如果给 <code>S3</code> 新增一条选课记录
+<code>S3 C4 88</code>，最好放在 <code>S3</code> 这一组附近。但如果 Page
+2 已经满了，就可能需要溢出页或移动记录。</li>
+<li><strong>删除复杂</strong>：删除某个学生时，可能还要处理和他聚集在一起的多条选课记录。</li>
+<li><strong>更新复杂</strong>：如果聚集 key 改变，例如某条记录的
+<code>sid</code> 改了，它可能需要移动到另一个聚集组。</li>
+<li><strong>不适合所有查询</strong>：如果查询只扫描整个 <code>SC</code>
+表，聚集文件中穿插着 <code>S</code> 记录，反而可能增加处理复杂度。</li>
+</ol>
+<p>所以聚集文件的 trade-off 是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方面</th>
+<th style="text-align: left;">表现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">连接查询</td>
+<td style="text-align: left;">通常更快，相关记录离得近</td>
+</tr>
+<tr>
+<td style="text-align: left;">单独扫描某个关系</td>
+<td style="text-align: left;">可能不如单独文件清晰</td>
+</tr>
+<tr>
+<td style="text-align: left;">插入/删除/更新</td>
+<td style="text-align: left;">更复杂，需要维护聚集关系</td>
+</tr>
+<tr>
+<td style="text-align: left;">适用性</td>
+<td style="text-align: left;">依赖
+workload，如果应用访问模式变化，收益会下降</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>简单记忆：<strong>聚集文件就是把“经常一起查”的不同表记录放近一点，用存储上的接近换取连接查询时更少的
+I/O。</strong></p>
+</blockquote>
+<h2 id="哈希文件">6.5 哈希文件</h2>
+<p><strong>哈希文件（Hashed File）</strong> 是一种按 Hash
+函数组织记录的文件方式。它的核心思想是：<strong>对 search key 做 Hash
+运算，根据运算结果直接决定记录应该放到哪个 bucket 中</strong>。</p>
+<p><span class="math display">bucket = <em>h</em>(search key)</span></p>
+<p>这里的 <strong>bucket（桶）</strong> 可以理解成一组数据页。一个
+bucket 可能只有一个 page，也可能包含多个 page。如果某个 bucket
+放不下，还可能接溢出页（overflow page）。</p>
+<h3 id="用学生表理解哈希文件">6.5.1 用学生表理解哈希文件</h3>
+<p>假设学生表按学号 <code>sid</code> 作为 search key，并使用一个简单的
+Hash 函数：</p>
+<p><span
+class="math display"><em>h</em>(sid) = sid最后一位数字 mod  4</span></p>
+<p>如果有 4 个 bucket：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Bucket 0</span><br><span class="line">Bucket 1</span><br><span class="line">Bucket 2</span><br><span class="line">Bucket 3</span><br></pre></td></tr></table></figure>
+<p>那么记录可能被分配为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">S1 -&gt; 1 mod 4 = Bucket 1</span><br><span class="line">S2 -&gt; 2 mod 4 = Bucket 2</span><br><span class="line">S3 -&gt; 3 mod 4 = Bucket 3</span><br><span class="line">S4 -&gt; 0 mod 4 = Bucket 0</span><br><span class="line">S5 -&gt; 1 mod 4 = Bucket 1</span><br><span class="line">S6 -&gt; 2 mod 4 = Bucket 2</span><br></pre></td></tr></table></figure>
+<p>对应的文件结构可以想成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Bucket 0: [S4 Ma 19]</span><br><span class="line">Bucket 1: [S1 Wang 20, S5 Zhou 23]</span><br><span class="line">Bucket 2: [S2 Liu 21, S6 Tang 20]</span><br><span class="line">Bucket 3: [S3 Chen 22]</span><br></pre></td></tr></table></figure>
+<h3 id="等值查询为什么快">6.5.2 等值查询为什么快</h3>
+<p>哈希文件最适合等值查询，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student <span class="keyword">WHERE</span> sid <span class="operator">=</span> <span class="string">&#x27;S6&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>DBMS 可以直接计算：</p>
+<p><span
+class="math display"><em>h</em>(<em>S</em>6) = 6 mod  4 = 2</span></p>
+<p>然后只访问 Bucket 2：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Bucket 2: [S2 Liu 21, S6 Tang 20]</span><br></pre></td></tr></table></figure>
+<p>接着在 Bucket 2 内部比较记录，找到 <code>S6</code>。如果 Hash
+函数分布均匀、bucket 不太大，那么 DBMS
+不需要扫描整个文件。这就是哈希文件等值查询快的原因。</p>
+<p>和堆文件对比：</p>
+<ul>
+<li>堆文件：不知道 <code>S6</code> 在哪，可能要扫描很多 page。</li>
+<li>哈希文件：先算 <span
+class="math inline"><em>h</em>(<em>S</em>6)</span>，直接跳到对应
+bucket。</li>
+</ul>
+<h3 id="插入如何进行">6.5.3 插入如何进行</h3>
+<p>插入记录也很直接。假设要插入：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S9 Xu 22</span><br></pre></td></tr></table></figure>
+<p>DBMS 先计算：</p>
+<p><span
+class="math display"><em>h</em>(<em>S</em>9) = 9 mod  4 = 1</span></p>
+<p>所以 <code>S9</code> 应该插入 Bucket 1：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">插入前：</span><br><span class="line">Bucket 1: [S1 Wang 20, S5 Zhou 23]</span><br><span class="line"></span><br><span class="line">插入后：</span><br><span class="line">Bucket 1: [S1 Wang 20, S5 Zhou 23, S9 Xu 22]</span><br></pre></td></tr></table></figure>
+<p>只要 Bucket 1
+还有空间，插入就比较高效。它不需要像顺序文件那样维护全局有序关系。</p>
+<h3 id="溢出问题">6.5.4 溢出问题</h3>
+<p>哈希文件必须处理 <strong>overflow（溢出）</strong>。如果很多记录经过
+Hash 后落到同一个 bucket，而这个 bucket 的主 page
+已经满了，就需要额外的溢出页。</p>
+<p>例如假设 Bucket 1 的主 page 最多只能放 3 条记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Bucket 1 main page:</span><br><span class="line">  [S1 Wang 20, S5 Zhou 23, S9 Xu 22]</span><br></pre></td></tr></table></figure>
+<p>现在再插入：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S13 Zhao 21</span><br></pre></td></tr></table></figure>
+<p>因为：</p>
+<p><span
+class="math display"><em>h</em>(<em>S</em>13) = 13 mod  4 = 1</span></p>
+<p>它也应该进入 Bucket 1，但主 page 已满，只能使用溢出页：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Bucket 1 main page:</span><br><span class="line">  [S1 Wang 20, S5 Zhou 23, S9 Xu 22]</span><br><span class="line">  overflow -&gt; Bucket 1 overflow page:</span><br><span class="line">                [S13 Zhao 21]</span><br></pre></td></tr></table></figure>
+<p>如果溢出页越来越多，查询 Bucket 1 时就不再只是读一个 page，而是要沿着
+overflow chain 继续查找：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Bucket 1 main page -&gt; overflow page 1 -&gt; overflow page 2 -&gt; ...</span><br></pre></td></tr></table></figure>
+<p>这样会削弱哈希文件的优势。因此好的 Hash 函数、合适的 bucket
+数量、动态扩展机制都很重要。</p>
+<h3 id="为什么范围查询不适合哈希文件">6.5.5
+为什么范围查询不适合哈希文件</h3>
+<p>哈希文件不适合范围查询，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> Student</span><br><span class="line"><span class="keyword">WHERE</span> sid <span class="keyword">BETWEEN</span> <span class="string">&#x27;S2&#x27;</span> <span class="keyword">AND</span> <span class="string">&#x27;S5&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>我们想要的是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S2, S3, S4, S5</span><br></pre></td></tr></table></figure>
+<p>但它们经过 Hash 后可能分散在不同 bucket：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">S2 -&gt; Bucket 2</span><br><span class="line">S3 -&gt; Bucket 3</span><br><span class="line">S4 -&gt; Bucket 0</span><br><span class="line">S5 -&gt; Bucket 1</span><br></pre></td></tr></table></figure>
+<p>也就是说，<code>S2</code> 到 <code>S5</code>
+在逻辑上连续，但在哈希文件中被打散了。DBMS 不能像顺序文件那样“找到 S2
+后顺着读到 S5”，通常只能扫描大量 bucket，甚至扫描整个文件。</p>
+<p>所以哈希文件的典型 trade-off 是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">表现</th>
+<th style="text-align: left;">原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Equality Search</td>
+<td style="text-align: left;">很好</td>
+<td style="text-align: left;">计算 Hash 后直接定位 bucket</td>
+</tr>
+<tr>
+<td style="text-align: left;">Range Search</td>
+<td style="text-align: left;">差</td>
+<td style="text-align: left;">Hash 打乱了 key 的大小顺序</td>
+</tr>
+<tr>
+<td style="text-align: left;">Insert</td>
+<td style="text-align: left;">通常较好</td>
+<td style="text-align: left;">计算 Hash 后插入对应 bucket</td>
+</tr>
+<tr>
+<td style="text-align: left;">Delete</td>
+<td style="text-align: left;">通常较好</td>
+<td style="text-align: left;">先定位 bucket，再在 bucket 内删除</td>
+</tr>
+<tr>
+<td style="text-align: left;">Scan</td>
+<td style="text-align: left;">一般</td>
+<td style="text-align: left;">要扫描所有
+bucket，且可能有空闲空间和溢出页</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>简单记忆：<strong>哈希文件用“打乱顺序分桶”的方式，换取等值查询的快速定位；但正因为顺序被打乱，范围查询就不擅长。</strong></p>
+</blockquote>
+<h1 id="文件组织的代价模型">7 文件组织的代价模型</h1>
+<h2 id="基本符号">7.1 基本符号</h2>
+<p>材料用代价模型估算不同文件组织方式在不同操作下的成本。基本符号如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em></span></td>
+<td style="text-align: left;">数据库或文件中的数据页数量</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>R</em></span></td>
+<td style="text-align: left;">每页中的记录个数</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>D</em></span></td>
+<td style="text-align: left;">读写一页的时间</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>C</em></span></td>
+<td style="text-align: left;">处理一条记录的时间，例如比较属性</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline"><em>H</em></span></td>
+<td style="text-align: left;">对一条记录执行 Hash 函数的时间</td>
+</tr>
+</tbody>
+</table>
+<p>由于 <span class="math inline"><em>D</em></span> 远大于 <span
+class="math inline"><em>C</em></span> 和 <span
+class="math inline"><em>H</em></span>，很多简化代价公式会忽略 CPU
+计算，只保留页 I/O 主项。</p>
+<h2 id="基本操作">7.2 基本操作</h2>
+<p>文件组织方式通常从以下操作角度比较：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Scan</td>
+<td style="text-align: left;">读取文件中的所有记录</td>
+</tr>
+<tr>
+<td style="text-align: left;">Equality Search</td>
+<td style="text-align: left;">读取满足某个相等条件的记录</td>
+</tr>
+<tr>
+<td style="text-align: left;">Range Search</td>
+<td style="text-align: left;">读取满足区间条件的记录</td>
+</tr>
+<tr>
+<td style="text-align: left;">Insert</td>
+<td style="text-align: left;">插入一条特定记录</td>
+</tr>
+<tr>
+<td style="text-align: left;">Delete</td>
+<td style="text-align: left;">删除一条特定记录</td>
+</tr>
+</tbody>
+</table>
+<h2 id="堆文件的代价">7.3 堆文件的代价</h2>
+<p>堆文件无序，因此查找通常只能扫描。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">代价</th>
+<th style="text-align: left;">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Scan</td>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></td>
+<td style="text-align: left;">每页读一次，每页处理 <span
+class="math inline"><em>R</em></span> 条记录</td>
+</tr>
+<tr>
+<td style="text-align: left;">Equality Search</td>
+<td style="text-align: left;">若确定只有一个结果：<span
+class="math inline">0.5<em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span>；否则同
+Scan</td>
+<td
+style="text-align: left;">单个结果平均扫描半个文件；多个结果必须扫完</td>
+</tr>
+<tr>
+<td style="text-align: left;">Range Search</td>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></td>
+<td style="text-align: left;">无序文件无法利用范围顺序</td>
+</tr>
+<tr>
+<td style="text-align: left;">Insert</td>
+<td style="text-align: left;"><span
+class="math inline">2<em>D</em> + <em>C</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>读</em><em>这</em><em>一</em><em>页</em><em>D</em> + <em>插</em><em>入</em><em>C</em> + <em>写</em><em>这</em><em>一</em><em>页</em><em>D</em> = 2<em>D</em> + <em>C</em></span>。材料假设数据加在关系最后面，需要读写相关页</td>
+</tr>
+<tr>
+<td style="text-align: left;">Delete</td>
+<td style="text-align: left;"><span
+class="math inline"><em>D</em> + <em>C</em></span></td>
+<td style="text-align: left;">假设数据已经在内存中，可用 rid 中的 page
+id 访问对应页</td>
+</tr>
+</tbody>
+</table>
+<p>堆文件适合插入频繁、查询条件不固定或主要通过索引访问的场景。</p>
+<h2 id="排序文件的代价">7.4 排序文件的代价</h2>
+<p>排序文件和顺序文件几乎是一件事。排序文件按 search key 有序存储。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">代价</th>
+<th style="text-align: left;">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Scan</td>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></td>
+<td style="text-align: left;">全表扫描仍需读所有页</td>
+</tr>
+<tr>
+<td style="text-align: left;">Equality Search</td>
+<td style="text-align: left;"><span
+class="math inline"><em>D</em>log<sub>2</sub><em>B</em> + <em>C</em>log<sub>2</sub><em>R</em></span></td>
+<td
+style="text-align: left;">没有重复且按查询属性排序时，可二分定位页和页内记录</td>
+</tr>
+<tr>
+<td style="text-align: left;">Range Search</td>
+<td style="text-align: left;"><span
+class="math inline"><em>D</em>log<sub>2</sub><em>B</em> + <em>C</em>log<sub>2</sub><em>R</em></span></td>
+<td style="text-align: left;">这里简化为同上或 <span
+class="math inline"><em>D</em>log<sub>2</sub><em>B</em> + #<em>m</em><em>a</em><em>t</em><em>c</em><em>h</em><em>e</em><em>s</em></span>
+的形式</td>
+</tr>
+<tr>
+<td style="text-align: left;">Insert</td>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></td>
+<td style="text-align: left;">若数据连续存放，插入可能移动大量数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">Delete</td>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></td>
+<td
+style="text-align: left;">若数据连续存放，删除也可能移动大量数据</td>
+</tr>
+</tbody>
+</table>
+<p>排序文件适合按某个键频繁做范围查询，但不适合频繁插入删除。</p>
+<h2 id="哈希文件的代价">7.5 哈希文件的代价</h2>
+<p>哈希文件通过 Hash 函数定位
+bucket。材料假设文件中保留一定空闲空间，因此扫描代价为 <span
+class="math inline">1.25<em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span>。</p>
+<p>这里的系数 <span class="math inline">1.25</span> 和
+<strong>bucket/page 中预留空闲空间的比例</strong>
+有关。哈希文件为了让后续插入不至于频繁产生 overflow，通常不会把每个
+bucket 都塞满，而是预留一部分空闲空间。这里的 <span
+class="math inline">1.25<em>B</em></span>
+相当于假设哈希文件的空间利用率约为 <span
+class="math inline">80%</span>。</p>
+<p>也就是说，如果数据在完全放满的情况下需要 <span
+class="math inline"><em>B</em></span> 个页，那么哈希文件因为保留了约
+<span class="math inline">20%</span> 的空闲空间，实际可能需要约 <span
+class="math inline">1.25<em>B</em></span> 个页。Scan
+时必须扫描这些实际存在的页，所以扫描代价变成 <span
+class="math inline">1.25<em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span>。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">代价</th>
+<th style="text-align: left;">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Scan</td>
+<td style="text-align: left;"><span
+class="math inline">1.25<em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></td>
+<td style="text-align: left;">保存空闲空间导致页数相对更多</td>
+</tr>
+<tr>
+<td style="text-align: left;">Equality Search</td>
+<td style="text-align: left;"><span
+class="math inline"><em>H</em> + <em>D</em> + 0.5<em>R</em><em>C</em></span></td>
+<td style="text-align: left;">计算 Hash 后读目标
+bucket，假设只有一个结果</td>
+</tr>
+<tr>
+<td style="text-align: left;">Range Search</td>
+<td style="text-align: left;"><span
+class="math inline">1.25<em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></td>
+<td style="text-align: left;">Hash 打乱顺序，范围查询无法直接利用</td>
+</tr>
+<tr>
+<td style="text-align: left;">Insert</td>
+<td style="text-align: left;"><span
+class="math inline">2<em>D</em></span></td>
+<td style="text-align: left;">定位 bucket 后插入，可能读写页</td>
+</tr>
+<tr>
+<td style="text-align: left;">Delete</td>
+<td style="text-align: left;"><span
+class="math inline"><em>C</em> + <em>D</em></span></td>
+<td style="text-align: left;">查找目标记录并删除</td>
+</tr>
+</tbody>
+</table>
+<p>哈希文件最适合等值查询，不适合范围查询。</p>
+<h2 id="三种文件组织方式总表">7.6 三种文件组织方式总表</h2>
+<p>材料最后给出的简化比较可整理为：</p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">文件类型</th>
+<th style="text-align: left;">Scan</th>
+<th style="text-align: left;">Equality Search</th>
+<th style="text-align: left;">Range Search</th>
+<th style="text-align: left;">Insert</th>
+<th style="text-align: left;">Delete</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Heap</td>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em><em>D</em></span></td>
+<td style="text-align: left;"><span
+class="math inline">0.5<em>B</em><em>D</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em><em>D</em></span></td>
+<td style="text-align: left;"><span
+class="math inline">2<em>D</em></span></td>
+<td style="text-align: left;">Search <span
+class="math inline">+<em>D</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Sorted</td>
+<td style="text-align: left;"><span
+class="math inline"><em>B</em><em>D</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>D</em>log<sub>2</sub><em>B</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>D</em>log<sub>2</sub><em>B</em> + #<em>m</em><em>a</em><em>t</em><em>c</em><em>h</em><em>e</em><em>s</em></span></td>
+<td style="text-align: left;">Search <span
+class="math inline">+<em>D</em></span> 或更高</td>
+<td style="text-align: left;">Search <span
+class="math inline">+<em>B</em><em>D</em></span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Hashed</td>
+<td style="text-align: left;"><span
+class="math inline">1.25<em>B</em><em>D</em></span></td>
+<td style="text-align: left;"><span
+class="math inline"><em>D</em></span></td>
+<td style="text-align: left;"><span
+class="math inline">1.25<em>B</em><em>D</em></span></td>
+<td style="text-align: left;"><span
+class="math inline">2<em>D</em></span></td>
+<td style="text-align: left;">Search <span
+class="math inline">+<em>D</em></span></td>
+</tr>
+</tbody>
+</table>
+<p>这里的表格忽略了 <span class="math inline"><em>C</em></span> 和 <span
+class="math inline"><em>H</em></span> 等 CPU 项，是因为课程重点放在页
+I/O 主导的代价分析上。</p>
+<p>核心记忆：</p>
+<ul>
+<li><strong>Heap</strong>：插入简单，查找差。</li>
+<li><strong>Sorted</strong>：范围查询好，插入删除差。</li>
+<li><strong>Hashed</strong>：等值查询好，范围查询差。</li>
+</ul>
+<h1 id="页格式与记录格式">8 页格式与记录格式</h1>
+<h2 id="页格式">8.1 页格式</h2>
+<p>一个页由多条记录构成，每条记录占据一个 slot。记录标识符通常为：</p>
+<p><span class="math display">(page id, slot number)</span></p>
+<p>这样做的好处是，外部模块可以通过 rid
+定位记录，而不需要知道记录在页内的真实字节偏移。页内部可以通过 slot
+字典或其他元数据把 slot number 翻译成实际位置。</p>
+<h2 id="定长记录">8.2 定长记录</h2>
+<p><strong>定长记录（Fixed-Length Record）</strong>
+指每条记录长度固定，没有变长字段。因此：</p>
+<ul>
+<li>每页能放多少条记录是确定的。</li>
+<li>每条记录在页内的位置也容易计算。</li>
+<li>字段偏移可以通过字段长度直接得到。</li>
+</ul>
+<p>如果一条记录包含字段 <span
+class="math inline"><em>F</em><sub>1</sub>, <em>F</em><sub>2</sub>, <em>F</em><sub>3</sub>, <em>F</em><sub>4</sub>, …</span>，对应长度为
+<span
+class="math inline"><em>L</em><sub>1</sub>, <em>L</em><sub>2</sub>, <em>L</em><sub>3</sub>, <em>L</em><sub>4</sub>, …</span>，页内基地址为
+<span class="math inline"><em>B</em></span>，那么字段 <span
+class="math inline"><em>F</em><sub>4</sub></span>
+的地址可通过偏移计算：</p>
+<p><span
+class="math display">Address(<em>F</em><sub>4</sub>) = <em>B</em> + <em>L</em><sub>1</sub> + <em>L</em><sub>2</sub> + <em>L</em><sub>3</sub></span></p>
+<h3 id="packed-与-unpacked">8.2.1 Packed 与 Unpacked</h3>
+<p>定长记录删除时有两种常见处理方式：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方式</th>
+<th style="text-align: left;">删除后处理</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Packed</td>
+<td
+style="text-align: left;">把页中最后一条记录移动到被删除位置，使空闲空间集中在页尾</td>
+<td style="text-align: left;">空间紧凑</td>
+<td style="text-align: left;">rid 可能变化</td>
+</tr>
+<tr>
+<td style="text-align: left;">Unpacked</td>
+<td style="text-align: left;">删除后不移动记录，用 bitmap
+或页尾信息记录空闲 slot</td>
+<td style="text-align: left;">rid 稳定</td>
+<td style="text-align: left;">页中可能有空洞</td>
+</tr>
+</tbody>
+</table>
+<p>这里的重点是 <strong>rid
+稳定性</strong>。数据库中很多上层结构可能持有某条记录的
+rid，如果删除导致其他记录移动并改变
+rid，就会带来额外维护成本。因此实际系统常常愿意牺牲一点页内紧凑性来保持
+rid 稳定。</p>
+<h2 id="变长记录">8.3 变长记录</h2>
+<p><strong>变长记录（Variable-Length Record）</strong>
+包含变长字段，因此无法简单分配固定
+slot。常见例子包括字符串、可变数组、大对象等。</p>
+<p>变长记录带来的问题包括：</p>
+<ul>
+<li>每条记录长度不同，页内空间更容易碎片化。</li>
+<li>删除记录后，需要调整页内空间，避免出现大量零碎空间。</li>
+<li>修改某个字段可能导致记录变长，需要移动其他字段或整条记录。</li>
+<li>如果记录变长后当前页容纳不下，可能要移动到其他页。</li>
+<li>如果记录超过一页大小，需要分页或使用大对象机制。</li>
+</ul>
+<h2 id="slot-字典">8.4 Slot 字典</h2>
+<p>为了解决变长记录定位和 rid 稳定性问题，这里提出使用 <strong>slot
+字典</strong>。slot 字典保存每条记录的：</p>
+<ul>
+<li>起始位置。</li>
+<li>记录长度。</li>
+</ul>
+<p>此时 rid 中的 slot number
+不再直接表示记录的物理起始位置，而是表示<strong>该记录在 slot
+字典中的条目位置。</strong>即：</p>
+<p><span class="math display">slot number → slot dictionary
+entry → (offset, length)</span></p>
+<p>这样，即使页内为了压缩碎片而移动记录本体，只要 slot
+字典中的条目位置不变，rid 就可以保持稳定。</p>
+<p>举个例子，假设 Page 17 中有三条变长记录，页尾维护一个 slot 字典：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Page 17</span><br><span class="line"></span><br><span class="line">记录数据区：</span><br><span class="line">  offset 100: R1 = &quot;S1 Wang&quot;</span><br><span class="line">  offset 140: R2 = &quot;S2 Christopher&quot;</span><br><span class="line">  offset 210: R3 = &quot;S3 Li&quot;</span><br><span class="line"></span><br><span class="line">Slot 字典：</span><br><span class="line">  slot 1 -&gt; (offset=100, length=30)</span><br><span class="line">  slot 2 -&gt; (offset=140, length=60)</span><br><span class="line">  slot 3 -&gt; (offset=210, length=20)</span><br></pre></td></tr></table></figure>
+<p>此时记录 <code>R2</code> 的 rid 可以写成：</p>
+<p><span
+class="math display">rid(<em>R</em><sub>2</sub>) = (17, 2)</span></p>
+<p>意思是：先找到 Page 17，再查 Page 17 的 slot 字典第 2 项，得到
+<code>R2</code> 真正的页内位置
+<code>(offset=140, length=60)</code>。</p>
+<p>现在假设删除 <code>R1</code>。如果不整理空间，Page 17
+里会出现一个空洞：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">offset 100: 空洞，原来是 R1</span><br><span class="line">offset 140: R2 = &quot;S2 Christopher&quot;</span><br><span class="line">offset 210: R3 = &quot;S3 Li&quot;</span><br></pre></td></tr></table></figure>
+<p>为了减少碎片，DBMS 可能把 <code>R2</code> 和 <code>R3</code>
+往前移动，压缩页内空间：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Page 17 压缩后</span><br><span class="line"></span><br><span class="line">记录数据区：</span><br><span class="line">  offset 100: R2 = &quot;S2 Christopher&quot;</span><br><span class="line">  offset 160: R3 = &quot;S3 Li&quot;</span><br><span class="line"></span><br><span class="line">Slot 字典：</span><br><span class="line">  slot 1 -&gt; deleted 或 free</span><br><span class="line">  slot 2 -&gt; (offset=100, length=60)</span><br><span class="line">  slot 3 -&gt; (offset=160, length=20)</span><br></pre></td></tr></table></figure>
+<p>注意，<code>R2</code> 的物理位置从 <code>offset=140</code> 变成了
+<code>offset=100</code>，但它在 slot 字典中的位置仍然是
+<code>slot 2</code>，所以它的 rid 仍然是：</p>
+<p><span
+class="math display">rid(<em>R</em><sub>2</sub>) = (17, 2)</span></p>
+<p>这就是 slot
+字典的核心价值：<strong>记录本体可以在页内移动，但外部看到的 slot number
+不变，从而保持 rid 稳定</strong>。如果没有 slot 字典，rid 直接保存物理
+offset，那么每次页内压缩或移动记录后，外部索引和引用都可能需要更新，维护成本会很高。</p>
+<h2 id="变长字段的两种存放方法">8.5 变长字段的两种存放方法</h2>
+<p>这里提到两类方法：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">思想</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">分隔符存放</td>
+<td style="text-align: left;">字段连续存放，用特殊分隔符区分字段</td>
+<td style="text-align: left;">实现直观</td>
+<td style="text-align: left;">查找第 <span
+class="math inline"><em>i</em></span> 个字段时可能要扫描前面字段</td>
+</tr>
+<tr>
+<td style="text-align: left;">指针/偏移存放</td>
+<td
+style="text-align: left;">在记录前端保存指向字段位置的指针或偏移</td>
+<td style="text-align: left;">可快速定位字段</td>
+<td style="text-align: left;">记录头部需要额外空间</td>
+</tr>
+</tbody>
+</table>
+<h3 id="分隔符存放的例子">8.5.1 分隔符存放的例子</h3>
+<p>假设有一条学生记录，字段分别是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sid = S1</span><br><span class="line">name = Wang</span><br><span class="line">address = Shanghai</span><br></pre></td></tr></table></figure>
+<p>如果用分隔符 <code>$</code> 存放，可以写成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S1$Wang$Shanghai$</span><br></pre></td></tr></table></figure>
+<p>这里 <code>$</code> 用来表示一个字段结束。DBMS 如果想读取第 1 个字段
+<code>sid</code>，从开头读到第一个 <code>$</code> 即可：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S1$</span><br></pre></td></tr></table></figure>
+<p>如果想读取第 3 个字段
+<code>address</code>，就要先跳过前两个字段：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">S1$Wang$Shanghai$</span><br><span class="line">^  ^    ^</span><br><span class="line">|  |    第三个字段开始</span><br><span class="line">|  第二个分隔符</span><br><span class="line">第一个分隔符</span><br></pre></td></tr></table></figure>
+<p>也就是说，分隔符方法实现简单，但访问靠后的字段时，可能必须从记录开头扫描，数过前面的分隔符后才能找到目标字段。这就是表格里“查找第
+<span class="math inline"><em>i</em></span>
+个字段时可能要扫描前面字段”的含义。</p>
+<h3 id="指针偏移存放的例子">8.5.2 指针/偏移存放的例子</h3>
+<p>另一种方法是在记录前端保存每个字段的起始位置，后面再连续存放字段内容。例如同一条记录：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sid = S1</span><br><span class="line">name = Wang</span><br><span class="line">address = Shanghai</span><br></pre></td></tr></table></figure>
+<p>可以存成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">记录头部：</span><br><span class="line">  field 1 offset = 20</span><br><span class="line">  field 2 offset = 22</span><br><span class="line">  field 3 offset = 26</span><br><span class="line"></span><br><span class="line">记录数据区：</span><br><span class="line">  offset 20: S1</span><br><span class="line">  offset 22: Wang</span><br><span class="line">  offset 26: Shanghai</span><br></pre></td></tr></table></figure>
+<p>如果 DBMS 想读取 <code>address</code>，不需要从 <code>S1</code>
+开始扫描，也不需要数分隔符，而是直接看记录头部：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">field 3 offset = 26</span><br></pre></td></tr></table></figure>
+<p>然后跳到 <code>offset 26</code> 读取
+<code>Shanghai</code>。这种方法访问字段更快，尤其适合字段很多、变长字段较多的记录。但它也需要额外空间保存
+offset 或 pointer。</p>
+<h3 id="修改变长字段为什么麻烦">8.5.3 修改变长字段为什么麻烦</h3>
+<p>变长字段的麻烦在于：一个字段长度变化后，后面字段的位置可能都要变。</p>
+<p>例如原记录是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S1$Wang$Shanghai$</span><br></pre></td></tr></table></figure>
+<p>现在把 <code>name</code> 从 <code>Wang</code> 改成更长的
+<code>Christopher</code>：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S1$Christopher$Shanghai$</span><br></pre></td></tr></table></figure>
+<p>可以看到，<code>address = Shanghai</code>
+的起始位置被往后推了。对于指针/偏移存放方式，也要更新字段 offset：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">修改前：</span><br><span class="line">  field 1 offset = 20   -&gt; S1</span><br><span class="line">  field 2 offset = 22   -&gt; Wang</span><br><span class="line">  field 3 offset = 26   -&gt; Shanghai</span><br><span class="line"></span><br><span class="line">修改后：</span><br><span class="line">  field 1 offset = 20   -&gt; S1</span><br><span class="line">  field 2 offset = 22   -&gt; Christopher</span><br><span class="line">  field 3 offset = 33   -&gt; Shanghai</span><br></pre></td></tr></table></figure>
+<p>如果这一条记录变长后当前 page 仍然有足够空间，DBMS
+可以在页内移动后续字段或移动整条记录，并更新 slot 字典中的
+<code>(offset, length)</code>。如果当前 page
+空间不够，就可能把记录移动到其他 page。为了保持原来的 rid
+不变，系统可以在原位置留下一个转发信息（forwarding
+pointer），指向记录的新位置：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">原位置：</span><br><span class="line">  rid = (17, 2)</span><br><span class="line">  forwarding pointer -&gt; Page 25, slot 4</span><br><span class="line"></span><br><span class="line">新位置：</span><br><span class="line">  Page 25, slot 4: S1 Christopher Shanghai</span><br></pre></td></tr></table></figure>
+<p>这样外部仍然可以通过原来的 <code>rid=(17,2)</code>
+找到记录，只是中间多了一次跳转。</p>
+<p>对于变长记录，修改某列可能改变后续列的位置。如果记录变长后当前页空间不足，为保持
+rid
+不变，系统可能在原位置保存一个转发信息，指向记录的新位置。对于超大记录，Oracle
+等系统可能不限制记录总长度，而 DB2
+等系统可能限制记录长度，但提供大对象数据类型（LOB）来存放大字段。</p>
+<h1 id="重点内容与易混点">9 重点内容与易混点</h1>
+<h2 id="必须掌握的主线">9.1 必须掌握的主线</h2>
+<p>本节课的主线可以概括为：</p>
+<ol type="1">
+<li>数据库数据必须持久化，不能只放在内存中。</li>
+<li>机械磁盘访问慢，主要慢在寻道和旋转延迟。</li>
+<li>DBMS 用页作为磁盘与内存之间的基本管理单位。</li>
+<li>Buffer Pool 负责缓存页，Replacement Policy 决定淘汰谁。</li>
+<li>文件组织方式影响 Scan、Equality Search、Range Search、Insert、Delete
+的代价。</li>
+<li>页内记录格式决定 rid
+是否稳定、空间利用率如何、变长字段怎样访问。</li>
+</ol>
+<h2 id="重点概念速记">9.2 重点概念速记</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">一句话记忆</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Seek Time</td>
+<td style="text-align: left;">磁头移动到目标磁道的时间</td>
+</tr>
+<tr>
+<td style="text-align: left;">Rotational Delay</td>
+<td style="text-align: left;">等目标扇区转到磁头下方的时间</td>
+</tr>
+<tr>
+<td style="text-align: left;">Transfer Time</td>
+<td style="text-align: left;">真正传输数据的时间</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sector</td>
+<td style="text-align: left;">磁盘硬件层的最小物理存储单位</td>
+</tr>
+<tr>
+<td style="text-align: left;">Block</td>
+<td
+style="text-align: left;">文件系统或存储设备一次分配、读写的连续空间单位</td>
+</tr>
+<tr>
+<td style="text-align: left;">Page</td>
+<td style="text-align: left;">DBMS 组织文件、缓存数据和估算 I/O
+代价的基本单位</td>
+</tr>
+<tr>
+<td style="text-align: left;">RAID</td>
+<td style="text-align: left;">多盘并行提高性能，冗余提高可靠性</td>
+</tr>
+<tr>
+<td style="text-align: left;">Striping</td>
+<td style="text-align: left;">把数据切分并分布到多个磁盘</td>
+</tr>
+<tr>
+<td style="text-align: left;">Parity</td>
+<td style="text-align: left;">用校验信息恢复或检测数据错误</td>
+</tr>
+<tr>
+<td style="text-align: left;">Buffer Pool</td>
+<td style="text-align: left;">DBMS 管理的内存页缓存</td>
+</tr>
+<tr>
+<td style="text-align: left;">Frame</td>
+<td style="text-align: left;">Buffer Pool 中容纳一个页的位置</td>
+</tr>
+<tr>
+<td style="text-align: left;">pin_count</td>
+<td style="text-align: left;">表示 frame 正在被多少操作使用</td>
+</tr>
+<tr>
+<td style="text-align: left;">dirty</td>
+<td style="text-align: left;">表示 frame
+中数据已被修改，替换前要写回</td>
+</tr>
+<tr>
+<td style="text-align: left;">Heap File</td>
+<td style="text-align: left;">无序存储，插入方便，查找通常慢</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sorted File</td>
+<td style="text-align: left;">按 search key 有序，范围查询好</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hashed File</td>
+<td style="text-align: left;">等值查询好，范围查询差</td>
+</tr>
+<tr>
+<td style="text-align: left;">rid</td>
+<td style="text-align: left;">记录的唯一标识，常见形式为
+<code>(page id, slot number)</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">Slot Dictionary</td>
+<td style="text-align: left;">用 slot 号间接定位记录，帮助保持 rid
+稳定</td>
+</tr>
+</tbody>
+</table>
+<h2 id="易混点辨析">9.3 易混点辨析</h2>
+<h3 id="sectorblockpage-的区别">9.3.1 Sector、Block、Page 的区别</h3>
+<p><strong>Sector</strong> 是硬件层面的最小单位；<strong>Block</strong>
+通常是磁盘传输或文件系统层面的单位；<strong>Page</strong> 是 DBMS
+逻辑管理和缓冲区管理的单位。课程代价模型通常使用 page I/O，是因为 DBMS
+的读写请求以页为核心。</p>
+<h3 id="lru-与-clock-的区别">9.3.2 LRU 与 Clock 的区别</h3>
+<p>LRU 尽量精确替换最近最少使用的页；Clock 是近似 LRU，用环形扫描和
+<code>referenced</code> 标志降低实现开销。Clock
+不保证严格的最近最少使用顺序，但实践中成本低、效果好。</p>
+<h3 id="dirty-与-pin_count-的区别">9.3.3 Dirty 与 pin_count 的区别</h3>
+<p><code>pin_count</code>
+说明页是否正在被使用，决定能不能替换。<code>dirty</code>
+说明页是否被修改，决定替换前要不要写回磁盘。</p>
+<p>一个 frame 可以：</p>
+<ul>
+<li><code>pin_count&gt;0</code> 且
+dirty：正在使用，而且修改过，不能替换。</li>
+<li><code>pin_count=0</code> 且
+dirty：可以被选择替换，但替换前必须写回。</li>
+<li><code>pin_count=0</code> 且不 dirty：最容易替换。</li>
+</ul>
+<h3 id="堆文件排序文件哈希文件的选择">9.3.4
+堆文件、排序文件、哈希文件的选择</h3>
+<p>如果应用经常插入记录，堆文件简单高效；如果经常按某个键做范围查询，排序文件更合适；如果主要是等值查询，哈希文件通常更高效。实际系统中还会结合索引、聚集索引、页空闲空间管理和
+workload 进行综合选择。</p>
+<h3 id="packed-删除为什么会影响-rid">9.3.5 Packed 删除为什么会影响
+rid</h3>
+<p>Packed
+删除会把页中最后一条记录移动到删除位置。这样页内空间更紧凑，但被移动记录的
+slot 或位置可能改变。如果外部索引或上层模块保存了原
+rid，就需要同步更新，否则会定位错误。</p>
+<p>Unpacked 删除不移动其他记录，通过 bitmap 或空闲 slot
+信息标记空位，牺牲部分紧凑性换取 rid 稳定。</p>
+<h2 id="公式汇总">9.4 公式汇总</h2>
+<p>磁盘容量：</p>
+<p><span class="math display">$$
+\text{容量} =
+\text{盘面数}
+\times \frac{\text{磁道数}}{\text{盘面}}
+\times \frac{\text{盘块数}}{\text{磁道}}
+\times \frac{\text{字节数}}{\text{盘块}}
+$$</span></p>
+<p>磁盘访问时间：</p>
+<p><span class="math display">Access Time = Seek Time + Rotational
+Delay + Transfer Time</span></p>
+<p>记录标识符：</p>
+<p><span class="math display">rid = (page id, slot number)</span></p>
+<p>字段偏移：</p>
+<p><span class="math display">$$
+\text{Address}(F_i)
+= B + \sum_{j=1}^{i-1} L_j
+$$</span></p>
+<p>堆文件扫描：</p>
+<p><span
+class="math display"><em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></p>
+<p>堆文件单结果等值查找平均代价：</p>
+<p><span
+class="math display">0.5<em>B</em>(<em>D</em> + <em>R</em><em>C</em>)</span></p>
+<p>排序文件无重复等值查找：</p>
+<p><span
+class="math display"><em>D</em>log<sub>2</sub><em>B</em> + <em>C</em>log<sub>2</sub><em>R</em></span></p>
+<p>哈希文件单结果等值查找：</p>
+<p><span
+class="math display"><em>H</em> + <em>D</em> + 0.5<em>R</em><em>C</em></span></p>
+<h2 id="学习建议">9.5 学习建议</h2>
+<p>学习时建议把本章理解成“DBMS 如何把关系模型落到物理存储上”：</p>
+<ul>
+<li>先理解磁盘为什么慢，以及为什么页 I/O 是代价核心。</li>
+<li>再理解 RAID 如何用多盘并行和冗余改善性能与可靠性。</li>
+<li>然后掌握 Buffer Pool 如何在内存中管理磁盘页。</li>
+<li>最后比较三种文件组织方式，并能根据查询类型判断哪种方式更合适。</li>
+</ul>
+<p>如果题目要求分析代价，优先写出 <span
+class="math inline"><em>B</em>, <em>D</em>, <em>R</em>, <em>C</em>, <em>H</em></span>
+的含义，再说明为什么可以近似忽略 CPU 项，只保留页 I/O
+主项。这样答案会更清楚，也更符合数据库内核课程的分析习惯。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/RAID/" rel="tag"># RAID</a>
+              <a href="/tags/%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" rel="tag"># 存储结构</a>
+              <a href="/tags/%E6%96%87%E4%BB%B6%E7%BB%84%E7%BB%87/" rel="tag"># 文件组织</a>
+              <a href="/tags/%E7%BC%93%E5%86%B2%E5%8C%BA%E7%AE%A1%E7%90%86/" rel="tag"># 缓冲区管理</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/07/09/database_design/%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/" rel="prev" title="数据存储">
+                  <i class="fa fa-angle-left"></i> 数据存储
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2026/07/09/database_design/%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84/" rel="next" title="索引结构">
+                  索引结构 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">Fqmmm</span>
+  </div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a>
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="Back to top">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
