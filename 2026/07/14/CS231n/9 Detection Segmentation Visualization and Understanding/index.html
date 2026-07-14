@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>9 Detection, Segmentation, Visualization, and Understanding | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">9 Detection, Segmentation, Visualization, and Understanding</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="transformer-与-vision-transformer-回顾">1 Transformer 与 Vision
+Transformer 回顾</h1>
+<h2 id="三种序列处理方式">1.1 三种序列处理方式</h2>
+<p>课件先回顾了三种处理序列或结构化输入的方式：循环神经网络（Recurrent
+Neural Network,
+RNN）、卷积（Convolution）和自注意力（Self-Attention）。</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">适合的数据结构</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RNN</td>
+<td style="text-align: left;">一维有序序列</td>
+<td style="text-align: left;">理论上对长度为 <span
+class="math inline">\(N\)</span> 的序列只需要 <span
+class="math inline">\(O(N)\)</span> 计算和内存，能逐步累积历史信息</td>
+<td style="text-align: left;">隐状态必须按时间顺序计算，不易并行</td>
+</tr>
+<tr>
+<td style="text-align: left;">卷积</td>
+<td style="text-align: left;"><span class="math inline">\(N\)</span>
+维规则网格，例如图像</td>
+<td
+style="text-align: left;">各位置输出可以并行计算，局部结构建模强</td>
+<td style="text-align: left;">长距离依赖需要堆很多层扩大感受野</td>
+</tr>
+<tr>
+<td style="text-align: left;">自注意力</td>
+<td style="text-align: left;">向量集合或 token 序列</td>
+<td
+style="text-align: left;">每个输出能直接依赖所有输入，矩阵乘法形式高度并行</td>
+<td style="text-align: left;">标准注意力计算量约为 <span
+class="math inline">\(O(N^2)\)</span>，长序列代价高</td>
+</tr>
+</tbody>
+</table>
+<p>自注意力的核心思想是：每个输入 token
+产生查询（Query）、键（Key）、值（Value），用查询和键计算相似度，再用
+softmax
+得到权重，对值向量做加权求和。它不像卷积那样预设局部邻域，因此非常适合捕捉全局关系。</p>
+<h2 id="vision-transformervit的基本流程">1.2 Vision
+Transformer（ViT）的基本流程</h2>
+<p>Vision Transformer 把图像转换成类似 NLP token 的序列，然后直接套用
+Transformer。以 <span class="math inline">\(224 \times 224 \times
+3\)</span> 图像和 <span class="math inline">\(16 \times 16\)</span>
+patch 为例：</p>
+<ol type="1">
+<li>将输入图像切成固定大小的图像块（patch）。每个 patch 形状为 <span
+class="math inline">\(16 \times 16 \times 3\)</span>，展平后长度为 <span
+class="math inline">\(768\)</span>。</li>
+<li>用线性投影把每个 patch 映射成 <span class="math inline">\(D\)</span>
+维向量。</li>
+<li>为每个位置加入可学习的位置编码（positional embedding），让模型知道
+patch 在二维图像中的位置。</li>
+<li>不使用因果 masking，每个图像 patch 都可以 attend 到所有其他
+patch。</li>
+<li>Transformer 输出每个 patch 对应的 <span
+class="math inline">\(D\)</span> 维向量。</li>
+<li>分类时可以使用额外的分类 token（class token），或对所有 patch
+输出做平均池化，再接线性层得到 <span class="math inline">\(C\)</span>
+类分类分数。</li>
+</ol>
+<p><strong>考试重点</strong>：ViT
+并不是在像素网格上做卷积，而是把图像变成 patch token
+序列。它的空间信息主要来自位置编码，全局交互来自自注意力。</p>
+<h2 id="transformer-常见现代改动">1.3 Transformer 常见现代改动</h2>
+<p>虽然 2017 年以来 Transformer
+主体变化不大，但一些工程上常见的改动已成为大模型和视觉 Transformer
+的常规组件。</p>
+<h3 id="pre-norm-transformer">1.3.1 Pre-Norm Transformer</h3>
+<p>原始结构中 Layer Normalization
+放在残差连接之外，这会带来一个有点奇怪的问题：模型难以严格学习恒等映射。Pre-Norm
+把归一化移动到 Self-Attention 和 MLP 之前，也就是残差分支内部：</p>
+<p><span class="math display">\[
+x_{l+1} = x_l + \mathrm{Block}(\mathrm{Norm}(x_l))
+\]</span></p>
+<p>这样训练通常更稳定，尤其在层数很深时更明显。</p>
+<h3 id="rmsnorm">1.3.2 RMSNorm</h3>
+<p>RMSNorm（Root-Mean-Square Normalization）用均方根归一化替代
+LayerNorm。对输入 <span class="math inline">\(x \in
+\mathbb{R}^D\)</span>，输出为：</p>
+<p><span class="math display">\[
+y_i = \frac{x_i}{\mathrm{RMS}(x)} \gamma_i
+\]</span></p>
+<p>其中</p>
+<p><span class="math display">\[
+\mathrm{RMS}(x) = \sqrt{\epsilon + \frac{1}{D}\sum_{i=1}^{D}x_i^2}
+\]</span></p>
+<p>它不像 LayerNorm 那样显式减去均值，计算更简洁，训练也往往更稳定。</p>
+<h3 id="swiglu-mlp">1.3.3 SwiGLU MLP</h3>
+<p>经典 Transformer MLP 通常写作：</p>
+<p><span class="math display">\[
+Y = \sigma(XW_1)W_2
+\]</span></p>
+<p>其中 <span class="math inline">\(X \in \mathbb{R}^{N \times
+D}\)</span>，<span class="math inline">\(W_1 \in \mathbb{R}^{D \times
+4D}\)</span>，<span class="math inline">\(W_2 \in \mathbb{R}^{4D \times
+D}\)</span>。SwiGLU 使用门控结构：</p>
+<p><span class="math display">\[
+Y = \left(\sigma(XW_1) \odot XW_2\right)W_3
+\]</span></p>
+<p>门控项让模型可以按维度控制信息通过程度。课件指出，当隐藏维度设为
+<span class="math inline">\(H=\frac{8D}{3}\)</span>
+时，总参数量可以与经典 MLP 大致相当。</p>
+<h3 id="mixture-of-expertsmoe">1.3.4 Mixture of Experts（MoE）</h3>
+<p>MoE 在每个 block 中学习 <span class="math inline">\(E\)</span>
+套不同的 MLP 权重，每套 MLP 称为一个专家（expert）。每个 token 只路由到
+<span class="math inline">\(A&lt;E\)</span>
+个活跃专家。这样参数量可以增加 <span class="math inline">\(E\)</span>
+倍，但每次前向计算只增加约 <span class="math inline">\(A\)</span>
+倍。</p>
+<p><strong>核心直觉</strong>：MoE
+用“条件计算”换取更大的模型容量。不是每个输入都跑完整模型，而是让不同
+token 使用不同专家。</p>
+<h1 id="视觉任务全景分类语义分割目标检测实例分割">2
+视觉任务全景：分类、语义分割、目标检测、实例分割</h1>
+<p>课件用四类任务建立视觉问题的层级：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">任务</th>
+<th style="text-align: left;">输出形式</th>
+<th style="text-align: left;">是否有空间范围</th>
+<th style="text-align: left;">是否区分实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">图像分类（Classification）</td>
+<td style="text-align: left;">整张图一个类别，例如 cat</td>
+<td style="text-align: left;">否</td>
+<td style="text-align: left;">否</td>
+</tr>
+<tr>
+<td style="text-align: left;">语义分割（Semantic Segmentation）</td>
+<td style="text-align: left;">每个像素一个语义类别，例如
+sky/cat/tree/grass</td>
+<td style="text-align: left;">是，像素级</td>
+<td style="text-align: left;">否</td>
+</tr>
+<tr>
+<td style="text-align: left;">目标检测（Object Detection）</td>
+<td style="text-align: left;">每个目标的类别与边界框，例如 dog: <span
+class="math inline">\((x,y,w,h)\)</span></td>
+<td style="text-align: left;">是，框级</td>
+<td style="text-align: left;">是</td>
+</tr>
+<tr>
+<td style="text-align: left;">实例分割（Instance Segmentation）</td>
+<td style="text-align: left;">每个目标的类别、边界框和 mask</td>
+<td style="text-align: left;">是，像素级</td>
+<td style="text-align: left;">是</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604132932951.png"
+alt="image-20260604132925717" />
+<figcaption aria-hidden="true">image-20260604132925717</figcaption>
+</figure>
+<p>这四类任务的关系可以理解为：分类只问“图里有什么”；语义分割问“每个像素是什么”；目标检测问“每个物体在哪里、是什么”；实例分割进一步问“每个物体精确覆盖哪些像素”。</p>
+<h1 id="语义分割semantic-segmentation">3 语义分割（Semantic
+Segmentation）</h1>
+<h2 id="问题定义">3.1 问题定义</h2>
+<p>语义分割的训练数据是成对的图像和像素标签。每张训练图像中，每个像素都被标注为一个语义类别。测试时，模型需要对新图像的每个像素输出类别。</p>
+<p>语义分割<strong>不区分同类物体的不同实例</strong>。例如图中有两头牛，语义分割只会把相关像素标成
+cow，而不会标成 cow 1 和 cow 2。</p>
+<h2 id="滑动窗口方法及其问题">3.2 滑动窗口方法及其问题</h2>
+<p>早期直觉做法是滑动窗口：对每个待分类像素，截取其周围 patch，用 CNN
+分类中心像素。这样能利用局部上下文，因为只看单个像素几乎无法判断类别。</p>
+<p>问题是它非常低效。相邻像素的 patch
+高度重叠，但模型会重复计算几乎相同的卷积特征。对于整张图逐像素分类，计算量不可接受。</p>
+<h2 id="全卷积网络fully-convolutional-network-fcn">3.3 全卷积网络（Fully
+Convolutional Network, FCN）</h2>
+<p>更自然的思路是一次性把整张图送入卷积网络，输出形状为 <span
+class="math inline">\(C \times H \times W\)</span>
+的类别分数图，再对每个像素取 argmax 得到 <span class="math inline">\(H
+\times W\)</span> 的预测图。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604133208936.png"
+alt="image-20260604133208809" />
+<figcaption aria-hidden="true">image-20260604133208809</figcaption>
+</figure>
+<p>如果完全不下采样，所有卷积都在原始分辨率上运行，计算非常贵。因此实际分割网络通常采用编码器-解码器结构：</p>
+<ul>
+<li>编码器阶段用池化或带步长卷积下采样，扩大感受野并提取高级语义特征。</li>
+<li>解码器阶段用上采样恢复空间分辨率，最后输出与输入同尺寸的像素分类结果。</li>
+</ul>
+<h2 id="上采样方法">3.4 上采样方法</h2>
+<p>课件介绍了几种网络内上采样方式。它们都解决同一个问题：编码器得到的特征图空间分辨率较低，例如
+<span class="math inline">\(H/4 \times
+W/4\)</span>，但语义分割最终需要回到 <span class="math inline">\(H
+\times W\)</span>
+的像素级预测。不同方法的差别在于：是否可学习、是否保留池化时的位置信息、恢复出的高分辨率特征是否平滑或稀疏。</p>
+<h3 id="最近邻上采样nearest-neighbor">3.4.1 最近邻上采样（Nearest
+Neighbor）</h3>
+<p>最近邻上采样是最直接的方法：把低分辨率特征中的每个值复制到高分辨率网格中的一块区域。比如一个
+<span class="math inline">\(2 \times 2\)</span> 输入</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+1 &amp; 2 \\
+3 &amp; 4
+\end{bmatrix}
+\]</span></p>
+<p>放大 2 倍后会变成</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+1 &amp; 1 &amp; 2 &amp; 2 \\
+1 &amp; 1 &amp; 2 &amp; 2 \\
+3 &amp; 3 &amp; 4 &amp; 4 \\
+3 &amp; 3 &amp; 4 &amp; 4
+\end{bmatrix}
+\]</span></p>
+<p>它的优点是简单、计算便宜、不会引入额外参数。缺点也很明显：复制操作本身不会学习“怎样恢复边界细节”，输出容易块状化。如果后面再接卷积层，网络可以在复制后的高分辨率特征上继续学习细化；如果只靠最近邻上采样，恢复能力就比较有限。</p>
+<p><strong>适合理解为</strong>：先粗暴地把特征图尺寸放大，再交给后续卷积去修边。</p>
+<h3 id="bed-of-nails">3.4.2 Bed of Nails</h3>
+<p>Bed of Nails
+也是一种固定规则的上采样，但它不是复制数值，而是把原来的值放到放大网格的固定位置，其余位置填
+0。仍以 <span class="math inline">\(2 \times 2\)</span> 输入为例，放大 2
+倍后可以得到：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+1 &amp; 0 &amp; 2 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 \\
+3 &amp; 0 &amp; 4 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0
+\end{bmatrix}
+\]</span></p>
+<p>这种结果非常稀疏，看起来不像最终想要的分割图，但它有一个重要作用：帮助理解转置卷积。可以把
+Bed of Nails
+看成“先把低分辨率输入插到高分辨率网格上并补零”，然后再用卷积核对这个稀疏网格做可学习的平滑和填充。</p>
+<p>它本身通常不是最终单独使用的高质量上采样方法，因为补零会产生大量空洞位置；但作为转置卷积的直觉模型很有用。</p>
+<p><strong>适合理解为</strong>：把低分辨率特征“钉”到高分辨率画布上，空白处等待后续卷积填补。</p>
+<h3 id="max-unpooling">3.4.3 Max Unpooling</h3>
+<p>Max Unpooling 与 Max Pooling 成对出现。Max Pooling
+下采样时，每个池化窗口只保留最大值。例如一个 <span
+class="math inline">\(2 \times 2\)</span>
+窗口中最大值在右上角，那么池化输出只记住这个最大值。Max Unpooling
+的关键是：池化时不仅保存最大值，还保存最大值来自窗口中的哪个位置，也就是
+pooling indices。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604133719007.png"
+alt="image-20260604133718855" />
+<figcaption aria-hidden="true">image-20260604133718855</figcaption>
+</figure>
+<p>上采样时，Max Unpooling
+会把低分辨率特征值放回当初最大值所在的位置，其余位置填 0。例如某个 <span
+class="math inline">\(2 \times 2\)</span>
+池化窗口最大值来自右上角，则反池化时该值也回到右上角。</p>
+<p>这种方法的优点是利用了下采样阶段留下来的空间位置信息，比盲目复制更知道“强响应原本在哪里”。缺点是它依赖对应的
+Max Pooling 层，必须额外保存 indices；同时未被选中的位置仍然填
+0，所以通常还需要后续卷积来补全稀疏特征。</p>
+<p><strong>适合理解为</strong>：下采样时记住“赢家的位置”，上采样时让赢家回到原来的格子里。</p>
+<h3 id="转置卷积transposed-convolution">3.4.4 转置卷积（Transposed
+Convolution）</h3>
+<p>转置卷积是可学习的上采样方法。普通卷积中，输出的每个位置来自输入局部窗口与卷积核的点积；如果
+stride 为 2，卷积核在输入上每移动 2 个像素，输出移动 1
+个位置，因此空间尺寸下降。转置卷积则把这个空间关系反过来：输入每移动 1
+个位置，卷积核在输出空间移动 <span class="math inline">\(s\)</span>
+个像素，并把贡献累加到输出图上。</p>
+<p>课件中的 1D 例子可以这样理解。输入为 <span
+class="math inline">\(a,b\)</span>，卷积核为 <span
+class="math inline">\(x,y,z\)</span>。转置卷积会让每个输入值生成一份“按该值加权的卷积核副本”：</p>
+<p><span class="math display">\[
+a[x,y,z] = [ax, ay, az]
+\]</span></p>
+<p><span class="math display">\[
+b[x,y,z] = [bx, by, bz]
+\]</span></p>
+<p>如果 stride
+使两份副本在输出空间发生重叠，那么重叠位置相加，可能得到类似：</p>
+<p><span class="math display">\[
+[ax,\ ay,\ az+bx,\ by,\ bz]
+\]</span></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604133907243.png" alt="image-20260604133907100" style="zoom: 33%;" /></p>
+<p>二维情况下也是同一个道理：低分辨率特征图中的每个位置都会在高分辨率输出图上“铺开”一个可学习卷积核，多个位置铺开的结果在重叠处求和。</p>
+<p>举一个最小的二维例子。假设输入特征图是 <span class="math inline">\(2
+\times 2\)</span>：</p>
+<p><span class="math display">\[
+X =
+\begin{bmatrix}
+a &amp; b \\
+c &amp; d
+\end{bmatrix}
+\]</span></p>
+<p>卷积核是 <span class="math inline">\(2 \times 2\)</span>：</p>
+<p><span class="math display">\[
+K =
+\begin{bmatrix}
+w_1 &amp; w_2 \\
+w_3 &amp; w_4
+\end{bmatrix}
+\]</span></p>
+<p>如果使用 stride <span class="math inline">\(=2\)</span>
+的转置卷积，并且不考虑
+padding，每个输入元素都会在输出图上放下一块按自身数值缩放的 <span
+class="math inline">\(2 \times 2\)</span> 卷积核。由于 stride
+等于卷积核大小，这个例子中各块刚好不重叠，输出为 <span
+class="math inline">\(4 \times 4\)</span>：</p>
+<p><span class="math display">\[
+Y =
+\begin{bmatrix}
+aw_1 &amp; aw_2 &amp; bw_1 &amp; bw_2 \\
+aw_3 &amp; aw_4 &amp; bw_3 &amp; bw_4 \\
+cw_1 &amp; cw_2 &amp; dw_1 &amp; dw_2 \\
+cw_3 &amp; cw_4 &amp; dw_3 &amp; dw_4
+\end{bmatrix}
+\]</span></p>
+<p>这说明转置卷积不是简单复制像素，而是让每个低分辨率位置生成一个由可学习参数控制的小模式。若
+kernel size 大于 stride，例如 kernel size <span
+class="math inline">\(=3\)</span>、stride <span
+class="math inline">\(=2\)</span>，相邻输入位置铺开的 <span
+class="math inline">\(3 \times 3\)</span>
+小块会发生重叠，重叠处会把来自多个输入位置的贡献相加。因为卷积核参数可学习，所以模型能根据训练数据学习如何恢复更合理的边界、形状和局部结构。</p>
+<p>普通带步长卷积可以看作<strong>可学习下采样</strong>：</p>
+<p><span class="math display">\[
+\text{input movement } s \rightarrow \text{output movement } 1
+\]</span></p>
+<p>转置卷积可以看作<strong>可学习上采样</strong>：</p>
+<p><span class="math display">\[
+\text{input movement } 1 \rightarrow \text{output movement } s
+\]</span></p>
+<p>需要注意，转置卷积有时会产生棋盘格伪影（checkerboard
+artifacts），尤其当 kernel size、stride 和 padding
+搭配不当时。实际网络中常见的替代做法是“插值上采样 +
+普通卷积”，但本讲重点是理解转置卷积如何作为网络内部的可学习上采样层。</p>
+<p><strong>适合理解为</strong>：每个低分辨率位置都向高分辨率画布投放一个可学习的小模板，重叠处相加，最终学出放大后的特征图。</p>
+<h2 id="u-net">3.5 U-Net</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604134201511.png" alt="image-20260604134201369" style="zoom:50%;" /></p>
+<p>U-Net
+是语义分割中的经典架构。它包含一个下采样路径和一个上采样路径：</p>
+<ul>
+<li>下采样阶段逐步扩大感受野，提取高级语义，但会丢失精细空间信息。</li>
+<li>上采样阶段恢复高分辨率预测。</li>
+<li>关键设计是跳跃连接（skip
+connection）：把下采样阶段的高分辨率特征与上采样阶段对应层拼接，使模型同时利用语义信息和细节位置信息。</li>
+</ul>
+<p><strong>直觉例子</strong>：判断“这是猫”需要高级语义特征，但确定猫耳朵边界需要低层空间细节。U-Net
+的跳跃连接正是把这两类信息接起来。</p>
+<h1 id="目标检测object-detection">4 目标检测（Object Detection）</h1>
+<h2 id="单目标检测分类-定位">4.1 单目标检测：分类 + 定位</h2>
+<p>如果每张图只有一个物体，可以把任务写成多任务学习：</p>
+<ul>
+<li>分类头输出类别分数，用 softmax loss 监督。</li>
+<li>边界框回归头输出 <span
+class="math inline">\((x,y,w,h)\)</span>，用回归损失如 <span
+class="math inline">\(L_2\)</span> loss 监督。</li>
+</ul>
+<p>总损失可以写成：</p>
+<p><span class="math display">\[
+L = L_{\mathrm{cls}} + \lambda L_{\mathrm{box}}
+\]</span></p>
+<p>其中 <span class="math inline">\(\lambda\)</span>
+控制分类和定位损失的相对权重。课件强调，锚框定位可以被看作一个回归问题。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604134852592.png"
+alt="image-20260604134852410" />
+<figcaption aria-hidden="true">image-20260604134852410</figcaption>
+</figure>
+<h2 id="多目标检测的核心困难">4.2 多目标检测的核心困难</h2>
+<p>多目标检测中，每张图的输出数量不固定：一张图可能有 1
+只猫，也可能有多只狗、猫和其他目标。因此不能简单让网络输出一个固定长度的类别向量和一个固定框。</p>
+<p>朴素方法是对大量候选 crop 分别跑 CNN，判断每个 crop
+是目标还是背景，并分类。但这需要覆盖大量位置、尺度和长宽比，计算极其昂贵。</p>
+<h2 id="region-proposal-与-r-cnn">4.3 Region Proposal 与 R-CNN</h2>
+<p>R-CNN 的流程是：</p>
+<ol type="1">
+<li>用 Selective Search 对输入图像生成约 2000 个 RoI（Region of
+Interest）。</li>
+<li>将每个 RoI warp 到固定大小，例如 <span class="math inline">\(224
+\times 224\)</span>。</li>
+<li>对每个区域独立跑预训练 ConvNet。</li>
+<li>用 SVM 对区域特征分类。</li>
+<li>用边界框回归预测相对 RoI 的修正量 <span
+class="math inline">\((d_x,d_y,d_w,d_h)\)</span>。</li>
+</ol>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604135518164.png"
+alt="image-20260604135038598" />
+<figcaption aria-hidden="true">image-20260604135038598</figcaption>
+</figure>
+<h3 id="selective-search-如何生成候选区域">4.3.1 Selective Search
+如何生成候选区域</h3>
+<p>Selective Search
+的目标是生成一批“可能包含物体”的候选框。它可以理解为一种基于图像底层线索的
+objectness proposal 方法。它会生成约 2000
+个候选区域，速度比穷举滑窗更快。</p>
+<p>它的大致流程如下：</p>
+<ol type="1">
+<li>先用图像分割算法把图像切成很多小区域，通常称为超像素（superpixels）。这些小区域往往沿着颜色、纹理或边缘变化形成。</li>
+<li>建立区域之间的邻接关系，只考虑空间上相邻的区域是否应该合并。</li>
+<li>对相邻区域计算相似度，常用线索包括颜色直方图相似度、纹理相似度、区域大小以及合并后
+bounding box 的紧凑程度。</li>
+<li>每次选择最相似的一对相邻区域，将它们合并成一个更大的区域。</li>
+<li>每次合并产生的新区域都可以转成一个 bounding box，作为候选 RoI。</li>
+<li>用不同尺度、颜色空间和分割参数重复上述过程，以获得更丰富的候选框。</li>
+</ol>
+<p>因此，Selective Search
+是一种自底向上的层次合并过程：从很多小区域开始，逐步合并成更大的区域，并把合并过程中出现的区域都作为候选框。它的优势是比暴力滑动窗口少得多，通常每张图只给出约
+2000 个 proposals；缺点是它仍然是外部算法，不能和 CNN
+主体端到端训练，也会成为 R-CNN/Fast R-CNN 的速度瓶颈之一。</p>
+<p><strong>直觉例子</strong>：如果图中有一只狗，初始分割可能把狗的头、身体、腿、背景草地切成许多小块。Selective
+Search
+会尝试把颜色和纹理相近、空间相邻的狗身体区域逐步合并，最后某些合并区域的外接框就可能覆盖整只狗，成为一个
+proposal。</p>
+<h3 id="r-cnn-中-svm-如何对区域特征分类">4.3.2 R-CNN 中 SVM
+如何对区域特征分类</h3>
+<p>R-CNN 对每个 RoI 先用 CNN 提取一个固定长度的特征向量，记为 <span
+class="math inline">\(f\)</span>。这个 <span
+class="math inline">\(f\)</span> 可以看成该候选区域的视觉表征。</p>
+<p>原始 R-CNN 使用的是按类别训练的线性 SVM（class-specific linear
+SVM）。如果数据集有 <span class="math inline">\(C\)</span>
+个目标类别，通常训练 <span class="math inline">\(C\)</span> 个
+one-vs-rest SVM。第 <span class="math inline">\(c\)</span>
+个类别对应一个超平面：</p>
+<p><span class="math display">\[
+s_c = w_c^T f + b_c
+\]</span></p>
+<p>其中 <span class="math inline">\(w_c\)</span> 和 <span
+class="math inline">\(b_c\)</span> 是第 <span
+class="math inline">\(c\)</span> 类 SVM 的参数，<span
+class="math inline">\(s_c\)</span> 是该 RoI 属于类别 <span
+class="math inline">\(c\)</span> 的分数。</p>
+<p>对第 <span class="math inline">\(c\)</span> 个 SVM 来说：</p>
+<ul>
+<li>正样本是与类别 <span class="math inline">\(c\)</span> 的
+ground-truth box 有足够高 IoU 的 RoI。</li>
+<li>负样本是背景 RoI，或者属于其他类别的 RoI。</li>
+<li>训练目标是让类别 <span class="math inline">\(c\)</span>
+的正样本分数高，负样本分数低。</li>
+</ul>
+<p>预测时，一个 RoI 会被送入所有类别的 SVM，得到：</p>
+<p><span class="math display">\[
+s_1, s_2, \dots, s_C
+\]</span></p>
+<p>模型选择分数最高的类别作为该 RoI
+的预测类别；如果所有类别分数都很低，则该区域可以被视为背景或在后处理时被过滤掉。</p>
+<p>R-CNN 的主要问题是<strong>慢</strong>：每张图要对约 2000
+个区域分别做一次 CNN 前向传播。</p>
+<h2 id="fast-r-cnn">4.4 Fast R-CNN</h2>
+<p>Fast R-CNN 的关键改进是先对整张图跑一次 backbone
+ConvNet，得到共享卷积特征图，然后在特征图上裁剪每个 RoI
+对应的区域，再对每个 RoI 做分类和边界框回归。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604140047111.png" alt="image-20260604140046934" style="zoom: 33%;" /></p>
+<p>这样大量重叠区域共享底层卷积计算，速度显著提升。其流程可概括为：</p>
+<ol type="1">
+<li>整张图经过 backbone 得到 feature map。</li>
+<li>外部 proposal 方法给出 RoI。</li>
+<li>在 feature map 上 crop + resize 每个 RoI 的特征。</li>
+<li>per-region network 输出类别和 box offset。</li>
+</ol>
+<h2 id="roi-pool-与-roi-align">4.5 RoI Pool 与 RoI Align</h2>
+<p>RoI Pool 和 RoI Align 的共同目的，是把<strong>大小不同的候选区域
+RoI</strong>
+转换成<strong>固定大小的区域特征</strong>，让后面的分类头和边界框回归头可以处理。</p>
+<p>在目标检测中，每个 proposal
+的大小和长宽比都不同：有的框可能覆盖一只小猫，有的框可能覆盖一辆大车。但全连接层或后续
+per-region head 通常要求输入维度固定，例如每个 RoI 都要变成 <span
+class="math inline">\(512 \times 7 \times 7\)</span> 的特征张量。因此
+Fast R-CNN / Faster R-CNN 需要一个操作：从整张图的共享 feature map
+中取出某个 RoI 对应的局部特征，并把它规整成统一尺寸。</p>
+<p>RoI Pool 和 RoI Align 做的就是这件事。区别在于：RoI Pool
+会把连续坐标取整后池化，简单但可能造成错位；RoI Align
+保留小数坐标，用双线性插值采样，位置对齐更准确，尤其适合 Mask R-CNN
+这种需要像素级 mask 的任务。</p>
+<h3 id="一个具体数字例子roi-pool">4.5.1 一个具体数字例子：RoI Pool</h3>
+<p>假设某张图经过 CNN 后得到一个单通道 <span class="math inline">\(4
+\times 4\)</span> feature map：</p>
+<p><span class="math display">\[
+F =
+\begin{bmatrix}
+1 &amp; 2 &amp; 3 &amp; 4 \\
+5 &amp; 6 &amp; 7 &amp; 8 \\
+9 &amp; 10 &amp; 11 &amp; 12 \\
+13 &amp; 14 &amp; 15 &amp; 16
+\end{bmatrix}
+\]</span></p>
+<p>现在有一个候选框投影到 feature map 后，连续坐标大致为左上角 <span
+class="math inline">\((0.2, 0.2)\)</span>、右下角 <span
+class="math inline">\((3.8,
+3.8)\)</span>。后面的分类网络要求固定大小输出为 <span
+class="math inline">\(2 \times 2\)</span>。</p>
+<p>RoI Pool
+会先把连续坐标吸附到离散网格。为了便于手算，这里近似看成取整后覆盖整个
+<span class="math inline">\(4 \times 4\)</span> feature
+map。然后把它平均分成 <span class="math inline">\(2 \times 2\)</span> 个
+bin，每个 bin 是 <span class="math inline">\(2 \times 2\)</span>：</p>
+<p>左上 bin：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+1 &amp; 2 \\
+5 &amp; 6
+\end{bmatrix}
+\Rightarrow \max = 6
+\]</span></p>
+<p>右上 bin：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+3 &amp; 4 \\
+7 &amp; 8
+\end{bmatrix}
+\Rightarrow \max = 8
+\]</span></p>
+<p>左下 bin：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+9 &amp; 10 \\
+13 &amp; 14
+\end{bmatrix}
+\Rightarrow \max = 14
+\]</span></p>
+<p>右下 bin：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+11 &amp; 12 \\
+15 &amp; 16
+\end{bmatrix}
+\Rightarrow \max = 16
+\]</span></p>
+<p>所以 RoI Pool 输出为：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+6 &amp; 8 \\
+14 &amp; 16
+\end{bmatrix}
+\]</span></p>
+<p>这个例子里看起来很整齐，但关键问题是：原始 RoI 的边界其实在 <span
+class="math inline">\((0.2,0.2)\)</span> 到 <span
+class="math inline">\((3.8,3.8)\)</span>，不是刚好贴着整数网格。RoI Pool
+为了做离散池化，把小数坐标吸附到了整数格子，这会让候选框和 feature map
+上的真实位置发生轻微错位。分类时这种错位可能还能忍受，但做 mask
+时，边界错一点就会明显影响像素级预测。</p>
+<h3 id="一个具体数字例子roi-align">4.5.2 一个具体数字例子：RoI
+Align</h3>
+<p>RoI Align 使用同样的输入 feature map 和同样的连续 RoI：</p>
+<p><span class="math display">\[
+(0.2,0.2) \rightarrow (3.8,3.8)
+\]</span></p>
+<p>但它不把坐标取整。输出仍然要变成 <span class="math inline">\(2 \times
+2\)</span>，所以这个 RoI 的宽和高都是：</p>
+<p><span class="math display">\[
+3.8 - 0.2 = 3.6
+\]</span></p>
+<p>每个 bin 的宽和高是：</p>
+<p><span class="math display">\[
+\frac{3.6}{2} = 1.8
+\]</span></p>
+<p>为了简化说明，假设每个 bin 只取中心点作为采样点。那么四个 bin
+的中心点分别是：</p>
+<p><span class="math display">\[
+(1.1,1.1),\ (2.9,1.1),\ (1.1,2.9),\ (2.9,2.9)
+\]</span></p>
+<p>这些点一般不会刚好落在 feature map 的整数格子上，所以 RoI Align
+用双线性插值计算该点的特征值。</p>
+<p>以 <span class="math inline">\((1.1,1.1)\)</span>
+为例，它位于四个整数格点之间：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">邻近格点</th>
+<th style="text-align: left;">特征值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\((1,1)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(6\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\((2,1)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(7\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\((1,2)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(10\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\((2,2)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(11\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>因为该点距离左上格点在 <span class="math inline">\(x\)</span> 和
+<span class="math inline">\(y\)</span> 方向都偏移 <span
+class="math inline">\(0.1\)</span>，所以双线性插值为：</p>
+<p><span class="math display">\[
+0.9 \times 0.9 \times 6
++ 0.1 \times 0.9 \times 7
++ 0.9 \times 0.1 \times 10
++ 0.1 \times 0.1 \times 11
+= 6.5
+\]</span></p>
+<p>同理可以算出四个采样点的值：</p>
+<p><span class="math display">\[
+(1.1,1.1) \Rightarrow 6.5
+\]</span></p>
+<p><span class="math display">\[
+(2.9,1.1) \Rightarrow 8.3
+\]</span></p>
+<p><span class="math display">\[
+(1.1,2.9) \Rightarrow 13.7
+\]</span></p>
+<p><span class="math display">\[
+(2.9,2.9) \Rightarrow 15.5
+\]</span></p>
+<p>因此这个简化版 RoI Align 的 <span class="math inline">\(2 \times
+2\)</span> 输出是：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+6.5 &amp; 8.3 \\
+13.7 &amp; 15.5
+\end{bmatrix}
+\]</span></p>
+<p>真实实现中，每个 bin 里可以采多个点，再对采样值做 average pooling 或
+max pooling；但核心思想不变：<strong>RoI Align 不把 RoI
+边界强行取整，而是在连续坐标上采样，并用双线性插值读取 feature map
+的值</strong>。</p>
+<h3 id="两者差异的直觉总结">4.5.3 两者差异的直觉总结</h3>
+<p>RoI Pool 和 RoI Align 的输入、输出目标一样，都是把任意大小的 RoI
+变成固定大小特征。但它们处理坐标的方式不同：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">坐标处理</th>
+<th style="text-align: left;">得到固定大小特征的方式</th>
+<th style="text-align: left;">主要问题或优势</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RoI Pool</td>
+<td style="text-align: left;">小数坐标取整，吸附到网格</td>
+<td style="text-align: left;">每个 bin 内 max pooling</td>
+<td style="text-align: left;">简单，但会产生 misalignment</td>
+</tr>
+<tr>
+<td style="text-align: left;">RoI Align</td>
+<td style="text-align: left;">保留小数坐标</td>
+<td style="text-align: left;">在采样点做双线性插值，再池化</td>
+<td style="text-align: left;">对齐更精确，适合 Mask R-CNN</td>
+</tr>
+</tbody>
+</table>
+<p>一句话记忆：<strong>RoI Pool 是“先对齐到格子再池化”，RoI Align
+是“保留真实位置再插值采样”。</strong></p>
+<h2 id="faster-r-cnn-与-region-proposal-networkrpn">4.6 Faster R-CNN 与
+Region Proposal Network（RPN）</h2>
+<p>Fast R-CNN 仍依赖外部 proposal 方法，运行时间会被 proposal
+阶段拖慢。Faster R-CNN 的核心是让 CNN 自己生成 proposals，即加入
+RPN。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604141325938.png"
+alt="image-20260604141325687" />
+<figcaption aria-hidden="true">image-20260604141325687</figcaption>
+</figure>
+<p>RPN 在 backbone feature map 的每个位置放置若干 anchor boxes。若
+feature map 大小为 <span class="math inline">\(20 \times
+15\)</span>，每个位置有 <span class="math inline">\(K\)</span> 个
+anchor，则 RPN 输出：</p>
+<ul>
+<li>objectness 分数：<span class="math inline">\(K \times 20 \times
+15\)</span>，判断每个 anchor 是否包含目标。</li>
+<li>box transforms：<span class="math inline">\(4K \times 20 \times
+15\)</span>，为每个 anchor 回归框修正量。</li>
+</ul>
+<p>随后按 objectness 排序，取 top proposals，例如约 300
+个，送入第二阶段分类和边界框回归。</p>
+<p>Faster R-CNN 是典型的两阶段检测器：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">阶段</th>
+<th style="text-align: left;">运行频率</th>
+<th style="text-align: left;">功能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">第一阶段</td>
+<td style="text-align: left;">每张图一次</td>
+<td style="text-align: left;">backbone + RPN，生成候选框</td>
+</tr>
+<tr>
+<td style="text-align: left;">第二阶段</td>
+<td style="text-align: left;">每个候选区域一次</td>
+<td style="text-align: left;">RoI Pool/Align，预测类别和 box offset</td>
+</tr>
+</tbody>
+</table>
+<p>训练时通常联合优化四个损失：RPN objectness 分类、RPN box
+回归、最终类别分类、最终 box 回归。</p>
+<h2 id="单阶段检测器yolo-ssd-retinanet">4.7 单阶段检测器：YOLO / SSD /
+RetinaNet</h2>
+<p>单阶段检测器不再显式分成 proposal 和 per-region
+分类两个阶段，而是在规则网格上直接预测框和类别。以 YOLO 为例：</p>
+<ul>
+<li>将图像划分为 <span class="math inline">\(S \times S\)</span>
+网格。</li>
+<li>每个网格预测 <span class="math inline">\(B\)</span> 个 bounding
+boxes。</li>
+<li>每个 box 输出目标置信度 <span
+class="math inline">\(P(\mathrm{object})\)</span> 和框参数 <span
+class="math inline">\((x,y,h,w)\)</span>。</li>
+<li>同时预测类别概率 <span
+class="math inline">\(P(\mathrm{class})\)</span>。</li>
+</ul>
+<p>课件给出的通用输出形式是：</p>
+<p><span class="math display">\[
+S \times S \times (5B + C)
+\]</span></p>
+<p>其中 5 对应 <span
+class="math inline">\((d_x,d_y,d_h,d_w,\mathrm{confidence})\)</span>，<span
+class="math inline">\(C\)</span> 是类别数。</p>
+<p><strong>取舍</strong>：Faster R-CNN 通常更慢但更准确；SSD/YOLO
+等单阶段方法速度更快，但早期版本准确率常弱一些。更大、更深的 backbone
+往往能提升检测性能。</p>
+<h2 id="detr用-transformer-做目标检测">4.8 DETR：用 Transformer
+做目标检测</h2>
+<p>DETR（Detection Transformer）尝试把检测建模为集合预测问题。它直接从
+Transformer 输出一组 boxes，不使用 anchors，也不预测相对 anchor 的 box
+transforms。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260604141543954.png"
+alt="image-20260604141543676" />
+<figcaption aria-hidden="true">image-20260604141543676</figcaption>
+</figure>
+<p>训练时，DETR 用二分图匹配（bipartite matching）把预测框集合与
+ground-truth
+框集合对应起来，然后监督类别和框坐标。它的意义是把目标检测从大量手工设计的
+anchor、NMS、proposal
+流程中抽象出来，但实际训练和收敛也有自己的挑战。</p>
+<h1 id="实例分割instance-segmentation">5 实例分割（Instance
+Segmentation）</h1>
+<p>实例分割结合了目标检测和语义分割：它既要区分每个物体实例，又要给出每个实例的像素级
+mask。</p>
+<h2 id="mask-r-cnn">5.1 Mask R-CNN</h2>
+<p>Mask R-CNN 在 Faster R-CNN 基础上增加一个 mask 分支：</p>
+<ol type="1">
+<li>backbone + RPN 生成候选 RoI。</li>
+<li>使用 RoI Align 得到对齐后的 RoI 特征，例如 <span
+class="math inline">\(256 \times 14 \times 14\)</span>。</li>
+<li>分类头输出 <span class="math inline">\(C\)</span> 类分数。</li>
+<li>box 头输出每类边界框坐标，维度为 <span
+class="math inline">\(4C\)</span>。</li>
+<li>mask head 用小型卷积网络为每个 RoI 预测 <span
+class="math inline">\(C \times 28 \times 28\)</span> 的二值 mask。</li>
+</ol>
+<p>Mask R-CNN 的关键点是 mask 分支在每个 RoI
+上独立工作，因此输出的是实例级
+mask，而不是整张图的语义标签图。课件还指出 Mask R-CNN
+可以扩展到人体姿态估计等任务。</p>
+<h2 id="开源框架">5.2 开源框架</h2>
+<p>课件列出了常见实现：</p>
+<ul>
+<li>TensorFlow Detection API：支持 Faster R-CNN、SSD、R-FCN、Mask R-CNN
+等。</li>
+<li>Detectron2（PyTorch）：支持 Mask R-CNN、RetinaNet、Faster
+R-CNN、RPN、Fast R-CNN、R-FCN 等。</li>
+</ul>
+<p>实际项目中常用预训练模型在自定义数据集上微调，而不是从零开始训练完整检测或分割系统。</p>
+<h1 id="可视化与模型理解visualization-and-understanding">6
+可视化与模型理解（Visualization and Understanding）</h1>
+<h2 id="可视化第一层滤波器">6.1 可视化第一层滤波器</h2>
+<p>第一层卷积滤波器直接作用于 RGB 像素，因此可以可视化为小图像。AlexNet
+的第一层滤波器形状为 <span class="math inline">\(64 \times 3 \times 11
+\times 11\)</span>；ResNet 和 DenseNet 常见第一层为 <span
+class="math inline">\(64 \times 3 \times 7 \times 7\)</span>。</p>
+<p>第一层滤波器通常学到边缘、颜色对比、方向纹理等低级视觉模式。这说明
+CNN 的早期层更接近通用图像特征。</p>
+<h2 id="saliency-map哪些像素影响分类">6.2 Saliency
+Map：哪些像素影响分类</h2>
+<p>Saliency Map
+用反向传播回答“哪些像素对某个类别分数最重要”。流程是：</p>
+<ol type="1">
+<li>前向传播得到某个类别的未归一化分数 <span
+class="math inline">\(S_c\)</span>。</li>
+<li>计算该分数对输入图像像素 <span class="math inline">\(I\)</span>
+的梯度：</li>
+</ol>
+<p><span class="math display">\[
+\frac{\partial S_c}{\partial I}
+\]</span></p>
+<ol start="3" type="1">
+<li>对梯度取绝对值，并在 RGB 通道上取最大值，得到每个像素的重要性。</li>
+</ol>
+<p>梯度越大，说明该像素的微小变化对类别分数影响越大。Saliency Map
+的优点是简单、适用于很多模型；缺点是通常比较噪声化，只能提供局部敏感性解释。</p>
+<h2 id="camclass-activation-mapping">6.3 CAM：Class Activation
+Mapping</h2>
+<p>CAM 适用于最后卷积层后接 Global Average Pooling
+和线性分类层的结构。</p>
+<p>设最后卷积特征为：</p>
+<p><span class="math display">\[
+f \in \mathbb{R}^{H \times W \times K}
+\]</span></p>
+<p>Global Average Pooling 得到：</p>
+<p><span class="math display">\[
+F_k = \frac{1}{HW}\sum_{h,w} f_{h,w,k}
+\]</span></p>
+<p>分类层权重为 <span class="math inline">\(w \in \mathbb{R}^{K \times
+C}\)</span>，类别 <span class="math inline">\(c\)</span> 的分数为：</p>
+<p><span class="math display">\[
+S_c = \sum_k w_{k,c}F_k
+\]</span></p>
+<p>代入 <span class="math inline">\(F_k\)</span>：</p>
+<p><span class="math display">\[
+S_c = \frac{1}{HW}\sum_{h,w}\sum_k w_{k,c}f_{h,w,k}
+\]</span></p>
+<p>因此类别 <span class="math inline">\(c\)</span> 在空间位置 <span
+class="math inline">\((h,w)\)</span> 的激活图可以定义为：</p>
+<p><span class="math display">\[
+M^c_{h,w} = \sum_k w_{k,c}f_{h,w,k}
+\]</span></p>
+<p><strong>直觉</strong>：如果某些通道对类别 <span
+class="math inline">\(c\)</span>
+的分类权重大，而这些通道在某些空间位置激活强，那么这些位置就是模型判断类别
+<span class="math inline">\(c\)</span> 的关键区域。</p>
+<p>CAM 的限制是它依赖特定结构，通常只能用于最后卷积层。</p>
+<h2 id="grad-cam">6.4 Grad-CAM</h2>
+<p>Grad-CAM 改进了 CAM
+的限制，可以选择任意卷积层或中间激活层。流程如下：</p>
+<ol type="1">
+<li>选择某层激活：</li>
+</ol>
+<p><span class="math display">\[
+A \in \mathbb{R}^{H \times W \times K}
+\]</span></p>
+<ol start="2" type="1">
+<li>计算类别分数 <span class="math inline">\(S_c\)</span> 对激活 <span
+class="math inline">\(A\)</span> 的梯度：</li>
+</ol>
+<p><span class="math display">\[
+\frac{\partial S_c}{\partial A} \in \mathbb{R}^{H \times W \times K}
+\]</span></p>
+<ol start="3" type="1">
+<li>对梯度做全局平均池化，得到每个通道的重要性权重：</li>
+</ol>
+<p><span class="math display">\[
+\alpha_k = \frac{1}{HW}\sum_{h,w}\frac{\partial S_c}{\partial A_{h,w,k}}
+\]</span></p>
+<ol start="4" type="1">
+<li>用权重对激活通道加权求和，并通过 ReLU 得到热力图：</li>
+</ol>
+<p><span class="math display">\[
+M^c_{h,w} = \mathrm{ReLU}\left(\sum_k \alpha_k A_{h,w,k}\right)
+\]</span></p>
+<p>ReLU 的作用是保留对类别 <span class="math inline">\(c\)</span>
+有正贡献的区域。Grad-CAM
+常用于判断模型是否真的看到了目标区域，还是依赖背景、纹理或数据集偏差。</p>
+<h2 id="中间特征与-guided-backprop">6.5 中间特征与 Guided Backprop</h2>
+<p>除了解释最终类别，也可以选择某个中间通道或神经元，计算其激活值对输入像素的梯度。这能帮助理解某一层某个通道偏好什么图案。</p>
+<p>Guided Backprop 会在 ReLU
+反向传播时只保留正梯度，使可视化图像更清晰。课件展示的 maximally
+activating patches 和 guided backprop
+说明：高层神经元往往响应更复杂的语义部件，而低层神经元更像边缘或纹理检测器。</p>
+<h2 id="vit-特征可视化">6.6 ViT 特征可视化</h2>
+<p>ViT 没有传统 CNN 的卷积通道和空间 feature map，但仍可以可视化 patch
+token、注意力模式或中间特征。课件只简要展示了 ViT feature
+visualization，核心启发是：Transformer 的可解释性通常围绕 token
+间关系、注意力图和 patch-level 表征展开。</p>
+<h1 id="复习重点与易混点">7 复习重点与易混点</h1>
+<h2 id="必须掌握的核心概念">7.1 必须掌握的核心概念</h2>
+<ul>
+<li><strong>语义分割 vs
+实例分割</strong>：语义分割只按类别标像素，不区分同类实例；实例分割要给每个物体单独
+mask。</li>
+<li><strong>目标检测输出不定长</strong>：多目标检测的根本困难是每张图目标数量不同，因此需要
+proposals、anchors、grid prediction 或 set prediction 等机制。</li>
+<li><strong>R-CNN 系列演进</strong>：R-CNN 对每个 proposal 独立跑
+CNN；Fast R-CNN 共享整图卷积特征；Faster R-CNN 用 RPN 取代外部
+proposal。</li>
+<li><strong>RoI Pool vs RoI Align</strong>：RoI Pool
+会量化/吸附坐标，可能造成错位；RoI Align 用双线性插值避免量化，更适合
+mask 预测。</li>
+<li><strong>两阶段 vs
+单阶段检测器</strong>：两阶段通常更准确但慢；单阶段通常更快，直接在
+dense grid/anchors 上预测类别和框。</li>
+<li><strong>CAM vs Grad-CAM</strong>：CAM 依赖最后 conv + GAP +
+线性分类结构；Grad-CAM 用梯度获得通道权重，可用于更多层。</li>
+</ul>
+<h2 id="典型考试问法">7.2 典型考试问法</h2>
+<ol type="1">
+<li><p>为什么滑动窗口做语义分割低效？</p>
+<p>因为相邻 patch 大量重叠，却要重复跑
+CNN，不能复用共享卷积特征。</p></li>
+<li><p>为什么语义分割网络需要下采样再上采样？</p>
+<p>下采样扩大感受野、降低计算量、获得高级语义；上采样恢复空间分辨率，使输出能对齐输入像素。</p></li>
+<li><p>转置卷积和普通卷积的 stride 有什么相反关系？</p>
+<p>普通 stride 卷积中，卷积核在输入上移动 <span
+class="math inline">\(s\)</span> 个像素，输出移动 1
+个位置；转置卷积中，输入移动 1 个位置，卷积核在输出上移动 <span
+class="math inline">\(s\)</span> 个像素。</p></li>
+<li><p>Faster R-CNN 的四个训练损失是什么？</p>
+<p>RPN objectness 分类、RPN box 回归、最终目标类别分类、最终 box
+回归。</p></li>
+<li><p>YOLO 的输出张量为什么是 <span class="math inline">\(S \times S
+\times (5B+C)\)</span>？</p>
+<p>每个网格预测 <span class="math inline">\(B\)</span> 个框，每个框有 4
+个坐标加 1 个置信度，共 <span
+class="math inline">\(5B\)</span>；同时预测 <span
+class="math inline">\(C\)</span> 个类别分数。</p></li>
+<li><p>Grad-CAM 中 <span class="math inline">\(\alpha_k\)</span>
+的含义是什么？</p>
+<p><span class="math inline">\(\alpha_k\)</span> 是类别分数对第 <span
+class="math inline">\(k\)</span>
+个通道激活的平均梯度，表示该通道对目标类别的重要程度。</p></li>
+</ol>
+<h2 id="一句话总览">7.3 一句话总览</h2>
+<p>本讲把现代视觉识别从“整图分类”扩展到“像素级和实例级理解”，并展示了两条主线：一条是通过
+FCN、U-Net、R-CNN、Faster R-CNN、Mask R-CNN
+等架构逐步解决空间输出问题；另一条是用 Saliency、CAM、Grad-CAM
+和特征可视化理解模型到底在看什么。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Object-Detection/"># Object Detection</a>
+                    
+                        <a href="/tags/Semantic-Segmentation/"># Semantic Segmentation</a>
+                    
+                        <a href="/tags/Instance-Segmentation/"># Instance Segmentation</a>
+                    
+                        <a href="/tags/Object-Localization/"># Object Localization</a>
+                    
+                        <a href="/tags/Feature-Visualization/"># Feature Visualization</a>
+                    
+                        <a href="/tags/Model-Interpretability/"># Model Interpretability</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/10%20Video%20Understanding/">10 Video Understanding</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/8%20Attention%20and%20Transformers/">8 Attention and Transformers</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

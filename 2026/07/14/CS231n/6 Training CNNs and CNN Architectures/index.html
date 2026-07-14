@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>6 Training CNNs and CNN Architectures | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">6 Training CNNs and CNN Architectures</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="cnn-的基本组件">1 CNN 的基本组件</h1>
+<h2 id="卷积层与池化层回顾">1.1 卷积层与池化层回顾</h2>
+<p>卷积神经网络（Convolutional Neural Network,
+CNN）的核心思想是把图像看成具有空间结构的张量，并用局部连接、参数共享的卷积核提取空间模式。以一个
+<span class="math inline">\(3 \times 32 \times 32\)</span>
+的输入图像为例，如果使用 <span class="math inline">\(6\)</span> 个大小为
+<span class="math inline">\(3 \times 5 \times 5\)</span>
+的卷积核，每个卷积核都会在图像上滑动并产生一张激活图；所有激活图堆叠后得到输出体积。卷积层通常还包含偏置项，并且卷积后的线性响应一般会接一个激活函数，例如
+ReLU。</p>
+<p>池化层（Pooling
+Layer）用于降低空间分辨率，同时保留局部区域中的显著信息。常见方式包括最大池化（Max
+Pooling）和平均池化（Average Pooling）。例如用 <span
+class="math inline">\(2 \times 2\)</span> 的窗口、步幅为 <span
+class="math inline">\(2\)</span>
+做池化时，每个不重叠局部区域会压缩成一个数：最大池化取区域最大值，平均池化取区域平均值。最大池化更强调局部最强响应，平均池化更像平滑汇总。</p>
+<h2 id="cnn-常见层的职责">1.2 CNN 常见层的职责</h2>
+<p>典型 CNN 可以由以下层组合而成：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">层类型</th>
+<th style="text-align: left;">主要作用</th>
+<th style="text-align: left;">复习要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">卷积层（Convolution）</td>
+<td style="text-align: left;">提取局部空间特征</td>
+<td style="text-align: left;">共享参数，输出多通道激活图</td>
+</tr>
+<tr>
+<td style="text-align: left;">池化层（Pooling）</td>
+<td style="text-align: left;">下采样、扩大有效感受野</td>
+<td style="text-align: left;">Max Pooling 强调最强响应</td>
+</tr>
+<tr>
+<td style="text-align: left;">全连接层（Fully Connected）</td>
+<td style="text-align: left;">将特征映射到分类分数或隐藏表示</td>
+<td style="text-align: left;">常出现在早期 CNN 的尾部</td>
+</tr>
+<tr>
+<td style="text-align: left;">归一化层（Normalization）</td>
+<td style="text-align: left;">稳定特征分布，帮助优化</td>
+<td style="text-align: left;">不同归一化方法统计维度不同</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dropout</td>
+<td style="text-align: left;">随机丢弃部分神经元，缓解过拟合</td>
+<td style="text-align: left;">训练时加随机性，测试时做尺度修正</td>
+</tr>
+<tr>
+<td style="text-align: left;">激活函数（Activation）</td>
+<td style="text-align: left;">引入非线性</td>
+<td style="text-align: left;">通常放在线性算子后面</td>
+</tr>
+</tbody>
+</table>
+<h1 id="归一化与-dropout">2 归一化与 Dropout</h1>
+<h2 id="layernorm-的思想">2.1 LayerNorm 的思想</h2>
+<p>归一化层的目标是对输入特征做标准化，再用可学习参数恢复模型需要的尺度和平移。以
+LayerNorm 为例，对输入 <span class="math inline">\(x \in \mathbb{R}^{N
+\times D}\)</span>，通常对每个样本内部的特征维度计算均值和标准差：</p>
+<p><span class="math display">\[
+y = \gamma \frac{x - \mu}{\sigma + \epsilon} + \beta
+\]</span></p>
+<p>其中 <span class="math inline">\(\mu, \sigma\)</span>
+是归一化统计量，<span class="math inline">\(\gamma, \beta\)</span>
+是可学习参数。直观上，归一化先把特征调整到比较稳定的数值范围，再让模型自己学习“应该放大多少、平移多少”。这样既能改善优化，又不会强行限制网络表达能力。</p>
+<p>不同归一化方法的差异主要在于统计量沿哪些维度计算。例如 BatchNorm 依赖
+batch 统计，LayerNorm 更关注单个样本内部特征，GroupNorm
+则把通道分组后计算统计量。选择哪种归一化方式，往往与 batch
+size、任务类型和网络结构有关。</p>
+<h2 id="dropout-的训练与测试逻辑">2.2 Dropout 的训练与测试逻辑</h2>
+<p>Dropout
+是一种正则化方法：训练时，以某个概率随机把神经元输出置零，常见丢弃概率为
+<span
+class="math inline">\(0.5\)</span>。这看起来像是在故意破坏网络，但它迫使模型不能过度依赖某几个特征，从而形成更冗余、更稳健的表示。</p>
+<p>Dropout 可以从两个角度理解：</p>
+<ul>
+<li><strong>防止特征共适应（co-adaptation）</strong>：如果某些神经元总是一起工作，模型可能记住训练集中的偶然组合。随机丢弃会迫使每个特征在不同上下文中仍然有用。</li>
+<li><strong>近似训练一个共享参数的大模型集成</strong>：每一种 dropout
+mask 都对应一个子网络。训练时相当于在许多共享权重的子网络之间采样。</li>
+</ul>
+<p>测试时所有神经元都保持激活，因此需要保证测试输出与训练时的期望输出一致。普通
+Dropout 的做法是在测试阶段按保留概率缩放激活；现代框架常用 inverted
+dropout，在训练时就完成缩放，使测试阶段不需要额外操作。<strong>考试常问点：Dropout
+是训练时引入随机性，测试时平均或近似平均随机性的正则化模式。</strong></p>
+<h1 id="激活函数">3 激活函数</h1>
+<h2 id="为什么需要激活函数">3.1 为什么需要激活函数</h2>
+<p>卷积层和全连接层本质上都是线性算子。如果多个线性层中间没有非线性激活，它们组合后仍然等价于一个线性变换，网络无法表达复杂决策边界。激活函数的作用是给模型引入非线性，使深层网络可以逐层构造复杂特征。</p>
+<p>在 CNN
+中，激活函数通常放在卷积层、线性层等线性算子之后。例如一个常见块可以写成：卷积
+<span class="math inline">\(\rightarrow\)</span> 归一化 <span
+class="math inline">\(\rightarrow\)</span> ReLU。</p>
+<h2 id="sigmoid历史上常用但梯度容易消失">3.2
+Sigmoid：历史上常用但梯度容易消失</h2>
+<p>Sigmoid 将输入压缩到 <span class="math inline">\([0,1]\)</span>：</p>
+<p><span class="math display">\[
+\sigma(x)=\frac{1}{1+e^{-x}}
+\]</span></p>
+<p>它曾经很受欢迎，因为输出可以解释为神经元的“发放率”或概率式响应。但
+Sigmoid 有明显缺陷：当 <span class="math inline">\(x\)</span>
+很大或很小时，函数进入饱和区，梯度接近 <span
+class="math inline">\(0\)</span>。多层 Sigmoid
+叠加后，反向传播中的梯度会越来越小，导致深层参数学习很慢，这就是梯度消失问题的一种典型来源。</p>
+<h2 id="relu简单高效的默认选择">3.3 ReLU：简单高效的默认选择</h2>
+<p>ReLU（Rectified Linear Unit）定义为：</p>
+<p><span class="math display">\[
+f(x)=\max(0,x)
+\]</span></p>
+<p>它在正半轴不饱和，计算也非常便宜，因此在实践中通常比 Sigmoid
+收敛更快。ReLU
+的缺点包括输出不是零中心，以及当输入长期落在负半轴时神经元可能“死亡”：因为负半轴输出为
+<span class="math inline">\(0\)</span>，梯度也为 <span
+class="math inline">\(0\)</span>，对应单元可能很难再恢复更新。</p>
+<p>尽管存在这些问题，ReLU 及其变体仍然是 CNN
+中最重要的激活函数族之一。它的成功也直接影响了后续权重初始化方法，例如
+Kaiming 初始化会专门考虑 ReLU 丢弃负半轴信号带来的方差变化。</p>
+<h2 id="gelu更平滑的现代激活函数">3.4 GELU：更平滑的现代激活函数</h2>
+<p>GELU（Gaussian Error Linear Unit）可写作：</p>
+<p><span class="math display">\[
+f(x)=x\Phi(x)
+\]</span></p>
+<p>其中 <span class="math inline">\(\Phi(x)\)</span>
+是标准正态分布的累积分布函数。GELU 在 <span
+class="math inline">\(0\)</span> 附近更加平滑，训练表现通常较好，因此在
+Transformer 等现代模型中很常见。它的计算成本高于
+ReLU，而且非常大的负值区域仍可能出现梯度趋近于 <span
+class="math inline">\(0\)</span> 的情况。</p>
+<h1 id="cnn-架构vgg-与-resnet">4 CNN 架构：VGG 与 ResNet</h1>
+<h2 id="ilsvrc-与深度革命">4.1 ILSVRC 与深度革命</h2>
+<p>ImageNet Large Scale Visual Recognition Challenge（ILSVRC）推动了 CNN
+架构快速演进。从较浅的早期方法，到
+AlexNet、VGG、GoogLeNet、ResNet、SENet，网络深度不断增加。一个重要趋势是：<strong>更深的网络往往有更强的表达能力，但只有当优化问题被处理好时，深度才真正转化为性能。</strong></p>
+<h2 id="vggnet小卷积核与更深网络">4.2 VGGNet：小卷积核与更深网络</h2>
+<p>VGGNet 的核心设计是用大量 <span class="math inline">\(3 \times
+3\)</span> 卷积核构建更深的网络。与 AlexNet 中较大的 <span
+class="math inline">\(11 \times 11\)</span>、<span
+class="math inline">\(5 \times 5\)</span> 卷积核相比，VGG
+更规则：主要使用 <span class="math inline">\(3 \times 3\)</span>
+卷积，步幅 <span class="math inline">\(1\)</span>，padding <span
+class="math inline">\(1\)</span>，再配合 <span class="math inline">\(2
+\times 2\)</span> max pooling、步幅 <span
+class="math inline">\(2\)</span> 做下采样。</p>
+<p>为什么使用小卷积核？三个连续的 <span class="math inline">\(3 \times
+3\)</span> 卷积层在步幅为 <span class="math inline">\(1\)</span>
+时，具有与一个 <span class="math inline">\(7 \times 7\)</span>
+卷积层相同的有效感受野。对每层通道数都为 <span
+class="math inline">\(C\)</span> 的情况，三个 <span
+class="math inline">\(3 \times 3\)</span> 卷积大约需要</p>
+<p><span class="math display">\[
+3 \times 3^2 C^2 = 27C^2
+\]</span></p>
+<p>个参数，而一个 <span class="math inline">\(7 \times 7\)</span>
+卷积需要</p>
+<p><span class="math display">\[
+7^2C^2 = 49C^2
+\]</span></p>
+<p>个参数。更小卷积核的堆叠同时带来三个好处：</p>
+<ul>
+<li><strong>参数更少</strong>：同等感受野下减少参数量。</li>
+<li><strong>非线性更多</strong>：三个卷积层之间可以插入多个
+ReLU，表达能力强于单个线性卷积。</li>
+<li><strong>结构更统一</strong>：规则架构便于扩展、实现和调参。</li>
+</ul>
+<p>VGG16/VGG19
+的命名大致对应网络中的可学习层数。它们说明了一个朴素但强大的方向：通过规则堆叠小卷积核，可以把
+CNN 做得更深、更有效。</p>
+<h2 id="resnet深度带来的不是过拟合而是优化困难">4.3
+ResNet：深度带来的不是过拟合，而是优化困难</h2>
+<p>如果简单地继续堆叠普通卷积层，深层网络并不一定更好。ResNet
+的实验现象很关键：一个 56 层 plain CNN 在训练误差和测试误差上都可能差于
+20
+层网络。由于训练误差也更高，这说明问题不只是过拟合，而是<strong>更深网络更难优化</strong>。</p>
+<p>理论上，深层模型的表达能力不应弱于浅层模型。一个更深网络至少可以复制浅层网络的已学层，并让新增层学习恒等映射（identity
+mapping）。问题在于，普通网络很难自动学出这种恒等映射。</p>
+<p>ResNet 的解决方案是让网络学习残差映射：</p>
+<p><span class="math display">\[
+H(x)=F(x)+x
+\]</span></p>
+<p>其中 <span class="math inline">\(H(x)\)</span>
+是希望得到的整体映射，<span class="math inline">\(x\)</span>
+是输入，<span class="math inline">\(F(x)\)</span>
+是残差分支需要学习的内容。因此：</p>
+<p><span class="math display">\[
+F(x)=H(x)-x
+\]</span></p>
+<p>如果最佳映射接近恒等映射，只需要让 <span class="math inline">\(F(x)
+\approx 0\)</span>，这比让若干卷积层直接拟合 <span
+class="math inline">\(H(x)=x\)</span>
+更容易。残差连接为梯度传播提供了更直接的路径，也让非常深的网络更容易训练。</p>
+<h2 id="resnet-架构要点">4.4 ResNet 架构要点</h2>
+<p>典型 ResNet 由残差块堆叠而成。基础残差块通常包含两个 <span
+class="math inline">\(3 \times 3\)</span> 卷积层，并把输入通过 shortcut
+加到输出上。网络会周期性地增加通道数并降低空间分辨率：例如通道数翻倍，同时使用
+stride <span class="math inline">\(2\)</span>
+让特征图宽高减半。开头还会有一个 stem 卷积层，例如 <span
+class="math inline">\(7 \times 7\)</span> 卷积、stride <span
+class="math inline">\(2\)</span>。</p>
+<p>ResNet 有 18、34、50、101、152 等不同深度版本。152 层 ResNet 曾在
+ILSVRC 2015
+中取得很强结果，说明残差连接确实让“深度”变成可以有效利用的资源。</p>
+<h1 id="权重初始化">5 权重初始化</h1>
+<h2 id="初始化过小与过大的问题">5.1 初始化过小与过大的问题</h2>
+<p>深层网络训练开始前，权重通常随机初始化。如果初始化标准差太小，前向传播时每一层输出都会进一步缩小，深层激活逐渐趋近于
+<span
+class="math inline">\(0\)</span>。这样反向传播时梯度也会变弱，训练很难启动。</p>
+<p>如果初始化标准差太大，激活会随着层数迅速放大，导致数值爆炸。对于深层网络，权重初始化的目标不是随便给一个小随机数，而是<strong>让信号在多层传播后仍保持合理尺度</strong>。</p>
+<h2 id="kaiming-msra-初始化">5.2 Kaiming / MSRA 初始化</h2>
+<p>对于使用 ReLU 的网络，常用 Kaiming 初始化，也叫 MSRA
+初始化。它根据输入维度 <span class="math inline">\(D_{in}\)</span>
+设置权重标准差：</p>
+<p><span class="math display">\[
+\operatorname{std}=\sqrt{\frac{2}{D_{in}}}
+\]</span></p>
+<p>其中 <span class="math inline">\(D_{in}\)</span> 可以理解为输入
+fan-in。系数 <span class="math inline">\(2\)</span> 与 ReLU
+会将大约一半负值截断为 <span class="math inline">\(0\)</span>
+有关。这个初始化能让各层激活分布保持在合适范围内，避免过快衰减或爆炸。</p>
+<p><strong>复习重点：初始化不是孤立技巧，而是与激活函数、层宽度和深度共同决定信号传播稳定性。</strong></p>
+<h1 id="图像数据预处理">6 图像数据预处理</h1>
+<p>现代视觉模型通常会对输入图像按通道做中心化和缩放：对 RGB
+三个通道分别减去均值、除以标准差。写作公式为：</p>
+<p><span class="math display">\[
+x&#39;_c=\frac{x_c-\mu_c}{\sigma_c}
+\]</span></p>
+<p>其中 <span class="math inline">\(c\)</span> 表示通道，<span
+class="math inline">\(\mu_c,\sigma_c\)</span>
+是在训练集上预先计算的通道均值和标准差。这样做可以让不同通道的输入尺度更一致，减轻优化器处理尺度差异的负担。</p>
+<p>需要注意的是，均值和标准差应来自训练数据，而不是验证集或测试集。测试时使用训练集统计量处理输入，保持训练和测试数据分布一致。</p>
+<h1 id="数据增强与正则化">7 数据增强与正则化</h1>
+<h2 id="正则化的共同模式">7.1 正则化的共同模式</h2>
+<p>许多正则化方法共享一个模式：训练时加入随机性，测试时对随机性做平均或近似平均。Dropout
+是随机丢弃激活；数据增强是随机改变输入图像；Cutout
+是随机遮挡图像区域。它们的共同目标都是让模型不要只记住训练样本的某种固定呈现方式。</p>
+<h2 id="常见图像数据增强">7.2 常见图像数据增强</h2>
+<p>数据增强（Data
+Augmentation）在训练时对图像做随机变换，但标签保持不变。例如一张猫的图片水平翻转后仍然是猫。常见增强包括：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">增强方式</th>
+<th style="text-align: left;">做法</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">水平翻转</td>
+<td style="text-align: left;">随机左右翻转图像</td>
+<td style="text-align: left;">适合左右对称语义任务，增加姿态变化</td>
+</tr>
+<tr>
+<td style="text-align: left;">随机裁剪与缩放</td>
+<td style="text-align: left;">先随机缩放，再裁剪固定大小 patch</td>
+<td style="text-align: left;">让模型适应位置与尺度变化</td>
+</tr>
+<tr>
+<td style="text-align: left;">颜色扰动（Color Jitter）</td>
+<td style="text-align: left;">随机改变亮度、对比度等</td>
+<td style="text-align: left;">降低模型对光照条件的依赖</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cutout</td>
+<td style="text-align: left;">随机把图像局部区域置零</td>
+<td style="text-align: left;">迫使模型利用更全局、更鲁棒的线索</td>
+</tr>
+</tbody>
+</table>
+<p>以 ResNet 的随机裁剪为例，训练时可随机选择短边长度 <span
+class="math inline">\(L \in [256,480]\)</span>，将图像短边缩放到 <span
+class="math inline">\(L\)</span>，再随机裁剪 <span
+class="math inline">\(224 \times 224\)</span> 的
+patch。测试时也可以做测试时增强（Test Time Augmentation,
+TTA），例如在多个尺度上取中心、四角及翻转 crop，然后平均预测结果。</p>
+<p>Cutout 在 CIFAR 这类小数据集上常很有效，但在 ImageNet
+等大规模数据集上不一定是最常见选择。原因是大数据本身已经提供了更多多样性，而过强遮挡可能破坏图像中的关键目标信息。</p>
+<h1 id="迁移学习">8 迁移学习</h1>
+<h2 id="为什么小数据集也能训练-cnn">8.1 为什么小数据集也能训练 CNN</h2>
+<p>从零训练大型 CNN
+通常需要大量标注数据。如果目标数据集较小，可以先使用在 ImageNet
+或互联网级大数据上训练好的模型，再迁移到自己的任务。预训练模型的浅层卷积通常学到边缘、纹理、颜色等通用视觉特征，深层则更偏向源任务中的语义类别。</p>
+<p>迁移学习的基本流程是：先在大数据集上训练一个强模型，再把它作为特征提取器或初始化参数，用于目标数据集。</p>
+<h2 id="冻结线性分类器与微调">8.2 冻结、线性分类器与微调</h2>
+<p>对于小数据集，可以冻结预训练卷积层，只重新初始化并训练最后的分类层。例如原本
+ImageNet 分类头输出 <span class="math inline">\(1000\)</span> 类，迁移到
+<span class="math inline">\(C\)</span> 类任务时，将最后一层替换为输出
+<span class="math inline">\(C\)</span>
+类的全连接层。这样参数少，过拟合风险较低。</p>
+<p>如果目标数据集更大，可以用预训练权重初始化整个网络，然后微调（finetune）更多层，甚至微调整个模型。数据越多，越有能力更新更多参数。</p>
+<p>一个实用决策表如下：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">数据量</th>
+<th style="text-align: left;">与预训练数据相似</th>
+<th style="text-align: left;">与预训练数据差异很大</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">很少数据</td>
+<td style="text-align: left;">冻结主干，用最终特征训练线性分类器</td>
+<td
+style="text-align: left;">尝试寻找更相近的预训练模型，或收集更多数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">较多数据</td>
+<td style="text-align: left;">微调整个模型</td>
+<td style="text-align: left;">微调整个模型或从头训练</td>
+</tr>
+</tbody>
+</table>
+<p>经验结论是：如果手头数据少于约一百万张图像，通常应优先寻找相似大数据集上的预训练模型，再做迁移学习。PyTorch、HuggingFace
+timm 等生态都提供了模型库（Model
+Zoo），可以直接使用大量预训练视觉模型。</p>
+<h1 id="超参数选择与训练诊断">9 超参数选择与训练诊断</h1>
+<h2 id="训练前的-sanity-check">9.1 训练前的 sanity check</h2>
+<p>选择超参数时，不应一开始就大规模训练。更稳妥的流程是逐步检查：</p>
+<ol type="1">
+<li><strong>检查初始
+loss</strong>：确认随机初始化下的损失是否符合预期。例如 <span
+class="math inline">\(C\)</span> 类 softmax 分类的初始交叉熵大约应接近
+<span class="math inline">\(\log C\)</span>。</li>
+<li><strong>在小样本上过拟合</strong>：取很小一部分训练数据，确认模型能把训练
+loss
+降到很低。如果小样本都不能过拟合，可能是模型、损失、数据管线或优化代码有问题。</li>
+<li><strong>寻找能让 loss
+下降的学习率</strong>：使用全部训练数据，打开较小 weight decay，尝试
+<span
+class="math inline">\(10^{-1},10^{-2},10^{-3},10^{-4},10^{-5}\)</span>
+等学习率，看约 <span class="math inline">\(100\)</span> 次迭代内 loss
+是否明显下降。</li>
+<li><strong>粗粒度搜索</strong>：训练约 <span
+class="math inline">\(1\)</span> 到 <span
+class="math inline">\(5\)</span> 个
+epoch，筛掉明显不好的超参数范围。</li>
+<li><strong>细粒度搜索并训练更久</strong>：在较好范围附近细化学习率、正则强度等。</li>
+<li><strong>观察 loss 和 accuracy
+曲线</strong>：根据曲线判断训练是否足够、是否过拟合、是否欠拟合。</li>
+<li><strong>回到第 5 步继续迭代</strong>。</li>
+</ol>
+<h2 id="训练曲线的解释">9.2 训练曲线的解释</h2>
+<p>训练集和验证集准确率曲线能直接暴露模型状态：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">曲线现象</th>
+<th style="text-align: left;">可能原因</th>
+<th style="text-align: left;">调整方向</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">训练和验证准确率仍在上升</td>
+<td style="text-align: left;">训练尚未充分</td>
+<td style="text-align: left;">训练更久，或调整学习率计划</td>
+</tr>
+<tr>
+<td style="text-align: left;">训练准确率高、验证准确率明显低</td>
+<td style="text-align: left;">过拟合</td>
+<td style="text-align: left;">增加正则化、数据增强，或收集更多数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">训练和验证准确率都低且差距小</td>
+<td style="text-align: left;">欠拟合</td>
+<td style="text-align: left;">训练更久、增大模型、减弱正则化</td>
+</tr>
+</tbody>
+</table>
+<p>过拟合的关键特征是 train/val gap
+很大；欠拟合的关键特征是两者都不够好，且 gap 不明显。</p>
+<h2 id="随机搜索优于网格搜索的直觉">9.3 随机搜索优于网格搜索的直觉</h2>
+<p>超参数中并不是每个维度都同样重要。网格搜索会在所有维度上均匀取点，如果某个维度不重要，就会浪费大量实验预算。随机搜索更容易在重要维度上覆盖更多不同取值，因此在高维超参数空间中通常比规则网格更高效。</p>
+<p>例如学习率可能比某个不敏感参数重要得多。随机搜索虽然看起来“不整齐”，但能用同样实验次数探索更多学习率取值，因此更可能找到有效区间。</p>
+<h1 id="总结">10 总结</h1>
+<p>本讲围绕“如何构建 CNN”和“如何训练 CNN”展开。构建方面，CNN
+由卷积、池化、全连接、归一化、Dropout
+和激活函数等组件组成；激活函数提供非线性；VGG
+展示了小卷积核堆叠的力量；ResNet
+用残差连接解决深层网络优化困难；权重初始化需要维持信号在多层中的尺度稳定。</p>
+<p>训练方面，图像输入通常按通道减均值、除标准差；数据增强和 Dropout
+都体现了训练时加入随机性、测试时平均随机性的正则化思想；迁移学习让小数据集也能利用大规模预训练模型；超参数选择应从初始
+loss、小样本过拟合、学习率范围和训练曲线诊断逐步推进。</p>
+<p><strong>最重要的复习主线：深度 CNN
+的成功不只是“堆更多层”，而是同时依赖合适的非线性、归一化、初始化、残差结构、数据处理、正则化和调参流程。</strong></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Convolutional-Neural-Networks/"># Convolutional Neural Networks</a>
+                    
+                        <a href="/tags/CNN-Training/"># CNN Training</a>
+                    
+                        <a href="/tags/Weight-Initialization/"># Weight Initialization</a>
+                    
+                        <a href="/tags/Normalization/"># Normalization</a>
+                    
+                        <a href="/tags/Dropout/"># Dropout</a>
+                    
+                        <a href="/tags/CNN-Architectures/"># CNN Architectures</a>
+                    
+                        <a href="/tags/Transfer-Learning/"># Transfer Learning</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/7%20Recurrent%20Neural%20Networks/">7 Recurrent Neural Networks</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/2%20Image%20Classification%20with%20Linear%20Classifiers/">2 Image Classification with Linear Classifiers</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>11 Large-Scale Distributed Training | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">11 Large-Scale Distributed Training</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="大规模分布式训练的背景">1 大规模分布式训练的背景</h1>
+<p>本讲讨论的是<strong>大规模分布式训练（Large-Scale Distributed
+Training）</strong>：当模型参数、激活值、训练数据和计算量都大到单张 GPU
+无法承受时，如何把一次神经网络训练拆到很多 GPU 上完成。</p>
+<p>课件用 <strong>Llama3-405B</strong> 作为贯穿例子。GPT-4
+技术报告公开了模型能力，但没有公开太多架构、训练硬件、训练数据和训练方法细节；而
+Meta 的 Llama 3
+论文公开了较多模型规模和训练系统信息，因此适合作为课程中的工程案例。</p>
+<p>这里的核心问题是：<strong>给定一个巨大模型和一个 GPU
+集群，如何让模型放得下、跑得快、通信不拖垮训练。</strong></p>
+<h1 id="gpu-硬件与训练集群">2 GPU 硬件与训练集群</h1>
+<h2 id="gpu-为什么适合深度学习">2.1 GPU 为什么适合深度学习</h2>
+<p>GPU（Graphics Processing
+Unit）最初是为图形渲染设计的，但现在已经成为通用并行处理器。深度学习中的卷积、线性层、注意力等计算大量依赖矩阵乘法和向量化操作，这类工作天然适合
+GPU 上的大规模并行执行。</p>
+<p>以 <strong>NVIDIA H100</strong> 为例，一张 GPU
+内部包含大量计算核心、片上缓存、高带宽显存和专门加速矩阵乘法的 Tensor
+Core。课件给出的关键数字包括：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">组件或指标</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">HBM 显存</td>
+<td style="text-align: left;">H100 有约 80GB 高带宽显存</td>
+</tr>
+<tr>
+<td style="text-align: left;">显存到计算核心带宽</td>
+<td style="text-align: left;">约 <span class="math inline">\(3352 \text{
+GB/s}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">L2 Cache</td>
+<td style="text-align: left;">约 50MB</td>
+</tr>
+<tr>
+<td style="text-align: left;">Streaming Multiprocessor（SM）</td>
+<td style="text-align: left;">H100 有 132 个启用
+SM，可看作很多独立并行核心</td>
+</tr>
+<tr>
+<td style="text-align: left;">FP32 Core</td>
+<td style="text-align: left;">每个 SM 有 128 个 FP32
+Core，适合普通浮点向量运算</td>
+</tr>
+<tr>
+<td style="text-align: left;">Tensor Core</td>
+<td style="text-align: left;">每个 SM 有 4 个 Tensor
+Core，专门加速矩阵乘法</td>
+</tr>
+</tbody>
+</table>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703170549303.png"
+alt="image-20260703170549102" />
+<figcaption aria-hidden="true">image-20260703170549102</figcaption>
+</figure>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703170608296.png"
+alt="image-20260703170608102" />
+<figcaption aria-hidden="true">image-20260703170608102</figcaption>
+</figure>
+<p>普通 FP32 Core 可以执行类似 <span class="math inline">\(a \times x +
+b\)</span> 的标量/向量浮点运算；Tensor Core 则直接执行小块矩阵乘加，例如
+<span
+class="math inline">\(AX+B\)</span>。因此，在现代深度学习训练中，<strong>大矩阵乘法能否充分喂饱
+Tensor Core</strong> 是训练速度的关键。</p>
+<h2 id="flopstensor-core-与混合精度">2.2 FLOPs、Tensor Core
+与混合精度</h2>
+<p>FLOP（Floating Point Operation）表示一次浮点操作。课件中提到，一个
+FP32 Core 每个周期做乘加时可视为 2 FLOPs；而 Tensor Core
+一次可以完成小矩阵乘加，例如：</p>
+<p><span class="math display">\[
+[16 \times 4][4 \times 8] + [16 \times 8]
+\]</span></p>
+<p>这个矩阵乘加包含：</p>
+<p><span class="math display">\[
+16 \times 4 \times 8 \times 2 = 1024
+\]</span></p>
+<p>次浮点操作。由于每个 SM 有多个 Tensor Core，H100 在 16-bit
+矩阵乘法上的理论吞吐可以远高于普通 FP32 运算。</p>
+<p>这也解释了为什么大模型训练通常使用<strong>混合精度（Mixed
+Precision）</strong>：权重、激活或矩阵乘法使用 FP16/BF16 等 16-bit
+数值来提高吞吐和降低显存占用，而某些累加、归一化或优化器状态可能保留更高精度以保证稳定性。</p>
+<h2 id="gpu-性能增长与集群规模">2.3 GPU 性能增长与集群规模</h2>
+<p>课件展示了 GPU 从 K40、P100、V100、A100 到 H100、B200
+的计算能力增长。相比 2013 年左右的 K40，现代 Tensor Core GPU
+的理论吞吐提升可达约 <span
+class="math inline">\(1000\times\)</span>。但是单张 GPU
+仍然不够训练今天最大的模型，因此还需要把很多 GPU 组织成集群。</p>
+<p>以 Llama3 集群为例，课件给出了一种层级结构：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">层级</th>
+<th style="text-align: left;">规模</th>
+<th style="text-align: left;">通信特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">单张 H100 GPU</td>
+<td style="text-align: left;">80GB 显存，内部带宽约 <span
+class="math inline">\(3352 \text{ GB/s}\)</span></td>
+<td style="text-align: left;">GPU 内部最快</td>
+</tr>
+<tr>
+<td style="text-align: left;">单台服务器</td>
+<td style="text-align: left;">8 张 GPU</td>
+<td style="text-align: left;">GPU 间带宽约 <span
+class="math inline">\(900 \text{ GB/s}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">一个 Rack</td>
+<td style="text-align: left;">2 台服务器，16 张 GPU</td>
+<td style="text-align: left;">机架内通信较快</td>
+</tr>
+<tr>
+<td style="text-align: left;">一个 Pod</td>
+<td style="text-align: left;">192 个 Rack，3072 张 GPU</td>
+<td style="text-align: left;">GPU 间约 <span class="math inline">\(50
+\text{ GB/s}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">一个 Cluster</td>
+<td style="text-align: left;">8 个 Pod，24576 张 GPU</td>
+<td style="text-align: left;">跨 Pod 通信更慢</td>
+</tr>
+</tbody>
+</table>
+<p>这个层级非常重要：<strong>分布式训练不仅要看 GPU 数量，还要看 GPU
+之间的通信拓扑。</strong> 同一台服务器内的 GPU 通信很快，跨机架、跨 Pod
+的通信慢得多。因此后面设计并行策略时，通常会把通信最频繁的维度放在同机或同
+Pod 内，把通信较少的维度放到更远的网络层级上。</p>
+<h2 id="其他训练芯片">2.4 其他训练芯片</h2>
+<p>除了 NVIDIA GPU，课件还提到：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">芯片</th>
+<th style="text-align: left;">特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Google TPU v5p</td>
+<td style="text-align: left;">Google 设计的训练加速芯片，单芯片约 459
+TFLOP/s BF16、95GB 内存，可组成 8960 芯片的 pod</td>
+</tr>
+<tr>
+<td style="text-align: left;">AMD MI325X</td>
+<td style="text-align: left;">约 1300 TFLOP/s BF16、256GB 内存</td>
+</tr>
+<tr>
+<td style="text-align: left;">AWS Trainium2</td>
+<td style="text-align: left;">约 667 TFLOP/s BF16、96GB 内存，可在
+UltraServer 中打包 64 个芯片</td>
+</tr>
+</tbody>
+</table>
+<p>这些硬件的共同目标都是提高矩阵计算吞吐、显存容量和集群扩展能力。</p>
+<h1 id="多-gpu-训练的基本切分维度">3 多 GPU 训练的基本切分维度</h1>
+<p>一个有 <span class="math inline">\(L\)</span>
+层的模型通常在形状为：</p>
+<p><span class="math display">\[
+(\text{Batch}, \text{Sequence}, \text{Dim})
+\]</span></p>
+<p>的张量上工作。要把模型训练拆到多张 GPU 上，可以沿不同维度切分：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">并行方式</th>
+<th style="text-align: left;">切分维度</th>
+<th style="text-align: left;">核心思想</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">数据并行（Data Parallelism, DP）</td>
+<td style="text-align: left;">Batch 维度</td>
+<td style="text-align: left;">每张 GPU 处理不同样本，最后同步梯度</td>
+</tr>
+<tr>
+<td style="text-align: left;">上下文并行（Context Parallelism, CP）</td>
+<td style="text-align: left;">Sequence 维度</td>
+<td style="text-align: left;">多张 GPU 共同处理一个超长序列</td>
+</tr>
+<tr>
+<td style="text-align: left;">流水线并行（Pipeline Parallelism,
+PP）</td>
+<td style="text-align: left;">Layer 维度</td>
+<td style="text-align: left;">不同 GPU 负责不同层</td>
+</tr>
+<tr>
+<td style="text-align: left;">张量并行（Tensor Parallelism, TP）</td>
+<td style="text-align: left;">Dim 维度</td>
+<td style="text-align: left;">把线性层权重和矩阵乘法按块切开</td>
+</tr>
+</tbody>
+</table>
+<p>这四种方法不是互斥的。最大模型训练时往往会把它们组合起来，形成多维并行。</p>
+<h1 id="数据并行fsdp-与-hsdp">4 数据并行、FSDP 与 HSDP</h1>
+<h2 id="普通数据并行">4.1 普通数据并行</h2>
+<p>数据并行是最容易理解的多 GPU 训练方式。假设原本一个 minibatch 有
+<span class="math inline">\(N\)</span> 个样本，现在有 <span
+class="math inline">\(M\)</span> 张 GPU，则可以使用 <span
+class="math inline">\(MN\)</span> 个样本的大 batch，把每 <span
+class="math inline">\(N\)</span> 个样本分给一张 GPU。</p>
+<p>损失函数可以写成：</p>
+<p><span class="math display">\[
+L = \frac{1}{MN}\sum_{i=1}^{M}\sum_{j=1}^{N}\ell(x_{i,j}, W)
+\]</span></p>
+<p>由于梯度对样本求和是线性的，总梯度可以写成每张 GPU
+局部梯度的平均：</p>
+<p><span class="math display">\[
+\frac{\partial L}{\partial W}
+= \frac{1}{M}\sum_{i=1}^{M}
+\frac{1}{N}\sum_{j=1}^{N}
+\frac{\partial}{\partial W}\ell(x_{i,j}, W)
+\]</span></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171000749.png" alt="image-20260703171000609" style="zoom: 50%;" /></p>
+<p>一次普通 DP 训练迭代通常是：</p>
+<ol type="1">
+<li>每张 GPU 保存一份完整模型和优化器状态。</li>
+<li>每张 GPU 读取自己的局部 batch。</li>
+<li>每张 GPU 独立前向传播，得到局部 loss。</li>
+<li>每张 GPU 独立反向传播，得到局部梯度。</li>
+<li>所有 GPU 对梯度求平均，常用 all-reduce 完成。（可与第4步并行）</li>
+<li>每张 GPU 用相同平均梯度更新自己的模型副本。</li>
+</ol>
+<p>DP
+的优点是简单、吞吐提升明显，而且反向传播和梯度通信可以部分重叠。但它有一个致命限制：<strong>每张
+GPU 都要放下一整份模型、梯度和优化器状态。</strong></p>
+<h2 id="普通-dp-的显存瓶颈">4.2 普通 DP 的显存瓶颈</h2>
+<p>使用 Adam 优化器时，每个参数通常至少需要保存 4 类数值：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">数值</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">参数 <span
+class="math inline">\(W\)</span></td>
+<td style="text-align: left;">当前模型权重</td>
+</tr>
+<tr>
+<td style="text-align: left;">梯度 <span class="math inline">\(\nabla
+W\)</span></td>
+<td style="text-align: left;">本轮反向传播得到的梯度</td>
+</tr>
+<tr>
+<td style="text-align: left;">Adam 一阶矩 <span
+class="math inline">\(\beta_1\)</span> 状态</td>
+<td style="text-align: left;">估计梯度均值</td>
+</tr>
+<tr>
+<td style="text-align: left;">Adam 二阶矩 <span
+class="math inline">\(\beta_2\)</span> 状态</td>
+<td style="text-align: left;">估计梯度平方均值</td>
+</tr>
+</tbody>
+</table>
+<p>如果每个数用 2 字节，那么 1B 参数约需要：</p>
+<p><span class="math display">\[
+1\text{B} \times 4 \times 2 \text{ bytes} = 8 \text{GB}
+\]</span></p>
+<p>因此 10B 参数就会占满一张 80GB GPU 的大部分显存，更不用说激活值、临时
+buffer 和通信缓存。普通 DP 只能扩
+batch，不能解决“模型本身放不下”的问题。</p>
+<h2 id="fully-sharded-data-parallelismfsdp">4.3 Fully Sharded Data
+Parallelism（FSDP）</h2>
+<p><strong>FSDP（Fully Sharded Data Parallelism）</strong>思想来自 ZeRO
+系列优化：<strong>把模型权重、梯度和优化器状态切分到多张 GPU
+上，而不是每张 GPU 都保存完整副本。</strong></p>
+<p>FSDP 的基本机制如下：</p>
+<ol type="1">
+<li>每个权重块 <span class="math inline">\(W_i\)</span> 只由某一张 GPU
+或某一组 GPU 拥有，同时该 GPU 保存对应的梯度和优化器状态。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171244911.png" alt="image-20260703171244772" style="zoom: 50%;" /></p>
+<ol start="2" type="1">
+<li>在某层前向传播前，拥有 <span class="math inline">\(W_i\)</span> 的
+GPU 把该层权重广播给其他 GPU。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171342965.png" alt="image-20260703171342825" style="zoom: 50%;" /></p>
+<ol start="3" type="1">
+<li><p>所有 GPU 使用 <span class="math inline">\(W_i\)</span>
+计算该层前向传播，算完后删除临时权重副本。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171455148.png" alt="image-20260703171455016" style="zoom: 50%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171532453.png" alt="image-20260703171532313" style="zoom: 50%;" /></p></li>
+<li><p>在反向传播到该层前，再次广播所需权重。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171549837.png" alt="image-20260703171549701" style="zoom:50%;" /></p></li>
+<li><p>每张 GPU 计算自己局部 batch 对该层权重的局部梯度。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171726058.png" alt="image-20260703171725911" style="zoom:50%;" /></p></li>
+<li><p>局部梯度被发送回拥有该权重的 GPU，由拥有者汇总并更新参数。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171813896.png" alt="image-20260703171813759" style="zoom:50%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703171855368.png" alt="image-20260703171855211" style="zoom:50%;" /></p></li>
+</ol>
+<p>FSDP 的关键是<strong>显存从“每张 GPU 保存全模型”变成“每张 GPU
+保存模型的一部分”</strong>。例如 100B 参数若每个参数需要 4 个 2
+字节数值，总共约 800GB；如果分到 80 张 GPU 上，每张 GPU 只需要约 10GB
+来保存这些状态。</p>
+<p>代价是通信增加。FSDP
+在前向和反向中都要不断取回当前层权重，并在反向后汇总梯度。实际系统会做预取和重叠，例如在计算
+<span class="math inline">\(W_i\)</span> 对应层的同时预取 <span
+class="math inline">\(W_{i+1}\)</span>，在反向计算 <span
+class="math inline">\(W_i\)</span>
+时同时发送上一层梯度并更新参数。这样可以把一部分通信隐藏在计算之后。</p>
+<h2 id="hybrid-sharded-data-parallelhsdp">4.4 Hybrid Sharded Data
+Parallel（HSDP）</h2>
+<p>当 GPU 数量继续变大时，完全在所有 GPU 上做 FSDP
+可能导致通信范围过大。<strong>HSDP（Hybrid Sharded Data
+Parallel）</strong> 把 <span class="math inline">\(N=M\times K\)</span>
+张 GPU 分成 <span class="math inline">\(M\)</span> 个组，每组 <span
+class="math inline">\(K\)</span> 张 GPU：</p>
+<ul>
+<li>组内做 FSDP：模型状态在 <span class="math inline">\(K\)</span> 张
+GPU 之间切分。</li>
+<li>组间做 DP：不同组处理不同数据，最后同步组间梯度。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172005178.png" alt="image-20260703172005030" style="zoom:50%;" /></p>
+<p>这是一种二维并行：一个维度负责模型切分，另一个维度负责数据切分。课件强调通信层级：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">通信位置</th>
+<th style="text-align: left;">通信内容</th>
+<th style="text-align: left;">设计建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">FSDP 组内</td>
+<td style="text-align: left;">前向取 <span
+class="math inline">\(W\)</span>，反向取 <span
+class="math inline">\(W\)</span> 和传 <span class="math inline">\(\nabla
+W\)</span>，约 3 倍通信</td>
+<td style="text-align: left;">放在同节点或同 Pod 等高速网络内</td>
+</tr>
+<tr>
+<td style="text-align: left;">DP 组间</td>
+<td style="text-align: left;">主要同步 <span
+class="math inline">\(\nabla W\)</span>，约 1 倍通信</td>
+<td style="text-align: left;">可以跨更慢的网络层级</td>
+</tr>
+</tbody>
+</table>
+<p>因此 HSDP
+的意义不只是省显存，也是在匹配硬件拓扑：<strong>高频通信放近，低频通信放远。</strong></p>
+<h1 id="activation-checkpointing用计算换显存">5 Activation
+Checkpointing：用计算换显存</h1>
+<h2 id="为什么激活值也会撑爆显存">5.1 为什么激活值也会撑爆显存</h2>
+<p>即使 FSDP
+解决了参数和优化器状态的显存问题，训练时还必须保存激活值。反向传播需要用前向传播中的中间激活来计算梯度。</p>
+<p>课件给出 Llama3-405B 的例子：Transformer 有 126 层，隐藏维度 <span
+class="math inline">\(D=16384\)</span>，序列长度为 4096。仅 FFN hidden
+activations 就可能需要：</p>
+<p><span class="math display">\[
+2 \times 126 \times (4 \times 16384) \times 4096 \text{ bytes}
+\approx 63 \text{GB}
+\]</span></p>
+<p>这还没有包括注意力、残差、归一化等其他激活。因此，仅靠切分参数还不够，还要处理激活显存。</p>
+<h2 id="常规反向传播的复杂度">5.2 常规反向传播的复杂度</h2>
+<p>设第 <span class="math inline">\(i\)</span> 层前向函数为：</p>
+<p><span class="math display">\[
+A_{i+1}=F_i^{\rightarrow}(A_i)
+\]</span></p>
+<p>反向函数为：</p>
+<p><span class="math display">\[
+G_i=F_i^{\leftarrow}(A_i, G_{i+1})
+\]</span></p>
+<p>其中 <span class="math inline">\(A_i\)</span> 是第 <span
+class="math inline">\(i\)</span> 层激活，<span
+class="math inline">\(G_i\)</span>
+是对该激活的梯度。普通训练会在前向时保存每一层激活，反向时直接使用它们。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172150680.png" alt="image-20260703172150547" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172202925.png" alt="image-20260703172202789" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172219430.png" alt="image-20260703172219297" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172238965.png" alt="image-20260703172238823" style="zoom:33%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172256817.png" alt="image-20260703172256682" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172312008.png" alt="image-20260703172311873" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172325769.png" alt="image-20260703172325636" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172338983.png" alt="image-20260703172338849" style="zoom:33%;" /></p>
+<p>如果每一层前向和反向都看作 <span class="math inline">\(O(1)\)</span>
+计算和内存，则 <span class="math inline">\(N\)</span>
+层网络的普通前向加反向复杂度是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">计算复杂度</th>
+<th style="text-align: left;">激活内存复杂度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">保存所有激活</td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>它计算最省，但内存随层数线性增长。</p>
+<h2 id="完全重计算">5.3 完全重计算</h2>
+<p>Activation Checkpointing
+的核心思想是：<strong>前向时不保存所有激活，反向需要某个激活时再从最近的已知激活重新算出来。</strong></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172414983.png" alt="image-20260703172414851" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172428775.png" alt="image-20260703172428640" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172440745.png" alt="image-20260703172440606" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172454150.png" alt="image-20260703172454009" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172512644.png" alt="image-20260703172512510" style="zoom:33%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172543759.png" alt="image-20260703172543617" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172556224.png" alt="image-20260703172556096" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172620661.png" alt="image-20260703172620502" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172634335.png" alt="image-20260703172634198" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172647034.png" alt="image-20260703172646898" style="zoom:33%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172702556.png" alt="image-20260703172702425" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172715449.png" alt="image-20260703172715317" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172727394.png" alt="image-20260703172727256" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703172750120.png" alt="image-20260703172749976" style="zoom:33%;" /></p>
+<p>最极端的做法是只保存输入，其他激活都不保存。这样内存可以降到 <span
+class="math inline">\(O(1)\)</span>，但反向时每到一层都可能需要从头重新前向计算一遍，导致计算复杂度变成
+<span class="math inline">\(O(N^2)\)</span>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">计算复杂度</th>
+<th style="text-align: left;">激活内存复杂度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">完全重计算</td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N^2)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(O(1)\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>这在大模型里通常太慢，因为 <span class="math inline">\(N^2\)</span>
+级别的重算会浪费大量 GPU 时间。</p>
+<h2 id="每隔-c-层保存-checkpoint">5.4 每隔 C 层保存 checkpoint</h2>
+<p>更实用的方法是在前向传播中每隔 <span class="math inline">\(C\)</span>
+层保存一个 checkpoint。反向传播时，如果需要某个中间层激活，就从最近的
+checkpoint 重新算到目标层。</p>
+<p>课件给出的近似复杂度是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">计算复杂度</th>
+<th style="text-align: left;">激活内存复杂度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">保存所有激活</td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">完全重计算</td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N^2)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(O(1)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">保存 <span
+class="math inline">\(C\)</span> 个 checkpoint</td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N^2/C)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(O(C)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">保存 <span
+class="math inline">\(\sqrt{N}\)</span> 个 checkpoint</td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N\sqrt{N})\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(O(\sqrt{N})\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>直观上，checkpointing 是一个典型的工程
+trade-off：<strong>牺牲一些额外计算，换取显存下降，从而允许更大模型、更长序列或更大
+batch。</strong></p>
+<h2 id="一个实用扩展配方">5.5 一个实用扩展配方</h2>
+<p>课件给出了一套逐步扩展训练规模的经验配方：</p>
+<ol type="1">
+<li>先使用数据并行扩展到约 128 张 GPU，适合约 1B 参数模型。</li>
+<li>每张 GPU 的 batch size 尽量设到能吃满显存。</li>
+<li>如果模型超过 1B 参数，考虑 FSDP。</li>
+<li>加入 activation checkpointing，以容纳更大 batch 或更长序列。</li>
+<li>如果超过 256 张 GPU，考虑 HSDP。</li>
+<li>如果超过 1000 张 GPU、模型超过 50B 参数，或序列长度超过 16K，再考虑
+CP、PP、TP 等更复杂策略。</li>
+</ol>
+<p>这个配方的精神是：<strong>先用简单并行获得收益，再在明确遇到显存、序列长度或通信瓶颈时增加复杂并行维度。</strong></p>
+<h1 id="hfu-与-mfu如何评价训练效率">6 HFU 与 MFU：如何评价训练效率</h1>
+<h2 id="hfu硬件-flops-利用率">6.1 HFU：硬件 FLOPs 利用率</h2>
+<p><strong>HFU（Hardware FLOPs Utilization）</strong>
+衡量实际执行吞吐占硬件理论峰值的比例。以 H100 为例，它在 16-bit Tensor
+Core 矩阵乘法上的理论峰值约为：</p>
+<p><span class="math display">\[
+989.4 \text{ TFLOP/s}
+\]</span></p>
+<p>如果只跑大矩阵乘法这样的最佳场景，H100 可以达到较高
+HFU，课件中大矩阵乘法约能达到 80% HFU。</p>
+<p>但 HFU 有一个问题：它会把所有实际发生的计算都算进利用率，包括
+activation checkpointing
+的重计算、数据预处理、优化器更新等“辅助计算”。因此 HFU
+高不一定说明模型训练本身高效。</p>
+<h2 id="mfu模型-flops-利用率">6.2 MFU：模型 FLOPs 利用率</h2>
+<p><strong>MFU（Model FLOPs Utilization）</strong> 更关心 GPU
+理论峰值中有多少被用于“有用的模型计算”。计算步骤是：</p>
+<ol type="1">
+<li>估计一次 forward + backward 中模型矩阵乘法的理论 FLOPs，记为 <span
+class="math inline">\(\text{FLOP}_{\text{theoretical}}\)</span>。通常可近似认为
+backward FLOPs 约为 forward 的 2 倍。</li>
+<li>查硬件理论峰值吞吐 <span
+class="math inline">\(\text{FLOP/s}_{\text{theoretical}}\)</span>，例如
+H100 约 <span class="math inline">\(989 \text{ TFLOP/s}\)</span>。</li>
+<li>计算理论最短时间：</li>
+</ol>
+<p><span class="math display">\[
+t_{\text{theoretical}}
+= \frac{\text{FLOP}_{\text{theoretical}}}
+{\text{FLOP/s}_{\text{theoretical}}}
+\]</span></p>
+<ol start="4" type="1">
+<li>实测一次完整迭代时间 <span
+class="math inline">\(t_{\text{actual}}\)</span>，包括数据加载、前向、反向和优化器更新。</li>
+<li>计算：</li>
+</ol>
+<p><span class="math display">\[
+\text{MFU} = \frac{t_{\text{theoretical}}}{t_{\text{actual}}}
+\]</span></p>
+<p>MFU
+体现的是：理论上做这些模型矩阵乘法需要这么久，实际一次训练迭代花了更久，那么二者比例就是模型计算利用率。</p>
+<h2 id="如何解读-mfu">6.3 如何解读 MFU</h2>
+<p>课件给出经验标准：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">MFU</th>
+<th style="text-align: left;">解读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(&gt;30\%\)</span></td>
+<td style="text-align: left;">已经不错</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(&gt;40\%\)</span></td>
+<td style="text-align: left;">非常优秀</td>
+</tr>
+</tbody>
+</table>
+<p>MFU 会受到矩阵大小、通信开销、显存带宽、pipeline bubble、checkpoint
+重算、数据加载等因素影响。课件还指出，新一代设备不一定 MFU
+更高，因为峰值 FLOPs 增长可能快于显存带宽增长。例如从 A100 到
+H100，FLOPs 约提升 <span
+class="math inline">\(3.1\times\)</span>，但显存带宽约提升 <span
+class="math inline">\(2.1\times\)</span>。如果模型受到内存带宽或通信限制，理论峰值越高，反而越难“吃满”。</p>
+<p>因此分布式训练调参的目标可以总结为：<strong>选择并行策略和
+batch/序列/切分配置，使 MFU 尽可能高，同时满足显存约束。</strong></p>
+<h1 id="context-parallelism沿序列维度切分">7 Context
+Parallelism：沿序列维度切分</h1>
+<h2 id="cp-的基本思想">7.1 CP 的基本思想</h2>
+<p><strong>Context Parallelism（CP）</strong> 通常用于
+Transformer，尤其是长序列训练或长上下文微调。它沿 sequence
+维度切分，让多张 GPU 共同处理同一个长序列。</p>
+<p>如果序列长度 <span class="math inline">\(S\)</span> 太长，单张 GPU
+放不下注意力计算或激活，就可以把 token 分段放到不同 GPU 上。这样每张 GPU
+只处理一部分序列，减轻单卡显存压力。</p>
+<h2 id="哪些模块容易序列并行">7.2 哪些模块容易序列并行</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703173229320.png" alt="image-20260703173229185" style="zoom: 33%;" /></p>
+<p>Transformer 中不同模块的 CP 难度不同：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">模块</th>
+<th style="text-align: left;">是否容易 CP</th>
+<th style="text-align: left;">原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">LayerNorm / residual</td>
+<td style="text-align: left;">容易</td>
+<td style="text-align: left;">没有权重或只做局部逐元素操作，各 token
+可独立处理</td>
+</tr>
+<tr>
+<td style="text-align: left;">MLP</td>
+<td style="text-align: left;">相对容易</td>
+<td style="text-align: left;">每个 token 的 MLP
+可独立计算，但权重需要复制，梯度像 DP 一样同步</td>
+</tr>
+<tr>
+<td style="text-align: left;">QKV projection</td>
+<td style="text-align: left;">相对容易</td>
+<td style="text-align: left;">本质也是对每个 token 做线性投影</td>
+</tr>
+<tr>
+<td style="text-align: left;">Attention operator</td>
+<td style="text-align: left;">最难</td>
+<td style="text-align: left;">每个 query 可能需要看所有
+key/value，天然跨序列位置通信</td>
+</tr>
+</tbody>
+</table>
+<p>难点集中在注意力。自注意力需要构造 query-key
+相似度，如果序列被分到多张 GPU 上，每张 GPU 上的 query 仍可能需要其他
+GPU 上的 key/value。</p>
+<h2 id="ring-attention-与-ulysses">7.3 Ring Attention 与 Ulysses</h2>
+<p>课件提到两种处理长序列注意力的方案：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">思路</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Ring Attention</td>
+<td style="text-align: left;">把序列分成 block 分布到 GPU
+上，内层循环遍历 key/value，外层循环遍历
+query，通过环形通信逐步完成注意力</td>
+<td style="text-align: left;">可扩展到非常长的上下文</td>
+<td style="text-align: left;">实现复杂，通信调度要求高</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ulysses</td>
+<td style="text-align: left;">不直接分布完整注意力矩阵，而是按
+multi-head attention 的 head 维度并行</td>
+<td style="text-align: left;">相对简单</td>
+<td style="text-align: left;">最大并行度受 attention head 数量限制</td>
+</tr>
+</tbody>
+</table>
+<p>Llama3-405B 的例子中，Stage 1 使用 <span
+class="math inline">\(S=8192\)</span>，不使用 context parallelism；Stage
+2 使用 <span class="math inline">\(S=131072\)</span>，采用 16-way
+context parallelism，相当于每张 GPU 处理约 8192 个 token。</p>
+<h1 id="pipeline-parallelism沿层数切分">8 Pipeline
+Parallelism：沿层数切分</h1>
+<h2 id="pp-的基本思想">8.1 PP 的基本思想</h2>
+<p><strong>Pipeline Parallelism（PP）</strong> 沿模型层数切分。假设有 4
+张 GPU，可以让 GPU 1 负责前几层，GPU 2 负责中间一段层，GPU 3 和 GPU 4
+负责后续层。前向传播时，GPU 1 计算完自己的层后，把激活传给 GPU
+2；反向传播时，梯度反向传回来。</p>
+<p>PP 的好处是可以把模型参数按层分散到多张 GPU
+上，解决单卡放不下所有层的问题。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703173705424.png" alt="image-20260703173705280" style="zoom: 33%;" /></p>
+<h2 id="pipeline-bubble">8.2 Pipeline bubble</h2>
+<p>PP 的主要问题是<strong>顺序依赖</strong>。如果只有一个 batch，GPU 1
+先工作，GPU 2 等待；GPU 2 工作时，GPU 1 可能空闲。反向传播也类似。大量
+GPU 时间会浪费在等待上，这段空闲被称为 <strong>pipeline
+bubble</strong>。</p>
+<p>课件指出，如果直接做 <span class="math inline">\(N\)</span>-way PP
+而没有 microbatch，最大 MFU 可能只有：</p>
+<p><span class="math display">\[
+\frac{1}{N}
+\]</span></p>
+<p>例如 4-way PP 时，上限只有 25%，非常低。</p>
+<h2 id="microbatch-提高流水线利用率">8.3 Microbatch
+提高流水线利用率</h2>
+<p>解决方法是把一个大 batch 切成多个 <strong>microbatch</strong>，让多个
+microbatch 同时处在 pipeline 的不同阶段。这样 GPU 1 在处理第 2 个
+microbatch 时，GPU 2 可以处理第 1 个
+microbatch，流水线逐渐被填满。下图中不同的颜色代表不同的microbatch：</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703173744695.png"
+alt="image-20260703173744560" />
+<figcaption aria-hidden="true">image-20260703173744560</figcaption>
+</figure>
+<p>课件中的例子是 4-way PP 配 4 个 microbatch，最大 MFU 从：</p>
+<p><span class="math display">\[
+\frac{1}{4}=25\%
+\]</span></p>
+<p>提高到：</p>
+<p><span class="math display">\[
+\frac{16}{28}\approx 57.1\%
+\]</span></p>
+<p>因此 PP 的核心调参问题是：<strong>如何选择 pipeline stage 数量和
+microbatch 数量，让 bubble 尽量小，同时不让显存和通信失控。</strong></p>
+<h1 id="tensor-parallelism沿特征维度切分">9 Tensor
+Parallelism：沿特征维度切分</h1>
+<h2 id="tp-的基本思想">9.1 TP 的基本思想</h2>
+<p><strong>Tensor Parallelism（TP）</strong>
+把单个线性层的矩阵乘法拆到多张 GPU 上。考虑一层线性变换：</p>
+<p><span class="math display">\[
+XW=Y
+\]</span></p>
+<p>其中：</p>
+<p><span class="math display">\[
+X \in \mathbb{R}^{N\times D},\quad
+W \in \mathbb{R}^{D\times D},\quad
+Y \in \mathbb{R}^{N\times D}
+\]</span></p>
+<p>如果做 4-way TP，可以把 <span class="math inline">\(W\)</span>
+按列切成：</p>
+<p><span class="math display">\[
+W = [W_1, W_2, W_3, W_4]
+\]</span></p>
+<p>每张 GPU 计算：</p>
+<p><span class="math display">\[
+Y_i = XW_i
+\]</span></p>
+<p>最后得到：</p>
+<p><span class="math display">\[
+Y = [Y_1, Y_2, Y_3, Y_4]
+\]</span></p>
+<p>这能把单层大矩阵乘法分散到多张 GPU 上。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703173928277.png" alt="image-20260703173928133" style="zoom: 33%;" /></p>
+<h2 id="tp-的通信问题">9.2 TP 的通信问题</h2>
+<p>如果只看一层，列切分后每张 GPU 只得到 <span
+class="math inline">\(Y\)</span> 的一部分。下一层如果需要完整 <span
+class="math inline">\(Y\)</span>，就必须 gather 所有分片。这个 gather
+往往不能很好地与计算重叠，因此会成为性能瓶颈。</p>
+<p>课件给出的技巧是：<strong>连续两层使用互补切分方式，减少中间通信。</strong></p>
+<p>第一层按列切分：</p>
+<p><span class="math display">\[
+XW = [XW_1, XW_2, XW_3, XW_4]
+= [Y_1, Y_2, Y_3, Y_4]
+\]</span></p>
+<p>第二层把权重 <span class="math inline">\(U\)</span> 按行切分：</p>
+<p><span class="math display">\[
+U =
+\begin{bmatrix}
+U_1 \\
+U_2 \\
+U_3 \\
+U_4
+\end{bmatrix}
+\]</span></p>
+<p>则：</p>
+<p><span class="math display">\[
+YU = Y_1U_1 + Y_2U_2 + Y_3U_3 + Y_4U_4 = Z
+\]</span></p>
+<p>每张 GPU 可以先计算自己的局部项：</p>
+<p><span class="math display">\[
+Z_i = Y_iU_i
+\]</span></p>
+<p>最后再把这些局部结果相加并广播。这样中间的 <span
+class="math inline">\(Y\)</span> 不需要先完整
+gather，通信位置被推迟到第二层之后。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703174105901.png"
+alt="image-20260703174105735" />
+<figcaption aria-hidden="true">image-20260703174105735</figcaption>
+</figure>
+<blockquote>
+<p>图中的等号有点歧义，实际上是 <span
+class="math inline">\(Y_i=XW_i\)</span>，<span
+class="math inline">\(Z_i=Y_i U_i\)</span></p>
+</blockquote>
+<h2 id="tp-的适用场景">9.3 TP 的适用场景</h2>
+<p>TP 特别适合单层矩阵很大的模型，例如超大 Transformer 的 MLP 和
+attention
+projection。它的优点是能切开单层计算和单层参数；缺点是通信非常频繁，通常需要高速
+GPU 互联，适合放在同一节点内或高速互联的小组内使用。</p>
+<h1 id="多维并行与复习重点">10 多维并行与复习重点</h1>
+<h2 id="nd-parallelism">10.1 ND Parallelism</h2>
+<p>对于最大规模模型，答案通常不是只用一种并行，而是
+<strong>DP、FSDP/HSDP、CP、PP、TP 同时使用</strong>。课件称为 <strong>ND
+Parallelism</strong>：把 GPU 排成多维网格，每张 GPU
+的坐标决定它在数据维度、序列维度、层维度和张量维度上的角色。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260703174252131.png" alt="image-20260703174251953"  /></p>
+<p>例如一个训练系统可以这样组织：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">并行策略</th>
+<th style="text-align: left;">主要解决问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Batch</td>
+<td style="text-align: left;">DP / HSDP</td>
+<td style="text-align: left;">提高数据吞吐，扩大 global batch</td>
+</tr>
+<tr>
+<td style="text-align: left;">参数状态</td>
+<td style="text-align: left;">FSDP / HSDP</td>
+<td style="text-align: left;">让超大参数和优化器状态放得下</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sequence</td>
+<td style="text-align: left;">CP</td>
+<td style="text-align: left;">支持超长上下文</td>
+</tr>
+<tr>
+<td style="text-align: left;">Layers</td>
+<td style="text-align: left;">PP</td>
+<td style="text-align: left;">把不同层分到不同 GPU</td>
+</tr>
+<tr>
+<td style="text-align: left;">Dim / Linear layer</td>
+<td style="text-align: left;">TP</td>
+<td style="text-align: left;">切开单层巨大矩阵乘法</td>
+</tr>
+</tbody>
+</table>
+<p>调参目标仍然是：在满足显存、通信拓扑和模型正确性的前提下，最大化
+MFU。</p>
+<h2 id="四种并行方式对比">10.2 四种并行方式对比</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">切分对象</th>
+<th style="text-align: left;">主要收益</th>
+<th style="text-align: left;">主要代价</th>
+<th style="text-align: left;">常见使用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">DP</td>
+<td style="text-align: left;">batch</td>
+<td style="text-align: left;">简单提升吞吐</td>
+<td style="text-align: left;">每卡保存完整模型，需同步梯度</td>
+<td style="text-align: left;">中小模型、多卡训练起点</td>
+</tr>
+<tr>
+<td style="text-align: left;">FSDP</td>
+<td style="text-align: left;">参数、梯度、优化器状态</td>
+<td style="text-align: left;">大幅降低每卡参数显存</td>
+<td style="text-align: left;">前向/反向频繁取权重和传梯度</td>
+<td style="text-align: left;">模型放不进单卡时</td>
+</tr>
+<tr>
+<td style="text-align: left;">HSDP</td>
+<td style="text-align: left;">组内 FSDP，组间 DP</td>
+<td style="text-align: left;">兼顾省显存和通信拓扑</td>
+<td style="text-align: left;">并行配置更复杂</td>
+<td style="text-align: left;">数百张以上 GPU</td>
+</tr>
+<tr>
+<td style="text-align: left;">CP</td>
+<td style="text-align: left;">sequence</td>
+<td style="text-align: left;">支持长上下文</td>
+<td style="text-align: left;">attention 通信复杂</td>
+<td style="text-align: left;">长序列训练/微调</td>
+</tr>
+<tr>
+<td style="text-align: left;">PP</td>
+<td style="text-align: left;">layers</td>
+<td style="text-align: left;">模型按层放到多卡</td>
+<td style="text-align: left;">pipeline bubble，需 microbatch</td>
+<td style="text-align: left;">层数很多、参数按层可切</td>
+</tr>
+<tr>
+<td style="text-align: left;">TP</td>
+<td style="text-align: left;">dim / linear weights</td>
+<td style="text-align: left;">切开单层大矩阵</td>
+<td style="text-align: left;">频繁通信，需要高速互联</td>
+<td style="text-align: left;">超大 Transformer 层</td>
+</tr>
+</tbody>
+</table>
+<h2 id="容易考的关键结论">10.3 容易考的关键结论</h2>
+<ul>
+<li><strong>数据并行的数学依据是梯度对样本平均的线性性。</strong> 每张
+GPU 算局部梯度，平均后等价于在更大的 batch 上训练。</li>
+<li><strong>普通 DP 不能解决大模型显存问题。</strong> 因为每张 GPU
+都保存完整参数、梯度和优化器状态。</li>
+<li><strong>FSDP/ZeRO 的核心是 shard 模型状态。</strong>
+它用更多通信换更低显存。</li>
+<li><strong>HSDP 是拓扑友好的折中。</strong>
+组内高频通信放在高速互联内，组间低频通信可以跨更慢网络。</li>
+<li><strong>Activation checkpointing 用重计算换显存。</strong>
+保存所有激活是 <span class="math inline">\(O(N)\)</span> compute、<span
+class="math inline">\(O(N)\)</span> memory；完全重算是 <span
+class="math inline">\(O(N^2)\)</span> compute、<span
+class="math inline">\(O(1)\)</span> memory；保存 <span
+class="math inline">\(\sqrt{N}\)</span> 个 checkpoint 可达到 <span
+class="math inline">\(O(N\sqrt{N})\)</span> compute、<span
+class="math inline">\(O(\sqrt{N})\)</span> memory。</li>
+<li><strong>HFU 不等于 MFU。</strong> HFU 看硬件实际执行 FLOPs
+占峰值比例；MFU 看有用模型计算占理论峰值比例，更适合评价训练配置。</li>
+<li><strong>MFU &gt; 30% 通常不错，&gt; 40% 很优秀。</strong></li>
+<li><strong>PP 的核心问题是 bubble。</strong> microbatch
+可以填充流水线，提高利用率。</li>
+<li><strong>TP 的核心问题是通信。</strong>
+连续两层采用列切分/行切分组合，可以减少中间 gather。</li>
+<li><strong>最大模型通常要多维并行。</strong>
+Batch、Sequence、Layers、Dim 都可能被同时切分。</li>
+</ul>
+<h2 id="一句话总览">10.4 一句话总览</h2>
+<p>大规模分布式训练的本质是把一个形状为 <span
+class="math inline">\((\text{Batch}, \text{Sequence},
+\text{Dim})\)</span>、包含很多层的模型训练过程，沿数据、序列、层和特征维度拆到
+GPU
+集群上；每一种拆法都在显存、通信和计算利用率之间交换成本，最终目标是让模型放得下，并让
+MFU 尽可能高。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Distributed-Training/"># Distributed Training</a>
+                    
+                        <a href="/tags/GPU-Computing/"># GPU Computing</a>
+                    
+                        <a href="/tags/Data-Parallelism/"># Data Parallelism</a>
+                    
+                        <a href="/tags/Model-Parallelism/"># Model Parallelism</a>
+                    
+                        <a href="/tags/Mixed-Precision-Training/"># Mixed Precision Training</a>
+                    
+                        <a href="/tags/Large-Scale-Deep-Learning/"># Large-Scale Deep Learning</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/13-14%20Generative%20Models/">13-14 Generative Models</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/10%20Video%20Understanding/">10 Video Understanding</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

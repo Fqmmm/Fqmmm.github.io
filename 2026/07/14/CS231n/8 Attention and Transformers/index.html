@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>8 Attention and Transformers | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">8 Attention and Transformers</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="从-rnn-seq2seq-到注意力机制">1 从 RNN Seq2Seq 到注意力机制</h1>
+<h2 id="encoder-decoder-rnn-的基本形式">1.1 Encoder-Decoder RNN
+的基本形式</h2>
+<p>机器翻译是理解本讲的核心例子：输入是一个长度为 <span
+class="math inline">\(T\)</span> 的源语言序列 <span
+class="math inline">\(x_1,\dots,x_T\)</span>，输出是一个长度为 <span
+class="math inline">\(T&#39;\)</span> 的目标语言序列 <span
+class="math inline">\(y_1,\dots,y_{T&#39;}\)</span>。传统 Seq2Seq
+模型使用一个 RNN 编码器和一个 RNN 解码器。</p>
+<p>编码器逐步读取输入 token，并维护隐藏状态：</p>
+<p><span class="math display">\[
+h_t = f_W(x_t, h_{t-1})
+\]</span></p>
+<p>读完所有输入后，模型通常用最后一个隐藏状态 <span
+class="math inline">\(h_T\)</span> 生成解码器初始状态 <span
+class="math inline">\(s_0\)</span>，并把某个固定长度向量 <span
+class="math inline">\(c\)</span> 作为上下文向量（context
+vector）。很多早期模型直接令 <span
+class="math inline">\(c=h_T\)</span>。解码器再从特殊 token
+<code>[START]</code> 开始，一步一步生成输出：</p>
+<p><span class="math display">\[
+s_t = g_U(y_{t-1}, s_{t-1}, c)
+\]</span></p>
+<p>例如输入英文 “we see the sky”，解码器可能依次输出意大利语 “vediamo il
+cielo [STOP]”。</p>
+<h2 id="固定长度上下文向量的瓶颈">1.2 固定长度上下文向量的瓶颈</h2>
+<p>Encoder-Decoder RNN
+的主要问题是：<strong>整段输入序列的信息必须被压缩进一个固定长度向量
+<span
+class="math inline">\(c\)</span></strong>。当输入很短时这可能可行；但如果
+<span
+class="math inline">\(T=1000\)</span>，最后隐藏状态必须同时保存开头、中间、结尾以及长距离依赖，信息瓶颈会非常严重。</p>
+<p>直观地说，翻译某个目标词时，模型并不总是需要整句输入的全部信息。生成
+“il” 时最相关的源词可能是 “the”；生成 “cielo” 时最相关的源词可能是
+“sky”。因此，更自然的做法是：<strong>解码器每一步都回看整段输入，并选择当前最相关的部分</strong>。</p>
+<h2 id="rnn-attention-的流程">1.3 RNN Attention 的流程</h2>
+<p>Bahdanau attention
+把固定上下文向量改成每个解码步动态计算的上下文向量。对于第 <span
+class="math inline">\(t\)</span> 个解码步，使用上一步解码器状态 <span
+class="math inline">\(s_{t-1}\)</span> 和每个编码器隐藏状态 <span
+class="math inline">\(h_i\)</span> 计算对齐分数：</p>
+<p><span class="math display">\[
+e_{t,i} = f_{\text{att}}(s_{t-1}, h_i)
+\]</span></p>
+<p>然后对这些分数做 softmax，得到注意力权重：</p>
+<p><span class="math display">\[
+a_{t,i} = \frac{\exp(e_{t,i})}{\sum_j \exp(e_{t,j})},
+\quad
+0&lt;a_{t,i}&lt;1,
+\quad
+\sum_i a_{t,i}=1
+\]</span></p>
+<p>最后用注意力权重对所有编码器隐藏状态做加权求和：</p>
+<p><span class="math display">\[
+c_t = \sum_i a_{t,i}h_i
+\]</span></p>
+<p>解码器在第 <span class="math inline">\(t\)</span> 步使用的是 <span
+class="math inline">\(c_t\)</span>，而不是同一个固定 <span
+class="math inline">\(c\)</span>：</p>
+<p><span class="math display">\[
+s_t = g_U(y_{t-1}, s_{t-1}, c_t)
+\]</span></p>
+<p><strong>关键结论</strong>：注意力机制让每个输出位置拥有自己的上下文向量。输入不再被压缩到单个固定向量中，模型可以在不同输出步关注输入序列的不同位置。</p>
+<h2 id="注意力权重的可视化意义">1.4 注意力权重的可视化意义</h2>
+<p>在翻译任务中，可以把 <span class="math inline">\(a_{t,i}\)</span>
+可视化成一个矩阵：横轴是输入词，纵轴是输出词。如果源语言和目标语言词序相近，注意力图常呈现接近对角线的结构；如果词序不同，注意力权重会偏离对角线，反映重排序关系。</p>
+<p>注意力图并不等同于严格的语言学对齐，但它提供了一个有用直觉：每个输出
+token
+不是盲目依赖一个全局状态，而是在当前步从输入序列中抽取相关信息。</p>
+<h1 id="注意力层的数学形式">2 注意力层的数学形式</h1>
+<h2 id="从-rnn-attention-抽象出通用算子">2.1 从 RNN Attention
+抽象出通用算子</h2>
+<p>RNN attention 中有两类向量：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">角色</th>
+<th style="text-align: left;">在 RNN 翻译例子中</th>
+<th style="text-align: left;">抽象含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">查询向量（Query）</td>
+<td style="text-align: left;">解码器状态 <span
+class="math inline">\(s_t\)</span></td>
+<td style="text-align: left;">“我现在想找什么信息”</td>
+</tr>
+<tr>
+<td style="text-align: left;">数据向量（Data）</td>
+<td style="text-align: left;">编码器状态 <span
+class="math inline">\(h_i\)</span></td>
+<td style="text-align: left;">可被查询的信息集合</td>
+</tr>
+<tr>
+<td style="text-align: left;">输出向量（Output）</td>
+<td style="text-align: left;">上下文向量 <span
+class="math inline">\(c_t\)</span></td>
+<td style="text-align: left;">从数据集合中按相关性混合出的结果</td>
+</tr>
+</tbody>
+</table>
+<p>因此，注意力可以看成一个作用在向量集合上的通用层：每个 query
+都会查看所有 data vectors，并输出一个由 data vectors
+加权组合得到的新向量。</p>
+<h2 id="单个-query-的注意力">2.2 单个 Query 的注意力</h2>
+<p>设 query 为 <span
+class="math inline">\(q\in\mathbb{R}^{D_Q}\)</span>，数据向量为 <span
+class="math inline">\(X\in\mathbb{R}^{N_X\times
+D_X}\)</span>。最一般的形式是先用某个函数计算相似度：</p>
+<p><span class="math display">\[
+e_i = f_{\text{att}}(q, X_i)
+\]</span></p>
+<p>再做 softmax：</p>
+<p><span class="math display">\[
+a=\mathrm{softmax}(e)
+\]</span></p>
+<p>最后输出：</p>
+<p><span class="math display">\[
+y=\sum_i a_i X_i
+\]</span></p>
+<p>这个版本的输出维度与数据向量维度相同，都是 <span
+class="math inline">\(D_X\)</span>。</p>
+<h2 id="scaled-dot-product-attention">2.3 Scaled Dot-Product
+Attention</h2>
+<p>现代 Transformer 中通常使用点积相似度，并加入缩放项：</p>
+<p><span class="math display">\[
+e_i = \frac{q\cdot X_i}{\sqrt{D_X}}
+\]</span></p>
+<p>缩放的原因是：维度 <span class="math inline">\(D\)</span>
+增大时，点积的数值尺度通常会随 <span
+class="math inline">\(\sqrt{D}\)</span> 增大。过大的 logits 会让 softmax
+过早饱和，导致梯度变小。除以 <span
+class="math inline">\(\sqrt{D}\)</span> 可以让 softmax
+的输入尺度更稳定。</p>
+<p>对于多个 query，令 <span
+class="math inline">\(Q\in\mathbb{R}^{N_Q\times D_X}\)</span>，则：</p>
+<p><span class="math display">\[
+E=\frac{QX^T}{\sqrt{D_X}}\in\mathbb{R}^{N_Q\times N_X}
+\]</span></p>
+<p><span class="math display">\[
+A=\mathrm{softmax}(E)
+\]</span></p>
+<p><span class="math display">\[
+Y=AX
+\]</span></p>
+<p>其中 <span class="math inline">\(Y\in\mathbb{R}^{N_Q\times
+D_X}\)</span>，每个 query 得到一个输出向量。</p>
+<h2 id="keyvalue-分离">2.4 Key、Value 分离</h2>
+<p>Transformer 更常用的写法会把数据向量 <span
+class="math inline">\(X\)</span> 投影成 key 和 value：</p>
+<p><span class="math display">\[
+K=XW_K,\quad V=XW_V
+\]</span></p>
+<p>其中 <span class="math inline">\(W_K\in\mathbb{R}^{D_X\times
+D_Q}\)</span>，<span class="math inline">\(W_V\in\mathbb{R}^{D_X\times
+D_V}\)</span>。注意力计算变为：</p>
+<p><span class="math display">\[
+E=\frac{QK^T}{\sqrt{D_Q}}
+\]</span></p>
+<p><span class="math display">\[
+A=\mathrm{softmax}(E)
+\]</span></p>
+<p><span class="math display">\[
+Y=AV
+\]</span></p>
+<p><strong>Key 决定匹配方式，Value 决定被混合的信息内容。</strong>
+这是一点很容易混淆：相似度不是用 value 算的，而是用 query 和 key
+算的；最终输出不是 key 的加权和，而是 value 的加权和。</p>
+<h2 id="cross-attention">2.5 Cross-Attention</h2>
+<p>当 query 和 data
+来自不同来源时，这就是交叉注意力（Cross-Attention）。例如在
+Encoder-Decoder 结构中，decoder 的状态作为 query，encoder 的隐藏状态作为
+data vectors。每个 decoder query 会从 encoder
+输出中抽取当前需要的信息。</p>
+<p>Cross-attention 的核心特征是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(Q\)</span></td>
+<td style="text-align: left;">当前要更新的一组 query 向量</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(K,V\)</span></td>
+<td style="text-align: left;">另一组 data 向量</td>
+</tr>
+<tr>
+<td style="text-align: left;">输出数量</td>
+<td style="text-align: left;">与 query 数量相同</td>
+</tr>
+</tbody>
+</table>
+<h1 id="self-attention位置编码与-masked-attention">3
+Self-Attention、位置编码与 Masked Attention</h1>
+<h2 id="self-attention-的定义">3.1 Self-Attention 的定义</h2>
+<p>自注意力（Self-Attention）是 cross-attention
+的特殊情况：query、key、value 都从同一组输入向量 <span
+class="math inline">\(X\)</span> 生成。</p>
+<p>设输入为 <span class="math inline">\(X\in\mathbb{R}^{N\times
+D_{\text{in}}}\)</span>，则：</p>
+<p><span class="math display">\[
+Q=XW_Q,\quad K=XW_K,\quad V=XW_V
+\]</span></p>
+<p>其中通常 <span class="math inline">\(Q,K,V\in\mathbb{R}^{N\times
+D_{\text{out}}}\)</span>。相似度矩阵、注意力权重和输出为：</p>
+<p><span class="math display">\[
+E=\frac{QK^T}{\sqrt{D_Q}}\in\mathbb{R}^{N\times N}
+\]</span></p>
+<p><span class="math display">\[
+A=\mathrm{softmax}(E)
+\]</span></p>
+<p><span class="math display">\[
+Y=AV
+\]</span></p>
+<p>每个输入向量都会产生一个输出向量；每个输出向量都是所有 value
+的加权和。因此，<strong>self-attention 是让同一组 token
+彼此交换信息的机制</strong>。</p>
+<p>实际实现时，<span class="math inline">\(Q,K,V\)</span>
+常被合并成一次矩阵乘法：</p>
+<p><span class="math display">\[
+[Q\ K\ V]=X[W_Q\ W_K\ W_V]
+\]</span></p>
+<p>这样可以更好地利用矩阵乘法硬件。</p>
+<h2 id="self-attention-的排列等变性">3.2 Self-Attention
+的排列等变性</h2>
+<p>Self-attention
+对输入顺序本身没有天然感知。若把输入向量顺序打乱，<span
+class="math inline">\(Q,K,V\)</span>、相似度矩阵、注意力权重和输出也会以相同方式被打乱。形式化地说：</p>
+<p><span class="math display">\[
+F(\sigma(X))=\sigma(F(X))
+\]</span></p>
+<p>这叫<strong>排列等变性（Permutation Equivariance）</strong>。它说明
+self-attention
+本质上适合处理“向量集合”，而不是天然知道“一维序列的第一个、第二个、第三个位置”。</p>
+<h2 id="位置编码">3.3 位置编码</h2>
+<p>为了让 self-attention 能处理序列，需要给每个输入 token
+加入位置编码（Positional Encoding）：</p>
+<p><span class="math display">\[
+\tilde{x}_i = x_i + p_i
+\]</span></p>
+<p>其中 <span class="math inline">\(p_i\)</span> 是与位置 <span
+class="math inline">\(i\)</span>
+对应的向量，可以是固定函数，也可以是可学习参数。加入位置编码后，即使两个
+token 内容相同，只要位置不同，它们进入模型的向量也不同。</p>
+<p>在语言中，位置编码告诉模型词序；在图像 ViT 中，位置编码告诉模型 patch
+的二维空间位置。没有位置编码，Transformer 很难区分 “dog bites man” 和
+“man bites dog” 这类只靠顺序决定语义的情况。</p>
+<h2 id="masked-self-attention">3.4 Masked Self-Attention</h2>
+<p>语言建模需要预测下一个 token。训练时虽然整句话都已知，但模型在预测第
+<span class="math inline">\(t\)</span> 个位置后面的词时，不能偷看未来
+token。Masked self-attention 通过把不允许访问的位置相似度改成 <span
+class="math inline">\(-\infty\)</span> 来实现：</p>
+<p><span class="math display">\[
+E_{i,j}=-\infty \quad \text{if position } j \text{ is not visible to
+query } i
+\]</span></p>
+<p>softmax 后这些位置的权重会变成 <span
+class="math inline">\(0\)</span>。对于自回归语言模型，常用的是因果
+mask（causal mask）：每个 token 只能看见自己和它之前的 token。</p>
+<p><strong>例子</strong>：输入 “Attention is very” 时，预测 “is”
+的位置只能看见 “Attention”；预测 “very” 的位置可以看见 “Attention
+is”；不能提前看见未来答案。</p>
+<h1 id="multi-head-self-attention-与计算代价">4 Multi-Head
+Self-Attention 与计算代价</h1>
+<h2 id="多头注意力的动机">4.1 多头注意力的动机</h2>
+<p>多头自注意力（Multi-Head Self-Attention）并行运行 <span
+class="math inline">\(H\)</span> 组 self-attention，每组叫一个
+head。不同 head 有独立的 <span
+class="math inline">\(W_Q,W_K,W_V\)</span>，因此可以学习不同类型的关系。</p>
+<p>一个 head 可能关注局部邻近词，另一个 head 可能关注主谓关系，还有一个
+head
+可能关注长距离依赖。多头结构给模型提供了多个“关系子空间”，最后再把这些
+head 的输出融合。</p>
+<h2 id="多头注意力的形状">4.2 多头注意力的形状</h2>
+<p>设输入 <span class="math inline">\(X\in\mathbb{R}^{N\times
+D}\)</span>，head 数为 <span class="math inline">\(H\)</span>，每个 head
+的维度为 <span class="math inline">\(D_H\)</span>。通常取：</p>
+<p><span class="math display">\[
+D_H=\frac{D}{H}
+\]</span></p>
+<p>这样所有 head 拼接后的总维度仍接近 <span
+class="math inline">\(D\)</span>。计算中会得到：</p>
+<p><span class="math display">\[
+Q,K,V\in\mathbb{R}^{H\times N\times D_H}
+\]</span></p>
+<p>每个 head 独立计算：</p>
+<p><span class="math display">\[
+E=\frac{QK^T}{\sqrt{D_H}}\in\mathbb{R}^{H\times N\times N}
+\]</span></p>
+<p><span class="math display">\[
+A=\mathrm{softmax}(E)
+\]</span></p>
+<p><span class="math display">\[
+Y=AV\in\mathbb{R}^{H\times N\times D_H}
+\]</span></p>
+<p>然后把所有 head 的输出 reshape 成 <span
+class="math inline">\(\mathbb{R}^{N\times
+HD_H}\)</span>，再乘输出投影矩阵：</p>
+<p><span class="math display">\[
+O=YW_O,\quad W_O\in\mathbb{R}^{HD_H\times D}
+\]</span></p>
+<h2 id="self-attention-是四次主要矩阵乘法">4.3 Self-Attention
+是四次主要矩阵乘法</h2>
+<p>多头 self-attention 的主要计算可以概括为四步：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">步骤</th>
+<th style="text-align: left;">作用</th>
+<th style="text-align: left;">典型形状</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">QKV Projection</td>
+<td style="text-align: left;">从输入一次性生成 <span
+class="math inline">\(Q,K,V\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\([N,D][D,3HD_H]\to[N,3HD_H]\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">QK Similarity</td>
+<td style="text-align: left;">计算每个 query 对每个 key 的相似度</td>
+<td style="text-align: left;"><span
+class="math inline">\([H,N,D_H][H,D_H,N]\to[H,N,N]\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">V-Weighting</td>
+<td style="text-align: left;">用注意力权重加权 value</td>
+<td style="text-align: left;"><span
+class="math inline">\([H,N,N][H,N,D_H]\to[H,N,D_H]\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Output Projection</td>
+<td style="text-align: left;">融合所有 head</td>
+<td style="text-align: left;"><span
+class="math inline">\([N,HD_H][HD_H,D]\to[N,D]\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>这也是 Transformer
+高效的重要原因：大部分工作都可以变成大矩阵乘法，非常适合 GPU。</p>
+<h2 id="复杂度与-flash-attention">4.4 复杂度与 Flash Attention</h2>
+<p>标准 self-attention 的注意力矩阵形状为 <span
+class="math inline">\(H\times N\times
+N\)</span>，因此计算量随序列长度增长为：</p>
+<p><span class="math display">\[
+O(N^2)
+\]</span></p>
+<p>如果显式保存注意力权重，内存也会出现二次增长。课件中的例子给出：当
+<span class="math inline">\(N=100000\)</span>、<span
+class="math inline">\(H=64\)</span> 时，注意力权重矩阵会达到 TB
+级别，普通 GPU 显然无法直接存储。</p>
+<p>Flash Attention 的思想是：<strong>在不显式保存完整 <span
+class="math inline">\(N\times N\)</span> 注意力矩阵的情况下，分块完成
+softmax 和 value 加权</strong>。它计算的是精确 attention，但通过
+IO-aware 的分块算法显著降低显存占用，使大 <span
+class="math inline">\(N\)</span> 的 attention 更可行。</p>
+<h2 id="rnn卷积self-attention-的对比">4.5 RNN、卷积、Self-Attention
+的对比</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">输入结构</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">RNN</td>
+<td style="text-align: left;">一维有序序列</td>
+<td style="text-align: left;">理论上对长度 <span
+class="math inline">\(N\)</span> 序列只需 <span
+class="math inline">\(O(N)\)</span> 计算和内存，适合逐步累积历史</td>
+<td style="text-align: left;">隐状态必须顺序计算，不易并行</td>
+</tr>
+<tr>
+<td style="text-align: left;">卷积</td>
+<td style="text-align: left;"><span class="math inline">\(N\)</span>
+维规则网格</td>
+<td style="text-align: left;">输出可并行计算，局部结构强</td>
+<td style="text-align: left;">长距离依赖需要堆很多层扩大感受野</td>
+</tr>
+<tr>
+<td style="text-align: left;">Self-Attention</td>
+<td style="text-align: left;">向量集合或 token 序列</td>
+<td
+style="text-align: left;">每个输出可直接依赖所有输入，矩阵乘法高度并行</td>
+<td style="text-align: left;">标准形式计算量和注意力矩阵规模约为 <span
+class="math inline">\(O(N^2)\)</span></td>
+</tr>
+</tbody>
+</table>
+<h1 id="transformer-block">5 Transformer Block</h1>
+<h2 id="transformer-的基本组件">5.1 Transformer 的基本组件</h2>
+<p>Transformer block 接收一组向量 <span
+class="math inline">\(x_1,\dots,x_N\)</span>，输出同样数量的一组向量
+<span class="math inline">\(y_1,\dots,y_N\)</span>。经典 block
+包含：</p>
+<ol type="1">
+<li>Multi-Head Self-Attention</li>
+<li>残差连接（Residual Connection）</li>
+<li>Layer Normalization</li>
+<li>对每个 token 独立作用的 MLP / FFN</li>
+<li>再一次残差连接与 Layer Normalization</li>
+</ol>
+<p>Self-attention 是 token 之间唯一的信息交互路径；LayerNorm 和 MLP
+都是对每个 token 独立处理的。</p>
+<h2 id="layer-normalization">5.2 Layer Normalization</h2>
+<p>LayerNorm 对每个 token 的特征维度做归一化。给定某个 token 的隐藏向量
+<span class="math inline">\(h_i\in\mathbb{R}^D\)</span>：</p>
+<p><span class="math display">\[
+\mu_i=\frac{1}{D}\sum_j h_{i,j}
+\]</span></p>
+<p><span class="math display">\[
+\sigma_i=\sqrt{\frac{1}{D}\sum_j (h_{i,j}-\mu_i)^2}
+\]</span></p>
+<p><span class="math display">\[
+z_i=\frac{h_i-\mu_i}{\sigma_i}
+\]</span></p>
+<p><span class="math display">\[
+y_i=\gamma \odot z_i + \beta
+\]</span></p>
+<p>其中 <span class="math inline">\(\gamma,\beta\in\mathbb{R}^D\)</span>
+是可学习参数。LayerNorm 与 BatchNorm 不同，它不依赖 batch
+维度统计量，因此很适合序列模型和 Transformer。</p>
+<h2 id="mlp-ffn">5.3 MLP / FFN</h2>
+<p>Transformer block 中的 MLP 通常是两层前馈网络，经典结构为：</p>
+<p><span class="math display">\[
+D \rightarrow 4D \rightarrow D
+\]</span></p>
+<p>它对每个 token 独立应用，负责在每个位置内部做非线性特征变换。可以把
+self-attention 理解为“token 间通信”，把 MLP 理解为“每个 token
+自己内部加工信息”。</p>
+<h2 id="transformer-是堆叠的-block">5.4 Transformer 是堆叠的 block</h2>
+<p>一个完整 Transformer 就是很多个相同结构的 block
+堆叠起来。课件列举了模型规模增长的例子：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">模型</th>
+<th style="text-align: left;">block 数</th>
+<th style="text-align: left;"><span
+class="math inline">\(D\)</span></th>
+<th style="text-align: left;">head 数</th>
+<th style="text-align: left;">上下文长度 <span
+class="math inline">\(N\)</span></th>
+<th style="text-align: left;">参数量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">原始 Transformer</td>
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">1024</td>
+<td style="text-align: left;">16</td>
+<td style="text-align: left;">512</td>
+<td style="text-align: left;">约 213M</td>
+</tr>
+<tr>
+<td style="text-align: left;">GPT-2</td>
+<td style="text-align: left;">48</td>
+<td style="text-align: left;">1600</td>
+<td style="text-align: left;">25</td>
+<td style="text-align: left;">1024</td>
+<td style="text-align: left;">约 1.5B</td>
+</tr>
+<tr>
+<td style="text-align: left;">GPT-3</td>
+<td style="text-align: left;">96</td>
+<td style="text-align: left;">12288</td>
+<td style="text-align: left;">96</td>
+<td style="text-align: left;">2048</td>
+<td style="text-align: left;">约 175B</td>
+</tr>
+</tbody>
+</table>
+<p>Transformer 架构自 2017
+年以来主体变化不大，但规模越来越大，训练数据和工程系统也越来越重要。</p>
+<h1 id="transformer-在语言建模中的用法">6 Transformer
+在语言建模中的用法</h1>
+<h2 id="token-embedding">6.1 Token Embedding</h2>
+<p>语言模型首先学习一个 embedding matrix，把离散 token
+转成连续向量。若词表大小为 <span
+class="math inline">\(V\)</span>，模型维度为 <span
+class="math inline">\(D\)</span>，embedding matrix 形状为：</p>
+<p><span class="math display">\[
+[V\times D]
+\]</span></p>
+<p>每个 token id 对应查表得到一个 <span class="math inline">\(D\)</span>
+维向量。</p>
+<h2 id="因果-mask-与下一词预测">6.2 因果 Mask 与下一词预测</h2>
+<p>语言模型使用 masked self-attention，使每个位置只能看到自己及其之前的
+token。这样模型可以被训练成预测下一个 token：</p>
+<p><span class="math display">\[
+p(x_{t+1}\mid x_1,\dots,x_t)
+\]</span></p>
+<p>训练时，模型末端用一个投影矩阵把每个位置的 <span
+class="math inline">\(D\)</span> 维向量投影回词表大小：</p>
+<p><span class="math display">\[
+[D\times V]
+\]</span></p>
+<p>得到每个词表 token 的分数，再使用 softmax + cross-entropy loss
+训练。</p>
+<h2 id="自回归生成">6.3 自回归生成</h2>
+<p>生成时，模型先读入已有上下文，预测下一个 token 的分布，采样或选择一个
+token 后把它追加到上下文，再重复这个过程。因果 mask
+保证模型的训练目标和推理过程一致：每一步只基于过去生成未来。</p>
+<h1 id="vision-transformervit">7 Vision Transformer（ViT）</h1>
+<h2 id="从图像到-patch-token">7.1 从图像到 Patch Token</h2>
+<p>Vision Transformer 把图像转换成 token 序列。以 <span
+class="math inline">\(224\times224\times3\)</span> 图像和 <span
+class="math inline">\(16\times16\)</span> patch 为例：</p>
+<ol type="1">
+<li>将图像切成不重叠 patch。</li>
+<li>每个 patch 的形状为 <span
+class="math inline">\(16\times16\times3\)</span>，展平后长度为 <span
+class="math inline">\(768\)</span>。</li>
+<li>用线性层把 <span class="math inline">\(768\)</span> 维 patch
+向量投影到 <span class="math inline">\(D\)</span> 维。</li>
+<li>得到 <span class="math inline">\(N\)</span> 个 <span
+class="math inline">\(D\)</span> 维 patch token，输入 Transformer。</li>
+</ol>
+<p>这个 patch embedding 操作也可以等价理解为一个卷积层：卷积核大小 <span
+class="math inline">\(16\times16\)</span>，stride 为 <span
+class="math inline">\(16\)</span>，输入通道为 <span
+class="math inline">\(3\)</span>，输出通道为 <span
+class="math inline">\(D\)</span>。</p>
+<h2 id="vit-中的位置编码和注意力">7.2 ViT 中的位置编码和注意力</h2>
+<p>图像 patch 本身被整理成 token 集合后，Transformer
+并不知道它们在二维图像中的位置。因此 ViT 需要加入位置编码，告诉模型每个
+patch 的二维空间位置。</p>
+<p>与语言模型不同，ViT 分类通常不使用因果 mask。每个 image patch 可以
+attend 到所有其他
+patch，因为图像分类任务中不存在“不能看未来”的限制。</p>
+<h2 id="分类输出">7.3 分类输出</h2>
+<p>Transformer 会为每个 patch 输出一个 <span
+class="math inline">\(D\)</span> 维向量。分类时可以：</p>
+<ol type="1">
+<li>对所有 <span class="math inline">\(N\times D\)</span> patch
+输出做平均池化，得到 <span class="math inline">\(1\times D\)</span>
+表示；</li>
+<li>再接一个线性层 <span class="math inline">\(D\to C\)</span>，输出
+<span class="math inline">\(C\)</span> 个类别分数。</li>
+</ol>
+<p>很多 ViT 变体也会使用额外的 class
+token，但本讲重点强调的是：<strong>图像先被 patch 化，再作为 token
+序列交给 Transformer 处理</strong>。</p>
+<h1 id="transformer-的常见现代改动">8 Transformer 的常见现代改动</h1>
+<h2 id="pre-norm-transformer">8.1 Pre-Norm Transformer</h2>
+<p>原始 Transformer 中 LayerNorm
+位于残差连接外侧。这会带来一个不太理想的问题：残差结构本来希望容易学习恒等映射，但如果归一化放在残差之后，严格的恒等映射会被
+LayerNorm 改变。</p>
+<p>Pre-Norm 把 LayerNorm 移到 self-attention 和 MLP
+之前，也就是残差分支内部：</p>
+<p><span class="math display">\[
+x_{l+1}=x_l+\mathrm{Block}(\mathrm{Norm}(x_l))
+\]</span></p>
+<p>这种结构通常训练更稳定，尤其在层数很深时更明显。</p>
+<h2 id="rmsnorm">8.2 RMSNorm</h2>
+<p>RMSNorm（Root-Mean-Square Normalization）用均方根归一化替代
+LayerNorm。对输入 <span
+class="math inline">\(x\in\mathbb{R}^D\)</span>：</p>
+<p><span class="math display">\[
+y_i=\frac{x_i}{\mathrm{RMS}(x)}\gamma_i
+\]</span></p>
+<p>其中：</p>
+<p><span class="math display">\[
+\mathrm{RMS}(x)=\sqrt{\epsilon+\frac{1}{D}\sum_{i=1}^{D}x_i^2}
+\]</span></p>
+<p>它不像 LayerNorm
+那样显式减去均值，形式更简单，很多大模型中也很常见。</p>
+<h2 id="swiglu-mlp">8.3 SwiGLU MLP</h2>
+<p>经典 Transformer MLP 可以写成：</p>
+<p><span class="math display">\[
+Y=\sigma(XW_1)W_2
+\]</span></p>
+<p>其中 <span
+class="math inline">\(W_1\in\mathbb{R}^{D\times4D}\)</span>，<span
+class="math inline">\(W_2\in\mathbb{R}^{4D\times D}\)</span>。</p>
+<p>SwiGLU 使用门控形式：</p>
+<p><span class="math display">\[
+Y=\sigma(XW_1)\odot(XW_2)W_3
+\]</span></p>
+<p>其中 <span class="math inline">\(W_1,W_2\in\mathbb{R}^{D\times
+H}\)</span>，<span class="math inline">\(W_3\in\mathbb{R}^{H\times
+D}\)</span>。若设置 <span
+class="math inline">\(H=\frac{8D}{3}\)</span>，可以让参数量与经典 <span
+class="math inline">\(4D\)</span> MLP 大致相当。</p>
+<p>直观上，SwiGLU 让 MLP
+的一条分支产生门控信号，另一条分支产生候选特征，再逐元素相乘后输出，表达能力通常更强。</p>
+<h2 id="mixture-of-expertsmoe">8.4 Mixture of Experts（MoE）</h2>
+<p>Mixture of Experts 在每个 block 中学习 <span
+class="math inline">\(E\)</span> 套不同的 MLP 权重，每套 MLP 称为一个
+expert。例如：</p>
+<p><span class="math display">\[
+W_1: [D,4D]\rightarrow[E,D,4D]
+\]</span></p>
+<p><span class="math display">\[
+W_2: [4D,D]\rightarrow[E,4D,D]
+\]</span></p>
+<p>每个 token 只被路由到其中 <span class="math inline">\(A&lt;E\)</span>
+个 active experts。因此 MoE 可以把参数量扩大约 <span
+class="math inline">\(E\)</span> 倍，但计算量只增加到与 active experts
+数 <span class="math inline">\(A\)</span> 相关。</p>
+<p><strong>核心意义</strong>：MoE
+用稀疏激活的方式扩大模型容量，让模型拥有更多参数，但每个 token
+只使用一小部分参数，从而控制推理和训练计算量。</p>
+<h1 id="复习重点与易混点">9 复习重点与易混点</h1>
+<h2 id="必须掌握的核心公式">9.1 必须掌握的核心公式</h2>
+<p>Scaled dot-product attention：</p>
+<p><span class="math display">\[
+Q=XW_Q,\quad K=XW_K,\quad V=XW_V
+\]</span></p>
+<p><span class="math display">\[
+E=\frac{QK^T}{\sqrt{D_Q}}
+\]</span></p>
+<p><span class="math display">\[
+A=\mathrm{softmax}(E)
+\]</span></p>
+<p><span class="math display">\[
+Y=AV
+\]</span></p>
+<p>多头 self-attention：</p>
+<p><span class="math display">\[
+Q,K,V\in\mathbb{R}^{H\times N\times D_H}
+\]</span></p>
+<p><span class="math display">\[
+A\in\mathbb{R}^{H\times N\times N}
+\]</span></p>
+<p><span class="math display">\[
+O=YW_O
+\]</span></p>
+<h2 id="querykeyvalue-的区别">9.2 Query、Key、Value 的区别</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">名称</th>
+<th style="text-align: left;">作用</th>
+<th style="text-align: left;">类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Query</td>
+<td style="text-align: left;">发起查询，决定“我想找什么”</td>
+<td style="text-align: left;">搜索请求</td>
+</tr>
+<tr>
+<td style="text-align: left;">Key</td>
+<td style="text-align: left;">被匹配，决定“我是否相关”</td>
+<td style="text-align: left;">索引标签</td>
+</tr>
+<tr>
+<td style="text-align: left;">Value</td>
+<td style="text-align: left;">被加权求和，决定“取回什么内容”</td>
+<td style="text-align: left;">实际内容</td>
+</tr>
+</tbody>
+</table>
+<p>考试或面试中常见错误是把 key 和 value 混为一谈。相似度由 <span
+class="math inline">\(QK^T\)</span> 决定，输出由 <span
+class="math inline">\(AV\)</span> 决定。</p>
+<h2 id="self-attention-为什么需要位置编码">9.3 Self-Attention
+为什么需要位置编码</h2>
+<p>Self-attention
+对输入顺序是排列等变的；它只看到一组向量，天然不知道哪个 token
+在前、哪个 token 在后。位置编码把位置信息加入 token
+表示，使模型能够利用顺序或空间布局。</p>
+<p>语言模型需要一维位置编码；ViT 需要表达二维 patch
+位置。二者目的相同：弥补 self-attention 本身不带顺序偏置的问题。</p>
+<h2 id="masked-attention-与普通-self-attention-的区别">9.4 Masked
+Attention 与普通 Self-Attention 的区别</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">类型</th>
+<th style="text-align: left;">可见范围</th>
+<th style="text-align: left;">典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">普通 self-attention</td>
+<td style="text-align: left;">每个 token 可以看所有 token</td>
+<td style="text-align: left;">图像分类、编码器、双向表示</td>
+</tr>
+<tr>
+<td style="text-align: left;">masked self-attention</td>
+<td style="text-align: left;">每个 token
+只能看允许的位置，语言模型中通常只能看过去</td>
+<td style="text-align: left;">自回归语言建模、下一词预测</td>
+</tr>
+</tbody>
+</table>
+<p>mask 的实现方式通常是在 softmax 前把不允许的位置设为 <span
+class="math inline">\(-\infty\)</span>，使其 softmax 权重为 <span
+class="math inline">\(0\)</span>。</p>
+<h2 id="transformer-block-的分工">9.5 Transformer Block 的分工</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">组件</th>
+<th style="text-align: left;">是否混合 token 间信息</th>
+<th style="text-align: left;">主要作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Self-Attention</td>
+<td style="text-align: left;">是</td>
+<td style="text-align: left;">不同 token 之间通信</td>
+</tr>
+<tr>
+<td style="text-align: left;">MLP / FFN</td>
+<td style="text-align: left;">否</td>
+<td style="text-align: left;">每个 token 内部非线性变换</td>
+</tr>
+<tr>
+<td style="text-align: left;">LayerNorm / RMSNorm</td>
+<td style="text-align: left;">否</td>
+<td style="text-align: left;">稳定数值尺度和训练</td>
+</tr>
+<tr>
+<td style="text-align: left;">Residual Connection</td>
+<td style="text-align: left;">保留原输入并改善梯度传播</td>
+<td style="text-align: left;">让深层网络更容易训练</td>
+</tr>
+</tbody>
+</table>
+<h2 id="复杂度重点">9.6 复杂度重点</h2>
+<p>标准 self-attention 的主要瓶颈来自注意力矩阵 <span
+class="math inline">\(A\in\mathbb{R}^{H\times N\times
+N}\)</span>。当序列长度 <span class="math inline">\(N\)</span>
+很大时，计算和显存都会迅速增长。Flash Attention 的意义不是改变 attention
+的数学定义，而是通过更好的分块计算方式避免保存完整注意力矩阵，从而降低显存压力。</p>
+<h2 id="本讲的主线">9.7 本讲的主线</h2>
+<p>本讲可以用一句话串起来：</p>
+<p><strong>RNN Seq2Seq 的固定上下文向量造成信息瓶颈，于是引入
+attention；attention 被抽象成 Q/K/V 的通用向量集合算子；self-attention
+让 token 之间高效并行通信；堆叠
+self-attention、MLP、归一化和残差连接，就得到 Transformer；Transformer
+再通过 mask、patch embedding、现代归一化和 MoE
+等设计扩展到语言、视觉和大规模 AI 模型。</strong></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Attention/"># Attention</a>
+                    
+                        <a href="/tags/Transformers/"># Transformers</a>
+                    
+                        <a href="/tags/Self-Attention/"># Self-Attention</a>
+                    
+                        <a href="/tags/Multi-Head-Attention/"># Multi-Head Attention</a>
+                    
+                        <a href="/tags/Positional-Encoding/"># Positional Encoding</a>
+                    
+                        <a href="/tags/Vision-Transformer/"># Vision Transformer</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/9%20Detection%20Segmentation%20Visualization%20and%20Understanding/">9 Detection, Segmentation, Visualization, and Understanding</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/7%20Recurrent%20Neural%20Networks/">7 Recurrent Neural Networks</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

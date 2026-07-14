@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>10 Video Understanding | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">10 Video Understanding</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="视频理解的基本问题">1 视频理解的基本问题</h1>
+<h2 id="从图像理解到视频理解">1.1 从图像理解到视频理解</h2>
+<p>前几讲主要讨论的是静态图像任务，例如图像分类、目标检测、语义分割和实例分割。图像分类只需要判断一张图属于哪个类别，检测和分割进一步要求模型理解图像中的空间位置、物体边界和像素级语义。</p>
+<p>视频理解在此基础上多了一个关键维度：<strong>时间（Time）</strong>。一段视频可以看成一串连续图像，因此常见输入张量可以写成：</p>
+<p><span class="math display">\[
+T \times 3 \times H \times W
+\]</span></p>
+<p>或等价地写成：</p>
+<p><span class="math display">\[
+3 \times T \times H \times W
+\]</span></p>
+<p>其中 <span class="math inline">\(T\)</span> 是帧数，<span
+class="math inline">\(3\)</span> 是 RGB 通道数，<span
+class="math inline">\(H,W\)</span>
+是空间分辨率。视频不是简单的“多张图片堆在一起”，因为许多语义依赖时间变化。例如单张图像可能只能看出“一个人在泳池边”，但视频中的连续动作可以让我们判断“游泳”“跳水”或“跑步”。</p>
+<h2 id="视频分类的任务形式">1.2 视频分类的任务形式</h2>
+<p>视频分类（Video
+Classification）的输入是一段视频，输出是动作或事件类别，例如：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">图像分类更关注</th>
+<th style="text-align: left;">视频分类更关注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">物体类别：dog, cat, truck, plane</td>
+<td style="text-align: left;">动作类别：swimming, running, jumping,
+eating</td>
+</tr>
+<tr>
+<td style="text-align: left;">单帧外观、纹理、形状</td>
+<td style="text-align: left;">外观加运动、时间顺序、动作持续过程</td>
+</tr>
+</tbody>
+</table>
+<p>因此，视频分类既需要识别“画面里有什么”，也需要识别“这些东西如何随时间变化”。在很多动作识别问题中，单帧外观本身已经很有帮助，但真正困难的部分通常来自运动和长时序结构。</p>
+<h2 id="视频数据很大">1.3 视频数据很大</h2>
+<p>视频的主要工程难点是体量巨大。以未压缩 RGB 视频估算，每个像素 3
+字节，若视频约为 30 fps：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">分辨率</th>
+<th style="text-align: left;">每分钟未压缩大小</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">SD <span class="math inline">\(640 \times
+480\)</span></td>
+<td style="text-align: left;">约 1.5 GB</td>
+</tr>
+<tr>
+<td style="text-align: left;">HD <span class="math inline">\(1920 \times
+1080\)</span></td>
+<td style="text-align: left;">约 10 GB</td>
+</tr>
+</tbody>
+</table>
+<p>这意味着不能简单地把完整高分辨率长视频直接送入模型训练。常见做法是：<strong>训练时采样短
+clip，降低帧率和空间分辨率</strong>。例如取 <span
+class="math inline">\(T=16, H=W=112\)</span> 的短片段，在 5 fps 下约覆盖
+3.2 秒，数据量约 588
+KB。这样既保留一定时间信息，又能让训练成本可控。</p>
+<h1 id="短视频片段上的视频分类">2 短视频片段上的视频分类</h1>
+<h2 id="clip-训练与测试">2.1 Clip 训练与测试</h2>
+<p>实际训练通常不是直接处理完整长视频，而是从原始视频中采样短片段：</p>
+<ol type="1">
+<li>原始视频通常很长、帧率高、分辨率高。</li>
+<li>训练时采样短 clip，并以较低帧率和较低分辨率输入模型。</li>
+<li>测试时可以从同一个视频采样多个 clip，对每个 clip
+做预测，再平均预测概率。</li>
+</ol>
+<p>这种策略的核心思想是：<strong>训练时让模型学习局部时间窗口中的视觉模式；测试时用多个局部窗口近似整段视频的语义</strong>。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702171736929.png" /></p>
+<h2 id="single-frame-cnn必须先尝试的强基线">2.2 Single-Frame
+CNN：必须先尝试的强基线</h2>
+<p>对于视频分类任务，最简单的想法是直接使用普通 2D
+CNN，对视频中的每一帧独立分类，测试时平均各帧预测概率。这被称为
+Single-Frame CNN。</p>
+<p>虽然它完全忽略显式时间建模，但在很多数据集上表现很强，原因是动作类别常常与场景和物体强相关。例如“游泳”常出现在泳池，“篮球”常出现在球场，“做饭”常出现在厨房。模型可能只靠单帧中的物体和背景就得到不错的分类结果。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702171700908.png" /></p>
+<h2 id="late-fusion先提取每帧高级特征再融合">2.3 Late
+Fusion：先提取每帧高级特征，再融合</h2>
+<p>Late Fusion 的思路是：先用同一个 2D CNN
+独立处理每一帧，得到每帧的高级外观特征，再在高层融合时间信息。</p>
+<p>一种实现是把所有帧特征拼接后送入 MLP：</p>
+<p><span class="math display">\[
+\text{Frame features}: T \times D \times H&#39; \times W&#39;
+\]</span></p>
+<p>展平后得到 clip
+级特征，再输出类别分数。另一种更常见的方式是对空间和时间做 average
+pooling，得到一个 <span class="math inline">\(D\)</span> 维 clip
+特征，然后接线性分类器。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702171917520.png" /></p>
+<p>Late Fusion 的优点是实现简单，可以复用成熟的 2D
+CNN。缺点是：<strong>低层运动信息很难被比较</strong>。因为每帧在前面已经被独立处理，只有高层语义特征才被融合，模型不容易捕捉像素级或局部纹理随时间的细微变化。</p>
+<h2 id="early-fusion在最开始就融合时间">2.4 Early
+Fusion：在最开始就融合时间</h2>
+<p>Early Fusion 把 <span class="math inline">\(T\)</span>
+帧沿通道维拼接，将输入从 <span class="math inline">\(T \times 3 \times H
+\times W\)</span> 改写为：</p>
+<p><span class="math display">\[
+3T \times H \times W
+\]</span></p>
+<p>然后用普通 2D CNN 处理。第一层 2D
+卷积会一次性看到所有帧，因此可以在网络开头比较不同时间的图像。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702172001362.png" /></p>
+<p>Early Fusion
+的问题是：<strong>时间信息只在第一层被一次性压缩，后续网络又退化为普通
+2D CNN。</strong>
+如果动作需要多层次、逐步抽象的时间建模，仅靠第一层融合往往不够。</p>
+<h1 id="从-2d-cnn-到-3d-cnn如何建模时间">3 从 2D CNN 到 3D
+CNN：如何建模时间</h1>
+<h2 id="d-cnn-的基本思想">3.1 3D CNN 的基本思想</h2>
+<p>3D CNN 将 2D 卷积和池化扩展到时间维。每一层特征是四维张量：</p>
+<p><span class="math display">\[
+D \times T \times H \times W
+\]</span></p>
+<p>卷积核不再只在空间上滑动，而是在时间和空间上共同滑动。例如 <span
+class="math inline">\(3 \times 3 \times 3\)</span> 卷积同时覆盖 3 帧、3
+个高度位置和 3 个宽度位置。</p>
+<p>与 Early Fusion 不同，3D CNN
+会在网络多个层级中逐渐融合时间信息，因此也被称为 Slow
+Fusion：<strong>空间感受野逐层扩大，时间感受野也逐层扩大</strong>。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702172244399.png" /></p>
+<h2 id="early-fusionlate-fusion-与-3d-cnn-的感受野差异">3.2 Early
+Fusion、Late Fusion 与 3D CNN 的感受野差异</h2>
+<p>PPT 用一个小网络对比三种方法。输入大小为：</p>
+<p><span class="math display">\[
+3 \times 20 \times 64 \times 64
+\]</span></p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">时间融合方式</th>
+<th style="text-align: left;">直观结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Late Fusion</td>
+<td
+style="text-align: left;">前面各帧独立处理，最后全局平均池化才融合时间</td>
+<td style="text-align: left;">空间逐步构建，时间在末尾一次性融合</td>
+</tr>
+<tr>
+<td style="text-align: left;">Early Fusion</td>
+<td
+style="text-align: left;">一开始把所有帧压到通道维，第一层融合时间</td>
+<td style="text-align: left;">空间逐步构建，时间在开头一次性融合</td>
+</tr>
+<tr>
+<td style="text-align: left;">3D CNN</td>
+<td style="text-align: left;">每层用 3D 卷积/池化逐步融合时间</td>
+<td style="text-align: left;">空间和时间都逐步构建</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702172418109.png" style="zoom:50%;" /></p>
+<p>关键区别在于时间感受野。Late Fusion 的中间卷积层时间感受野通常仍是
+<span
+class="math inline">\(1\)</span>，直到最后全局池化才覆盖所有帧。Early
+Fusion 的第一层已经覆盖全部 <span class="math inline">\(T\)</span>
+帧，但之后不再保留显式时间轴。3D CNN
+则保留时间轴，并让每一层的时间感受野逐渐变大。</p>
+<h2 id="d-early-fusion-与-3d-conv-的本质差异">3.3 2D Early Fusion 与 3D
+Conv 的本质差异</h2>
+<p>Early Fusion 中的第一层 2D 卷积权重可以看成：</p>
+<p><span class="math display">\[
+C_{\text{out}} \times C_{\text{in}} \times T \times 3 \times 3
+\]</span></p>
+<p>它一次性覆盖整个 clip 的时间长度，但只在 <span
+class="math inline">\(x,y\)</span>
+空间位置滑动，不在时间上滑动。因此它没有时间平移不变性：如果同一个运动模式发生在
+clip 的不同时间位置，模型可能需要学不同的滤波器。</p>
+<p>3D 卷积的卷积核形状通常是：</p>
+<p><span class="math display">\[
+C_{\text{out}} \times C_{\text{in}} \times 3 \times 3 \times 3
+\]</span></p>
+<p>它会在时间、宽度、高度三个维度上滑动，因此具有<strong>时间平移不变性（temporal
+shift-invariance）</strong>。也就是说，同一个局部运动模式无论出现在 clip
+的前、中、后，3D 卷积都可以用同一组权重检测。</p>
+<p>一个直观例子：如果模型要识别“蓝色区域变成橙色区域”的局部运动，3D
+卷积可以在任意时间位置检测这种变化；Early Fusion
+则更像把不同时间位置当作不同通道，缺少自然的时间滑动结构。</p>
+<h2 id="sports-1m-与早期实验结论">3.4 Sports-1M 与早期实验结论</h2>
+<p>Sports-1M 是一个包含约 100 万 YouTube 视频、487
+类运动标签的数据集。早期结果显示：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">Sports-1M Top-5 Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Single Frame</td>
+<td style="text-align: left;">76.8</td>
+</tr>
+<tr>
+<td style="text-align: left;">Early Fusion</td>
+<td style="text-align: left;">77.7</td>
+</tr>
+<tr>
+<td style="text-align: left;">Late Fusion</td>
+<td style="text-align: left;">78.7</td>
+</tr>
+<tr>
+<td style="text-align: left;">3D CNN</td>
+<td style="text-align: left;">80.2</td>
+</tr>
+<tr>
+<td style="text-align: left;">C3D</td>
+<td style="text-align: left;">84.4</td>
+</tr>
+</tbody>
+</table>
+<p>这个结果说明两个重要事实：</p>
+<ul>
+<li>单帧模型已经很强，因此任何视频模型都应与它比较。</li>
+<li>更合理的时空建模可以带来提升，尤其是后来更成熟的 3D CNN 架构。</li>
+</ul>
+<h2 id="c3d3d-cnn-中的-vgg">3.5 C3D：3D CNN 中的 VGG</h2>
+<p>C3D 可以理解为视频领域中类似 VGG 的 3D CNN：大量使用 <span
+class="math inline">\(3 \times 3 \times 3\)</span> 卷积和 <span
+class="math inline">\(2 \times 2 \times 2\)</span>
+池化。输入通常为：</p>
+<p><span class="math display">\[
+3 \times 16 \times 112 \times 112
+\]</span></p>
+<p>它的特点是结构规则、易于复用，并且曾经常被作为视频特征提取器，尤其是使用
+Sports-1M 预训练模型。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702172950427.png" style="zoom: 67%;" /></p>
+<p>但 C3D 的问题也很明显：<strong>3D 卷积非常昂贵</strong>。PPT
+中给出的计算量对比为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">模型</th>
+<th style="text-align: left;">计算量</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">AlexNet</td>
+<td style="text-align: left;">约 0.7 GFLOP</td>
+</tr>
+<tr>
+<td style="text-align: left;">VGG-16</td>
+<td style="text-align: left;">约 13.6 GFLOP</td>
+</tr>
+<tr>
+<td style="text-align: left;">C3D</td>
+<td style="text-align: left;">约 39.5 GFLOP，约为 VGG 的 2.9 倍</td>
+</tr>
+</tbody>
+</table>
+<p>因此，视频模型设计始终伴随一个核心矛盾：要利用时间信息，就需要处理更多维度；但时间维会显著增加计算和内存成本。</p>
+<h1 id="运动信息光流与双流网络">4 运动信息、光流与双流网络</h1>
+<h2 id="人可以只靠运动识别动作">4.1 人可以只靠运动识别动作</h2>
+<p>PPT
+引用了生物运动感知的经典现象：人类可以只通过一些运动点的轨迹识别走路、跑步等动作。这说明动作识别不一定需要完整外观，<strong>运动本身就携带强语义信息</strong>。</p>
+<p>这也是为什么视频理解不能只依赖单帧外观。某些动作的关键差异不在物体是什么，而在物体如何移动。例如“举重”和“拿着杠铃站立”在单帧上可能相似，但在运动模式上不同。</p>
+<h2 id="optical-flow-的定义">4.2 Optical Flow 的定义</h2>
+<p>光流（Optical Flow）描述相邻两帧之间每个像素的位移场。对于第 <span
+class="math inline">\(t\)</span> 帧图像 <span
+class="math inline">\(I_t\)</span> 和第 <span
+class="math inline">\(t+1\)</span> 帧图像 <span
+class="math inline">\(I_{t+1}\)</span>，光流 <span
+class="math inline">\(F\)</span> 在像素位置 <span
+class="math inline">\((x,y)\)</span> 上给出：</p>
+<p><span class="math display">\[
+F(x,y) = (dx, dy)
+\]</span></p>
+<p>其理想关系可以写成：</p>
+<p><span class="math display">\[
+I_{t+1}(x+dx, y+dy) = I_t(x,y)
+\]</span></p>
+<p>这里 <span class="math inline">\(dx\)</span> 是水平位移，<span
+class="math inline">\(dy\)</span>
+是垂直位移。光流图把局部运动显式表示出来，因此能突出人体、物体或局部区域的运动方向和速度。</p>
+<p>需要注意：这个公式依赖亮度一致性假设，即同一个物体点在相邻帧中的外观强度近似不变。现实中遮挡、光照变化和运动模糊会让光流估计变难。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702173154118.png" style="zoom: 33%;" /></p>
+<h2 id="two-stream-networks分离外观与运动">4.3 Two-Stream
+Networks：分离外观与运动</h2>
+<p>双流网络（Two-Stream Networks）将视频输入分成两个分支：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">分支</th>
+<th style="text-align: left;">输入</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Spatial stream</td>
+<td style="text-align: left;">单帧 RGB 图像，形状 <span
+class="math inline">\(3 \times H \times W\)</span></td>
+<td style="text-align: left;">建模外观、场景、物体</td>
+</tr>
+<tr>
+<td style="text-align: left;">Temporal stream</td>
+<td style="text-align: left;">连续光流堆叠，形状 <span
+class="math inline">\(2(T-1) \times H \times W\)</span></td>
+<td style="text-align: left;">建模运动方向和速度</td>
+</tr>
+</tbody>
+</table>
+<p>Temporal stream 常使用 Early
+Fusion，因为多个光流帧直接沿通道堆叠，让第一层 2D
+卷积处理整段运动信息。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702185127280.png" /></p>
+<p>在 UCF-101 上，PPT 给出的大致结果为：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">3D CNN</td>
+<td style="text-align: left;">65.4</td>
+</tr>
+<tr>
+<td style="text-align: left;">Spatial only</td>
+<td style="text-align: left;">73.0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Temporal only</td>
+<td style="text-align: left;">83.7</td>
+</tr>
+<tr>
+<td style="text-align: left;">Two-stream，平均融合</td>
+<td style="text-align: left;">86.9</td>
+</tr>
+<tr>
+<td style="text-align: left;">Two-stream，SVM 融合</td>
+<td style="text-align: left;">88.0</td>
+</tr>
+</tbody>
+</table>
+<p>这个结果说明：在当时的数据和模型条件下，显式光流对动作识别非常有帮助，甚至
+temporal stream 单独就超过 spatial
+stream。外观和运动互补，融合后效果最好。</p>
+<h1 id="长时序结构建模">5 长时序结构建模</h1>
+<h2 id="短-clip-的局限">5.1 短 clip 的局限</h2>
+<p>前面的 3D CNN、双流网络等通常处理约 2 到 5 秒的短
+clip，擅长捕捉局部动作模式。但许多视频理解问题需要长时间结构。例如：</p>
+<ul>
+<li>做饭包含拿食材、切菜、加热、装盘等阶段。</li>
+<li>体育动作可能由准备、起跳、击球、落地组成。</li>
+<li>复杂事件的类别取决于多个子事件的顺序。</li>
+</ul>
+<p>因此问题变成：如何在局部时空特征之上建模长程依赖？</p>
+<h2 id="cnn-rnn-lstm">5.2 CNN + RNN / LSTM</h2>
+<p>一种自然方法是先用 CNN
+提取每个时间片段的特征，再用循环网络处理这些特征序列：</p>
+<p><span class="math display">\[
+\text{Video} \rightarrow \text{CNN features} \rightarrow \text{RNN/LSTM}
+\rightarrow \text{Prediction}
+\]</span></p>
+<p>根据任务不同，可以使用：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">输出方式</th>
+<th style="text-align: left;">适用任务</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Many-to-one</td>
+<td style="text-align: left;">整段视频分类，只在最后输出一个类别</td>
+</tr>
+<tr>
+<td style="text-align: left;">Many-to-many</td>
+<td
+style="text-align: left;">每帧或每个时间步输出，例如动作定位、逐帧标签</td>
+</tr>
+</tbody>
+</table>
+<p>在实际训练中，有时不会把梯度反传回 CNN，而是先预训练
+CNN，再把它当作固定特征提取器。这样可以节省显存和计算。</p>
+<h2 id="cnn-局部时间结构-vs-rnn-全局时间结构">5.3 CNN 局部时间结构 vs
+RNN 全局时间结构</h2>
+<p>CNN
+中的每个特征值只依赖一个固定大小的时间窗口，因此它天然建模局部时间结构。RNN
+的隐藏状态则依赖过去所有时间步，因此理论上能建模全局时间结构。</p>
+<p>两者可以互补：</p>
+<ul>
+<li>CNN 提供局部时空模式，例如短时间动作片段。</li>
+<li>RNN/LSTM 在这些局部特征之上整合更长时间的顺序关系。</li>
+</ul>
+<p>不过 RNN
+的主要问题是长序列处理慢，因为时间步之间存在递归依赖，难以完全并行化。</p>
+<h2 id="recurrent-convolutional-network">5.4 Recurrent Convolutional
+Network</h2>
+<p>Recurrent Convolutional Network 把 RNN 的递归结构和 CNN
+的空间特征结合起来。每一层、每个时间步的特征图仍是：</p>
+<p><span class="math display">\[
+C \times H \times W
+\]</span></p>
+<p>但当前特征依赖两个输入：</p>
+<ol type="1">
+<li>同一层前一时间步的特征。</li>
+<li>前一层当前时间步的特征。</li>
+</ol>
+<p>普通 RNN 的更新可以写成：</p>
+<p><span class="math display">\[
+h_t = \tanh(W_h h_{t-1} + W_x x_t)
+\]</span></p>
+<p>Recurrent CNN 的关键是把矩阵乘法替换为 2D
+卷积，使隐藏状态仍然保留空间结构：</p>
+<p><span class="math display">\[
+H_t^L = \tanh(W_h * H_{t-1}^L + W_x * H_t^{L-1})
+\]</span></p>
+<p>其中 <span class="math inline">\(*\)</span>
+表示卷积。这样模型既有递归时间建模，又不会像全连接 RNN
+那样丢失空间布局。</p>
+<h1 id="时空自注意力i3d-与-video-transformer">6 时空自注意力、I3D 与
+Video Transformer</h1>
+<h2 id="self-attention-回顾">6.1 Self-Attention 回顾</h2>
+<p>自注意力（Self-Attention）的核心是让每个 token 根据相似度从所有 token
+聚合信息。给定输入向量 <span
+class="math inline">\(x_i\)</span>，先计算：</p>
+<p><span class="math display">\[
+q_i = x_i W_q,\quad k_i = x_i W_k,\quad v_i = x_i W_v
+\]</span></p>
+<p>对第 <span class="math inline">\(j\)</span> 个 query 和第 <span
+class="math inline">\(i\)</span> 个 key 的匹配分数为：</p>
+<p><span class="math display">\[
+e_{i,j} = \frac{q_j \cdot k_i}{\sqrt{D}}
+\]</span></p>
+<p>归一化得到注意力权重：</p>
+<p><span class="math display">\[
+a_{i,j} = \text{softmax}(e_{i,j})
+\]</span></p>
+<p>输出为 value 的加权和：</p>
+<p><span class="math display">\[
+y_j = \sum_i a_{i,j} v_i
+\]</span></p>
+<p>自注意力的优势是可以直接建立远距离依赖，不需要像 CNN
+那样通过多层局部卷积逐步扩大感受野，也不需要像 RNN
+那样按时间顺序串行传播。</p>
+<h2 id="spatio-temporal-self-attention-与-nonlocal-block">6.2
+Spatio-Temporal Self-Attention 与 Nonlocal Block</h2>
+<p>Nonlocal Block 将自注意力引入视频特征。假设 3D CNN 输出特征为：</p>
+<p><span class="math display">\[
+C \times T \times H \times W
+\]</span></p>
+<p>首先用 <span class="math inline">\(1 \times 1 \times 1\)</span>
+卷积生成 query、key、value：</p>
+<p><span class="math display">\[
+Q,K,V \in C&#39; \times T \times H \times W
+\]</span></p>
+<p>然后把时空位置展平成 <span class="math inline">\(THW\)</span> 个
+token，计算大小为：</p>
+<p><span class="math display">\[
+(THW) \times (THW)
+\]</span></p>
+<p>的注意力矩阵。这样任意两个时空位置之间都可以直接交互。例如，一个人在当前帧的手部位置可以关注到前几帧中的身体姿态或远处物体。</p>
+<p>Nonlocal Block 通常还会通过 <span class="math inline">\(1 \times 1
+\times 1\)</span> 卷积映射回原通道数，并加上 residual
+connection。它可以插入已有 3D CNN 架构中，增强长距离时空依赖建模。</p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260702185536644.png" /></p>
+<h2 id="i3d把-2d-图像网络膨胀到-3d">6.3 I3D：把 2D 图像网络膨胀到
+3D</h2>
+<p>I3D（Inflated 3D ConvNet）的出发点是：图像领域已经有大量成熟 2D CNN
+架构，能否把它们复用于视频？</p>
+<p>方法是把 2D 卷积或池化层：</p>
+<p><span class="math display">\[
+K_h \times K_w
+\]</span></p>
+<p>替换为 3D 版本：</p>
+<p><span class="math display">\[
+K_t \times K_h \times K_w
+\]</span></p>
+<p>例如 Inception block 中的 <span class="math inline">\(3 \times
+3\)</span> 卷积可以膨胀成 <span class="math inline">\(3 \times 3 \times
+3\)</span> 卷积，<span class="math inline">\(1 \times 1\)</span>
+卷积变成 <span class="math inline">\(1 \times 1 \times 1\)</span>
+卷积。</p>
+<p>I3D 还可以利用 ImageNet 预训练权重初始化 3D 卷积。设原 2D
+卷积核为：</p>
+<p><span class="math display">\[
+C_{\text{out}} \times C_{\text{in}} \times K_h \times K_w
+\]</span></p>
+<p>把它沿时间维复制 <span class="math inline">\(K_t\)</span> 次，并除以
+<span class="math inline">\(K_t\)</span>，得到：</p>
+<p><span class="math display">\[
+C_{\text{out}} \times C_{\text{in}} \times K_t \times K_h \times K_w
+\]</span></p>
+<p>这样当输入视频在时间上是“常量视频”时，3D 卷积输出与原 2D
+卷积保持一致。这是一个非常巧妙的初始化方式：既继承图像模型的表征能力，又允许模型继续学习时间特征。</p>
+<h2 id="kinetics-400-上的模型趋势">6.4 Kinetics-400 上的模型趋势</h2>
+<p>PPT 展示了 Kinetics-400 上不同方法的 Top-1 Accuracy：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">Top-1 Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Per-frame CNN</td>
+<td style="text-align: left;">62.2</td>
+</tr>
+<tr>
+<td style="text-align: left;">CNN + LSTM</td>
+<td style="text-align: left;">63.3</td>
+</tr>
+<tr>
+<td style="text-align: left;">Two-Stream CNN</td>
+<td style="text-align: left;">65.6</td>
+</tr>
+<tr>
+<td style="text-align: left;">I3D</td>
+<td style="text-align: left;">71.1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Inflated I3D</td>
+<td style="text-align: left;">74.2</td>
+</tr>
+<tr>
+<td style="text-align: left;">SlowFast 16x8 + Nonlocal</td>
+<td style="text-align: left;">79.8</td>
+</tr>
+<tr>
+<td style="text-align: left;">MViTv2-L</td>
+<td style="text-align: left;">86.1</td>
+</tr>
+<tr>
+<td style="text-align: left;">VideoMAE V2-g</td>
+<td style="text-align: left;">90.0</td>
+</tr>
+</tbody>
+</table>
+<p>可以看到，视频理解模型的发展趋势从手工加入光流、3D
+CNN、膨胀图像网络，逐渐走向更强的时空建模和大规模自监督预训练。</p>
+<h2 id="vision-transformers-for-video">6.5 Vision Transformers for
+Video</h2>
+<p>Video Transformer 的关键挑战是 token 数量巨大。视频不仅有空间
+patch，还有时间维，因此如果直接对所有时空 token
+做全局注意力，计算成本会非常高。</p>
+<p>PPT 提到几类重要思路：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">思路</th>
+<th style="text-align: left;">目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Factorized attention</td>
+<td style="text-align: left;">分解空间注意力和时间注意力，降低计算</td>
+</tr>
+<tr>
+<td style="text-align: left;">Pooling module / multiscale design</td>
+<td style="text-align: left;">减少 token 数量，在多尺度上建模</td>
+</tr>
+<tr>
+<td style="text-align: left;">Video masked autoencoders</td>
+<td style="text-align: left;">通过遮挡重建进行高效自监督预训练</td>
+</tr>
+</tbody>
+</table>
+<p>现代方法如 MViT、VideoMAE 的性能显著超过早期 CNN/RNN/Two-Stream
+方法，说明大规模预训练、Transformer 结构和高效 token
+设计对视频理解非常关键。</p>
+<h1 id="从分类到定位检测与可视化">7 从分类到定位、检测与可视化</h1>
+<h2 id="可视化视频模型理解了什么">7.1 可视化视频模型理解了什么</h2>
+<p>PPT 中展示了通过反向梯度可视化动作分类模型关注的内容。例如对
+“weightlifting” 类别，可以分别观察：</p>
+<ul>
+<li>appearance：模型从静态外观中看到杠铃、身体姿态等信息。</li>
+<li>slow motion：模型关注较慢、稳定的动作变化。</li>
+<li>fast motion：模型关注快速运动，例如杠铃晃动或向上推举的瞬间。</li>
+</ul>
+<p>这类可视化帮助我们理解：视频模型并不是只看“物体是什么”，也可能根据不同时间尺度的运动信息做判断。</p>
+<h2 id="temporal-action-localization">7.2 Temporal Action
+Localization</h2>
+<p>前面的分类任务假设输入 clip
+已经较短，且通常只需要输出一个动作类别。但现实视频常常是长而未裁剪的序列，其中不同时间段对应不同动作。</p>
+<p>时间动作定位（Temporal Action
+Localization）的任务是：给定长视频，识别不同动作发生的时间区间。例如同一段视频中先
+running，再 jumping。</p>
+<p>PPT 提到可以使用类似 Faster R-CNN 的思想：先生成 temporal
+proposals，再对这些时间候选片段分类。这里的 proposal
+不再是图像中的二维框，而是时间轴上的区间。</p>
+<h2 id="spatio-temporal-detection">7.3 Spatio-Temporal Detection</h2>
+<p>时空检测（Spatio-Temporal
+Detection）更进一步：给定长视频，既要检测人物在每一帧中的空间位置，又要分类他们正在执行的动作。</p>
+<p>这类任务的输出可以理解为“动作管道（action
+tube）”：空间上是随时间变化的 bounding
+boxes，时间上是动作发生的起止区间。AVA
+数据集就是典型例子，它标注视频中人的空间位置和原子动作。</p>
+<p>与视频分类相比，时空检测更接近真实应用，因为它要求模型回答：</p>
+<ul>
+<li>谁在做动作？</li>
+<li>动作发生在哪里？</li>
+<li>动作发生在什么时候？</li>
+<li>动作类别是什么？</li>
+</ul>
+<h1 id="多模态视频理解与高效视频理解">8
+多模态视频理解与高效视频理解</h1>
+<h2 id="temporal-stream-之外音频与视觉融合">8.1 Temporal Stream
+之外：音频与视觉融合</h2>
+<p>视频不仅包含视觉帧，还常常包含音频。PPT 后半部分从 temporal stream
+扩展到多模态视频理解。一个经典例子是 McGurk
+effect：人类听到的音节会受到嘴型视觉信息影响，说明音频和视觉在感知中会相互融合。</p>
+<p>在机器学习中，音频-视觉融合可以用于：</p>
+<ul>
+<li>视觉引导的音频源分离。</li>
+<li>音频-视觉活动识别。</li>
+<li>多模态 masked autoencoder。</li>
+<li>以音频作为预览信号来更高效地选择视频片段。</li>
+</ul>
+<h2 id="视觉引导的音频源分离">8.2 视觉引导的音频源分离</h2>
+<p>当多个说话者或多个乐器同时发声时，视觉信息可以帮助分离音频。例如看到左侧说话者的嘴在动，模型就可以把混合语音中的对应声源分离出来。类似地，在乐器视频中，模型可以根据不同乐器的视觉区域分离对应声音。</p>
+<p>这说明视频理解并不只是“看帧”，而是可以把视觉、音频和时间对齐起来，学习跨模态对应关系。</p>
+<h2 id="efficient-video-understanding">8.3 Efficient Video
+Understanding</h2>
+<p>长视频理解非常昂贵，因此高效视频理解是一条重要方向。PPT
+提到的方法包括：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法方向</th>
+<th style="text-align: left;">代表例子</th>
+<th style="text-align: left;">核心动机</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">高效模型架构</td>
+<td style="text-align: left;">MoViNets, X3D</td>
+<td style="text-align: left;">减少视频模型计算量</td>
+</tr>
+<tr>
+<td style="text-align: left;">显著 clip 采样</td>
+<td style="text-align: left;">SCSampler</td>
+<td style="text-align: left;">只处理信息量大的片段</td>
+</tr>
+<tr>
+<td style="text-align: left;">自适应多模态学习</td>
+<td style="text-align: left;">AdaMML</td>
+<td style="text-align: left;">根据输入动态选择模态或计算路径</td>
+</tr>
+<tr>
+<td style="text-align: left;">音频预览视觉</td>
+<td style="text-align: left;">Listen to Look</td>
+<td style="text-align: left;">用音频线索决定看哪些视频片段</td>
+</tr>
+</tbody>
+</table>
+<p>高效视频理解的核心问题是：<strong>不是每一帧都同样重要</strong>。模型应当学会在长视频中选择关键时刻、关键模态和合适的计算量。</p>
+<h2 id="egocentric-video-与-video-llms">8.4 Egocentric Video 与 Video
+LLMs</h2>
+<p>PPT 最后还提到第一人称/自我中心视频（Egocentric Video）和 Video
+Understanding +
+LLMs。第一人称视频往往包含摄像头佩戴者的视角、麦克风阵列、人与人的互动等，适合研究日常活动、对话图结构和具身智能。</p>
+<p>Video LLMs
+则把视频理解与大语言模型结合起来，目标不只是分类动作，而是进行更细粒度的视频问答、描述、推理和对齐。例如
+Video-LLaVA、Video-ChatGPT、VideoLLaMA
+等工作都试图让模型以自然语言方式理解视频内容。</p>
+<h1 id="复习重点与易混点">9 复习重点与易混点</h1>
+<h2 id="核心概念总结">9.1 核心概念总结</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">一句话理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Video tensor</td>
+<td style="text-align: left;">视频是图像序列，常写为 <span
+class="math inline">\(T \times 3 \times H \times W\)</span> 或 <span
+class="math inline">\(3 \times T \times H \times W\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Clip training</td>
+<td style="text-align: left;">用短片段、低帧率、低分辨率训练，测试时多
+clip 平均</td>
+</tr>
+<tr>
+<td style="text-align: left;">Single-Frame CNN</td>
+<td style="text-align: left;">强基线，只看单帧外观，不显式建模运动</td>
+</tr>
+<tr>
+<td style="text-align: left;">Late Fusion</td>
+<td style="text-align: left;">每帧先独立提特征，最后融合时间</td>
+</tr>
+<tr>
+<td style="text-align: left;">Early Fusion</td>
+<td
+style="text-align: left;">一开始把所有帧堆到通道维，第一层融合时间</td>
+</tr>
+<tr>
+<td style="text-align: left;">3D CNN</td>
+<td
+style="text-align: left;">卷积核在时间和空间上滑动，逐层融合时空信息</td>
+</tr>
+<tr>
+<td style="text-align: left;">Optical Flow</td>
+<td style="text-align: left;">相邻帧像素位移场，显式表示局部运动</td>
+</tr>
+<tr>
+<td style="text-align: left;">Two-Stream</td>
+<td style="text-align: left;">RGB 外观流 + 光流运动流</td>
+</tr>
+<tr>
+<td style="text-align: left;">CNN + RNN</td>
+<td style="text-align: left;">CNN 提取局部特征，RNN/LSTM 建模长时序</td>
+</tr>
+<tr>
+<td style="text-align: left;">Nonlocal Block</td>
+<td style="text-align: left;">在 <span
+class="math inline">\(THW\)</span> 个时空位置上做自注意力</td>
+</tr>
+<tr>
+<td style="text-align: left;">I3D</td>
+<td style="text-align: left;">把 2D 图像网络膨胀成 3D 视频网络，并可复用
+ImageNet 权重</td>
+</tr>
+<tr>
+<td style="text-align: left;">Video Transformer</td>
+<td style="text-align: left;">用注意力建模视频，但必须处理 token
+数量和计算成本</td>
+</tr>
+</tbody>
+</table>
+<h2 id="early-fusionlate-fusion3d-cnn-的易混点">9.2 Early Fusion、Late
+Fusion、3D CNN 的易混点</h2>
+<p><strong>Late Fusion</strong>
+不是完全不融合时间，而是在高层或最后池化时融合。因此它能利用多帧信息，但很难比较低层运动。</p>
+<p><strong>Early Fusion</strong> 不是 3D
+CNN。它虽然一开始看到所有帧，但之后时间维被压入通道维，缺少时间滑动和时间平移不变性。</p>
+<p><strong>3D CNN</strong>
+的关键不是“输入多帧”本身，而是卷积核在时间维上滑动，使局部运动模式可以在任意时间位置被同一组权重识别。</p>
+<h2 id="光流与-3d-cnn-的区别">9.3 光流与 3D CNN 的区别</h2>
+<p>光流是显式预计算的运动表示，告诉模型像素如何移动；3D CNN 是从 RGB
+clip 中学习隐式时空特征。双流网络把两者结合：RGB
+流提供外观，光流流提供运动。</p>
+<p>现代视频模型常常不再依赖传统光流，原因是光流计算昂贵，而且大规模 3D
+CNN / Transformer
+可以直接从数据中学习运动表征。但从概念上，光流仍然是理解视频动作识别的重要桥梁。</p>
+<h2 id="可能的考试题方向">9.4 可能的考试题方向</h2>
+<ol type="1">
+<li>解释为什么视频比图像更难处理，并写出视频张量形状。</li>
+<li>比较 Single-Frame CNN、Early Fusion、Late Fusion 和 3D CNN
+的优缺点。</li>
+<li>说明为什么 3D 卷积具有时间平移不变性，而 Early Fusion 没有。</li>
+<li>定义 optical flow，并解释它如何用于 Two-Stream Networks。</li>
+<li>解释 CNN + RNN 如何结合局部时空特征和长时序依赖。</li>
+<li>描述 Nonlocal Block 如何在 <span class="math inline">\(T \times H
+\times W\)</span> 的时空位置上做自注意力。</li>
+<li>说明 I3D 如何把 2D CNN 膨胀到 3D，并如何初始化 3D 卷积权重。</li>
+<li>解释为什么现代 Video Transformer 需要 factorized attention、pooling
+或 masked autoencoder 预训练。</li>
+<li>区分视频分类、时间动作定位和时空检测。</li>
+<li>举例说明音频-视觉融合为什么能改善视频理解。</li>
+</ol>
+<h2 id="本讲主线">9.5 本讲主线</h2>
+<p>本讲的主线可以概括为：</p>
+<p><strong>视频 = 图像 + 时间。</strong>
+最简单的单帧模型已经很强，但它无法真正理解运动。Early Fusion、Late
+Fusion 和 3D CNN 是对时间建模的三种基本方式，其中 3D CNN
+通过时空卷积逐层建立时间感受野。光流和双流网络显式利用运动信息，RNN/LSTM
+用于更长时间结构，Nonlocal Block 和 Video Transformer
+则通过注意力直接建模远距离时空依赖。随着任务扩展，视频理解从短 clip
+分类走向动作定位、时空检测、多模态理解、高效长视频处理和 Video
+LLMs。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Video-Understanding/"># Video Understanding</a>
+                    
+                        <a href="/tags/Video-Classification/"># Video Classification</a>
+                    
+                        <a href="/tags/Temporal-Modeling/"># Temporal Modeling</a>
+                    
+                        <a href="/tags/Optical-Flow/"># Optical Flow</a>
+                    
+                        <a href="/tags/Two-Stream-Networks/"># Two-Stream Networks</a>
+                    
+                        <a href="/tags/3D-Convolutional-Networks/"># 3D Convolutional Networks</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/11%20Large-Scale%20Distributed%20Training/">11 Large-Scale Distributed Training</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/9%20Detection%20Segmentation%20Visualization%20and%20Understanding/">9 Detection, Segmentation, Visualization, and Understanding</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

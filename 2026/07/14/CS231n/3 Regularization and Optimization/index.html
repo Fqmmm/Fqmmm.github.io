@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>3 Regularization and Optimization | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">3 Regularization and Optimization</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="上节内容回顾分类器损失函数与训练目标">1
+上节内容回顾：分类器、损失函数与训练目标</h1>
+<h2 id="图像分类的基本形式">1.1 图像分类的基本形式</h2>
+<p>图像分类（Image
+Classification）是计算机视觉中的核心任务：给定一张图像，从预先定义好的标签集合中选择一个类别，例如
+dog、cat、truck、plane
+等。这个任务表面上只是输出一个类别，但实际困难来自图像中的多种变化：光照、视角、形变、遮挡、背景杂乱以及同类内部差异。</p>
+<p>早期的简单方法可以用最近邻分类器（k-Nearest Neighbor,
+kNN）理解：把测试图像与训练图像比较，选择距离最近的样本或最近的若干样本投票。kNN
+的优点是训练阶段几乎没有计算，但测试慢、距离度量很脆弱，也难以真正学习视觉语义。</p>
+<h2 id="线性分类器与分数函数">1.2 线性分类器与分数函数</h2>
+<p>本讲的优化和正则化围绕线性分类器展开。对一张输入图像 <span
+class="math inline">\(x\)</span>，线性分类器输出各类别分数：</p>
+<p><span class="math display">\[
+f(x, W) = Wx + b
+\]</span></p>
+<p>其中 <span class="math inline">\(W\)</span> 是权重矩阵，<span
+class="math inline">\(b\)</span>
+是偏置项。每个类别对应一组权重，分数越高表示模型越倾向于把图像判为该类别。训练的目标不是手工指定
+<span
+class="math inline">\(W\)</span>，而是通过数据自动找到一组能让训练样本分类正确、并且能泛化到测试数据的参数。</p>
+<h2 id="损失函数与总体训练目标">1.3 损失函数与总体训练目标</h2>
+<p>给定训练集：</p>
+<p><span class="math display">\[
+\{(x_i, y_i)\}_{i=1}^{N}
+\]</span></p>
+<p>其中 <span class="math inline">\(x_i\)</span> 是第 <span
+class="math inline">\(i\)</span> 个样本，<span
+class="math inline">\(y_i\)</span> 是它的真实类别标签。损失函数（Loss
+Function）衡量当前模型在一个样本上的错误程度，数据集上的平均损失写作：</p>
+<p><span class="math display">\[
+L_{\text{data}}(W)=\frac{1}{N}\sum_{i=1}^{N}L_i(f(x_i,W),y_i)
+\]</span></p>
+<p>常见分类损失包括多类 SVM 损失和 Softmax
+交叉熵损失。它们的共同目的都是让正确类别的分数相对错误类别更高。到这里，学习问题就变成了一个优化问题：<strong>如何找到让损失尽可能小的参数
+<span class="math inline">\(W\)</span>？</strong></p>
+<h1 id="正则化regularization">2 正则化（Regularization）</h1>
+<h2 id="为什么需要正则化">2.1 为什么需要正则化</h2>
+<p>如果只最小化训练集上的数据损失，模型可能会过度贴合训练数据中的偶然噪声。一个简单的一维拟合例子可以说明这一点：如果数据点来自某个大致平滑的趋势，复杂模型可能穿过每个训练点，却在测试点上表现很差；较简单的模型虽然训练误差不一定最低，但更可能捕捉真实规律。</p>
+<p><strong>正则化（Regularization）</strong>的核心思想是：在要求模型拟合训练数据的同时，对模型复杂度或参数形态施加偏好，从而提高泛化能力。完整目标通常写成：</p>
+<p><span class="math display">\[
+L(W)=L_{\text{data}}(W)+\lambda R(W)
+\]</span></p>
+<p>其中 <span class="math inline">\(R(W)\)</span> 是正则化项，<span
+class="math inline">\(\lambda\)</span> 是正则化强度（regularization
+strength）。<span class="math inline">\(\lambda\)</span>
+越大，模型越倾向于满足正则化偏好；<span
+class="math inline">\(\lambda\)</span>
+越小，训练目标越接近纯数据损失。</p>
+<h2 id="occams-razor-与简单模型偏好">2.2 Occam’s Razor
+与简单模型偏好</h2>
+<p>正则化背后的直觉可以用奥卡姆剃刀（Occam’s
+Razor）概括：当多个假设都能解释训练数据时，优先选择更简单的假设。在机器学习中，“简单”不一定指模型参数少，也可以指权重更小、更平滑、更稀疏，或训练过程更不容易记住噪声。</p>
+<p><strong>考试重点</strong>：正则化并不是让训练集表现更好，而是有意阻止模型在训练集上“好得过头”，用一点训练误差换取更好的测试泛化。</p>
+<h2 id="常见正则化形式">2.3 常见正则化形式</h2>
+<p>常见的参数正则化包括：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">正则化</th>
+<th style="text-align: left;">形式</th>
+<th style="text-align: left;">主要偏好</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">L2 正则化</td>
+<td style="text-align: left;"><span class="math inline">\(R(W)=\sum_k
+W_k^2\)</span></td>
+<td style="text-align: left;">惩罚大权重，让权重更平滑、更分散</td>
+</tr>
+<tr>
+<td style="text-align: left;">L1 正则化</td>
+<td style="text-align: left;"><span class="math inline">\(R(W)=\sum_k
+|W_k|\)</span></td>
+<td style="text-align: left;">鼓励稀疏权重，使更多参数接近或等于 0</td>
+</tr>
+<tr>
+<td style="text-align: left;">Elastic Net</td>
+<td style="text-align: left;"><span
+class="math inline">\(R(W)=\alpha\sum_k |W_k|+\beta\sum_k
+W_k^2\)</span></td>
+<td style="text-align: left;">同时结合稀疏性和小权重偏好</td>
+</tr>
+</tbody>
+</table>
+<p>L2
+正则化喜欢把影响分散到多个维度上。例如两个权重向量如果都能产生相似分类效果，L2
+更偏好多个较小权重共同发挥作用，而不是少数维度权重特别大。L1
+正则化则更偏好稀疏解，因为绝对值惩罚会把一些参数推到 0。</p>
+<p>除了这些显式参数惩罚，深度学习中还有更复杂的正则化方法，例如
+Dropout、Batch Normalization、Stochastic Depth、Fractional Pooling
+等。它们不一定都表现为简单的 <span
+class="math inline">\(R(W)\)</span>，但都在某种意义上限制模型过拟合或改善训练行为。</p>
+<h2 id="正则化的三个作用">2.4 正则化的三个作用</h2>
+<p>正则化至少有三层意义：</p>
+<ol type="1">
+<li><strong>表达对权重的偏好</strong>：例如偏好小权重、稀疏权重或更平滑的函数。</li>
+<li><strong>提升测试集泛化</strong>：通过限制模型记忆训练噪声，让模型学习更稳定的规律。</li>
+<li><strong>改善优化曲面</strong>：某些正则项会给目标函数增加曲率，使优化问题更稳定。</li>
+</ol>
+<p>这里要注意，正则化强度 <span class="math inline">\(\lambda\)</span>
+是超参数，需要通过验证集调节。训练损失最低的 <span
+class="math inline">\(\lambda\)</span>
+不一定最好，验证集表现才是选择超参数的依据。</p>
+<h1 id="优化问题从随机搜索到梯度下降">3
+优化问题：从随机搜索到梯度下降</h1>
+<h2 id="训练分类器就是最小化损失">3.1 训练分类器就是最小化损失</h2>
+<p>在有了分数函数、损失函数和正则化项之后，训练问题可以写成：</p>
+<p><span class="math display">\[
+W^\ast=\arg\min_W L(W)
+\]</span></p>
+<p>也就是说，参数 <span class="math inline">\(W\)</span>
+是优化变量，损失 <span class="math inline">\(L(W)\)</span>
+是目标函数。对线性分类器而言，<span class="math inline">\(W\)</span>
+可能已经有成千上万个参数；对深度神经网络而言，参数数量可以达到百万、十亿甚至更多。因此，优化算法必须能在高维空间中高效寻找低损失区域。</p>
+<h2 id="随机搜索为什么很差">3.2 随机搜索为什么很差</h2>
+<p>最直观但很糟糕的办法是随机搜索：随机采样许多组 <span
+class="math inline">\(W\)</span>，计算它们在训练集或验证集上的表现，选最好的一个。这个方法偶尔能比随机猜测稍好，例如在
+CIFAR-10 上可能得到十几个百分点的准确率，但远远达不到现代模型水平。</p>
+<p>随机搜索的问题在于高维空间巨大。参数维度越高，随机命中好区域的概率越低。优化不能只靠“试运气”，而应该利用损失函数本身提供的信息。</p>
+<h2 id="顺着斜率下降">3.3 顺着斜率下降</h2>
+<p>更合理的策略是观察损失函数在当前位置的斜率。对一维函数，导数告诉我们函数在当前位置向右增加还是减少；对多维函数，梯度（Gradient）是所有偏导数组成的向量：</p>
+<p><span class="math display">\[
+\nabla_W L(W)=\left[\frac{\partial L}{\partial W_1},\frac{\partial
+L}{\partial W_2},\ldots,\frac{\partial L}{\partial W_d}\right]
+\]</span></p>
+<p>梯度方向是函数上升最快的方向，因此负梯度方向 <span
+class="math inline">\(-\nabla_W L(W)\)</span>
+是局部下降最快的方向。梯度下降的基本思想就是：反复计算当前位置的梯度，然后沿负梯度方向小步更新参数。</p>
+<h1 id="数值梯度解析梯度与梯度检查">4 数值梯度、解析梯度与梯度检查</h1>
+<h2 id="数值梯度">4.1 数值梯度</h2>
+<p>数值梯度（Numerical Gradient）用有限差分近似偏导。对某个参数维度
+<span class="math inline">\(W_j\)</span>，可以计算：</p>
+<p><span class="math display">\[
+\frac{\partial L}{\partial W_j}\approx \frac{L(W+h e_j)-L(W)}{h}
+\]</span></p>
+<p>其中 <span class="math inline">\(e_j\)</span> 表示只在第 <span
+class="math inline">\(j\)</span> 个维度为 1 的单位向量，<span
+class="math inline">\(h\)</span> 是很小的扰动。例如某一维参数增加 <span
+class="math inline">\(0.0001\)</span> 后，损失从 <span
+class="math inline">\(1.25347\)</span> 变为 <span
+class="math inline">\(1.25322\)</span>，则该维梯度近似为：</p>
+<p><span class="math display">\[
+\frac{1.25322-1.25347}{0.0001}=-2.5
+\]</span></p>
+<p>数值梯度的优点是容易实现、直观，不需要手工推导复杂公式。缺点也很明显：<strong>慢，并且只是近似值</strong>。如果有上百万个参数，每次计算完整梯度都要对每个维度单独扰动并重新计算损失，代价不可接受。</p>
+<h2 id="解析梯度">4.2 解析梯度</h2>
+<p>解析梯度（Analytic Gradient）通过微积分直接推导 <span
+class="math inline">\(\nabla_W L(W)\)</span>
+的公式。它速度快、结果精确，实际训练中必须使用解析梯度。深度学习框架中的自动微分，本质上就是在计算图上自动应用链式法则得到解析梯度。</p>
+<p>解析梯度的风险是实现容易出错，尤其是手写反向传播或自定义损失函数时。一处符号、维度或广播错误，就可能让训练表现异常。</p>
+<h2 id="梯度检查">4.3 梯度检查</h2>
+<p>实践中的标准做法是：<strong>训练时使用解析梯度，但用数值梯度检查解析梯度实现是否正确</strong>。这叫梯度检查（Gradient
+Check）。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">缺点</th>
+<th style="text-align: left;">用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">数值梯度</td>
+<td style="text-align: left;">容易写，直观</td>
+<td style="text-align: left;">慢，只是近似</td>
+<td style="text-align: left;">调试梯度实现</td>
+</tr>
+<tr>
+<td style="text-align: left;">解析梯度</td>
+<td style="text-align: left;">快，精确</td>
+<td style="text-align: left;">推导或实现可能出错</td>
+<td style="text-align: left;">实际训练</td>
+</tr>
+</tbody>
+</table>
+<p>梯度检查通常只在小模型、小 batch
+或少量参数上做，因为它太慢。通过检查后，就可以相信解析梯度并进入正式训练。</p>
+<h1 id="梯度下降与随机梯度下降sgd">5 梯度下降与随机梯度下降（SGD）</h1>
+<h2 id="梯度下降更新式">5.1 梯度下降更新式</h2>
+<p>标准梯度下降（Gradient Descent）的参数更新为：</p>
+<p><span class="math display">\[
+W_{t+1}=W_t-\eta \nabla_W L(W_t)
+\]</span></p>
+<p>其中 <span class="math inline">\(\eta\)</span> 是学习率（Learning
+Rate）。学习率控制每一步走多远：太小会训练很慢，太大可能越过低损失区域，甚至让损失爆炸。</p>
+<p>从几何上看，每一步都沿当前点的负梯度方向移动。由于梯度只是局部信息，梯度下降不保证一步到达全局最优，而是通过许多小步逐渐降低损失。</p>
+<h2 id="全量梯度下降的代价">5.2 全量梯度下降的代价</h2>
+<p>完整数据损失为：</p>
+<p><span class="math display">\[
+L(W)=\frac{1}{N}\sum_{i=1}^{N}L_i(W)+\lambda R(W)
+\]</span></p>
+<p>如果每次更新都计算所有 <span class="math inline">\(N\)</span>
+个样本上的梯度，当训练集很大时会非常昂贵。深度学习训练集通常包含数万、数百万甚至更多样本，全量梯度下降每一步都太慢。</p>
+<h2 id="随机梯度下降与-minibatch">5.3 随机梯度下降与 minibatch</h2>
+<p>随机梯度下降（Stochastic Gradient Descent,
+SGD）用一个小批量（minibatch）样本近似全数据梯度：</p>
+<p><span class="math display">\[
+\nabla_W L(W)\approx \frac{1}{B}\sum_{i\in \mathcal{B}}\nabla_W
+L_i(W)+\lambda \nabla_W R(W)
+\]</span></p>
+<p>其中 <span class="math inline">\(\mathcal{B}\)</span> 是大小为 <span
+class="math inline">\(B\)</span> 的 minibatch。常见 batch size 例如
+32、64、128。SGD 每次更新便宜很多，因此可以频繁更新参数。</p>
+<p>SGD 的关键权衡是：minibatch
+梯度是有噪声的估计，不一定等于全量梯度；但只要估计方向总体上有用，许多便宜的小步通常比少数昂贵的大步更适合深度学习。</p>
+<h1 id="sgd-的困难病态曲率局部极小值鞍点与噪声">6 SGD
+的困难：病态曲率、局部极小值、鞍点与噪声</h1>
+<h2 id="问题一不同方向曲率差异很大">6.1
+问题一：不同方向曲率差异很大</h2>
+<p>如果损失函数在一个方向变化很快，在另一个方向变化很慢，SGD
+会出现典型的低效行为：在陡峭方向来回震荡，在平坦方向前进缓慢。这种现象常出现在狭长山谷形的损失曲面中。</p>
+<p>课件用条件数（Condition Number）描述这种困难。粗略来说，Hessian
+矩阵最大和最小奇异值之比很大时，损失曲面在不同方向的曲率差异很大，优化会变得困难。</p>
+<h2 id="问题二局部极小值与鞍点">6.2 问题二：局部极小值与鞍点</h2>
+<p>在非凸优化中，损失函数可能存在局部极小值（Local
+Minimum）和鞍点（Saddle Point）。如果梯度接近
+0，普通梯度下降可能停滞。</p>
+<p>在高维深度学习问题中，鞍点通常比局部极小值更常见。鞍点在某些方向像极小值，在另一些方向像极大值；如果算法只看当前位置梯度，可能因为梯度很小而难以离开。</p>
+<h2 id="问题三minibatch-梯度噪声">6.3 问题三：minibatch 梯度噪声</h2>
+<p>SGD 的梯度来自 minibatch，因此不同 batch
+给出的梯度会有随机波动。噪声有时有好处，例如可以帮助模型逃离某些平坦停滞区域；但噪声也会让优化轨迹抖动，导致收敛不稳定。</p>
+<p>因此，现代优化器通常会引入动量、自适应学习率或学习率计划，来缓解曲率差异、鞍点停滞和梯度噪声。</p>
+<h1 id="动量方法与自适应优化器">7 动量方法与自适应优化器</h1>
+<h2 id="sgd-momentum">7.1 SGD + Momentum</h2>
+<p>动量（Momentum）的思想是维护一个速度向量，把过去的梯度方向累积起来。常见写法为：</p>
+<p><span class="math display">\[
+v_{t+1}=\rho v_t-\eta \nabla_W L(W_t)
+\]</span></p>
+<p><span class="math display">\[
+W_{t+1}=W_t+v_{t+1}
+\]</span></p>
+<p>其中 <span class="math inline">\(\rho\)</span> 是动量系数，常用 <span
+class="math inline">\(0.9\)</span> 或 <span
+class="math inline">\(0.99\)</span>。<span
+class="math inline">\(\rho\)</span>
+可以理解为“摩擦”或“记忆”参数：值越大，过去方向保留得越久。</p>
+<p>动量的作用包括：</p>
+<ol type="1">
+<li>在长期一致的方向上加速，例如狭长山谷中的平坦方向。</li>
+<li>在来回震荡的方向上相互抵消，例如陡峭方向。</li>
+<li>在梯度噪声较大时，让更新方向更平滑。</li>
+</ol>
+<p>因此，SGD + Momentum 往往比普通 SGD 更快、更稳定。</p>
+<h2 id="rmsprop">7.2 RMSProp</h2>
+<p>RMSProp
+是一种自适应学习率方法。它为每个参数维度维护历史平方梯度的指数滑动平均：</p>
+<p><span class="math display">\[
+s_{t+1}=\beta s_t+(1-\beta)g_t^2
+\]</span></p>
+<p><span class="math display">\[
+W_{t+1}=W_t-\eta \frac{g_t}{\sqrt{s_{t+1}}+\epsilon}
+\]</span></p>
+<p>其中 <span class="math inline">\(g_t=\nabla_W
+L(W_t)\)</span>，平方和除法都是逐元素进行。直觉上，如果某个维度历史梯度一直很大，说明这个方向可能很陡，RMSProp
+会缩小该方向步长；如果某个维度历史梯度较小，说明方向较平，RMSProp
+会相对放大该方向更新。</p>
+<p><strong>核心结论</strong>：RMSProp
+会抑制陡峭方向的更新，加速平坦方向的进展，因此能缓解不同方向曲率差异的问题。</p>
+<h2 id="adam">7.3 Adam</h2>
+<p>Adam 可以理解为把 Momentum 和 RMSProp
+结合起来。它同时维护一阶矩估计和二阶矩估计：</p>
+<p><span class="math display">\[
+m_t=\beta_1 m_{t-1}+(1-\beta_1)g_t
+\]</span></p>
+<p><span class="math display">\[
+v_t=\beta_2 v_{t-1}+(1-\beta_2)g_t^2
+\]</span></p>
+<p>其中 <span class="math inline">\(m_t\)</span> 类似动量，<span
+class="math inline">\(v_t\)</span> 类似 RMSProp 的平方梯度统计。由于
+<span class="math inline">\(m_0\)</span> 和 <span
+class="math inline">\(v_0\)</span> 通常初始化为 0，训练初期估计会偏向
+0，所以 Adam 使用偏差校正：</p>
+<p><span class="math display">\[
+\hat{m}_t=\frac{m_t}{1-\beta_1^t}
+\]</span></p>
+<p><span class="math display">\[
+\hat{v}_t=\frac{v_t}{1-\beta_2^t}
+\]</span></p>
+<p>最终更新为：</p>
+<p><span class="math display">\[
+W_{t+1}=W_t-\eta \frac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}
+\]</span></p>
+<p>常用起点是 <span class="math inline">\(\beta_1=0.9\)</span>、<span
+class="math inline">\(\beta_2=0.999\)</span>，学习率 <span
+class="math inline">\(\eta=10^{-3}\)</span> 或 <span
+class="math inline">\(5\times 10^{-4}\)</span>。Adam
+是许多模型的强默认选择，常常即使使用常数学习率也能工作得不错。</p>
+<h1 id="adamw权重衰减与学习率计划">8 AdamW、权重衰减与学习率计划</h1>
+<h2 id="adam-中的-l2-正则化和-adamw-的区别">8.1 Adam 中的 L2 正则化和
+AdamW 的区别</h2>
+<p>在普通 SGD 中，L2 正则化和权重衰减（Weight
+Decay）常常可以看成等价。但在 Adam
+这类自适应优化器中，二者不再完全等价，因为 L2
+正则项会先进入梯度，再参与一阶、二阶矩统计。</p>
+<p>标准 Adam 如果把 L2 正则化写进损失：</p>
+<p><span class="math display">\[
+L(W)=L_{\text{data}}(W)+\lambda \|W\|_2^2
+\]</span></p>
+<p>那么梯度中的正则化部分会参与 <span class="math inline">\(m_t\)</span>
+和 <span class="math inline">\(v_t\)</span> 的计算。AdamW
+的做法是把权重衰减从梯度矩估计中解耦，在 Adam
+的自适应更新之后直接对权重施加衰减：</p>
+<p><span class="math display">\[
+W_{t+1}=W_t-\eta \frac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}-\eta\lambda
+W_t
+\]</span></p>
+<p><strong>重要区别</strong>：AdamW 的权重衰减项不参与 Adam
+的动量和二阶矩统计，因此通常比在 Adam 损失中直接加 L2
+更符合“缩小权重”的初衷。</p>
+<h2 id="为什么需要学习率计划">8.2 为什么需要学习率计划</h2>
+<p>SGD、SGD + Momentum、RMSProp、Adam、AdamW
+都依赖学习率。一个固定学习率可能在训练早期太小，导致进展慢；也可能在训练后期太大，导致模型无法稳定收敛。因此实践中常让学习率随训练时间变化。</p>
+<p>常见学习率计划包括：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">计划</th>
+<th style="text-align: left;">形式或直觉</th>
+<th style="text-align: left;">典型用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Step decay</td>
+<td style="text-align: left;">在若干固定 epoch
+将学习率乘以某个因子，例如 <span class="math inline">\(0.1\)</span></td>
+<td style="text-align: left;">传统 CNN/ResNet 训练常见</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cosine decay</td>
+<td style="text-align: left;">学习率按余弦曲线平滑下降</td>
+<td style="text-align: left;">现代视觉和语言模型常见</td>
+</tr>
+<tr>
+<td style="text-align: left;">Linear decay</td>
+<td style="text-align: left;">从初始值线性下降到较小值或 0</td>
+<td style="text-align: left;">BERT 等训练中常见</td>
+</tr>
+<tr>
+<td style="text-align: left;">Inverse square root</td>
+<td style="text-align: left;">学习率按 <span
+class="math inline">\(1/\sqrt{t}\)</span> 类似形式下降</td>
+<td style="text-align: left;">Transformer 相关训练中常见</td>
+</tr>
+</tbody>
+</table>
+<p>余弦衰减常写作：</p>
+<p><span class="math display">\[
+\eta_t=\frac{1}{2}\eta_0\left(1+\cos\left(\frac{t}{T}\pi\right)\right)
+\]</span></p>
+<p>其中 <span class="math inline">\(\eta_0\)</span> 是初始学习率，<span
+class="math inline">\(t\)</span> 是当前训练步或 epoch，<span
+class="math inline">\(T\)</span> 是总训练长度。</p>
+<h2 id="linear-warmup">8.3 Linear Warmup</h2>
+<p>训练初期如果学习率过高，损失可能爆炸。线性预热（Linear
+Warmup）会在最开始一段迭代中把学习率从 0 逐渐增加到目标值：</p>
+<p><span class="math display">\[
+\eta_t=\eta_{\max}\frac{t}{T_{\text{warmup}}}, \quad 0\le t\le
+T_{\text{warmup}}
+\]</span></p>
+<p>预热结束后再接余弦衰减、线性衰减或其他计划。经验规则之一是：如果
+batch size 扩大 <span class="math inline">\(N\)</span>
+倍，初始学习率也可以按比例扩大 <span class="math inline">\(N\)</span>
+倍，但通常需要配合 warmup 保持稳定。</p>
+<h1 id="一阶优化与二阶优化">9 一阶优化与二阶优化</h1>
+<h2 id="一阶优化">9.1 一阶优化</h2>
+<p>一阶优化（First-Order
+Optimization）只使用梯度信息。可以把损失函数在当前位置做线性近似：</p>
+<p><span class="math display">\[
+L(W+\Delta W)\approx L(W)+\nabla L(W)^T\Delta W
+\]</span></p>
+<p>然后选择能降低这个近似目标的方向。梯度下降、SGD、Momentum、RMSProp、Adam
+都属于一阶方法。它们的优点是每步成本相对可控，适合大规模深度学习。</p>
+<h2 id="二阶优化">9.2 二阶优化</h2>
+<p>二阶优化（Second-Order Optimization）不仅使用梯度，还使用 Hessian
+矩阵 <span class="math inline">\(H\)</span> 描述曲率。二阶 Taylor
+展开为：</p>
+<p><span class="math display">\[
+L(W+\Delta W)\approx L(W)+\nabla L(W)^T\Delta W+\frac{1}{2}\Delta W^T H
+\Delta W
+\]</span></p>
+<p>令这个二次近似的导数为 0，可以得到 Newton 更新：</p>
+<p><span class="math display">\[
+W_{t+1}=W_t-H^{-1}\nabla L(W_t)
+\]</span></p>
+<p>二阶方法的直觉是：如果知道曲率，就可以更聪明地决定每个方向走多远。</p>
+<h2 id="为什么二阶方法难以直接用于深度学习">9.3
+为什么二阶方法难以直接用于深度学习</h2>
+<p>深度学习模型参数 <span class="math inline">\(N\)</span>
+往往是百万、千万、亿级。Hessian 矩阵有 <span
+class="math inline">\(O(N^2)\)</span> 个元素，存储已经很困难；求逆还需要
+<span class="math inline">\(O(N^3)\)</span> 时间，直接使用 Newton
+方法几乎不可行。</p>
+<p>因此，深度学习实践中最常用的仍然是一阶方法。若能进行全
+batch、确定性优化，可以考虑 L-BFGS 等近似二阶方法；但在 minibatch
+随机训练中，二阶方法的优势不容易直接发挥。</p>
+<h2 id="实践建议">9.4 实践建议</h2>
+<p>本讲给出的实践经验可以概括为：</p>
+<ol type="1">
+<li><strong>Adam 或 AdamW
+是许多模型的好默认选择</strong>，调参成本相对低。</li>
+<li><strong>SGD + Momentum 有时能超过
+Adam</strong>，但通常需要更仔细地调学习率和学习率计划。</li>
+<li>如果能承受 full batch 更新，可以考虑二阶或近似二阶方法。</li>
+</ol>
+<h1 id="从线性分类器走向神经网络">10 从线性分类器走向神经网络</h1>
+<h2 id="线性分类器的局限">10.1 线性分类器的局限</h2>
+<p>线性分类器只能用线性决策边界分割数据。如果二维平面中的红点和蓝点呈环形或其他非线性结构，单条直线无法把它们分开。</p>
+<p>解决思路是引入特征变换。例如把原始坐标 <span
+class="math inline">\((x,y)\)</span> 变换为极坐标相关特征 <span
+class="math inline">\((r,\theta)\)</span>，原来不可线性分离的数据可能在新特征空间中变得线性可分。</p>
+<h2 id="神经网络作为可学习特征变换">10.2 神经网络作为可学习特征变换</h2>
+<p>神经网络可以看成把“特征变换”也变成可学习的部分。一个两层神经网络可以写成：</p>
+<p><span class="math display">\[
+f(x)=W_2 \sigma(W_1 x)
+\]</span></p>
+<p>其中 <span class="math inline">\(W_1\)</span>
+把输入映射到隐藏表示，<span class="math inline">\(\sigma\)</span>
+是非线性激活函数，<span class="math inline">\(W_2\)</span>
+再把隐藏表示映射到类别分数。实际中通常还会在每层加偏置项。</p>
+<p>这里的关键是非线性。如果没有 <span
+class="math inline">\(\sigma\)</span>，多个线性层叠加仍然等价于一个线性层：</p>
+<p><span class="math display">\[
+W_2(W_1x)=(W_2W_1)x
+\]</span></p>
+<p>因此，神经网络之所以比线性分类器更强，是因为它通过非线性层学习复杂特征空间。</p>
+<h2 id="名称说明">10.3 名称说明</h2>
+<p>“神经网络（Neural
+Network）”是一个很宽泛的术语。本讲下一步要讨论的两层网络，更准确地说是全连接网络（Fully
+Connected Network）或多层感知机（Multi-Layer Perceptron,
+MLP）。后续课程会进一步讨论反向传播，也就是如何为多层网络高效计算梯度。</p>
+<h1 id="附录补充nesterovadagradl-bfgs-与-svmsoftmax-易混点">11
+附录补充：Nesterov、AdaGrad、L-BFGS 与 SVM/Softmax 易混点</h1>
+<h2 id="nesterov-momentum">11.1 Nesterov Momentum</h2>
+<p>普通 Momentum 在当前位置计算梯度，再结合速度更新。Nesterov Momentum
+的思想是先沿当前速度“向前看”一步，在这个前瞻位置计算梯度，再决定实际更新方向。</p>
+<p>直觉上，普通动量像是根据当前位置的坡度和已有速度继续滑行；Nesterov
+则先估计“如果按惯性走过去会到哪里”，再在那个位置修正方向。这种前瞻机制有时能减少过冲。</p>
+<h2 id="adagrad-与-rmsprop-的关系">11.2 AdaGrad 与 RMSProp 的关系</h2>
+<p>AdaGrad 也使用历史平方梯度为每个参数设置自适应学习率：</p>
+<p><span class="math display">\[
+s_t=s_{t-1}+g_t^2
+\]</span></p>
+<p><span class="math display">\[
+W_{t+1}=W_t-\eta \frac{g_t}{\sqrt{s_t}+\epsilon}
+\]</span></p>
+<p>它会抑制历史梯度大的方向、加速历史梯度小的方向。但由于 <span
+class="math inline">\(s_t\)</span>
+持续累加不衰减，长期训练后分母越来越大，步长会逐渐衰减到接近 0。RMSProp
+可以看成“带泄漏的
+AdaGrad”：它使用指数滑动平均，让很久以前的梯度影响逐渐变小。</p>
+<h2 id="l-bfgs">11.3 L-BFGS</h2>
+<p>BFGS 是拟牛顿方法，会近似 Hessian 逆矩阵，避免直接求 Hessian
+逆。L-BFGS（Limited-memory BFGS）进一步减少内存，不显式存储完整逆
+Hessian。</p>
+<p>L-BFGS 在 full batch、确定性目标上通常表现很好；但在 minibatch
+随机训练中，由于目标函数和梯度本身有噪声，L-BFGS
+往往效果不好。把二阶方法适配到大规模随机深度学习仍然是研究方向。</p>
+<h2 id="svm-零损失解为什么不唯一">11.4 SVM 零损失解为什么不唯一</h2>
+<p>多类 SVM 损失关注正确类别分数是否比错误类别分数至少高出
+margin。如果某个 <span class="math inline">\(W\)</span>
+已经让所有样本损失为 0，把 <span class="math inline">\(W\)</span> 放大为
+<span class="math inline">\(2W\)</span>
+后，正确类别与错误类别之间的分数差距也会放大，因此损失仍然可能为 0。</p>
+<p>这说明没有正则化时，零训练损失解不唯一。正则化可以在多个同样训练损失很低的解之间做选择，例如
+L2 正则化通常会偏好范数更小的 <span
+class="math inline">\(W\)</span>，而不是无意义地把权重越放越大。</p>
+<h1 id="复习重点与易混点">12 复习重点与易混点</h1>
+<h2 id="必须掌握的核心公式">12.1 必须掌握的核心公式</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">主题</th>
+<th style="text-align: left;">公式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">总损失</td>
+<td style="text-align: left;"><span
+class="math inline">\(L(W)=L_{\text{data}}(W)+\lambda R(W)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">L2 正则化</td>
+<td style="text-align: left;"><span class="math inline">\(R(W)=\sum_k
+W_k^2\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">L1 正则化</td>
+<td style="text-align: left;"><span class="math inline">\(R(W)=\sum_k
+|W_k|\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">梯度下降</td>
+<td style="text-align: left;"><span
+class="math inline">\(W_{t+1}=W_t-\eta\nabla_W L(W_t)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">SGD minibatch 梯度</td>
+<td style="text-align: left;"><span class="math inline">\(\nabla_W
+L(W)\approx \frac{1}{B}\sum_{i\in \mathcal{B}}\nabla_W
+L_i(W)+\lambda\nabla_W R(W)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Momentum</td>
+<td style="text-align: left;"><span class="math inline">\(v_{t+1}=\rho
+v_t-\eta g_t,\quad W_{t+1}=W_t+v_{t+1}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">RMSProp</td>
+<td style="text-align: left;"><span class="math inline">\(s_{t+1}=\beta
+s_t+(1-\beta)g_t^2,\quad
+W_{t+1}=W_t-\eta\frac{g_t}{\sqrt{s_{t+1}}+\epsilon}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Adam</td>
+<td style="text-align: left;"><span
+class="math inline">\(m_t=\beta_1m_{t-1}+(1-\beta_1)g_t,\quad
+v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Newton 更新</td>
+<td style="text-align: left;"><span
+class="math inline">\(W_{t+1}=W_t-H^{-1}\nabla L(W_t)\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="常见概念对比">12.2 常见概念对比</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">关键区别</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">数据损失 vs 正则化损失</td>
+<td
+style="text-align: left;">数据损失要求拟合训练标签，正则化损失表达对模型复杂度或权重形态的偏好</td>
+</tr>
+<tr>
+<td style="text-align: left;">训练误差 vs 泛化能力</td>
+<td
+style="text-align: left;">训练误差低不代表测试表现好，过拟合时训练很好但测试变差</td>
+</tr>
+<tr>
+<td style="text-align: left;">数值梯度 vs 解析梯度</td>
+<td
+style="text-align: left;">数值梯度慢但易写，适合检查；解析梯度快且精确，适合训练</td>
+</tr>
+<tr>
+<td style="text-align: left;">全量梯度下降 vs SGD</td>
+<td style="text-align: left;">全量梯度每步准确但贵；SGD
+每步便宜但有噪声</td>
+</tr>
+<tr>
+<td style="text-align: left;">Momentum vs RMSProp</td>
+<td style="text-align: left;">Momentum 平滑并累积更新方向；RMSProp
+为每个维度调整学习率</td>
+</tr>
+<tr>
+<td style="text-align: left;">Adam vs AdamW</td>
+<td style="text-align: left;">Adam 结合动量和自适应学习率；AdamW
+解耦权重衰减，更适合配合 Adam 类优化器</td>
+</tr>
+<tr>
+<td style="text-align: left;">一阶优化 vs 二阶优化</td>
+<td style="text-align: left;">一阶只用梯度，成本低；二阶使用 Hessian
+曲率，信息多但成本高</td>
+</tr>
+</tbody>
+</table>
+<h2 id="考试和作业中容易出错的点">12.3 考试和作业中容易出错的点</h2>
+<ol type="1">
+<li><strong>正则化强度是超参数</strong>，通常用验证集选择，而不是训练集。</li>
+<li><strong>L2 正则化偏好小而分散的权重</strong>，L1
+正则化更偏好稀疏权重。</li>
+<li><strong>负梯度方向是局部下降最快方向</strong>，梯度本身是上升最快方向。</li>
+<li><strong>数值梯度不能用于实际训练大模型</strong>，它主要用于 gradient
+check。</li>
+<li><strong>SGD 的 minibatch
+梯度有噪声</strong>，这既是效率来源，也是训练不稳定来源。</li>
+<li><strong>鞍点在高维非凸问题中非常常见</strong>，不能只用一维局部极小值的直觉理解深度学习优化。</li>
+<li><strong>Adam 的偏差校正来自初始矩估计为
+0</strong>，训练初期尤其重要。</li>
+<li><strong>Adam 中直接加 L2 与 AdamW
+的权重衰减不同</strong>，因为前者会影响自适应矩估计。</li>
+<li><strong>学习率计划和优化器同样重要</strong>，一个好优化器配错学习率也可能训练失败。</li>
+<li><strong>多层线性变换仍然是线性的</strong>，神经网络需要非线性激活才能表达复杂决策边界。</li>
+</ol>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Adam/"># Adam</a>
+                    
+                        <a href="/tags/Momentum/"># Momentum</a>
+                    
+                        <a href="/tags/Regularization/"># Regularization</a>
+                    
+                        <a href="/tags/Optimization/"># Optimization</a>
+                    
+                        <a href="/tags/Stochastic-Gradient-Descent/"># Stochastic Gradient Descent</a>
+                    
+                        <a href="/tags/Learning-Rate-Scheduling/"># Learning Rate Scheduling</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/2%20Image%20Classification%20with%20Linear%20Classifiers/">2 Image Classification with Linear Classifiers</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/4%20Neural%20Networks%20and%20Backpropagation/">4 Neural Networks and Backpropagation</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

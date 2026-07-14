@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>2 Image Classification with Linear Classifiers | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">2 Image Classification with Linear Classifiers</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="图像分类任务与语义鸿沟">1 图像分类任务与语义鸿沟</h1>
+<h2 id="图像分类的基本形式">1.1 图像分类的基本形式</h2>
+<p><strong>图像分类（Image Classification）</strong>
+是计算机视觉中的核心任务之一。给定一张输入图像和一组候选类别，例如
+dog、cat、truck、plane，分类器需要输出图像所属的类别。这个任务看起来直观，因为人类可以很快认出一张图片里的猫、车或飞机；但对计算机来说，图像本质上只是一个由整数构成的张量。</p>
+<p>例如一张 <span class="math inline">\(800 \times 600\)</span> 的 RGB
+图像可以表示为大小为 <span class="math inline">\(800 \times 600 \times
+3\)</span> 的数组，其中每个像素通道通常是 <span
+class="math inline">\([0,255]\)</span>
+之间的整数。分类器真正看到的是这些数字，而不是“猫的耳朵”“车轮”“飞机机翼”这样的语义对象。</p>
+<p><strong>语义鸿沟（Semantic Gap）</strong>
+指的是低层像素数值和高层语义概念之间的巨大差距。图像分类的困难主要来自：模型必须从原始像素中学习出对类别有用的表示，而这些表示不能简单靠人工规则硬编码出来。</p>
+<h2 id="图像分类的典型挑战">1.2 图像分类的典型挑战</h2>
+<p>图像分类难，不是因为类别名字复杂，而是因为同一类别的像素外观可能变化极大，不同类别也可能在局部像素上非常相似。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">挑战</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">为什么困难</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">视角变化（Viewpoint Variation）</td>
+<td style="text-align: left;">相机位置或物体姿态改变</td>
+<td
+style="text-align: left;">同一个物体的所有像素都会随视角变化而改变</td>
+</tr>
+<tr>
+<td style="text-align: left;">光照变化（Illumination）</td>
+<td style="text-align: left;">光源方向、强度、颜色不同</td>
+<td style="text-align: left;">像素亮度和颜色变化不一定代表类别变化</td>
+</tr>
+<tr>
+<td style="text-align: left;">背景杂乱（Background Clutter）</td>
+<td style="text-align: left;">目标处在复杂背景中</td>
+<td style="text-align: left;">模型需要区分目标和无关背景</td>
+</tr>
+<tr>
+<td style="text-align: left;">遮挡（Occlusion）</td>
+<td style="text-align: left;">目标被其他物体部分挡住</td>
+<td style="text-align: left;">分类器只能看到部分证据</td>
+</tr>
+<tr>
+<td style="text-align: left;">形变（Deformation）</td>
+<td style="text-align: left;">同类物体形状可变</td>
+<td
+style="text-align: left;">例如动物姿态、人体动作、柔性物体都会改变外观</td>
+</tr>
+<tr>
+<td style="text-align: left;">类内差异（Intraclass Variation）</td>
+<td style="text-align: left;">同一类别内部差异很大</td>
+<td style="text-align: left;">“狗”包含很多品种、颜色和姿态</td>
+</tr>
+<tr>
+<td style="text-align: left;">上下文（Context）</td>
+<td style="text-align: left;">周围场景影响理解</td>
+<td style="text-align: left;">上下文有时有帮助，有时会误导模型</td>
+</tr>
+</tbody>
+</table>
+<p><strong>考试重点</strong>：图像分类不是把像素和标签做一一对应的记忆问题，而是要学习对上述变化具有鲁棒性的决策规则。</p>
+<h1 id="数据驱动的图像分类方法">2 数据驱动的图像分类方法</h1>
+<h2 id="为什么不能手写规则">2.1 为什么不能手写规则</h2>
+<p>如果任务是排序一组数字，可以直接写出明确算法；但“识别猫”没有显而易见的硬编码规则。早期视觉算法尝试先检测边缘、角点等低层结构，再组合成高层对象。边缘和角点确实有用，但很难靠人工规则覆盖现实图像中的所有变化。</p>
+<p>现代图像分类通常采用<strong>数据驱动方法（Data-Driven
+Approach）</strong>：</p>
+<ol type="1">
+<li>收集带标签的数据集，例如许多图像及其类别标签。</li>
+<li>使用机器学习算法从数据中训练分类器。</li>
+<li>在未见过的新图像上评估分类器性能。</li>
+</ol>
+<p>这个流程的关键变化是：分类规则不再由人手工完整写出，而是由模型根据训练数据自动学习。</p>
+<h2 id="训练集验证集与测试集的角色">2.2
+训练集、验证集与测试集的角色</h2>
+<p>机器学习分类器通常会接触三类数据：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">数据划分</th>
+<th style="text-align: left;">用途</th>
+<th style="text-align: left;">注意事项</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">训练集（Training Set）</td>
+<td style="text-align: left;">学习模型参数或记忆样本</td>
+<td style="text-align: left;">可以反复使用</td>
+</tr>
+<tr>
+<td style="text-align: left;">验证集（Validation Set）</td>
+<td style="text-align: left;">选择超参数和模型设计</td>
+<td style="text-align: left;">用于开发阶段的模型选择</td>
+</tr>
+<tr>
+<td style="text-align: left;">测试集（Test Set）</td>
+<td style="text-align: left;">最终评估泛化性能</td>
+<td style="text-align: left;">只能在最后使用一次</td>
+</tr>
+</tbody>
+</table>
+<p><strong>测试集不能用来调参</strong>。如果根据测试集表现反复选择模型，就等价于把测试集信息泄漏进训练流程，最终测试准确率会过于乐观，不能代表模型对新数据的真实表现。</p>
+<h1 id="最近邻分类器nearest-neighbor">3 最近邻分类器（Nearest
+Neighbor）</h1>
+<h2 id="基本思想">3.1 基本思想</h2>
+<p><strong>最近邻分类器（Nearest Neighbor Classifier）</strong>
+是最简单的数据驱动分类器。它的训练阶段几乎什么都不做，只是把所有训练图像和标签存下来；预测时，对于一张测试图像，在训练集中找到最相似的一张图像，然后直接复制它的标签。</p>
+<p>形式化地说，给定测试图像 <span class="math inline">\(x\)</span>
+和训练样本 <span
+class="math inline">\(\{(x_i,y_i)\}_{i=1}^{N}\)</span>，最近邻分类器先计算
+<span class="math inline">\(x\)</span> 与每个 <span
+class="math inline">\(x_i\)</span> 的距离，再选择距离最小的样本：</p>
+<p><span class="math display">\[
+i^* = \arg\min_i d(x,x_i)
+\]</span></p>
+<p>预测标签为：</p>
+<p><span class="math display">\[
+\hat{y}=y_{i^*}
+\]</span></p>
+<h2 id="训练和预测复杂度">3.2 训练和预测复杂度</h2>
+<p>最近邻分类器的时间开销非常不平衡：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">阶段</th>
+<th style="text-align: left;">复杂度</th>
+<th style="text-align: left;">原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">训练</td>
+<td style="text-align: left;"><span class="math inline">\(O(1)\)</span>
+或近似 <span class="math inline">\(O(N)\)</span> 存储</td>
+<td style="text-align: left;">只需要记住训练数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">预测</td>
+<td style="text-align: left;"><span
+class="math inline">\(O(N)\)</span></td>
+<td style="text-align: left;">每个测试样本都要和所有训练样本比较</td>
+</tr>
+</tbody>
+</table>
+<p>这和实际需求正好相反。很多应用可以接受较慢的离线训练，但希望上线后的预测非常快。最近邻方法预测时需要扫描大量训练样本，因此不适合作为大规模图像分类的主力方法。</p>
+<p>近似最近邻搜索（Approximate Nearest Neighbor）可以缓解这个问题，例如
+FAISS 这类系统能做大规模向量检索；但在 CS231n
+的图像分类主线中，最近邻主要用于说明数据驱动方法、距离度量和超参数选择。</p>
+<h1 id="k-近邻距离度量与超参数选择">4 K 近邻、距离度量与超参数选择</h1>
+<h2 id="从-1-nn-到-knn">4.1 从 1-NN 到 KNN</h2>
+<p><strong>K 近邻（K-Nearest Neighbors, KNN）</strong>
+对最近邻方法做了一个自然扩展：预测时不只看最近的一个训练样本，而是找出距离测试图像最近的
+<span class="math inline">\(K\)</span>
+个训练样本，并通过多数投票决定标签。</p>
+<p>当 <span class="math inline">\(K=1\)</span> 时，KNN
+就退化为普通最近邻分类器。增大 <span class="math inline">\(K\)</span>
+往往能减少单个异常样本造成的影响，使决策边界更平滑；但 <span
+class="math inline">\(K\)</span>
+太大也可能把过多无关样本纳入投票，导致分类边界过于粗糙。</p>
+<h2 id="l1-距离与-l2-距离">4.2 L1 距离与 L2 距离</h2>
+<p>图像通常被展平成向量后比较距离。常见距离度量包括 <strong>L1
+距离（Manhattan Distance）</strong> 和 <strong>L2 距离（Euclidean
+Distance）</strong>。</p>
+<p>给定两个向量 <span class="math inline">\(x,y \in
+\mathbb{R}^D\)</span>：</p>
+<p><span class="math display">\[
+d_1(x,y)=\sum_{k=1}^{D}|x_k-y_k|
+\]</span></p>
+<p><span class="math display">\[
+d_2(x,y)=\sqrt{\sum_{k=1}^{D}(x_k-y_k)^2}
+\]</span></p>
+<p>L1 距离像在方格城市中沿街道移动，距离由各坐标差的绝对值相加得到。L2
+距离是直线距离，更强调较大的单维差异，因为平方会放大大偏差。</p>
+<p>例如在二维平面中，<span class="math inline">\(O=(0,0)\)</span>，<span
+class="math inline">\(A=(1,0)\)</span>，<span
+class="math inline">\(B=(\frac{1}{\sqrt{2}},\frac{1}{\sqrt{2}})\)</span>：</p>
+<p><span class="math display">\[
+d_2(O,A)=1,\quad d_2(O,B)=1
+\]</span></p>
+<p>但 L1 距离中：</p>
+<p><span class="math display">\[
+d_1(O,A)=1,\quad d_1(O,B)=\sqrt{2}
+\]</span></p>
+<p>因此，<strong>同一组点在不同距离度量下可能产生不同的最近邻和不同的分类边界</strong>。</p>
+<h2 id="超参数">4.3 超参数</h2>
+<p>KNN 中的 <span class="math inline">\(K\)</span>
+和距离度量都属于<strong>超参数（Hyperparameters）</strong>。超参数不是通过训练过程直接学出来的模型参数，而是算法设计中的选择，例如：</p>
+<ul>
+<li>使用 <span class="math inline">\(K=1,3,5\)</span> 还是更大的 <span
+class="math inline">\(K\)</span>。</li>
+<li>使用 L1 距离还是 L2 距离。</li>
+<li>是否使用某种特征变换或归一化。</li>
+</ul>
+<p>超参数通常高度依赖具体数据集，不能只凭直觉决定，必须通过验证集或交叉验证进行选择。</p>
+<h2 id="如何正确选择超参数">4.4 如何正确选择超参数</h2>
+<p>选择超参数时有几种常见思路：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">是否合理</th>
+<th style="text-align: left;">原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">在训练集上选表现最好的超参数</td>
+<td style="text-align: left;">不合理</td>
+<td style="text-align: left;">例如 <span
+class="math inline">\(K=1\)</span>
+通常能在训练集上表现完美，但可能过拟合</td>
+</tr>
+<tr>
+<td style="text-align: left;">在测试集上选表现最好的超参数</td>
+<td style="text-align: left;">严重错误</td>
+<td style="text-align: left;">测试集会被用于模型选择，最终评估失真</td>
+</tr>
+<tr>
+<td style="text-align: left;">划分训练集、验证集、测试集</td>
+<td style="text-align: left;">合理</td>
+<td style="text-align: left;">用验证集调参，用测试集做最终评估</td>
+</tr>
+<tr>
+<td style="text-align: left;">交叉验证（Cross-Validation）</td>
+<td style="text-align: left;">小数据集上有用</td>
+<td style="text-align: left;">多次轮换验证折，结果更稳定</td>
+</tr>
+</tbody>
+</table>
+<p><strong>交叉验证</strong> 的做法是把训练数据分成若干折，例如 5
+折。每次用其中一折做验证，其余折做训练，轮换多次后平均验证结果。它在小数据集上很有价值，但在深度学习中不常频繁使用，因为训练成本太高，通常更常见的是固定验证集。</p>
+<h1 id="cifar-10-与-knn-的局限">5 CIFAR-10 与 KNN 的局限</h1>
+<h2 id="cifar-10-数据集">5.1 CIFAR-10 数据集</h2>
+<p><strong>CIFAR-10</strong> 是图像分类中的经典数据集，包含 10
+个类别、50,000 张训练图像和 10,000 张测试图像，每张图像大小为 <span
+class="math inline">\(32 \times 32 \times 3\)</span>。</p>
+<p>它常用于教学和小规模实验，因为图像尺寸小、类别清晰、训练速度较快。对
+CS231n 来说，CIFAR-10 是理解
+KNN、线性分类器、损失函数和神经网络的常用例子。</p>
+<h2 id="为什么像素距离上的-knn-很少用于图像分类">5.2 为什么像素距离上的
+KNN 很少用于图像分类</h2>
+<p>KNN
+的关键问题在于：<strong>原始像素空间中的距离通常不等于语义相似度</strong>。例如一张原图、被遮挡后的图、整体平移
+1
+个像素的图、颜色轻微偏移的图，在人类看来语义几乎不变，但像素距离可能和另一张完全不同内容的图片一样大。</p>
+<p>这说明直接比较像素有严重缺陷：</p>
+<ul>
+<li>对平移、旋转、光照变化非常敏感。</li>
+<li>不能理解物体结构，只是在比较数字差异。</li>
+<li>高维像素空间中，距离度量容易变得不稳定。</li>
+<li>预测需要保存并扫描训练集，部署成本高。</li>
+</ul>
+<p>因此，KNN
+是理解图像分类的好起点，但不是现代视觉分类器的核心方案。</p>
+<h1 id="线性分类器与参数化方法">6 线性分类器与参数化方法</h1>
+<h2 id="参数化方法的基本思想">6.1 参数化方法的基本思想</h2>
+<p>与 KNN 不同，<strong>参数化方法（Parametric Approach）</strong>
+不在预测时查找整个训练集，而是学习一组参数，把输入图像直接映射为各类别的分数。</p>
+<p>对于 CIFAR-10，一张图像展平后是 <span class="math inline">\(32 \times
+32 \times 3=3072\)</span> 维向量。线性分类器输出 10 个类别分数：</p>
+<p><span class="math display">\[
+f(x,W)=Wx
+\]</span></p>
+<p>加入偏置项后：</p>
+<p><span class="math display">\[
+f(x,W,b)=Wx+b
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">\(x \in \mathbb{R}^{3072}\)</span>
+是输入图像向量。</li>
+<li><span class="math inline">\(W \in \mathbb{R}^{10 \times
+3072}\)</span> 是权重矩阵。</li>
+<li><span class="math inline">\(b \in \mathbb{R}^{10}\)</span>
+是偏置向量。</li>
+<li>输出 <span class="math inline">\(s=f(x,W,b)\in
+\mathbb{R}^{10}\)</span>，每个分量是一个类别分数。</li>
+</ul>
+<p>预测时选择分数最高的类别：</p>
+<p><span class="math display">\[
+\hat{y}=\arg\max_j s_j
+\]</span></p>
+<h2 id="一个小型线性分类例子">6.2 一个小型线性分类例子</h2>
+<p>假设输入图像只有 4 个像素，展平后得到向量 <span
+class="math inline">\(x\)</span>，分类任务有 cat、dog、ship
+三类。线性分类器会为每个类别学习一行权重，将输入像素加权求和再加上偏置，得到该类别的分数。</p>
+<p>例如：</p>
+<p><span class="math display">\[
+s_{\text{cat}}=w_{\text{cat}}^Tx+b_{\text{cat}}
+\]</span></p>
+<p>每一类都有自己的权重向量。某一类的权重可以理解为一个模板：如果输入图像和该模板在像素空间中“对齐”，对应类别分数就会较高。</p>
+<h1 id="线性分类器的三种理解方式">7 线性分类器的三种理解方式</h1>
+<h2 id="代数视角">7.1 代数视角</h2>
+<p>从代数角度看，线性分类器就是矩阵乘法加偏置：</p>
+<p><span class="math display">\[
+s=Wx+b
+\]</span></p>
+<p>它把一个高维输入向量映射为类别分数向量。训练的目标是找到合适的 <span
+class="math inline">\(W\)</span> 和 <span
+class="math inline">\(b\)</span>，让正确类别的分数通常高于错误类别。</p>
+<h2 id="视觉视角">7.2 视觉视角</h2>
+<p>从视觉角度看，权重矩阵 <span class="math inline">\(W\)</span>
+的每一行可以 reshape
+回图像形状，成为某个类别的模板。输入图像和模板做内积，越匹配，分数越高。</p>
+<p>这种理解很直观，但也暴露了线性分类器的限制：每个类别只有一个线性模板，很难同时表示同一类别的多种模式。例如“汽车”可能有正面、侧面、不同颜色和不同背景，一个单一模板会把这些变化平均在一起。</p>
+<h2 id="几何视角">7.3 几何视角</h2>
+<p>从几何角度看，线性分类器在输入空间中学习一组线性决策边界。对于两个类别
+<span class="math inline">\(i\)</span> 和 <span
+class="math inline">\(j\)</span>，分类边界满足：</p>
+<p><span class="math display">\[
+w_i^Tx+b_i=w_j^Tx+b_j
+\]</span></p>
+<p>整理后仍是一个超平面：</p>
+<p><span class="math display">\[
+(w_i-w_j)^Tx+(b_i-b_j)=0
+\]</span></p>
+<p>因此线性分类器只能用直线、平面或高维超平面分割空间。对于
+XOR、环形区域、多模态类别等结构，单个线性分类器很难正确表示。</p>
+<h1 id="损失函数如何评价一个分类器">8 损失函数：如何评价一个分类器</h1>
+<h2 id="为什么需要损失函数">8.1 为什么需要损失函数</h2>
+<p>线性分类器的核心问题是：如何找到好的 <span
+class="math inline">\(W\)</span> 和 <span
+class="math inline">\(b\)</span>。这需要两件事：</p>
+<ol type="1">
+<li>定义一个<strong>损失函数（Loss
+Function）</strong>，衡量当前分类器在训练数据上有多差。</li>
+<li>使用<strong>优化（Optimization）</strong>
+方法，高效寻找能降低损失的参数。</li>
+</ol>
+<p>给定训练集：</p>
+<p><span class="math display">\[
+\{(x_i,y_i)\}_{i=1}^{N}
+\]</span></p>
+<p>其中 <span class="math inline">\(x_i\)</span> 是第 <span
+class="math inline">\(i\)</span> 张图像，<span
+class="math inline">\(y_i\)</span> 是整数类别标签。单个样本的损失记为
+<span class="math inline">\(L_i\)</span>，整个数据集的平均损失为：</p>
+<p><span class="math display">\[
+L=\frac{1}{N}\sum_{i=1}^{N}L_i
+\]</span></p>
+<p>损失越小，表示模型给训练数据的分类分数越符合目标；损失越大，表示模型对正确类别的信心不足或把错误类别打得太高。</p>
+<h1 id="softmax-分类器与交叉熵损失">9 Softmax 分类器与交叉熵损失</h1>
+<h2 id="从分数到概率">9.1 从分数到概率</h2>
+<p>线性分类器输出的原始分数也叫
+<strong>logits</strong>。这些分数可以是任意实数，不一定非负，也不一定和为
+1。<strong>Softmax 分类器（Softmax Classifier）</strong> 使用 softmax
+函数把 logits 转换为概率分布：</p>
+<p><span class="math display">\[
+p_j=\frac{e^{s_j}}{\sum_{k=1}^{C}e^{s_k}}
+\]</span></p>
+<p>其中 <span class="math inline">\(C\)</span> 是类别数，<span
+class="math inline">\(s_j\)</span> 是类别 <span
+class="math inline">\(j\)</span> 的 logit，<span
+class="math inline">\(p_j\)</span> 是模型认为输入属于类别 <span
+class="math inline">\(j\)</span> 的概率。</p>
+<p>Softmax 有两个重要性质：</p>
+<ul>
+<li><span class="math inline">\(p_j \ge
+0\)</span>，因为指数函数输出非负。</li>
+<li><span
+class="math inline">\(\sum_{j=1}^{C}p_j=1\)</span>，因为所有指数值被总和归一化。</li>
+</ul>
+<h2 id="交叉熵损失">9.2 交叉熵损失</h2>
+<p>如果正确类别是 <span class="math inline">\(y_i\)</span>，Softmax
+损失定义为：</p>
+<p><span class="math display">\[
+L_i=-\log p_{y_i}
+\]</span></p>
+<p>展开为 logits 形式：</p>
+<p><span class="math display">\[
+L_i=-\log\left(\frac{e^{s_{y_i}}}{\sum_{j=1}^{C}e^{s_j}}\right)
+\]</span></p>
+<p>也可以写成：</p>
+<p><span class="math display">\[
+L_i=-s_{y_i}+\log\sum_{j=1}^{C}e^{s_j}
+\]</span></p>
+<p>这个损失鼓励正确类别概率 <span class="math inline">\(p_{y_i}\)</span>
+尽可能接近 1。若正确类别概率很高，<span class="math inline">\(-\log
+p_{y_i}\)</span> 接近 0；若正确类别概率很低，损失会很大。</p>
+<h2 id="最大似然kl-散度与交叉熵">9.3 最大似然、KL 散度与交叉熵</h2>
+<p>Softmax
+损失也可以从概率建模角度理解：模型给每个类别一个概率，训练时希望最大化观测到的正确标签的似然。最大化正确类别概率等价于最小化负对数似然：</p>
+<p><span class="math display">\[
+\max p_{y_i} \quad \Longleftrightarrow \quad \min -\log p_{y_i}
+\]</span></p>
+<p>如果把真实标签表示为 one-hot 分布 <span
+class="math inline">\(q\)</span>，模型输出为概率分布 <span
+class="math inline">\(p\)</span>，交叉熵为：</p>
+<p><span class="math display">\[
+H(q,p)=-\sum_{j=1}^{C}q_j\log p_j
+\]</span></p>
+<p>由于 one-hot 标签只有正确类别位置为 1，上式就化简为：</p>
+<p><span class="math display">\[
+H(q,p)=-\log p_{y_i}
+\]</span></p>
+<p>从分布比较角度看，它也和 KL
+散度有关：当真实分布固定时，最小化交叉熵等价于让模型分布更接近真实分布。</p>
+<h2 id="softmax-损失的常见问答">9.4 Softmax 损失的常见问答</h2>
+<p><strong>最小可能值</strong>：当正确类别概率 <span
+class="math inline">\(p_{y_i}=1\)</span> 时，</p>
+<p><span class="math display">\[
+L_i=-\log 1=0
+\]</span></p>
+<p>因此最小值是 0。</p>
+<p><strong>最大可能值</strong>：当正确类别概率趋近于 0 时，</p>
+<p><span class="math display">\[
+-\log p_{y_i}\to \infty
+\]</span></p>
+<p>因此最大值无上界。</p>
+<p><strong>初始化时的损失</strong>：如果初始化时所有类别分数近似相等，那么
+softmax 输出近似均匀分布：</p>
+<p><span class="math display">\[
+p_j\approx \frac{1}{C}
+\]</span></p>
+<p>正确类别损失为：</p>
+<p><span class="math display">\[
+L_i=-\log\frac{1}{C}=\log C
+\]</span></p>
+<p>对于 CIFAR-10，<span class="math inline">\(C=10\)</span>，所以初始
+softmax loss 大约是：</p>
+<p><span class="math display">\[
+\log 10 \approx 2.3
+\]</span></p>
+<h1 id="多类-svm-损失">10 多类 SVM 损失</h1>
+<h2 id="svm-损失的基本形式">10.1 SVM 损失的基本形式</h2>
+<p><strong>多类 SVM 损失（Multiclass SVM Loss）</strong> 又称 hinge
+loss。它不把分数解释为概率，而是要求正确类别分数比所有错误类别分数至少高出一个间隔（margin）。</p>
+<p>给定第 <span class="math inline">\(i\)</span> 个样本的分数向量 <span
+class="math inline">\(s=f(x_i,W)\)</span>，正确类别为 <span
+class="math inline">\(y_i\)</span>，SVM 损失为：</p>
+<p><span class="math display">\[
+L_i=\sum_{j\ne y_i}\max(0, s_j-s_{y_i}+1)
+\]</span></p>
+<p>其中 <span class="math inline">\(1\)</span> 是 margin。对每个错误类别
+<span class="math inline">\(j\)</span>，如果：</p>
+<p><span class="math display">\[
+s_{y_i}\ge s_j+1
+\]</span></p>
+<p>说明正确类别至少领先该错误类别 1 分，这一项损失为
+0。否则该错误类别会产生正损失。</p>
+<h2 id="svm-损失例子">10.2 SVM 损失例子</h2>
+<p>假设有 3 个类别 cat、car、frog，某个 cat 样本的分数为：</p>
+<p><span class="math display">\[
+s_{\text{cat}}=3.2,\quad s_{\text{car}}=5.1,\quad s_{\text{frog}}=-1.7
+\]</span></p>
+<p>正确类别是 cat，则损失为：</p>
+<p><span class="math display">\[
+L_i=\max(0,5.1-3.2+1)+\max(0,-1.7-3.2+1)
+\]</span></p>
+<p><span class="math display">\[
+=\max(0,2.9)+\max(0,-3.9)=2.9
+\]</span></p>
+<p>car 的分数比 cat 高，因此产生很大损失；frog
+的分数已经足够低，不产生损失。</p>
+<p>如果另一个 car 样本分数为：</p>
+<p><span class="math display">\[
+s_{\text{cat}}=1.3,\quad s_{\text{car}}=4.9,\quad s_{\text{frog}}=2.0
+\]</span></p>
+<p>正确类别 car 已经比其他类别至少高 1：</p>
+<p><span class="math display">\[
+\max(0,1.3-4.9+1)=0
+\]</span></p>
+<p><span class="math display">\[
+\max(0,2.0-4.9+1)=0
+\]</span></p>
+<p>所以该样本损失为 0。</p>
+<h2 id="svm-损失的性质">10.3 SVM 损失的性质</h2>
+<p>SVM
+损失关注的是<strong>相对分数差距</strong>，不是概率。只要正确类别分数比错误类别分数高出
+margin，继续提高正确类别分数不会进一步降低该样本损失。</p>
+<p>常见问题包括：</p>
+<ul>
+<li>最小损失是 0。</li>
+<li>最大损失无上界，因为错误类别分数可以比正确类别高任意多。</li>
+<li>如果初始化时所有分数接近相等，则每个错误类别项约为 <span
+class="math inline">\(\max(0,1)=1\)</span>，所以单样本损失约为 <span
+class="math inline">\(C-1\)</span>。</li>
+<li>如果把正确类别 <span class="math inline">\(j=y_i\)</span>
+也放进求和，会额外多出 <span
+class="math inline">\(\max(0,s_{y_i}-s_{y_i}+1)=1\)</span>，整体损失平移一个常数，不改变相对参数偏好，但会改变损失数值。</li>
+<li>如果用 mean 替代
+sum，只是按类别数缩放损失和梯度，通常可以通过学习率调整补偿。</li>
+</ul>
+<h2 id="svm-损失的向量化实现思路">10.4 SVM 损失的向量化实现思路</h2>
+<p>实现多类 SVM 损失时，一般步骤是：</p>
+<ol type="1">
+<li>计算所有样本的类别分数矩阵 <span
+class="math inline">\(S=XW+b\)</span>。</li>
+<li>取出每个样本正确类别的分数 <span
+class="math inline">\(s_{y_i}\)</span>。</li>
+<li>计算所有类别的 margin：</li>
+</ol>
+<p><span class="math display">\[
+\text{margin}_{ij}=s_j-s_{y_i}+1
+\]</span></p>
+<ol start="4" type="1">
+<li>对正确类别位置设置为 0，因为 <span
+class="math inline">\(j=y_i\)</span> 不参与求和。</li>
+<li>对所有 margin 应用 <span
+class="math inline">\(\max(0,\cdot)\)</span>。</li>
+<li>对类别求和，再对样本求平均。</li>
+</ol>
+<p>这类实现体现了深度学习代码中的重要风格：尽量使用矩阵运算和向量化操作，而不是对样本和类别写大量
+Python 循环。</p>
+<h1 id="softmax-与-svm-的比较">11 Softmax 与 SVM 的比较</h1>
+<p>Softmax 和 SVM 都可以训练线性分类器，但它们对分数的解释不同。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">维度</th>
+<th style="text-align: left;">Softmax</th>
+<th style="text-align: left;">Multiclass SVM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">分数解释</td>
+<td style="text-align: left;">logits 经过 softmax 后变成概率</td>
+<td style="text-align: left;">分数只用于比较相对大小</td>
+</tr>
+<tr>
+<td style="text-align: left;">损失形式</td>
+<td style="text-align: left;"><span class="math inline">\(-\log
+p_{y_i}\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\sum_{j\ne
+y_i}\max(0,s_j-s_{y_i}+1)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">优化目标</td>
+<td style="text-align: left;">提高正确类别概率</td>
+<td style="text-align: left;">让正确类别比分错类别高出 margin</td>
+</tr>
+<tr>
+<td style="text-align: left;">对很自信样本的处理</td>
+<td
+style="text-align: left;">继续提高正确概率仍会减少损失，但收益变小</td>
+<td style="text-align: left;">一旦满足 margin，损失就是 0</td>
+</tr>
+<tr>
+<td style="text-align: left;">输出可解释性</td>
+<td style="text-align: left;">有概率解释</td>
+<td style="text-align: left;">没有直接概率解释</td>
+</tr>
+</tbody>
+</table>
+<p>考虑正确类别分数已经很高的情况，例如分数为 <span
+class="math inline">\([10,-2,3]\)</span>，若正确类别是第一类，SVM
+可能已经满足 margin，损失为 0；Softmax 损失也很小，但仍不是严格
+0。若把正确类别分数从 10 提高到 20，SVM 损失仍然是 0，而 Softmax
+损失会继续变得更接近 0。</p>
+<p><strong>核心区别</strong>：SVM 关心“是否已经领先足够多”，Softmax
+关心“正确类别概率是否尽可能接近 1”。</p>
+<h1 id="复习重点与易混点">12 复习重点与易混点</h1>
+<h2 id="必须掌握的概念">12.1 必须掌握的概念</h2>
+<ul>
+<li><strong>语义鸿沟</strong>：图像是像素张量，但任务目标是高层语义类别。</li>
+<li><strong>KNN</strong>：训练时记忆数据，测试时找最近邻或 <span
+class="math inline">\(K\)</span> 个近邻投票。</li>
+<li><strong>距离度量</strong>：L1 和 L2
+会导致不同的邻居关系和决策边界。</li>
+<li><strong>超参数</strong>：例如 <span class="math inline">\(K\)</span>
+和距离度量，需要用验证集选择。</li>
+<li><strong>测试集只在最后使用一次</strong>：否则会造成测试集泄漏。</li>
+<li><strong>线性分类器</strong>：<span
+class="math inline">\(f(x,W,b)=Wx+b\)</span>，输出类别分数。</li>
+<li><strong>损失函数</strong>：把“分类器表现好坏”转化为可优化的数值目标。</li>
+<li><strong>Softmax 损失</strong>：把 logits
+变为概率，最小化正确类别的负对数概率。</li>
+<li><strong>SVM 损失</strong>：要求正确类别分数比错误类别分数至少高出
+margin。</li>
+</ul>
+<h2 id="常见易混点">12.2 常见易混点</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">易混点</th>
+<th style="text-align: left;">正确理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">KNN 训练快，所以整体好用</td>
+<td style="text-align: left;">KNN
+预测慢，而且像素距离不符合语义相似度</td>
+</tr>
+<tr>
+<td style="text-align: left;">训练集表现最好就是模型最好</td>
+<td
+style="text-align: left;">训练集表现可能来自过拟合，超参数应看验证集</td>
+</tr>
+<tr>
+<td style="text-align: left;">测试集可以用来调参</td>
+<td
+style="text-align: left;">测试集只用于最终评估，不能参与选择模型</td>
+</tr>
+<tr>
+<td style="text-align: left;">Softmax 的输入就是概率</td>
+<td style="text-align: left;">Softmax 输入是 logits，输出才是概率</td>
+</tr>
+<tr>
+<td style="text-align: left;">SVM 和 Softmax 都只看最大分数类别</td>
+<td
+style="text-align: left;">训练时两者都利用所有类别分数，但损失定义不同</td>
+</tr>
+<tr>
+<td style="text-align: left;">线性分类器可以解决所有分类边界</td>
+<td
+style="text-align: left;">线性模型只能表示超平面边界，复杂模式需要非线性模型</td>
+</tr>
+</tbody>
+</table>
+<h2 id="公式速查">12.3 公式速查</h2>
+<p>KNN 最近邻：</p>
+<p><span class="math display">\[
+i^*=\arg\min_i d(x,x_i),\quad \hat{y}=y_{i^*}
+\]</span></p>
+<p>L1 距离：</p>
+<p><span class="math display">\[
+d_1(x,y)=\sum_{k=1}^{D}|x_k-y_k|
+\]</span></p>
+<p>L2 距离：</p>
+<p><span class="math display">\[
+d_2(x,y)=\sqrt{\sum_{k=1}^{D}(x_k-y_k)^2}
+\]</span></p>
+<p>线性分类器：</p>
+<p><span class="math display">\[
+s=f(x,W,b)=Wx+b
+\]</span></p>
+<p>数据集平均损失：</p>
+<p><span class="math display">\[
+L=\frac{1}{N}\sum_{i=1}^{N}L_i
+\]</span></p>
+<p>Softmax 概率：</p>
+<p><span class="math display">\[
+p_j=\frac{e^{s_j}}{\sum_{k=1}^{C}e^{s_k}}
+\]</span></p>
+<p>Softmax 损失：</p>
+<p><span class="math display">\[
+L_i=-\log p_{y_i}
+\]</span></p>
+<p>多类 SVM 损失：</p>
+<p><span class="math display">\[
+L_i=\sum_{j\ne y_i}\max(0,s_j-s_{y_i}+1)
+\]</span></p>
+<h2 id="做题时的检查习惯">12.4 做题时的检查习惯</h2>
+<p>计算 Softmax loss 时，先确认正确类别概率是否合理；若所有 logits
+相等，答案应为 <span class="math inline">\(\log C\)</span>。计算 SVM
+loss 时，逐个错误类别检查 <span
+class="math inline">\(s_j-s_{y_i}+1\)</span> 是否大于 0，只有正 margin
+才会贡献损失。调参题中，看到“在 test set
+上选择最优模型”应立即判断为错误做法。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Image-Classification/"># Image Classification</a>
+                    
+                        <a href="/tags/Linear-Classifiers/"># Linear Classifiers</a>
+                    
+                        <a href="/tags/K-Nearest-Neighbors/"># K-Nearest Neighbors</a>
+                    
+                        <a href="/tags/SVM/"># SVM</a>
+                    
+                        <a href="/tags/Softmax/"># Softmax</a>
+                    
+                        <a href="/tags/Loss-Functions/"># Loss Functions</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/6%20Training%20CNNs%20and%20CNN%20Architectures/">6 Training CNNs and CNN Architectures</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/3%20Regularization%20and%20Optimization/">3 Regularization and Optimization</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

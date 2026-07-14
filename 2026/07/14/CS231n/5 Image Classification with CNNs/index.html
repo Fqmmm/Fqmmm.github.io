@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>5 Image Classification with CNNs | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">5 Image Classification with CNNs</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="从线性分类器到卷积网络">1 从线性分类器到卷积网络</h1>
+<h2 id="图像分类任务">1.1 图像分类任务</h2>
+<p>图像分类（Image
+Classification）的输入是一张图像，输出是在给定类别集合中的预测类别。例如类别集合可以是
+<code>{dog, cat, truck, plane, ...}</code>，模型需要根据像素内容给出每个类别的分数，最后选择分数最高的类别。</p>
+<p>在前几讲中，最基本的做法是把图像表示成一个向量，然后使用线性分类器：</p>
+<p><span class="math display">\[
+f(x, W) = Wx + b
+\]</span></p>
+<p>其中 <span class="math inline">\(x\)</span>
+是输入图像展平后的向量，<span class="math inline">\(W\)</span>
+是可学习权重，<span class="math inline">\(b\)</span>
+是偏置，输出是每个类别的
+score。训练时用损失函数衡量预测和真实标签的差距，例如 Softmax loss，再用
+SGD、Momentum、RMSProp、Adam 等优化算法更新参数。</p>
+<h2 id="线性分类器的局限">1.2 线性分类器的局限</h2>
+<p>线性分类器有两个重要局限。</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">视角</th>
+<th style="text-align: left;">局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">视觉视角</td>
+<td
+style="text-align: left;">每个类别只能学习一个模板，难以表达同一类别内部的大量外观变化</td>
+</tr>
+<tr>
+<td style="text-align: left;">几何视角</td>
+<td
+style="text-align: left;">只能在特征空间中画线性决策边界，难以处理复杂非线性分类问题</td>
+</tr>
+</tbody>
+</table>
+<p>例如“猫”可以有不同姿态、尺度、背景、光照和遮挡。一个线性模板很难同时匹配所有猫的外观，又排除外观相似但不是猫的图像。两层神经网络已经能通过隐藏层表达非线性函数，但如果直接把
+<span class="math inline">\(32 \times 32 \times 3\)</span> 图像展平成
+<span class="math inline">\(3072\)</span>
+维向量，<strong>二维空间结构会被破坏</strong>：相邻像素在图像中的局部关系被压成一维位置关系，模型不能自然利用“边缘、角点、纹理、局部形状”等图像结构。</p>
+<h1 id="图像特征从手工设计到端到端学习">2
+图像特征：从手工设计到端到端学习</h1>
+<h2 id="像素空间与特征空间">2.1 像素空间与特征空间</h2>
+<p>直接在像素空间上训练线性分类器，等价于希望原始 RGB
+数值已经足够线性可分。但图像中的语义往往不是由单个像素决定，而是由局部模式和更高层结构决定。因此传统计算机视觉常先把图像转换成特征表示（Feature
+Representation），再在特征上训练分类器：</p>
+<p><span class="math display">\[
+\text{image} \rightarrow \text{feature representation} \rightarrow
+f(x)=Wx \rightarrow \text{class scores}
+\]</span></p>
+<p>这里的核心思想是：如果特征提取器能把颜色、边缘、纹理、局部部件等信息编码得更好，后面的线性分类器就更容易完成分类。</p>
+<h2 id="典型手工特征">2.2 典型手工特征</h2>
+<h3 id="颜色直方图color-histogram">2.2.1 颜色直方图（Color
+Histogram）</h3>
+<p>颜色直方图统计图像中不同颜色或颜色区间出现的频率。它对整体颜色分布很敏感，适合区分颜色差异明显的类别，但会丢失空间布局。例如一张蓝天图和一张蓝色物体图可能有相似颜色分布，但语义完全不同。</p>
+<h3 id="方向梯度直方图histogram-of-oriented-gradients-hog">2.2.2
+方向梯度直方图（Histogram of Oriented Gradients, HoG）</h3>
+<p>HoG 把图像划分为小区域，在每个区域内统计边缘方向。例如一张 <span
+class="math inline">\(320 \times 240\)</span> 图像可以划分成 <span
+class="math inline">\(40 \times 30\)</span> 个 <span
+class="math inline">\(8 \times 8\)</span> 区域，每个区域量化成 9 个方向
+bin，则特征维度为：</p>
+<p><span class="math display">\[
+40 \times 30 \times 9 = 10800
+\]</span></p>
+<p>HoG
+比颜色直方图更关注局部边缘和形状，因此曾广泛用于行人检测等任务。它的关键假设是：物体的局部形状可以通过边缘方向分布表达。</p>
+<h3 id="视觉词袋bag-of-words">2.2.3 视觉词袋（Bag of Words）</h3>
+<p>视觉词袋的流程通常分两步：</p>
+<ol type="1">
+<li>从训练图像中提取大量局部 patch，并聚类形成视觉词典（codebook /
+visual words）。</li>
+<li>对每张图像，把局部 patch
+映射到最近的视觉词，再统计视觉词出现频率作为图像特征。</li>
+</ol>
+<p>这种方法借鉴了文本中的词袋模型，把图像看成由许多局部视觉词组成。它比简单全局统计更灵活，但仍然依赖人工设计流程，并且空间关系表达有限。</p>
+<h2 id="convnet-与手工特征的区别">2.3 ConvNet 与手工特征的区别</h2>
+<p>传统流程把“特征提取”和“分类器训练”分成两个阶段：特征通常由人设计，分类器再学习。卷积神经网络（Convolutional
+Neural Network, ConvNet /
+CNN）把这两部分合在一起：<strong>卷积层和池化层负责学习图像特征，后面的分类层负责输出类别分数，整个系统通过反向传播和梯度下降端到端训练</strong>。</p>
+<p>这意味着特征不再是固定的 HoG
+或视觉词袋，而是为了当前任务和数据自动学习出来的。浅层卷积可能学到边缘和颜色对比，深层卷积可能学到眼睛、轮子、字母、纹理组合或更抽象的物体部件。</p>
+<h1 id="卷积神经网络的整体思想">3 卷积神经网络的整体思想</h1>
+<h2 id="cnn-保留图像的空间结构">3.1 CNN 保留图像的空间结构</h2>
+<p>全连接层（Fully Connected Layer, FC layer）会把 <span
+class="math inline">\(32 \times 32 \times 3\)</span> 图像展平成 <span
+class="math inline">\(3072 \times 1\)</span>
+向量，每个神经元都看整个输入。这种做法参数多，而且不显式利用局部空间结构。</p>
+<p>卷积层则把输入保留为三维张量，例如 <span class="math inline">\(C
+\times H \times W\)</span>。对于 RGB 图像，<span
+class="math inline">\(C=3\)</span>，<span
+class="math inline">\(H,W\)</span>
+是高度和宽度。卷积核在空间维度上滑动，对局部区域做点积，从而生成空间上仍然有位置对应关系的
+feature map。</p>
+<p><strong>核心直觉</strong>：图像中的局部模式很重要，而且同一种局部模式可以出现在不同位置。卷积层通过局部连接和权重共享，把这种归纳偏置直接写进模型结构。</p>
+<h2 id="cnn-的常见组成">3.2 CNN 的常见组成</h2>
+<p>本讲涉及四类基本模块：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">模块</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">卷积层（Convolution Layer）</td>
+<td style="text-align: left;">提取局部空间特征，产生 feature maps</td>
+</tr>
+<tr>
+<td style="text-align: left;">激活函数（Activation Function）</td>
+<td style="text-align: left;">引入非线性，常见如 ReLU</td>
+</tr>
+<tr>
+<td style="text-align: left;">池化层（Pooling Layer）</td>
+<td
+style="text-align: left;">下采样，减少空间尺寸，增强小位移不敏感性</td>
+</tr>
+<tr>
+<td style="text-align: left;">全连接层（Fully Connected Layer）</td>
+<td style="text-align: left;">在网络末端形成分类器，输出类别分数</td>
+</tr>
+</tbody>
+</table>
+<p>历史上常见 CNN 结构可以概括为：</p>
+<p><span class="math display">\[
+[(\mathrm{CONV}-\mathrm{RELU}) \times N-\mathrm{POOL?}] \times M
+-(\mathrm{FC}-\mathrm{RELU}) \times K-\mathrm{SOFTMAX}
+\]</span></p>
+<p>其中 <span class="math inline">\(N\)</span> 表示连续卷积块数量，<span
+class="math inline">\(M\)</span> 表示堆叠多少个阶段，<span
+class="math inline">\(K\)</span>
+是末端全连接层数量。现代结构逐渐减少池化层和全连接层的使用，更多用卷积、残差连接、归一化和注意力等模块。</p>
+<h1 id="卷积层convolution-layer">4 卷积层（Convolution Layer）</h1>
+<h2 id="卷积核如何作用在图像上">4.1 卷积核如何作用在图像上</h2>
+<p>以输入图像 <span class="math inline">\(3 \times 32 \times 32\)</span>
+和一个 <span class="math inline">\(3 \times 5 \times 5\)</span>
+卷积核为例。卷积核的深度必须覆盖输入的全部通道，因此 RGB 输入上的 <span
+class="math inline">\(5 \times 5\)</span> 空间窗口实际包含：</p>
+<p><span class="math display">\[
+3 \times 5 \times 5 = 75
+\]</span></p>
+<p>个数值。卷积核与这个局部块做点积，再加上一个 bias，得到输出 feature
+map
+上的一个数。然后卷积核在图像平面上滑动，对所有空间位置重复同样操作。</p>
+<p>如果有 6 个不同卷积核，每个卷积核都会产生一张 activation map。把 6 张
+activation map 堆叠起来，就得到输出张量。例如无 padding、stride 为 1
+时：</p>
+<p><span class="math display">\[
+3 \times 32 \times 32 \xrightarrow[]{6\ \text{filters of } 3 \times 5
+\times 5} 6 \times 28 \times 28
+\]</span></p>
+<p>对于 batch 输入，形状通常写作：</p>
+<p><span class="math display">\[
+N \times C_{in} \times H \times W
+\]</span></p>
+<p>卷积权重形状为：</p>
+<p><span class="math display">\[
+C_{out} \times C_{in} \times K_H \times K_W
+\]</span></p>
+<p>输出形状为：</p>
+<p><span class="math display">\[
+N \times C_{out} \times H&#39; \times W&#39;
+\]</span></p>
+<p>偏置向量长度为 <span class="math inline">\(C_{out}\)</span>。</p>
+<h2 id="卷积层与全连接层的对比">4.2 卷积层与全连接层的对比</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">层类型</th>
+<th style="text-align: left;">每个神经元看的范围</th>
+<th style="text-align: left;">是否保留空间结构</th>
+<th style="text-align: left;">参数共享</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">全连接层</td>
+<td style="text-align: left;">整个输入向量</td>
+<td style="text-align: left;">否，通常先展平</td>
+<td style="text-align: left;">否</td>
+</tr>
+<tr>
+<td style="text-align: left;">卷积层</td>
+<td style="text-align: left;">局部感受野</td>
+<td style="text-align: left;">是，输出仍是空间网格</td>
+<td style="text-align: left;">是，同一个 filter 在所有位置共享</td>
+</tr>
+</tbody>
+</table>
+<p>全连接层中的一个输出神经元对 <span
+class="math inline">\(3072\)</span>
+维输入做点积；卷积层中的一个输出位置只对局部区域做点积。例如 <span
+class="math inline">\(5 \times 5\)</span> RGB filter 只看 <span
+class="math inline">\(75\)</span> 个输入值。由于同一个 filter
+在所有位置复用，卷积层能用较少参数检测在任意位置出现的相同局部模式。</p>
+<h2 id="多个-filter-与通道数">4.3 多个 filter 与通道数</h2>
+<p>卷积层的输出通道数等于 filter 的数量。若输入是 <span
+class="math inline">\(C_{in} \times H \times W\)</span>，使用 <span
+class="math inline">\(C_{out}\)</span> 个大小为 <span
+class="math inline">\(C_{in} \times K_H \times K_W\)</span> 的
+filter，则每个空间位置输出一个 <span
+class="math inline">\(C_{out}\)</span> 维向量。</p>
+<p>可以把卷积层理解为：在每个位置提取一组局部特征，每个 filter
+对应一种局部模式检测器。浅层 filter 常学到方向边缘、颜色对比；深层
+feature 更难直接可视化，但往往对应更大的结构和语义部件。</p>
+<h2 id="times-1-卷积">4.4 <span class="math inline">\(1 \times
+1\)</span> 卷积</h2>
+<p><span class="math inline">\(1 \times 1\)</span>
+卷积看起来空间范围很小，但它非常有意义。若输入为 <span
+class="math inline">\(64 \times 56 \times 56\)</span>，使用 32 个 <span
+class="math inline">\(1 \times 1 \times 64\)</span> filter，输出为 <span
+class="math inline">\(32 \times 56 \times
+56\)</span>。每个空间位置上，<span class="math inline">\(1 \times
+1\)</span> 卷积对 64 维通道向量做线性变换：</p>
+<p><span class="math display">\[
+\mathbb{R}^{64} \rightarrow \mathbb{R}^{32}
+\]</span></p>
+<p>它不混合相邻空间位置，但会混合通道信息，常用于改变通道数、降低计算量或在通道维度上组合特征。</p>
+<h1 id="空间尺寸填充步幅与感受野">5 空间尺寸、填充、步幅与感受野</h1>
+<h2 id="无-paddingstride-为-1-的输出尺寸">5.1 无 padding、stride 为 1
+的输出尺寸</h2>
+<p>一维情况下，输入宽度为 <span
+class="math inline">\(W\)</span>，卷积核大小为 <span
+class="math inline">\(K\)</span>，不使用 padding，stride 为
+1，则输出宽度为：</p>
+<p><span class="math display">\[
+W&#39; = W - K + 1
+\]</span></p>
+<p>例如 <span class="math inline">\(7 \times 7\)</span> 输入配 <span
+class="math inline">\(3 \times 3\)</span> filter，输出为 <span
+class="math inline">\(5 \times 5\)</span>。原因是 <span
+class="math inline">\(3 \times 3\)</span> 窗口能在长度为 7
+的方向上合法放置 5 个位置。</p>
+<p>这带来一个问题：如果连续堆很多层卷积，feature map 会不断变小。</p>
+<h2 id="padding">5.2 Padding</h2>
+<p>填充（Padding）是在输入边缘补零，使卷积核可以覆盖图像边界附近的位置。若
+padding 大小为 <span class="math inline">\(P\)</span>，stride 为
+1，则输出尺寸变为：</p>
+<p><span class="math display">\[
+W&#39; = W - K + 1 + 2P
+\]</span></p>
+<p>常见设置是：</p>
+<p><span class="math display">\[
+P = \frac{K-1}{2}
+\]</span></p>
+<p>当 <span class="math inline">\(K\)</span>
+为奇数时，这会让输出和输入空间尺寸相同，称为 same padding。例如 <span
+class="math inline">\(K=3\)</span> 时取 <span
+class="math inline">\(P=1\)</span>，<span
+class="math inline">\(K=5\)</span> 时取 <span
+class="math inline">\(P=2\)</span>。</p>
+<h2 id="stride">5.3 Stride</h2>
+<p>步幅（Stride）控制卷积核每次滑动多少个像素。stride
+越大，输出空间尺寸越小，也就实现了下采样。一般公式为：</p>
+<p><span class="math display">\[
+H&#39; = \frac{H - K + 2P}{S} + 1
+\]</span></p>
+<p><span class="math display">\[
+W&#39; = \frac{W - K + 2P}{S} + 1
+\]</span></p>
+<p>其中 <span class="math inline">\(S\)</span> 是
+stride。实际网络设计中需要确保结果是整数，否则说明该组超参数不能整齐覆盖输入。</p>
+<h2 id="卷积层参数量">5.4 卷积层参数量</h2>
+<p>卷积层参数量只与 filter
+尺寸、输入通道数和输出通道数有关，与输入图像的 <span
+class="math inline">\(H,W\)</span> 无关。对于 <span
+class="math inline">\(C_{out}\)</span> 个 filter，每个 filter 大小为
+<span class="math inline">\(C_{in} \times K_H \times
+K_W\)</span>，再加一个 bias，则参数总量为：</p>
+<p><span class="math display">\[
+C_{out} \times (C_{in}K_HK_W + 1)
+\]</span></p>
+<p>例子：输入 <span class="math inline">\(3 \times 32 \times
+32\)</span>，使用 10 个 <span class="math inline">\(5 \times 5\)</span>
+filter，stride <span class="math inline">\(1\)</span>，padding <span
+class="math inline">\(2\)</span>。</p>
+<p>输出空间尺寸：</p>
+<p><span class="math display">\[
+32&#39; = \frac{32 + 2 \times 2 - 5}{1} + 1 = 32
+\]</span></p>
+<p>所以输出为：</p>
+<p><span class="math display">\[
+10 \times 32 \times 32
+\]</span></p>
+<p>每个 filter 的参数量为：</p>
+<p><span class="math display">\[
+3 \times 5 \times 5 + 1 = 76
+\]</span></p>
+<p>总参数量为：</p>
+<p><span class="math display">\[
+10 \times 76 = 760
+\]</span></p>
+<p>乘加运算量可以按“输出元素个数 <span
+class="math inline">\(\times\)</span>
+每个输出的点积长度”估算。输出元素个数为：</p>
+<p><span class="math display">\[
+10 \times 32 \times 32 = 10240
+\]</span></p>
+<p>每个输出位置需要 <span class="math inline">\(3 \times 5 \times
+5=75\)</span> 次乘加，因此总量约为：</p>
+<p><span class="math display">\[
+10240 \times 75 = 768000
+\]</span></p>
+<h2 id="感受野receptive-field">5.5 感受野（Receptive Field）</h2>
+<p>感受野指输出中的某个元素依赖输入中的多大区域。对于 kernel size 为
+<span class="math inline">\(K\)</span>、stride 为 1
+的连续卷积，每加一层卷积，输入感受野大小增加 <span
+class="math inline">\(K-1\)</span>。如果堆叠 <span
+class="math inline">\(L\)</span> 层，则感受野大小为：</p>
+<p><span class="math display">\[
+1 + L(K-1)
+\]</span></p>
+<p>例如连续堆叠 3 层 <span class="math inline">\(3 \times 3\)</span>
+卷积，感受野大小为：</p>
+<p><span class="math display">\[
+1 + 3(3-1)=7
+\]</span></p>
+<p>这说明小卷积核通过加深网络也能逐渐看到更大区域。对大图像来说，如果希望高层特征覆盖足够大的上下文，通常需要网络更深，或者在网络中进行下采样。</p>
+<h2 id="卷积层常见设置">5.6 卷积层常见设置</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">设置</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(K=3, P=1,
+S=1\)</span></td>
+<td style="text-align: left;">常见 <span class="math inline">\(3 \times
+3\)</span> same convolution</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(K=5, P=2,
+S=1\)</span></td>
+<td style="text-align: left;">常见 <span class="math inline">\(5 \times
+5\)</span> same convolution</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(K=1, P=0,
+S=1\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(1 \times
+1\)</span> 卷积，主要混合通道</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(K=3, P=1,
+S=2\)</span></td>
+<td style="text-align: left;">空间尺寸下采样约 2 倍</td>
+</tr>
+</tbody>
+</table>
+<p>输出通道数常取 32、64、128、256 等 2
+的幂，这是一种工程上常见的维度设计习惯。</p>
+<h1 id="池化层pooling-layer">6 池化层（Pooling Layer）</h1>
+<h2 id="池化的作用">6.1 池化的作用</h2>
+<p>池化层是另一种下采样方式。给定输入 <span class="math inline">\(C
+\times H \times
+W\)</span>，池化通常对每个通道独立操作，只在空间维度上聚合局部区域，不改变通道数。</p>
+<p>池化的常见目的有三个：</p>
+<ol type="1">
+<li>降低 feature map 的空间尺寸，减少后续计算量。</li>
+<li>让表示对小范围空间位移更不敏感。</li>
+<li>聚合局部响应，保留局部区域中最显著或平均的信息。</li>
+</ol>
+<h2 id="max-pooling">6.2 Max Pooling</h2>
+<p>最大池化（Max Pooling）在每个局部窗口中取最大值。例如对单个通道的
+<span class="math inline">\(4 \times 4\)</span> 输入使用 <span
+class="math inline">\(2 \times 2\)</span> kernel、stride 为 2：</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+1 &amp; 1 &amp; 2 &amp; 4 \\
+5 &amp; 6 &amp; 7 &amp; 8 \\
+3 &amp; 2 &amp; 1 &amp; 0 \\
+1 &amp; 2 &amp; 3 &amp; 4
+\end{bmatrix}
+\rightarrow
+\begin{bmatrix}
+6 &amp; 8 \\
+3 &amp; 4
+\end{bmatrix}
+\]</span></p>
+<p>每个 <span class="math inline">\(2 \times 2\)</span>
+区域只保留最大激活值。直觉上，如果某个局部特征在窗口内稍微移动，最大值仍可能被保留下来，因此
+max pooling 能带来一定的局部空间不变性。</p>
+<h2 id="池化输出尺寸">6.3 池化输出尺寸</h2>
+<p>池化层没有可学习参数。若 kernel size 为 <span
+class="math inline">\(K\)</span>，stride 为 <span
+class="math inline">\(S\)</span>，输入为 <span class="math inline">\(C
+\times H \times W\)</span>，输出为：</p>
+<p><span class="math display">\[
+C \times H&#39; \times W&#39;
+\]</span></p>
+<p>其中：</p>
+<p><span class="math display">\[
+H&#39; = \frac{H-K}{S}+1
+\]</span></p>
+<p><span class="math display">\[
+W&#39; = \frac{W-K}{S}+1
+\]</span></p>
+<p>常见设置是 max pooling，<span class="math inline">\(K=2,
+S=2\)</span>，这会把空间尺寸下采样 2 倍。</p>
+<h1 id="平移等变性与空间不变性">7 平移等变性与空间不变性</h1>
+<h2 id="平移等变性translation-equivariance">7.1 平移等变性（Translation
+Equivariance）</h2>
+<p>卷积和池化都具有重要的平移等变性。设 <span
+class="math inline">\(\mathrm{Translate}(X)\)</span>
+表示把输入图像平移，卷积满足近似关系：</p>
+<p><span class="math display">\[
+\mathrm{Conv}(\mathrm{Translate}(X)) =
+\mathrm{Translate}(\mathrm{Conv}(X))
+\]</span></p>
+<p>意思是：如果输入中的物体移动了，输出 feature map
+中对应的激活也会以相同方式移动。卷积不会因为猫从左边移动到右边就需要重新学习一套完全不同的参数；同一个
+filter 可以在所有位置检测相同局部模式。</p>
+<h2 id="平移不变性translation-invariance">7.2 平移不变性（Translation
+Invariance）</h2>
+<p>等变性和不变性不同。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">概念</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">平移等变性</td>
+<td style="text-align: left;">输入移动，输出表示也按对应方式移动</td>
+</tr>
+<tr>
+<td style="text-align: left;">平移不变性</td>
+<td style="text-align: left;">输入移动，最终预测基本不变</td>
+</tr>
+</tbody>
+</table>
+<p>卷积层本身更接近等变性；池化、下采样、全局平均池化、分类头等结构可以逐渐让最终分类结果对小范围位移更不敏感。图像分类通常希望模型最终具有一定平移不变性，因为物体在图像中的绝对位置不应改变类别。</p>
+<h1 id="cnn-的历史位置与现代视觉模型">8 CNN
+的历史位置与现代视觉模型</h1>
+<h2 id="cnn-为什么曾经主导视觉任务">8.1 CNN 为什么曾经主导视觉任务</h2>
+<p>CNN 直接编码了图像的几个重要先验：</p>
+<ol type="1">
+<li><strong>局部性</strong>：相邻像素之间关系最密切。</li>
+<li><strong>权重共享</strong>：同一种局部模式可以出现在不同空间位置。</li>
+<li><strong>层级结构</strong>：浅层检测边缘和纹理，中层组合局部部件，深层形成更抽象语义。</li>
+<li><strong>可端到端训练</strong>：卷积特征和分类器一起通过反向传播优化。</li>
+</ol>
+<p>从 LeNet 到 AlexNet，CNN 在文档识别、ImageNet
+分类等任务中取得关键成功。约 2012 到 2020 年，ConvNet
+是许多视觉任务的核心架构，包括分类、检测、图像描述和生成模型中的视觉组件。</p>
+<h2 id="transformer-的兴起">8.2 Transformer 的兴起</h2>
+<p>2021 年以后，Transformer 在视觉任务中变得越来越重要。Vision
+Transformer 把图像切成 patch token，然后用自注意力建模全局关系。与 CNN
+相比，Transformer
+较少依赖局部卷积先验，更依赖大规模数据和训练策略学习视觉结构。</p>
+<p>这并不意味着 CNN
+的思想过时。卷积的局部连接、权重共享、平移等变性、感受野和下采样仍然是理解现代视觉网络的基础。很多现代架构仍会混合使用卷积、注意力和
+MLP。</p>
+<h1 id="复习重点与易混点">9 复习重点与易混点</h1>
+<h2 id="必须掌握的公式">9.1 必须掌握的公式</h2>
+<h3 id="卷积输出尺寸">卷积输出尺寸</h3>
+<p><span class="math display">\[
+H&#39; = \frac{H-K+2P}{S}+1
+\]</span></p>
+<p><span class="math display">\[
+W&#39; = \frac{W-K+2P}{S}+1
+\]</span></p>
+<h3 id="卷积参数量">卷积参数量</h3>
+<p><span class="math display">\[
+C_{out}(C_{in}K_HK_W + 1)
+\]</span></p>
+<p>其中 <span class="math inline">\(+1\)</span> 是每个 filter 的
+bias。</p>
+<h3 id="池化输出尺寸-1">池化输出尺寸</h3>
+<p><span class="math display">\[
+H&#39; = \frac{H-K}{S}+1,\quad W&#39; = \frac{W-K}{S}+1
+\]</span></p>
+<p>池化层通常没有参数。</p>
+<h3 id="多层卷积感受野">多层卷积感受野</h3>
+<p>当 stride 为 1，连续堆叠 <span class="math inline">\(L\)</span> 层
+kernel size 为 <span class="math inline">\(K\)</span> 的卷积时：</p>
+<p><span class="math display">\[
+\text{receptive field} = 1 + L(K-1)
+\]</span></p>
+<h2 id="易混点">9.2 易混点</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">易混点</th>
+<th style="text-align: left;">正确理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">filter 的深度</td>
+<td style="text-align: left;">filter 必须覆盖输入的全部通道，空间大小是
+<span class="math inline">\(K_H \times K_W\)</span>，完整大小是 <span
+class="math inline">\(C_{in} \times K_H \times K_W\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">filter 数量与输出通道</td>
+<td style="text-align: left;">filter 数量就是输出通道数 <span
+class="math inline">\(C_{out}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">参数量与输入空间尺寸</td>
+<td style="text-align: left;">卷积参数量与 <span
+class="math inline">\(H,W\)</span> 无关，但计算量与输出空间尺寸有关</td>
+</tr>
+<tr>
+<td style="text-align: left;">padding 的作用</td>
+<td style="text-align: left;">padding 可以控制输出尺寸，常用 same
+padding 保持空间大小</td>
+</tr>
+<tr>
+<td style="text-align: left;">stride 与 pooling</td>
+<td style="text-align: left;">二者都可下采样；stride convolution
+有可学习参数，pooling 通常无参数</td>
+</tr>
+<tr>
+<td style="text-align: left;">等变性与不变性</td>
+<td
+style="text-align: left;">卷积更强调平移等变，最终分类器希望获得一定平移不变</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(1 \times
+1\)</span> 卷积</td>
+<td
+style="text-align: left;">不是“没用的卷积”，它在每个空间位置混合通道并改变通道数</td>
+</tr>
+</tbody>
+</table>
+<h2 id="典型计算题">9.3 典型计算题</h2>
+<p>输入为 <span class="math inline">\(3 \times 32 \times
+32\)</span>，使用 10 个 <span class="math inline">\(5 \times 5\)</span>
+filter，stride <span class="math inline">\(S=1\)</span>，padding <span
+class="math inline">\(P=2\)</span>。</p>
+<p>输出尺寸：</p>
+<p><span class="math display">\[
+H&#39; = W&#39; = \frac{32-5+2 \times 2}{1}+1=32
+\]</span></p>
+<p>输出张量：</p>
+<p><span class="math display">\[
+10 \times 32 \times 32
+\]</span></p>
+<p>参数量：</p>
+<p><span class="math display">\[
+10 \times (3 \times 5 \times 5 + 1)=760
+\]</span></p>
+<p>乘加量：</p>
+<p><span class="math display">\[
+10 \times 32 \times 32 \times 3 \times 5 \times 5=768000
+\]</span></p>
+<h2 id="一句话总结">9.4 一句话总结</h2>
+<p>CNN
+的关键思想是：<strong>用局部连接和权重共享保留图像空间结构，用卷积层学习可复用的局部模式，用下采样扩大有效感受野并降低计算量，最后通过端到端训练把特征提取和分类统一起来</strong>。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Image-Classification/"># Image Classification</a>
+                    
+                        <a href="/tags/Convolutional-Neural-Networks/"># Convolutional Neural Networks</a>
+                    
+                        <a href="/tags/Convolution/"># Convolution</a>
+                    
+                        <a href="/tags/Pooling/"># Pooling</a>
+                    
+                        <a href="/tags/Image-Features/"># Image Features</a>
+                    
+                        <a href="/tags/Feature-Learning/"># Feature Learning</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/4%20Neural%20Networks%20and%20Backpropagation/">4 Neural Networks and Backpropagation</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/10/computer_organization/Naive%20Tomasulo%E4%BE%8B%E5%AD%90/">Naive Tomasulo例子</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>15 3D Vision | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">15 3D Vision</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="本讲主线为什么-3d-vision-先要谈表示">1 本讲主线：为什么 3D
+Vision 先要谈表示</h1>
+<p>这节课由 Stanford CS231n 的客座讲者 Jiajun Wu 主讲，主题是 <strong>3D
+Vision</strong>。老师在视频开头特别强调：这节课和前面几周的卷积网络、Transformer、视觉语言模型、生成模型不太一样，因为进入
+3D 以后，第一个问题不是“用什么网络”，而是 <strong>3D
+对象到底用什么数据结构表示</strong>。</p>
+<p>2D 图像比较统一：一张 PNG/JPEG 基本就是一个像素矩阵，例如 <span
+class="math inline">\(200\times200\)</span> 或 <span
+class="math inline">\(500\times500\)</span>。即使任务不同，输入形式通常仍然是规则网格上的
+RGB 像素。但 3D 对象没有这样统一的自然格式。一个 3D 对象可能包含：</p>
+<ul>
+<li><strong>几何（geometry）</strong>：形状、表面、体积、拓扑。</li>
+<li><strong>纹理（texture）</strong>：表面颜色和图案。</li>
+<li><strong>材料（material）</strong>：透明、粗糙、金属、高光等反射属性。</li>
+<li><strong>尺度和结构</strong>：可以是杯子、椅子、人体，也可以是城市、树、河流状分叉结构。</li>
+</ul>
+<p>课件开头的玻璃杯、城市航拍、自然分叉结构等图片就是在说明：3D
+世界远比一张固定大小的像素图复杂。对象可以透明，可以有复杂拓扑，可以是大尺度场景，也可以有非常细的局部纹理和几何细节。因此，本讲先从
+<strong>3D shape representation</strong>
+讲起，再讨论深度学习如何和这些表示结合。</p>
+<p>老师给出的核心问题可以概括为：</p>
+<blockquote>
+<p>在 2D 中我们几乎默认使用 pixels；但在 3D
+中，我们必须先决定用点、网格、体素、参数曲面、隐式函数、神经场还是结构化部件来表示对象。</p>
+</blockquote>
+<p>这个选择会影响后面所有事情：存储、编辑、生成、渲染、动画、重建、分类、分割，以及是否容易与深度网络结合。</p>
+<h1 id="d-几何表示的基本谱系">2 3D 几何表示的基本谱系</h1>
+<p>课件把 3D 几何表示先粗分为两大类：<strong>显式表示（explicit
+representations）</strong> 和 <strong>隐式表示（implicit
+representations）</strong>。</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">类别</th>
+<th style="text-align: left;">代表形式</th>
+<th style="text-align: left;">核心思想</th>
+<th style="text-align: left;">典型优势</th>
+<th style="text-align: left;">典型困难</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>显式表示</strong></td>
+<td style="text-align: left;">点云、polygon
+mesh、subdivision、NURBS、样条、参数曲面</td>
+<td
+style="text-align: left;">直接给出表面上的点、面片，或给出能直接生成表面点的参数映射</td>
+<td
+style="text-align: left;">容易采样表面点；适合传统图形学渲染和局部编辑</td>
+<td
+style="text-align: left;">不一定容易判断任意空间点在物体内还是外；拓扑和不规则结构会给神经网络带来困难</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>隐式表示</strong></td>
+<td style="text-align: left;">代数曲面、CSG、距离函数、SDF、level
+set、occupancy/radiance field</td>
+<td style="text-align: left;">用函数关系定义表面、内部、密度或外观</td>
+<td
+style="text-align: left;">内外测试、融合、分裂、布尔运算和可微查询方便</td>
+<td
+style="text-align: left;">表面采样和高效渲染可能困难；密集空间查询代价高</td>
+</tr>
+</tbody>
+</table>
+<p>老师在视频中补充了一个重要视角：<strong>每一种表示都不只是数学定义，它还决定了深度学习怎么用它。</strong>
+图像输入是固定大小矩阵，所以 CNN 很自然；但 3D 点云是无序集合，mesh
+是不规则图，体素是三维体积，隐式函数是连续坐标查询。深度学习在 3D
+里起步相对晚，一个重要原因就是这些表示没有像图像像素那样统一、规则、容易批处理。</p>
+<p>选择表示时要考虑：</p>
+<ol type="1">
+<li><strong>存储</strong>：点云、mesh、体素、函数参数的存储方式完全不同。</li>
+<li><strong>形状创建</strong>：输入可以是照片、文字、手绘 stroke、CAD
+操作或随机 latent code。</li>
+<li><strong>几何操作</strong>：编辑、简化、平滑、滤波、修补、配准、融合。</li>
+<li><strong>渲染</strong>：如何把 3D 表示变成 2D 图像。</li>
+<li><strong>逆渲染与重建</strong>：如何从 2D 图像反推 3D
+几何和外观。</li>
+<li><strong>动画</strong>：人体、动物和可动对象还需要关节、形变和时序。</li>
+<li><strong>与深度学习结合</strong>：输入是否规则、是否可微、是否能批量训练、是否有足够数据。</li>
+</ol>
+<h1 id="显式表示点云网格与参数曲面">3
+显式表示：点云、网格与参数曲面</h1>
+<h2 id="点云point-clouds">3.1 点云（Point Clouds）</h2>
+<p><strong>点云</strong>是最简单的 3D 表示：一个对象由 <span
+class="math inline">\(N\)</span> 个三维点表示，可以写成一个 <span
+class="math inline">\(3\times N\)</span> 的矩阵，每列是一个点的 <span
+class="math inline">\((x,y,z)\)</span> 坐标。点云通常没有
+connectivity，也就是说它只告诉我们点在哪里，不告诉我们哪些点相邻、哪些点组成面片。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708221532504.png" alt="image-20260708221532352" style="zoom:50%;" /></p>
+<p>如果 <span class="math inline">\(N\)</span>
+很小，点云就会变成很粗糙的表面采样。例如椅背的细杆、杯子的薄边、兔子耳朵尖端，如果没有点采到，就等于表示里不存在。</p>
+<p>在工程上，一个 batch 中每个样本的 <span
+class="math inline">\(N\)</span> 通常是固定的，也就是说可以写成 <span
+class="math inline">\(B \times N \times 3\)</span>
+的张量。但在数学上，点云不要求每个对象点数相同。</p>
+<p>点云有时还会附带法向量（surface
+normal）。因为如果要渲染点云，需要知道光从某个方向照来时如何与局部表面相互作用；只有点的位置不足以决定
+shading。带有方向的点也常被称为 <strong>surfels</strong>。</p>
+<h3 id="点云从哪里来">3.1.1 点云从哪里来</h3>
+<p>点云常常是 3D 传感器的原始输出，例如：</p>
+<ul>
+<li>深度相机和 RGB-D 传感器；</li>
+<li>3D scanner；</li>
+<li>结构光或激光扫描；</li>
+<li>多视角重建；</li>
+<li>手机 ARKit 等移动设备扫描。</li>
+</ul>
+<p>这些系统得到的往往不是干净完整的对象，而是多个视角下的 raw
+scans。之后需要进行
+<strong>registration（配准）</strong>、融合、去噪、补洞和纹理处理，才能得到更完整的形状。</p>
+<h3 id="点云的优势">3.1.2 点云的优势</h3>
+<p>点云的主要优点是自由、简单、接近传感器输出：</p>
+<ul>
+<li>不受拓扑约束，几乎可以表示任何几何形状。</li>
+<li>对大规模、多类别数据集友好。</li>
+<li>可以直接从扫描设备或多视角重建中获得。</li>
+<li>作为神经网络输入时，比 mesh 少了显式面结构的复杂性。</li>
+</ul>
+<h3 id="点云的困难">3.1.3 点云的困难</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708221452689.png" alt="image-20260708221452512" style="zoom:50%;" /></p>
+<ul>
+<li><strong>无连接关系</strong>：点云无法区分某些拓扑不同但采样点相似的形状。例如一圈采样点可能来自一个环面（torus），也可能来自几个断开的环形结构。（如上图）</li>
+<li><strong>采样不均匀</strong>：如果兔子头部点很多、尾部点很少，模型和渲染都会偏向高密度区域。点云算法往往需要考虑如何让采样尽量均匀。</li>
+<li><strong>不直接支持细分/简化/光滑渲染</strong>：这些操作通常依赖表面连接或局部邻域估计。</li>
+<li><strong>噪声与缺失</strong>：真实扫描点云常有噪声、遮挡、局部缺失和配准误差。</li>
+</ul>
+<p>因此，点云是信息非常直接但也非常“不完整”的表示：它给出了空间采样，却没有给出表面的组织方式。</p>
+<h2 id="polygon-meshes最常用的图形学表示">3.2 Polygon
+Meshes：最常用的图形学表示</h2>
+<p><strong>多边形网格（polygonal
+meshes）</strong>在点的基础上加入连接关系。最常见的是三角网格：顶点构成边，边构成三角面，三角面拼接成表面。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708221631539.png" alt="image-20260708221631405" style="zoom:50%;" /></p>
+<p>mesh 可以说是传统图形学、游戏、CAD 和很多渲染管线中最广泛使用的 3D
+表示。原因是 mesh 不只是点集，它明确给出 surface faces，所以适合：</p>
+<ul>
+<li>光栅化（rasterization）和 ray tracing；</li>
+<li>纹理映射；</li>
+<li>几何编辑；</li>
+<li>碰撞检测；</li>
+<li>mesh subdivision、simplification、regularization。</li>
+</ul>
+<p>课件中的 Digital Michelangelo Project 展示了 David
+雕塑的巨大三角网格：约 2818 万 vertices 和 5623 万 triangles。Google
+Earth 则是更极端的大尺度例子：由卫星和航拍重建出的城市 mesh 可以达到
+trillions of triangles。</p>
+<h3 id="mesh-操作">3.2.1 Mesh 操作</h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">图中直观效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Subdivision /
+Upsampling</strong></td>
+<td style="text-align: left;">增加面片数量，通过插值获得更高分辨率</td>
+<td style="text-align: left;">牛头从粗糙网格变得更细腻</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Simplification /
+Downsampling</strong></td>
+<td style="text-align: left;">减少三角形数量，同时尽量保持外观</td>
+<td style="text-align: left;">复杂模型变成更稀疏但仍可辨认的形状</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Regularization</strong></td>
+<td style="text-align: left;">调整三角形大小和分布，使 mesh 更均匀</td>
+<td style="text-align: left;">三角形更规则，便于后续处理</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708221834934.png" alt="image-20260708221834744" style="zoom: 22%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708221927798.png" alt="image-20260708221927600" style="zoom: 22%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708221952990.png" alt="image-20260708221952789" style="zoom:22%;" /></p>
+<blockquote>
+<p>Upsampling, Downsampling and Regularization</p>
+</blockquote>
+<h3 id="mesh-和深度学习为什么不好直接结合">3.2.2 Mesh
+和深度学习为什么不好直接结合</h3>
+<p>视频中老师补充了一个很重要的历史原因：早期深度学习喜欢固定分辨率输入，例如图像矩阵；但
+mesh 是高度不规则的：</p>
+<ul>
+<li>每个对象顶点数不同；</li>
+<li>每个面可能有 3、4、5 个顶点；</li>
+<li>邻接关系不是规则网格；</li>
+<li>batch 处理和卷积定义都不直接。</li>
+</ul>
+<p>这也是 3D deep learning 相比 2D vision 起步较慢的原因之一：3D
+的主流表示不像像素矩阵那样天然适合 CNN。</p>
+<h2 id="参数表示parametric-representation">3.3 参数表示（Parametric
+Representation）</h2>
+<p>参数表示把曲线或曲面看成一个低维参数空间到 3D 空间的映射：</p>
+<p><span class="math display">\[
+f:X\rightarrow Y,\quad X\subseteq\mathbb{R}^m,\ Y\subseteq\mathbb{R}^n.
+\]</span></p>
+<p>对于 3D 曲面，通常是：</p>
+<p><span class="math display">\[
+s(u,v)=(x(u,v),y(u,v),z(u,v)).
+\]</span></p>
+<p>并且 <span class="math inline">\(m=2\)</span>，<span
+class="math inline">\(n=3\)</span>。</p>
+<p>老师在视频中强调：很多曲线和曲面的 <strong>内在自由度（intrinsic
+dimensionality）</strong> 比它们嵌入的 3D
+空间低。自由度可以理解为：<strong>描述或控制一个几何对象上的点，需要独立改变几个参数</strong>。例如曲线只有一个自由度，曲面通常只有两个自由度。参数表示正是利用低维参数来生成高维空间中的曲线或曲面。</p>
+<h3 id="圆与球面的例子">3.3.1 圆与球面的例子</h3>
+<p>二维圆可以写成：</p>
+<p><span class="math display">\[
+p(t)=r(\cos t,\sin t),\quad t\in[0,2\pi).
+\]</span></p>
+<p>三维球面可以写成：</p>
+<p><span class="math display">\[
+s(u,v)=r(\cos u\cos v,\sin u\cos v,\sin v),
+\]</span></p>
+<p>其中 <span class="math inline">\(u\)</span> 和 <span
+class="math inline">\(v\)</span> 是两个自由度。</p>
+<p>如果要采样参数曲面，只需要在参数域中采样 <span
+class="math inline">\((u,v)\)</span>，再代入函数，就能得到曲面上的点。这是显式参数表示最重要的优点。</p>
+<h3 id="bézier-曲线bézier-曲面与-subdivision">3.3.2 Bézier 曲线、Bézier
+曲面与 Subdivision</h3>
+<p>课件展示了 Bézier curves、piecewise Bézier、Bézier surfaces 和
+subdivision curves/surfaces。它们的共同点是
+<strong>用少量控制点或局部规则描述光滑曲线/曲面。</strong></p>
+<ul>
+<li><p><strong>Bézier curve：用控制点拉出一条光滑曲线。</strong></p>
+<p>可以把它想象成绘图软件里的钢笔工具：起点和终点决定曲线从哪里开始、到哪里结束，中间控制点决定曲线怎样弯。曲线不一定穿过所有控制点，但会被控制点“吸引”。这种表示适合字体轮廓、图标边缘、动画路径、汽车或产品外形线等需要平滑轮廓的对象。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708222902177.png" alt="image-20260708222902014" style="zoom: 33%;" /></p></li>
+<li><p><strong>Piecewise Bézier：把多段 Bézier
+曲线拼成复杂轮廓。</strong></p>
+<p>单独一段 Bézier
+通常只能表达一段较简单的弯曲；如果要表示字母、花瓶外轮廓、车身侧面线条等复杂形状，就把很多段
+Bézier 接起来。关键要求是拼接处尽量平滑，否则会出现明显折角。</p></li>
+<li><p><strong>Bézier surface：把 Bézier
+曲线扩展成一张光滑曲面。</strong></p>
+<p>如果 Bézier curve 像一根被控制点拉动的弹性线，那么 Bézier surface
+就像一张被控制点拉扯的橡胶布。移动控制点时，整张曲面会随之鼓起、凹下或弯曲。它可以看成从二维参数
+<span class="math inline">\((u,v)\)</span> 生成三维点 <span
+class="math inline">\((x,y,z)\)</span> 的映射，因此属于参数曲面。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708222941049.png" alt="image-20260708222940872" style="zoom:50%;" /></p></li>
+<li><p><strong>Subdivision
+curve/surface：从粗糙形状反复细分，逐渐变光滑。</strong></p>
+<p>它的思路不是直接写一条曲线公式，而是先给一个粗控制多边形或粗
+mesh，然后不断插入新点、调整位置。重复多次后，原本粗糙的折线或多面体会变成光滑曲线/曲面。直觉上，它像把低分辨率模型不断“打磨”成更圆滑的模型。</p></li>
+</ul>
+<p>​
+<img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708223025794.png" alt="image-20260708223025590" style="zoom: 50%;" /></p>
+<p>老师在视频里把这类表示和设计联系起来：桌子、椅子、工业零件等对象中有很多直线、曲面、对称结构和低维规则，仅用点或
+mesh 可能丢失这种“设计意图”；参数表示可以更紧凑地表达这些规则。</p>
+<h1 id="隐式表示函数距离场level-set-与体素">4
+隐式表示：函数、距离场、Level Set 与体素</h1>
+<h2 id="显式表示的核心权衡">4.1 显式表示的核心权衡</h2>
+<p>显式表示的最大优点是
+<strong>采样容易</strong>。例如环面可以写作：</p>
+<p><span class="math display">\[
+f(u,v)=((2+\cos u)\cos v,\ (2+\cos u)\sin v,\ \sin u).
+\]</span></p>
+<p>只要随机采样 <span
+class="math inline">\(u,v\)</span>，就能得到表面上的点。</p>
+<p>但显式表示的一个典型困难是：<strong>判断任意空间点在物体内部还是外部很难</strong>。如果给定点
+<span
+class="math inline">\((3/4,1/2,1/4)\)</span>，显式曲面本身不一定直接告诉我们这个点是否在闭合物体内部。老师将这个问题和神经渲染联系起来：很多
+neural rendering 方法需要频繁查询某个 3D
+位置的密度、颜色、材质或是否在物体内部；显式表示不一定天然支持这种查询。</p>
+<h2 id="隐式表示的定义">4.2 隐式表示的定义</h2>
+<p>隐式表示用函数关系定义表面。最经典形式是：</p>
+<p><span class="math display">\[
+f(x,y,z)=0.
+\]</span></p>
+<p>例如单位球面：</p>
+<p><span class="math display">\[
+x^2+y^2+z^2=1.
+\]</span></p>
+<p>更一般地，函数值的符号可以表示内外：</p>
+<ul>
+<li><span class="math inline">\(f(x,y,z)=0\)</span>：点在表面上；</li>
+<li><span class="math inline">\(f(x,y,z)&lt;0\)</span>：点在内部；</li>
+<li><span class="math inline">\(f(x,y,z)&gt;0\)</span>：点在外部。</li>
+</ul>
+<p>隐式表示的优势正好和显式表示互补：给定一个查询点，直接代入函数，就能得到它与对象的关系。但如果要采样整个表面，即找到所有满足
+<span class="math inline">\(f(x,y,z)=0\)</span>
+的点，就比较困难，需要数值方法。</p>
+<p>这里容易产生一个误解：隐式表示好像只是把显式公式“移项”成 <span
+class="math inline">\(f(x,y,z)=0\)</span>。对于球面、圆环面这类简单形状，确实常常可以在参数式和隐式方程之间互相转换。但两者的核心差别不是能不能描述同一个几何对象，而是
+<strong>查询方向不同</strong>：</p>
+<ul>
+<li>显式/参数表示更像“造点机器”：输入参数 <span
+class="math inline">\((u,v)\)</span>，直接输出表面点 <span
+class="math inline">\((x,y,z)\)</span>，所以采样表面很方便。</li>
+<li>隐式表示更像“检测器”：输入任意空间点 <span
+class="math inline">\((x,y,z)\)</span>，输出 <span
+class="math inline">\(f(x,y,z)\)</span>，根据它是等于 0，小于 0 还是大于
+0，告诉我们这个点在表面上、内部还是外部，所以空间查询很方便。</li>
+</ul>
+<p>因此，同一个球面可以既有参数表示，也有隐式表示；但它们天然擅长的操作不同。显式表示适合生成表面点，隐式表示适合内外判断、距离查询、布尔组合、神经渲染中的密度或
+occupancy 查询。</p>
+<h2 id="代数曲面与-csg">4.3 代数曲面与 CSG</h2>
+<p><strong>代数曲面（Algebraic
+Surfaces）</strong>是多项式的零集合。球、环面、心形等规则形状都可以由多项式方程定义。它们适合规则几何，但很难单独表达真实世界中的复杂对象，比如一头牛、一把椅子或一个完整室内场景。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708223334432.png" alt="image-20260708223334233" style="zoom: 50%;" /></p>
+<p><strong>Constructive Solid Geometry（CSG）</strong>
+用布尔运算组合简单隐式几何：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">操作</th>
+<th style="text-align: left;">表达</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Union</td>
+<td style="text-align: left;"><span class="math inline">\(A\cup
+B\)</span></td>
+<td style="text-align: left;">合并两个物体</td>
+</tr>
+<tr>
+<td style="text-align: left;">Difference</td>
+<td style="text-align: left;"><span class="math inline">\(A\setminus
+B\)</span></td>
+<td style="text-align: left;">从 A 中挖掉 B</td>
+</tr>
+<tr>
+<td style="text-align: left;">Intersection</td>
+<td style="text-align: left;"><span class="math inline">\(A\cap
+B\)</span></td>
+<td style="text-align: left;">只保留重叠部分</td>
+</tr>
+</tbody>
+</table>
+<p>视频中老师补充：CSG 和隐式函数组合在工业设计、制造和 CAD
+中非常重要。因为函数值可以做加减、min/max、逻辑组合，所以复杂零件可以由简单体逐步组合出来。</p>
+<h2 id="距离函数与-sdf">4.4 距离函数与 SDF</h2>
+<h3 id="sdf-的定义带符号的表面距离">4.4.1 SDF
+的定义：带符号的表面距离</h3>
+<p><strong>距离函数（Distance Function）</strong>
+给出空间中任意点到物体表面的距离。若距离带正负号，就得到
+<strong>符号距离函数（Signed Distance Function, SDF）</strong>。SDF
+的值不仅告诉我们内外，还告诉我们离表面多远。</p>
+<p>SDF 的直观理解：</p>
+<p><span class="math display">\[
+\mathrm{SDF}(x)=
+\begin{cases}
+-d(x,\partial\Omega), &amp; x\text{ inside},\\
+0, &amp; x\text{ on surface},\\
+d(x,\partial\Omega), &amp; x\text{ outside}.
+\end{cases}
+\]</span></p>
+<p>其中 <span class="math inline">\(\partial\Omega\)</span>
+是物体表面。</p>
+<p>例如半径为 <span
+class="math inline">\(1\)</span>、中心在原点的球可以写成：</p>
+<p><span class="math display">\[
+\mathrm{SDF}(\mathbf{x})=\|\mathbf{x}\|_2-1.
+\]</span></p>
+<p>如果 <span class="math inline">\(\mathbf{x}=(0,0,0)\)</span>，则
+<span
+class="math inline">\(\mathrm{SDF}(\mathbf{x})=-1\)</span>，说明它在球内部，离表面距离为
+<span class="math inline">\(1\)</span>；如果 <span
+class="math inline">\(\mathbf{x}=(1,0,0)\)</span>，则 <span
+class="math inline">\(\mathrm{SDF}(\mathbf{x})=0\)</span>，说明它在球面上；如果
+<span class="math inline">\(\mathbf{x}=(2,0,0)\)</span>，则 <span
+class="math inline">\(\mathrm{SDF}(\mathbf{x})=1\)</span>，说明它在球外部，离表面距离为
+<span class="math inline">\(1\)</span>。</p>
+<p>如果一个点看起来可以连到表面的多个位置，SDF 取的是其中的
+<strong>最短距离</strong>。更准确地说：</p>
+<p><span class="math display">\[
+d(\mathbf{x},\partial\Omega)=\min_{\mathbf{y}\in\partial\Omega}\|\mathbf{x}-\mathbf{y}\|_2.
+\]</span></p>
+<p>直觉上，可以想象以 <span class="math inline">\(\mathbf{x}\)</span>
+为圆心不断扩大圆，第一次碰到物体表面时的半径，就是 <span
+class="math inline">\(|\mathrm{SDF}(\mathbf{x})|\)</span>。如果 <span
+class="math inline">\(\mathbf{x}\)</span>
+在物体内部，这个距离加负号；如果在物体外部，这个距离加正号。</p>
+<h3 id="例子用-sdf-插值移动边界">4.4.2 例子：用 SDF 插值移动边界</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708224416366.png" alt="image-20260708224416190" style="zoom: 33%;" /></p>
+<p>SDF
+的一个重要优点是可以平滑组合或插值形状。下面是一个一维边界移动的例子：上方的
+A 和 B
+可以看成两个黑白形状，黑色表示物体内部，白色表示物体外部，黑白交界处就是边界。A
+的边界偏左，B 的边界偏右。</p>
+<p>如果把 A 和 B 转成
+SDF，那么每个位置不再只是黑或白，而是有一个带符号距离值：</p>
+<ul>
+<li><span class="math inline">\(SDF&lt;0\)</span>：在物体内部；</li>
+<li><span class="math inline">\(SDF=0\)</span>：在边界上；</li>
+<li><span class="math inline">\(SDF&gt;0\)</span>：在物体外部。</li>
+</ul>
+<p>关键操作是对两个 SDF 做线性插值：</p>
+<p><span class="math display">\[
+\mathrm{lerp}(\mathrm{SDF}(A),\mathrm{SDF}(B))
+=(1-t)\mathrm{SDF}(A)+t\mathrm{SDF}(B).
+\]</span></p>
+<p>当 <span class="math inline">\(t=0\)</span> 时得到 A；当 <span
+class="math inline">\(t=1\)</span> 时得到 B；当 <span
+class="math inline">\(t=0.5\)</span> 时得到介于 A 和 B 之间的中间
+SDF。再从这个中间 SDF 中取 <span class="math inline">\(SDF=0\)</span>
+的位置，就得到一个边界位于 A 和 B 中间的新形状。</p>
+<p>这页的核心直觉是：<strong>不要直接混合黑白占据结果，而是混合每个点到边界的带符号距离。</strong>
+因为 SDF
+包含“离边界多远”的信息，所以插值后边界会连续移动，而不是突然跳变。推广到
+3D 后，同样可以对物体表面进行平滑变形、融合或生成中间形状。</p>
+<h2 id="level-set把隐式函数预采样到网格上">4.5 Level
+Set：把隐式函数预采样到网格上</h2>
+<p>隐式函数很灵活，但复杂形状很难写成简单闭式公式。老师在视频中给出动机：如果每次查询“一点是否在牛的内部”都要组合成百上千个函数，那会非常慢。一个折中办法是
+<strong>预查询（pre-query）</strong>大量空间点，并把结果存起来。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708224530077.png" alt="image-20260708224529906" style="zoom: 50%;" /></p>
+<p>这就是 Level Set 的思想：在 3D 空间中采样一个规则网格，例如 <span
+class="math inline">\(100\times100\times100\)</span>，对每个格点预先计算函数值或距离值，然后把这些值存成三维矩阵。表面位于函数值从正到负变化的位置，也就是插值后
+<span class="math inline">\(f=0\)</span> 的地方。</p>
+<p>预查询结束后，如果要判断一个点 <span
+class="math inline">\(\mathbf{x}\)</span>
+位于形状的内部、表面还是外部，通常采用 <strong>三线性插值</strong>
+的方法。用周围 <span class="math inline">\(2\times2\times2=8\)</span>
+个格点的 <span class="math inline">\(\text{SDF}\)</span> 做插值，得到
+<span class="math inline">\(\hat{\mathrm{SDF}}(\mathbf{x})\)</span>，即
+<span class="math inline">\(\mathbf{x}\)</span> 的 <span
+class="math inline">\(\mathbf{SDF}\)</span> 的估计值。然后判断：若<span
+class="math inline">\(\mathrm{SDF}(\mathbf{x})&lt;0\)</span>，则在形状内部；若
+<span
+class="math inline">\(\mathrm{SDF}(\mathbf{x})=0\)</span>，则在表面上；若
+<span
+class="math inline">\(\mathrm{SDF}(\mathbf{x})&gt;0\)</span>，则在形状外部。</p>
+<p>Level Set 的特点：</p>
+<ul>
+<li>本质上仍然是隐式表示，因为表面由 <span
+class="math inline">\(f=0\)</span> 定义；</li>
+<li>但它又是非参数的，因为函数值被离散存储在网格中；</li>
+<li>可以更直观地控制复杂形状；</li>
+<li>适合 CT/MRI 等体数据，因为医学图像天然就是体素网格。</li>
+</ul>
+<h2 id="体素voxels">4.6 体素（Voxels）</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708225129950.png" alt="image-20260708225129726" style="zoom: 33%;" /></p>
+<p>体素可以看成 3D 版像素。每个格子存储
+occupancy、density、SDF、语义标签或颜色等值。体素非常适合 3D
+CNN，因为它把 3D 数据变成规则张量。</p>
+<ul>
+<li><p><strong>Occupancy（占据状态）</strong>：表示这个 voxel
+是否被物体占据。最简单是二值标签，<span class="math inline">\(1\)</span>
+表示在物体内部，<span class="math inline">\(0\)</span>
+表示在物体外部；也可以是 <span class="math inline">\([0,1]\)</span>
+之间的概率，表示模型认为这里有物体的置信度。</p></li>
+<li><p><strong>Density（密度/不透明度）</strong>：表示这个位置对光线的阻挡、吸收或散射有多强。它不是简单回答“有没有物体”，而是回答“这里有多实、有多挡光”。在
+NeRF 等体渲染方法中，density
+会影响光线经过该位置时对最终像素颜色的贡献。</p></li>
+<li><p><strong>SDF（符号距离）</strong>：表示 voxel
+中心或格点到物体表面的带符号距离。负数表示在物体内部，零表示在表面上，正数表示在物体外部。</p></li>
+<li><p><strong>语义标签（semantic label）</strong>：表示该 voxel
+属于什么类别或部件，例如墙、地板、桌子、椅子腿、椅子背等。它常用于 3D
+scene parsing 或 part segmentation。</p></li>
+<li><p><strong>颜色（color）</strong>：通常存储 RGB 三个通道，即 <span
+class="math inline">\((R,G,B)\)</span>。如果需要透明度，也可以存
+RGBA；在更复杂的神经渲染中，颜色还可能和观察方向有关。</p></li>
+</ul>
+<p>但体素的核心问题是内存和计算量：三维分辨率增长很快。如果每个维度分辨率翻倍，总格子数变成原来的
+8
+倍。很多对象只在表面附近有信息，空空间占了大量格子，这会造成严重浪费。</p>
+<h2 id="d-形状表示总结">4.7 3D 形状表示总结</h2>
+<p>3D shape representation 可以用两个维度来理解：</p>
+<ul>
+<li><strong>显式（Explicit） vs
+隐式（Implicit）</strong>：显式表示直接给出表面上的点、面片或参数曲面；隐式表示用函数、体素值或规则判断空间点和物体的关系。</li>
+<li><strong>非参数（Non-parametric） vs
+参数（Parametric）</strong>：非参数表示通常直接存储离散数据，例如点、网格、体素格点；参数表示用公式、控制点、规则或构造过程来生成形状。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260708230251863.png" alt="image-20260708230251644" style="zoom: 33%;" /></p>
+<p>这张图提醒我们：<strong>3D 没有像 2D
+像素那样统一的默认表示</strong>。选择表示时，要看任务更需要什么：</p>
+<ul>
+<li>如果要直接处理扫描数据，点云很自然；</li>
+<li>如果要高质量传统渲染，mesh 很自然；</li>
+<li>如果要规则张量和卷积，voxel 很自然；</li>
+<li>如果要查询任意空间点的内外、距离或密度，SDF/occupancy/radiance field
+这类隐式表示更自然；</li>
+<li>如果要表达工业零件、曲线曲面和设计意图，splines、subdivision、CSG
+等参数化表示更自然。</li>
+</ul>
+<p>因此，3D Vision
+的很多方法差异，本质上不是网络结构不同，而是底层形状表示不同。表示一变，存储方式、采样方式、损失函数、渲染方式和神经网络结构都会随之改变。</p>
+<h1 id="d-数据集从小规模-cad-到大规模真实扫描与视频">5 3D
+数据集：从小规模 CAD 到大规模真实扫描与视频</h1>
+<p>老师在视频中把数据集发展讲得很清楚：3D vision
+很长时间里受限于数据规模。2D 图像有 ImageNet、互联网图像和海量视频；而
+3D 数据的获取、清洗、标注和重建都困难得多。</p>
+<h2 id="早期数据集">5.1 早期数据集</h2>
+<p>Princeton Shape Benchmark 包含 1814 个样本和 182
+个类别。这意味着平均每个类别大约只有 10
+个样本左右。放到今天看很小，但在当时已经是重要基准。</p>
+<p>2014 年以前，很多 3D
+数据集规模都不大，即使有上万模型，类别一多，每类样本数仍然有限。这也是早期
+3D 机器学习难以训练大模型的重要原因。</p>
+<h2 id="shapenet-与-modelnet">5.2 ShapeNet 与 ModelNet</h2>
+<p>ShapeNet 的出现类似 3D 领域的 ImageNet 时刻。</p>
+<ul>
+<li>ShapeNet：约 3M synthetic objects；</li>
+<li>ShapeNetCore：约 51.3K models，55 categories；</li>
+<li>ModelNet 后来被 ShapeNet 吸收。</li>
+</ul>
+<p>ShapeNetCore 平均每类约 1000 个样本，虽然类别分布不均，但 chairs 和
+cars 等大类终于有了足够样本。因此许多早期 3D deep learning
+论文都集中在椅子和车上展示结果。</p>
+<h2 id="objverse-与-objverse-xl">5.3 Objverse 与 Objverse-XL</h2>
+<p>Objverse 和 Objverse-XL 把规模进一步提高到约 800K 和 10M 级别的 3D
+assets。相比
+ShapeNet，它们类别更多、模型更多，很多对象还带纹理。它们代表了大规模
+synthetic 3D 数据的新阶段。</p>
+<h2 id="真实扫描与多视角视频">5.4 真实扫描与多视角视频</h2>
+<p>真实 3D 数据比合成 CAD 模型更难获取。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">数据集</th>
+<th style="text-align: left;">特点</th>
+<th style="text-align: left;">重要性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Object Scan</td>
+<td style="text-align: left;">10,933 RGB-D scans，441 models</td>
+<td style="text-align: left;">真实物体扫描数据</td>
+</tr>
+<tr>
+<td style="text-align: left;">CO3D</td>
+<td style="text-align: left;">约 19,000 videos，50 categories</td>
+<td
+style="text-align: left;">用手机/相机绕物体拍摄视频，支持真实物体重建</td>
+</tr>
+<tr>
+<td style="text-align: left;">ScanNet</td>
+<td style="text-align: left;">2.5M views，1500 RGB-D scans，camera
+poses，surface reconstructions，instance-level semantic
+segmentations</td>
+<td style="text-align: left;">室内场景理解的重要数据集</td>
+</tr>
+<tr>
+<td style="text-align: left;">ARKitScenes / ScanNet++</td>
+<td style="text-align: left;">更近期的真实场景数据</td>
+<td style="text-align: left;">更高质量图像和扫描</td>
+</tr>
+<tr>
+<td style="text-align: left;">PartNet</td>
+<td style="text-align: left;">细粒度、实例级、层次化部件标注</td>
+<td style="text-align: left;">支持部件分割和结构理解</td>
+</tr>
+</tbody>
+</table>
+<p>即使 CO3D 这类真实物体视频数据已经很有价值，和 2D
+图像/视频数据规模相比仍有巨大差距。2D 数据可以达到十亿、百亿级，而真实
+3D 数据往往还在十万量级附近。这也是现代 3D 研究重新重视 2D/视频
+foundation models 的原因之一。</p>
+<h1 id="ai-geometry-的任务与表示选择">6 AI + Geometry
+的任务与表示选择</h1>
+<p>AI + Geometry 的任务可分成三类。</p>
+<h2 id="生成式模型">6.1 生成式模型</h2>
+<p>生成式模型学习形状先验，用于：</p>
+<ul>
+<li>3D shape generation；</li>
+<li>shape completion；</li>
+<li>geometry data processing；</li>
+<li>从图像、文本或 latent code 生成 3D 对象；</li>
+<li>同时生成几何与外观。</li>
+</ul>
+<p>3D 生成不只是输出形状，还可能需要控制
+viewpoint、texture、identity，以及最终渲染出的 2D 图像是否真实。</p>
+<h2 id="判别式模型">6.2 判别式模型</h2>
+<p>判别式模型学习 shape descriptors，用于：</p>
+<ul>
+<li>shape classification；</li>
+<li>retrieval；</li>
+<li>segmentation；</li>
+<li>view estimation；</li>
+<li>scene parsing。</li>
+</ul>
+<h2 id="d-3d-联合建模">6.3 2D-3D 联合建模</h2>
+<p>因为 2D 数据和 2D 模型更丰富，3D 研究一直在尝试利用 2D 监督：</p>
+<ul>
+<li>多视角投影；</li>
+<li>differentiable projection/back-projection；</li>
+<li>differentiable rendering；</li>
+<li>neural rendering；</li>
+<li>从 2D images/videos 学习 3D geometry 和 appearance；</li>
+<li>融合文本等多模态输入。</li>
+</ul>
+<p>早期 3D deep learning 先尝试把 3D 转成 2D 或 3D voxel
+来套用已有网络；后来大家希望发展 3D-native 方法；而近年由于图像/视频
+foundation models 太强，研究趋势又重新回到“如何利用 2D/视频大模型帮助
+3D”。</p>
+<h1 id="多视角体素octree早期深度学习如何进入-3d">7
+多视角、体素、Octree：早期深度学习如何进入 3D</h1>
+<h2 id="multi-view-cnn">7.1 Multi-View CNN</h2>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709100851082.png"
+alt="image-20260709100843849" />
+<figcaption aria-hidden="true">image-20260709100843849</figcaption>
+</figure>
+<p>Multi-View CNN 的思路是把 3D 对象从多个相机角度渲染成 2D
+图像，再用成熟的 2D CNN 处理。流程如下：</p>
+<ol type="1">
+<li>对同一个 3D 对象渲染多个 views。</li>
+<li>每个 view 通过 CNN 提取图像特征。</li>
+<li>通过 <strong>view pooling</strong> 对多个视角特征做逐元素 max
+pooling。</li>
+<li>得到 shape descriptor，再用于分类或检索。</li>
+</ol>
+<p>ModelNet40 上的结果显示，MVCNN 显著提升了分类和检索表现：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Method</th>
+<th style="text-align: left;">Classification Accuracy</th>
+<th style="text-align: left;">Retrieval mAP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">SPH</td>
+<td style="text-align: left;">68.2%</td>
+<td style="text-align: left;">33.3%</td>
+</tr>
+<tr>
+<td style="text-align: left;">LFD</td>
+<td style="text-align: left;">75.5%</td>
+<td style="text-align: left;">40.9%</td>
+</tr>
+<tr>
+<td style="text-align: left;">3D ShapeNets</td>
+<td style="text-align: left;">77.3%</td>
+<td style="text-align: left;">49.2%</td>
+</tr>
+<tr>
+<td style="text-align: left;">FV, 12 views</td>
+<td style="text-align: left;">84.8%</td>
+<td style="text-align: left;">43.9%</td>
+</tr>
+<tr>
+<td style="text-align: left;">CNN, 12 views</td>
+<td style="text-align: left;">88.6%</td>
+<td style="text-align: left;">62.8%</td>
+</tr>
+<tr>
+<td style="text-align: left;">MVCNN, 12 views</td>
+<td style="text-align: left;">89.9%</td>
+<td style="text-align: left;">70.1%</td>
+</tr>
+<tr>
+<td style="text-align: left;">MVCNN + metric, 12 views</td>
+<td style="text-align: left;">89.5%</td>
+<td style="text-align: left;">80.2%</td>
+</tr>
+<tr>
+<td style="text-align: left;">MVCNN, 80 views</td>
+<td style="text-align: left;">90.1%</td>
+<td style="text-align: left;">70.4%</td>
+</tr>
+<tr>
+<td style="text-align: left;">MVCNN + metric, 80 views</td>
+<td style="text-align: left;">90.1%</td>
+<td style="text-align: left;">79.5%</td>
+</tr>
+</tbody>
+</table>
+<p>MVCNN 的优点是直接借用 2D CNN
+的方法和预训练特征；缺点是必须选择投影视角，而且如果输入本身是
+noisy/incomplete point cloud，渲染出的视图可能很差。</p>
+<h2 id="体素网络与-3d-gan">7.2 体素网络与 3D-GAN</h2>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709101028553.png"
+alt="image-20260709101028283" />
+<figcaption aria-hidden="true">image-20260709101028283</figcaption>
+</figure>
+<p>最直接的 3D-native 方法是把像素 CNN 扩展成体素 3D CNN。3D ShapeNets /
+3D Conv Deep Belief Networks 使用 voxel occupancy grid
+学习形状，可以做分类和生成。</p>
+<p>之后 3D-GAN 把 GAN 从 2D pixels 扩展到 3D voxels：latent code 经过
+generator 输出 3D voxel shape。这个思路很自然：GAN 可以生成 2D
+pixels，也可以生成 3D voxels，只是计算更重、分辨率更低。</p>
+<h2 id="visual-object-networks几何-渲染">7.3 Visual Object
+Networks：几何 + 渲染</h2>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709101305005.png"
+alt="image-20260709101304795" />
+<figcaption aria-hidden="true">image-20260709101304795</figcaption>
+</figure>
+<p>Visual Object Networks 把 3D generation 和 2D rendering
+结合起来：</p>
+<ul>
+<li>shape network 生成 3D shape；</li>
+<li>texture network 生成 texture；</li>
+<li>viewpoint 控制相机；</li>
+<li>differentiable projection/rendering 输出 depth、silhouette（轮廓）或
+RGB image；</li>
+<li>2D 图像损失可以反向监督 3D 形状和外观。</li>
+</ul>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709101557956.png"
+alt="image-20260709101557682" />
+<figcaption aria-hidden="true">image-20260709101557682</figcaption>
+</figure>
+<p>latent space 可以控制
+viewpoint、shape、texture：可以固定形状改变视角，也可以固定视角改变物体身份，还可以把一辆车的
+texture 转移到另一辆车的 shape 上。</p>
+<h2 id="octree稀疏体素与表面附近计算">7.4
+Octree：稀疏体素与表面附近计算</h2>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709101900089.png"
+alt="image-20260709101859879" />
+<figcaption aria-hidden="true">image-20260709101859879</figcaption>
+</figure>
+<p>体素方法的问题是大量空间为空。Octree
+的思想是递归划分空间：远离表面、信息少的区域用粗格子表示；接近表面和细节区域继续细分。</p>
+<p>Octree 的优点：</p>
+<ul>
+<li>存储稀疏表面信号；</li>
+<li>把计算限制在靠近表面的区域；</li>
+<li>高分辨率下比 dense voxel CNN 更省显存；</li>
+<li>可以逐层生成 octree，避免完整 <span
+class="math inline">\(O(n^3)\)</span> 重建。</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709102351018.png" alt="image-20260709102350826" style="zoom:50%;" /></p>
+<p>内存曲线说明：随着分辨率提高，Voxel CNN 的 GPU memory 快速增长，而
+O-CNN 增长慢得多。</p>
+<p>这里容易产生一个疑问：既然不同区域有粗格子和细格子，不同样本的 octree
+结构也不一样，那输入给网络会不会很乱？答案是：<strong>Octree 确实比
+dense voxel
+不规则，但它不是无结构的乱，而是带规则坐标的稀疏层级网格。</strong></p>
+<p>可以把 octree 看成一层一层的网格：</p>
+<ul>
+<li>第 0 层：一个大立方体；</li>
+<li>第 1 层：最多 <span class="math inline">\(2^3\)</span> 个格子；</li>
+<li>第 2 层：最多 <span class="math inline">\(4^3\)</span> 个格子；</li>
+<li>第 <span class="math inline">\(d\)</span> 层：最多 <span
+class="math inline">\(2^d\times2^d\times2^d\)</span> 个格子。</li>
+</ul>
+<p>实际计算时，只保留有用的 active
+cells，例如靠近表面或包含细节的格子；全空或信息少的区域就不继续细分。因此，全局坐标系统仍然是规则的，只是大量空格子被跳过了。网络通常按层处理这些
+active
+cells：同一层的格子尺度一致，每个格子带有自己的空间坐标、层级和特征，卷积或信息传播只在存在的格子及其邻居之间进行。</p>
+<p>不同样本的 octree 节点数通常不同。常见的做法是把多个样本的 active
+cells 打包成稀疏列表或稀疏张量，例如记录：</p>
+<p><span class="math display">\[
+(\text{batch id},x,y,z,\text{level},\text{feature}).
+\]</span></p>
+<p>这样网络知道每个格子属于哪个样本、位于哪个层级和哪个空间位置。代价是实现比普通
+3D CNN 更复杂；好处是避免把大量空空间塞进
+GPU，把存储和计算集中在表面附近。</p>
+<h1 id="点云学习pointnet图网络与点集距离">8
+点云学习：PointNet、图网络与点集距离</h1>
+<h2 id="从-eulerian-到-lagrangian">8.1 从 Eulerian 到 Lagrangian</h2>
+<p>“Eulerian -&gt; Lagrangian”
+表示从固定空间网格转向随几何分布移动的表示。体素和 level set 是
+Eulerian：格子固定在空间中；点云和 mesh 更像
+Lagrangian：元素跟随对象表面分布。</p>
+<h2 id="pointnet">8.2 PointNet</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709102841734.png" alt="image-20260709102841540" style="zoom: 50%;" /></p>
+<p>PointNet 是第一个非常有影响力的点云深度学习框架，可以用于：</p>
+<ul>
+<li>object classification；</li>
+<li>object part segmentation；</li>
+<li>semantic scene parsing。</li>
+</ul>
+<p>点云模型必须满足两个关键必要条件：</p>
+<ol type="1">
+<li><p><strong>Permutation Invariance</strong></p>
+<p>点云是无序集合，输入点顺序改变，输出不应改变。</p></li>
+<li><p><strong>Sampling Invariance</strong></p>
+<p>输出应该反映底层几何，而不是某一次采样的偶然性。</p></li>
+</ol>
+<h2 id="对称函数与-pointnet-形式">8.3 对称函数与 PointNet 形式</h2>
+<p>若函数满足：</p>
+<p><span class="math display">\[
+f(x_1,\ldots,x_n)=f(x_{\pi(1)},\ldots,x_{\pi(n)})
+\]</span></p>
+<p>对 <span class="math inline">\(\{1,2, \dots,n\}\)</span> 的任意排列
+<span class="math inline">\(\pi\)</span>
+成立，则它是对称函数。max、sum、average
+都是对称聚合。<strong>对称函数正是实现 permutation invariance
+的一种核心方法</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709103039068.png" alt="image-20260709103038884" style="zoom: 33%;" /></p>
+<p>PointNet 的形式可以理解为：</p>
+<p><span class="math display">\[
+f(x_1,\ldots,x_n)=\gamma\left(g(h(x_1),\ldots,h(x_n))\right),
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">\(h\)</span>：逐点
+MLP，把每个点映射成特征；</li>
+<li><span class="math inline">\(g\)</span>：对称聚合函数，常用 max
+pooling；</li>
+<li><span class="math inline">\(\gamma\)</span>：聚合后的预测网络。</li>
+</ul>
+<p>直接 max 聚合只能发现简单极值属性；PointNet 先用 <span
+class="math inline">\(h\)</span>
+学习丰富点特征，再用对称函数聚合，因此既有表达能力，又保持点顺序不变。</p>
+<h2 id="图神经网络处理点云">8.4 图神经网络处理点云</h2>
+<h3 id="图神经网络基础节点边与消息传递">8.4.1
+图神经网络基础：节点、边与消息传递</h3>
+<p><strong>图神经网络（Graph Neural Network, GNN）</strong>
+是专门处理图结构数据的神经网络。所谓图，由两类对象组成：</p>
+<ul>
+<li><strong>节点（nodes）</strong>：图中的实体；</li>
+<li><strong>边（edges）</strong>：节点之间的关系。</li>
+</ul>
+<p>例如社交网络中，节点可以是用户，边表示好友关系；分子结构中，节点可以是原子，边表示化学键；在点云中，节点可以是
+3D 点，边可以表示两个点在空间中互为邻居。</p>
+<p>GNN 的核心思想是 <strong>message
+passing（消息传递）</strong>：每个节点不仅看自己的特征，还会从邻居节点接收信息，然后更新自己的特征。一个典型过程可以概括为：</p>
+<ol type="1">
+<li>每个节点有初始特征，例如点云中的坐标、颜色、法向量或当前隐藏特征。</li>
+<li>每个节点从相邻节点收集信息，例如邻居的位置、特征差异或边特征。</li>
+<li>用 sum、mean、max 或一个小 MLP 聚合邻居信息。</li>
+<li>用聚合后的信息更新当前节点特征。</li>
+<li>重复多层后，一个节点的特征就会包含越来越大邻域的上下文。</li>
+</ol>
+<p>直觉上，GNN
+像是在图上做“局部交流”：第一层只和直接邻居交流，第二层可以间接看到二阶邻居，层数越深，感受野越大。它特别适合处理不规则结构，因为它不要求数据排成规则网格，只需要知道哪些节点相连。</p>
+<h3 id="点云为什么可以看成图">8.4.2 点云为什么可以看成图</h3>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709103434922.png" /></p>
+<p>PointNet 对局部邻域建模较弱，因此后续方法把点云看成图：</p>
+<ul>
+<li>点是 nodes；</li>
+<li>邻域关系是 edges；</li>
+<li>message passing 在邻域间传播信息。</li>
+</ul>
+<p>这样做的好处是：模型不再只把点云看成一堆独立点，而是能显式建模局部几何关系。例如，某个点附近的邻居如何排列，可以帮助判断这里是平面、边缘、角点，还是某个物体部件的局部结构。</p>
+<p>在实践中，点云图的边通常不是人工标注的，而是根据邻近关系自动构建：</p>
+<ul>
+<li><strong>空间邻近</strong>：在 3D 坐标中找每个点最近的 <span
+class="math inline">\(k\)</span> 个点，形成 <span
+class="math inline">\(k\)</span>NN 图；</li>
+<li><strong>半径邻近</strong>：把一定半径内的点连成边；</li>
+<li><strong>特征邻近</strong>：在网络中间层，根据 learned feature
+的相似性重新找邻居。</li>
+</ul>
+<p>Dynamic Graph CNN 等方法会根据空间邻近或特征邻近构建动态图。所谓
+dynamic，是指邻居关系可以随着网络层数和特征变化而更新，从而更好捕捉局部几何结构。</p>
+<h2 id="点集距离chamfer-distance-与-emd">8.5 点集距离：Chamfer Distance
+与 EMD</h2>
+<p>生成或重建点云时，需要把网络输出的点集和数据集中真实的点集作比较，从而写出
+loss function。下面这两种距离可以用作 loss function。设 <span
+class="math inline">\(S_1,S_2\subseteq\mathbb{R}^3\)</span>。</p>
+<p><strong>Chamfer Distance</strong>：</p>
+<p><span class="math display">\[
+d_{CD}(S_1,S_2)=
+\sum_{x\in S_1}\min_{y\in S_2}\|x-y\|_2+
+\sum_{y\in S_2}\min_{x\in S_1}\|x-y\|_2.
+\]</span></p>
+<p>它让每个点找另一个集合中的最近点，计算相对便宜，但可能产生多对一匹配。</p>
+<p><strong>Earth Mover’s Distance（EMD）</strong>：</p>
+<p>若 <span class="math inline">\(|S_1|=|S_2|\)</span>，</p>
+<p><span class="math display">\[
+d_{EMD}(S_1,S_2)=
+\min_{\phi:S_1\rightarrow S_2}
+\sum_{x\in S_1}\|x-\phi(x)\|_2,
+\]</span></p>
+<p>其中 <span class="math inline">\(\phi\)</span> 是双射。EMD
+更像“搬运”一个点集到另一个点集，匹配更严格，但计算更贵。</p>
+<h1 id="参数化神经解码器与-atlasnet">9 参数化神经解码器与 AtlasNet</h1>
+<p>AtlasNet
+的动机是：点云虽然摆脱了体素分辨率限制，但点是无序的，难以得到光滑表面。参数曲面能产生光滑表面，但复杂对象的闭式参数方程难以手写。于是可以用神经网络学习这个参数映射。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709104636745.png" style="zoom:50%;" /></p>
+<p>AtlasNet 把二维参数点 <span class="math inline">\((u,v)\)</span>
+和形状 latent code <span class="math inline">\(l\)</span> 输入 MLP，输出
+3D 点：</p>
+<p><span class="math display">\[
+\mathrm{MLP}(l,u,v)\rightarrow (x,y,z).
+\]</span></p>
+<p>可以用“纸片折叠”类比这一过程：一个 MLP
+可以把一张二维纸片折到三维空间中；多个小 MLP/patch
+可以共同覆盖复杂对象表面。这就是 AtlasNet 名字中 atlas
+的含义：用多个局部图册 patch 覆盖整体曲面。</p>
+<p>与 voxel 和 point cloud 相比：</p>
+<ul>
+<li>voxel 受分辨率限制，表面粗糙；</li>
+<li>point cloud 更自由，但没有连续表面；</li>
+<li>AtlasNet 学习低维参数域到 3D
+的映射，能产生更平滑的表面，并可进一步生成 mesh。</li>
+</ul>
+<h1 id="深度隐式函数nerf-与-3d-gaussian-splatting">10 深度隐式函数、NeRF
+与 3D Gaussian Splatting</h1>
+<h2 id="为什么深度网络适合表示隐式函数">10.1
+为什么深度网络适合表示隐式函数</h2>
+<p>深度网络本质上是在学习一个复杂函数。例如图像分类中，网络学习从高维像素空间到低维类别标签的映射；这个函数很难手写，所以用神经网络逼近。</p>
+<p>这个思路自然也适合 3D 隐式函数。与其把空间预采样成 voxel，再在 voxel
+上做 3D CNN，不如直接学习一个函数：</p>
+<p><span class="math display">\[
+F_\theta(x,z)\rightarrow \text{occupancy or SDF},
+\]</span></p>
+<p>其中 <span class="math inline">\(x\)</span> 是 3D 查询点，<span
+class="math inline">\(z\)</span> 是形状 latent
+code。给定任意空间点，网络输出该点是否在物体内、离表面多远，或表面附近的密度。</p>
+<p>代表方法包括：</p>
+<ul>
+<li>Occupancy Networks；</li>
+<li>DeepSDF；</li>
+<li>Deep Level Sets；</li>
+<li>Learning to Infer Implicit Surfaces without 3D Supervision。</li>
+</ul>
+<p>这些方法把 3D shape
+表示成连续神经隐式场，避免固定体素分辨率，但通常仍需要 3D shape
+supervision 或采样点监督。</p>
+<h2 id="nerf从几何隐式函数到几何-外观-2d-监督">10.2
+NeRF：从几何隐式函数到几何 + 外观 + 2D 监督</h2>
+<p>NeRF（Neural Radiance Fields）主要解决的问题是 <strong>novel view
+synthesis（新视角合成）</strong>：给定同一个场景或物体的多张 2D
+照片，以及这些照片对应的相机位姿，学习一个可以从任意新视角渲染图像的 3D
+表示。</p>
+<p>它的目标是学习一个连续的神经场。这个神经场像一个“3D
+世界查询器”：给定空间中的一个点和观察方向，网络返回这个位置的颜色以及这里有多挡光。</p>
+<p>更具体地说，NeRF 学习的函数可以写成：</p>
+<p><span class="math display">\[
+F_\theta(\mathbf{x},\mathbf{d})\rightarrow(\sigma,\mathbf{c}),
+\]</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">\(\mathbf{x}=(x,y,z)\)</span> 是空间中的
+3D 查询点；</li>
+<li><span class="math inline">\(\mathbf{d}\)</span> 是观察方向；</li>
+<li><span class="math inline">\(\sigma\)</span> 是该位置的
+density，可以理解成密度、不透明度或“这里有多像有东西”；</li>
+<li><span class="math inline">\(\mathbf{c}=(R,G,B)\)</span> 是从方向
+<span class="math inline">\(\mathbf{d}\)</span>
+看这个位置时的颜色。</li>
+</ul>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709105840318.png"
+alt="image-20260709105840099" />
+<figcaption aria-hidden="true">image-20260709105840099</figcaption>
+</figure>
+<p>训练时，NeRF 沿着每个像素对应的相机光线采样许多 3D 点，查询这些点的
+<span class="math inline">\(\sigma\)</span>
+和颜色，再通过可微体渲染把它们合成为一个预测像素颜色。这个预测颜色会和真实照片中的像素颜色比较，误差再反向传播更新网络。因此，NeRF
+的关键桥梁是：</p>
+<p><span class="math display">\[
+\text{3D neural field}\xrightarrow{\text{volume rendering}}\text{2D
+image}.
+\]</span></p>
+<p>这样一来，模型虽然学习的是 3D 场景表示，但监督信号可以来自普通 2D
+图像，而不一定需要真实的 3D shape 标注。</p>
+<p>NeRF 的关键跃迁不是凭空出现的。它很大程度上继承了 deep implicit
+functions 的思想，只是做了两个重要扩展：</p>
+<ol type="1">
+<li><p><strong>不只表示几何，还表示 appearance/radiance</strong>。</p>
+<p>网络输入空间位置和视角方向，输出颜色和体密度： <span
+class="math display">\[
+F_\theta(x,y,z,\theta,\phi)\rightarrow (RGB,\sigma).
+\]</span></p></li>
+<li><p><strong>通过可微体渲染从 2D images 学习</strong>。</p>
+<p>不再必须有 3D shape
+supervision，而是从多视角图像和相机位姿训练。</p></li>
+</ol>
+<h2 id="体渲染公式">10.3 体渲染公式</h2>
+<p>对一条相机光线：</p>
+<p><span class="math display">\[
+r(t)=o+td,
+\]</span></p>
+<p>沿光线采样多个点，每个采样点由网络输出 density <span
+class="math inline">\(\sigma_i\)</span> 和颜色 <span
+class="math inline">\(c_i\)</span>。为了计算每一小段光线对最终像素的贡献，通常会先把
+density <span class="math inline">\(\sigma_i\)</span> 转换成
+opacity/alpha：</p>
+<p><span class="math display">\[
+\alpha_i=1-\exp(-\sigma_i\delta_i),
+\]</span></p>
+<p>其中 <span class="math inline">\(\delta_i\)</span> 表示第 <span
+class="math inline">\(i\)</span> 个采样点附近这一小段 ray interval
+的长度。直觉上，<span class="math inline">\(\sigma_i\)</span>
+越大，说明该位置越“挡光”；<span class="math inline">\(\delta_i\)</span>
+越长，说明光线在这一段中穿过的距离越长；两者共同决定这一段的 <span
+class="math inline">\(\alpha_i\)</span> 有多大。</p>
+<p>最终像素颜色近似为：</p>
+<p><span class="math display">\[
+c\approx\sum_{i=1}^{n}T_i\alpha_i c_i.
+\]</span></p>
+<p>其中：</p>
+<p><span class="math display">\[
+T_i=\prod_{j=1}^{i-1}(1-\alpha_j).
+\]</span></p>
+<p><span class="math inline">\(T_i\)</span> 表示光线到达第 <span
+class="math inline">\(i\)</span>
+个采样点前还没有被前面点挡住的比例，<span
+class="math inline">\(\alpha_i\)</span> 表示第 <span
+class="math inline">\(i\)</span> 段贡献多少光，<span
+class="math inline">\(c_i\)</span>
+是该段颜色。因此，体渲染中的关系可以理解为：</p>
+<p><span class="math display">\[
+\sigma_i\rightarrow\alpha_i\rightarrow\text{最终像素颜色}.
+\]</span></p>
+<p>也就是说，公式里虽然直接出现的是 <span
+class="math inline">\(\alpha_i\)</span>，但 <span
+class="math inline">\(\alpha_i\)</span> 是由网络输出的 density <span
+class="math inline">\(\sigma_i\)</span> 和采样间隔 <span
+class="math inline">\(\delta_i\)</span>
+计算得到的。因为这些计算在离散近似下可微，所以可以从图像重建损失反向训练神经场。</p>
+<p>另外可以看到，体渲染公式对颜色 <span
+class="math inline">\(c_i\)</span> 和透明度/不透明度参数 <span
+class="math inline">\(\alpha_i\)</span>
+是可微的，所以可以用反向传播训练网络。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260709110754430.png" alt="image-20260709110754226" style="zoom: 33%;" /></p>
+<p>NeRF 的意义在于：</p>
+<ul>
+<li>用神经隐式函数表示 3D density 和 radiance；</li>
+<li>用体渲染连接 3D 场和 2D 图像；</li>
+<li>可以直接从 2D images 学习，而不局限于有大量 3D CAD 数据的类别；</li>
+<li>新视角合成质量很高。</li>
+</ul>
+<h2 id="生成式隐式几何-渲染">10.4 生成式隐式几何 + 渲染</h2>
+<p>课件后面把早期 voxel-based 生成模型替换成 radiance
+fields。也就是说，生成器不再只生成体素形状，而是生成一个隐式 radiance
+field，再通过 neural rendering 得到图像。这样可以保持
+viewpoint、identity、texture
+等控制能力，同时从图像数据中学习更真实的外观。</p>
+<p>视频中提到 Pi-GAN
+一类方法：用生成式神经网络输出隐式辐射场和密度，然后用 NeRF 风格渲染生成
+2D 图像。它把 GAN 的生成能力、隐式表示和可微渲染结合起来。</p>
+<h2 id="d-gaussian-splatting为什么又回到稀疏显式基元">10.5 3D Gaussian
+Splatting：为什么又回到稀疏显式基元</h2>
+<p>NeRF
+的问题是慢。它需要沿每条光线采样大量空间点，并反复查询神经网络。很多查询点位于空空间，最终密度接近
+0，却仍然消耗计算。</p>
+<p>视频中老师用这一点解释 3D Gaussian Splatting
+的动机：能否保留隐式/神经渲染的高质量，但避免在空空间密集采样？</p>
+<p>3DGS 的思想是把场景表示成稀疏的 3D Gaussian blobs：</p>
+<ul>
+<li>每个 Gaussian 像一个扩展点，不是无限小的点；</li>
+<li>它有位置、尺度/协方差、不透明度和颜色；</li>
+<li>渲染时只关注这些 blob 所在区域，而不是均匀查询整个空间；</li>
+<li>可以高效投影到图像平面并 splat。</li>
+</ul>
+<p>对比 NeRF 与 3DGS：</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">参数化方式</th>
+<th style="text-align: left;">渲染方式</th>
+<th style="text-align: left;">优势</th>
+<th style="text-align: left;">主要问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">NeRF</td>
+<td style="text-align: left;">密集连续神经场</td>
+<td style="text-align: left;">沿 ray 多点采样 + 体渲染</td>
+<td style="text-align: left;">质量高、连续、可从 2D 学习</td>
+<td style="text-align: left;">查询多，渲染慢</td>
+</tr>
+<tr>
+<td style="text-align: left;">3D Gaussian Splatting</td>
+<td style="text-align: left;">稀疏 3D Gaussian blobs</td>
+<td style="text-align: left;">将 Gaussian 投影/splat 到图像</td>
+<td style="text-align: left;">质量接近 NeRF，速度大幅提升</td>
+<td style="text-align: left;">依赖显式基元优化和可见性处理</td>
+</tr>
+</tbody>
+</table>
+<p>老师提到，3DGS 在质量指标上与 NeRF
+接近，但渲染速度可以高很多，因为它不再把大量算力浪费在空空间查询上。</p>
+<h1 id="结构感知表示几何细节之外的部件关系与程序">11
+结构感知表示：几何细节之外的部件、关系与程序</h1>
+<p>课程最后讨论 <strong>structure-aware
+representation</strong>。老师强调，点云、mesh、voxel、implicit functions
+更多表示的是几何细节，但真实物体还有结构规律，例如：</p>
+<ul>
+<li>椅子有座面、靠背、腿、扶手；</li>
+<li>左右腿应该对称；</li>
+<li>椅腿应与座面连接并支撑整体；</li>
+<li>房间里床通常靠墙，椅子常在桌子旁边；</li>
+<li>建筑和场景有层次：房间包含桌椅，椅子包含部件。</li>
+</ul>
+<p>课件用公式化图示表达：</p>
+<p><span class="math display">\[
+\text{Shape}=\text{Element Geometry}+\text{Element Structure}.
+\]</span></p>
+<h2 id="结构表示的层级">11.1 结构表示的层级</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">表示</th>
+<th style="text-align: left;">核心思想</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Segmented Geometry</td>
+<td style="text-align: left;">把几何分割成段</td>
+<td style="text-align: left;">简单，复用普通几何模型</td>
+<td style="text-align: left;">部件完整性不保证</td>
+</tr>
+<tr>
+<td style="text-align: left;">Part Sets</td>
+<td style="text-align: left;">用部件集合表示对象</td>
+<td style="text-align: left;">部件相对清晰</td>
+<td style="text-align: left;">不建模关系，部件可能漂浮</td>
+</tr>
+<tr>
+<td style="text-align: left;">Relationship Graphs</td>
+<td style="text-align: left;">部件为节点，关系为边</td>
+<td style="text-align: left;">可表达连接、支撑、对称、邻接</td>
+<td style="text-align: left;">通用图生成较难</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hierarchies</td>
+<td style="text-align: left;">用树表示 part-whole 层次</td>
+<td style="text-align: left;">树模型更容易学习</td>
+<td style="text-align: left;">不是所有关系都是树</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hierarchical Graphs</td>
+<td style="text-align: left;">同时有层次和横向关系</td>
+<td style="text-align: left;">表达力更强</td>
+<td style="text-align: left;">标注昂贵，数据难获得</td>
+</tr>
+<tr>
+<td style="text-align: left;">Programs</td>
+<td style="text-align: left;">用程序生成形状</td>
+<td style="text-align: left;">可表达循环、重复、参数和约束</td>
+<td style="text-align: left;">学习和数据获取最难</td>
+</tr>
+</tbody>
+</table>
+<h2 id="structurenet-与程序化趋势">11.2 StructureNet 与程序化趋势</h2>
+<p>StructureNet 用 hierarchical graph 表示椅子等对象：节点表示部件或
+primitive，边表示关系，图卷积网络用于编码/解码可变度节点。这样可以生成满足部件约束的
+3D 形状。</p>
+<p>视频结尾还提到一个新趋势：大型语言模型已经能理解语义和约束，研究者开始探索让
+LLM 输出 shape
+programs，再用隐式函数或其他几何表示生成具体部件细节。这说明未来 3D
+表示可能会把语言、程序、部件结构和低层几何结合起来。</p>
+<h1 id="复习重点公式与易混点">12 复习重点、公式与易混点</h1>
+<h2 id="本讲主线">12.1 本讲主线</h2>
+<p>这节课可以用一条线串起来：</p>
+<ol type="1">
+<li>3D 不像 2D 有统一像素表示，因此必须先选择 shape
+representation。</li>
+<li>显式表示直接给出表面或表面采样，采样容易，但内外查询和神经渲染查询不一定方便。</li>
+<li>隐式表示用函数定义表面和内外，查询容易，但采样表面和高效渲染更困难。</li>
+<li>3D 数据规模长期小于 2D 数据，因此 3D deep learning
+一直在表示、数据和监督之间折中。</li>
+<li>MVCNN 借用 2D CNN，voxel 网络借用 3D CNN，Octree
+解决体素稀疏性，PointNet 解决点云无序性。</li>
+<li>AtlasNet 用神经网络学习参数曲面映射，DeepSDF/Occupancy
+用神经网络学习隐式函数。</li>
+<li>NeRF 把 deep implicit functions 扩展到 density +
+radiance，并通过可微体渲染从 2D 图像学习。</li>
+<li>3DGS 重新引入稀疏显式基元，避免 NeRF 在空空间中密集查询。</li>
+<li>结构感知表示进一步建模部件、关系、层次、对称、重复和程序。</li>
+</ol>
+<h2 id="关键公式">12.2 关键公式</h2>
+<h3 id="参数曲面">参数曲面</h3>
+<p><span class="math display">\[
+s(u,v)=(x(u,v),y(u,v),z(u,v)).
+\]</span></p>
+<h3 id="隐式曲面">隐式曲面</h3>
+<p><span class="math display">\[
+f(x,y,z)=0.
+\]</span></p>
+<h3 id="chamfer-distance">Chamfer Distance</h3>
+<p><span class="math display">\[
+d_{CD}(S_1,S_2)=
+\sum_{x\in S_1}\min_{y\in S_2}\|x-y\|_2+
+\sum_{y\in S_2}\min_{x\in S_1}\|x-y\|_2.
+\]</span></p>
+<h3 id="emd">EMD</h3>
+<p><span class="math display">\[
+d_{EMD}(S_1,S_2)=
+\min_{\phi:S_1\rightarrow S_2}
+\sum_{x\in S_1}\|x-\phi(x)\|_2.
+\]</span></p>
+<h3 id="nerf-体渲染">NeRF 体渲染</h3>
+<p><span class="math display">\[
+c\approx\sum_{i=1}^{n}T_i\alpha_i c_i,\quad
+T_i=\prod_{j=1}^{i-1}(1-\alpha_j).
+\]</span></p>
+<h2 id="易混点">12.3 易混点</h2>
+<p><strong>显式表示不等于一定更好渲染。</strong><br />
+传统 mesh 很适合图形学渲染，但 NeRF/3DGS
+证明隐式或混合表示也可以做高质量神经渲染。</p>
+<p><strong>体素和隐式函数有关但不相同。</strong><br />
+体素可以存储
+occupancy/SDF/density，因此常是隐式函数的离散化；但连续隐式函数可以在任意坐标查询，不受固定网格分辨率限制。</p>
+<p><strong>PointNet 的核心不是 MLP，而是集合不变性。</strong><br />
+逐点 MLP 加 max pooling 的结构保证点顺序变化不会改变全局输出。</p>
+<p><strong>Chamfer 和 EMD 的区别在匹配约束。</strong><br />
+Chamfer 是双向最近邻，便宜但可能多对一；EMD
+是一对一最优搬运，更严格但更贵。</p>
+<p><strong>NeRF 不是突然出现的。</strong><br />
+它继承 deep implicit functions 的连续场思想，并加入 radiance、view
+direction 和可微 volume rendering，使得模型能从 2D images 学习 3D
+appearance 和 geometry。</p>
+<p><strong>3DGS 不是简单点云。</strong><br />
+它的 Gaussian
+是带尺度、形状、不透明度和颜色的扩展基元。它像点云一样稀疏高效，但比普通点有更强的局部体积和渲染表达能力。</p>
+<h2 id="可能考法">12.4 可能考法</h2>
+<ol type="1">
+<li>比较 point cloud、mesh、voxel、implicit function 的优缺点。</li>
+<li>解释为什么 3D deep learning 比 2D vision 更难直接套用 CNN。</li>
+<li>给定 <span
+class="math inline">\(f(x,y,z)\)</span>，判断点在表面、内部还是外部。</li>
+<li>写出 Chamfer Distance、EMD 或 NeRF 体渲染公式，并解释变量。</li>
+<li>说明 MVCNN 的 view pooling 为什么能产生多视角 shape
+descriptor。</li>
+<li>解释 PointNet 如何满足 permutation invariance。</li>
+<li>比较 NeRF 和 3D Gaussian Splatting 的表示和效率差异。</li>
+<li>说明为什么结构感知表示需要建模部件关系，而不仅是几何表面。</li>
+</ol>
+<h2 id="一句话总结">12.5 一句话总结</h2>
+<p><strong>3D Vision 的核心不是某一种网络结构，而是围绕 3D
+表示展开的系统性权衡：如何存储几何、如何查询内外和外观、如何渲染成图像、如何从有限
+3D 数据和海量 2D
+数据中学习，以及如何让生成的形状不仅有表面细节，还具有合理的部件结构。</strong></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/3D-Vision/"># 3D Vision</a>
+                    
+                        <a href="/tags/Point-Clouds/"># Point Clouds</a>
+                    
+                        <a href="/tags/Meshes/"># Meshes</a>
+                    
+                        <a href="/tags/Voxel-Grids/"># Voxel Grids</a>
+                    
+                        <a href="/tags/Neural-Radiance-Fields/"># Neural Radiance Fields</a>
+                    
+                        <a href="/tags/3D-Reconstruction/"># 3D Reconstruction</a>
+                    
+                        <a href="/tags/Novel-View-Synthesis/"># Novel View Synthesis</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/12%20Self-Supervised%20Learning/">12 Self-Supervised Learning</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/16%20Multi-Modal%20Foundation%20Models/">16 Multi-Modal Foundation Models</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

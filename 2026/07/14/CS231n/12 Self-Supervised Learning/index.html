@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>12 Self-Supervised Learning | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">12 Self-Supervised Learning</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="自监督学习的核心问题与基本范式">1
+自监督学习的核心问题与基本范式</h1>
+<h2 id="为什么需要自监督学习">1.1 为什么需要自监督学习</h2>
+<p>传统视觉模型在分类、语义分割、目标检测、实例分割等任务中通常依赖大量人工标注数据。大规模监督训练的主要问题是：<strong>标注昂贵、标注规模有限，并且很多下游任务没有足够大的人工标注数据集</strong>。</p>
+<p>自监督学习（Self-Supervised Learning,
+SSL）的目标是利用大量未标注数据学习有用的视觉表示。它不需要人工标签，而是从数据本身自动构造训练信号。例如，把图像旋转后让模型预测旋转角度，或者遮住图像一部分后让模型重建缺失内容。</p>
+<h2 id="pretext-task-与-downstream-task">1.2 Pretext task 与 downstream
+task</h2>
+<p>自监督学习通常分为两个阶段：</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">阶段</th>
+<th style="text-align: left;">数据</th>
+<th style="text-align: left;">目标</th>
+<th style="text-align: left;">训练信号来源</th>
+<th style="text-align: left;">产物</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">预训练任务（Pretext Task）</td>
+<td style="text-align: left;">大量未标注数据</td>
+<td style="text-align: left;">学习通用特征</td>
+<td style="text-align: left;">从数据自动生成标签或目标</td>
+<td style="text-align: left;">Encoder / feature extractor</td>
+</tr>
+<tr>
+<td style="text-align: left;">下游任务（Downstream Task）</td>
+<td style="text-align: left;">少量标注数据</td>
+<td style="text-align: left;">完成实际应用</td>
+<td style="text-align: left;">人工标注</td>
+<td style="text-align: left;">分类器、检测器、分割模型等</td>
+</tr>
+</tbody>
+</table>
+<p><strong>pretraining</strong> 指“预训练过程”；<strong>pretext
+task</strong> 指“为了预训练而构造的代理任务”。<code>pretext</code>
+有“借口、托辞”的意思，因为模型真正目标不是学会预测旋转角度、补全图像或解拼图，而是借这些任务逼自己学到可迁移的表示。</p>
+<p>预训练任务可以看作“无人工标注的数据任务”，但训练形式仍然经常是监督学习目标，例如分类或回归。关键区别在于：<strong>标签不是人给的，而是由数据变换、遮挡、时序关系或样本配对规则自动产生的</strong>。</p>
+<h2 id="如何评价自监督方法">1.3 如何评价自监督方法</h2>
+<p>评价自监督方法时，不能只看 pretext task
+本身做得多好。一个模型把旋转角度预测得很准，并不一定说明它学到了对分类、检测、分割都好的表示。因此更重要的是评估表示质量。</p>
+<p>常见评价方式包括：</p>
+<ul>
+<li><strong>Linear Evaluation Protocol / linear
+probing</strong>：冻结预训练好的
+encoder，只在其输出特征上训练一个线性分类器。如果线性分类器表现好，说明特征本身已经具有较强的可分性。</li>
+<li><strong>Fine-tuning</strong>：把预训练模型迁移到下游任务上继续训练。它更接近真实应用，也更能发挥模型潜力。</li>
+<li><strong>Clustering /
+t-SNE</strong>：用聚类指标或可视化观察表示空间是否按语义分离。</li>
+<li><strong>鲁棒性与泛化</strong>：测试模型在新数据集、分布变化或有限标注场景下是否仍然有效。</li>
+<li><strong>计算效率</strong>：比较训练时间、显存、批大小需求和分布式训练成本。</li>
+</ul>
+<h1 id="基于图像变换的预训练任务">2 基于图像变换的预训练任务</h1>
+<h2 id="旋转预测">2.1 旋转预测</h2>
+<p>旋转预测（rotation prediction）的基本做法是把输入图像整体旋转 <span
+class="math inline">\(0^\circ\)</span>、<span
+class="math inline">\(90^\circ\)</span>、<span
+class="math inline">\(180^\circ\)</span> 或 <span
+class="math inline">\(270^\circ\)</span>，然后训练模型做四分类，预测图像被旋转了多少。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704151847375.png" alt="image-20260704151840169" style="zoom:50%;" /></p>
+<p>这个任务背后的假设是：如果模型要判断一张图是否“正着放”，它必须理解物体通常的姿态、方向和场景布局。比如模型要知道车通常在地面上，人头通常在身体上方，天空通常在图像上部。这种知识被称为一种视觉常识（visual
+commonsense）。</p>
+<p>旋转预测的优点是标签自动生成、实现简单，并且能促使模型学习物体形状和方向信息。缺点是它与具体任务绑定较强，学到的表示未必对所有下游任务都最优。</p>
+<h2 id="相对-patch-位置预测与拼图任务">2.2 相对 patch
+位置预测与拼图任务</h2>
+<p>相对 patch 位置预测要求模型判断两个图像块之间的空间关系，例如一个
+patch 位于另一个 patch 的上方、左下方或右侧。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704152008269.png" alt="image-20260704152008008"  /></p>
+<p>拼图任务（jigsaw puzzle)进一步把图像切成多个 patch
+并打乱顺序，模型需要恢复合理排列。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704152046648.png"
+alt="image-20260704152046451" />
+<figcaption aria-hidden="true">image-20260704152046451</figcaption>
+</figure>
+<p>这类任务迫使模型理解局部纹理与全局结构之间的关系。只看一个 patch
+的颜色或纹理通常不够，模型还需要知道物体部件如何组合成完整对象。</p>
+<p>需要注意的是，这类任务容易被低层线索“作弊”。例如 patch
+边缘的颜色连续性可能泄露相邻关系。实际设计时通常要加入随机间隔、颜色扰动等机制，减少模型只靠浅层统计规律解题。</p>
+<h2 id="图像修复与-inpainting">2.3 图像修复与 inpainting</h2>
+<p>图像修复（inpainting）会遮住图像的一部分，让模型根据上下文预测缺失像素。典型结构是
+encoder-decoder：encoder 把可见区域压缩成表示，decoder
+根据表示重建被遮挡区域。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704152153985.png"
+alt="image-20260704152153831" />
+<figcaption aria-hidden="true">image-20260704152153831</figcaption>
+</figure>
+<p>Context Encoder
+的训练损失分为两部分：<strong>重建损失</strong>加上<strong>对抗损失</strong>。</p>
+<p><span class="math display">\[
+L(x) = L_{\text{recon}}(x) + L_{\text{adv}}(x)
+\]</span></p>
+<p>这里的 <span class="math inline">\(x\)</span> 是原始真实图像，<span
+class="math inline">\(L(x)\)</span>
+表示对这张图像训练一次时的总损失。它不是单纯的像素误差，而是同时要求模型“补得像原图”和“补得像真实自然图像”。</p>
+<h3 id="重建损失">2.3.1 重建损失</h3>
+<p>重建损失写为：</p>
+<p><span class="math display">\[
+L_{\text{recon}}(x) =
+\left\|M * \left(x - F_\theta((1-M)*x)\right)\right\|_2^2
+\]</span></p>
+<p><span class="math inline">\(M\)</span> 是二值 mask：</p>
+<p><span class="math display">\[
+M =
+\begin{cases}
+0, &amp; \text{not masked} \\
+1, &amp; \text{masked}
+\end{cases}
+\]</span></p>
+<p>因此 <span class="math inline">\((1-M)*x\)</span>
+表示把被遮挡区域置为 0，只保留未遮挡的上下文。这个被破坏的图像会输入到
+encoder-decoder 网络 <span class="math inline">\(F_\theta\)</span>
+中：</p>
+<p><span class="math display">\[
+\hat{x}=F_\theta((1-M)*x)
+\]</span></p>
+<p>也就是说，<span class="math inline">\(F_\theta\)</span>
+的任务是：<strong>只看没有被 mask
+的上下文，预测整张图像或至少预测缺失区域</strong>。然后公式中的 <span
+class="math inline">\(x-\hat{x}\)</span>
+比较真实图像和模型输出，外面再乘以 <span
+class="math inline">\(M\)</span>：</p>
+<p><span class="math display">\[
+M * (x-\hat{x})
+\]</span></p>
+<p>这一步非常关键，因为 <span class="math inline">\(M=1\)</span>
+的地方才是缺失区域，<span class="math inline">\(M=0\)</span>
+的地方是原本可见的上下文。乘以 <span class="math inline">\(M\)</span>
+后，损失只保留被遮挡区域的误差，忽略未遮挡区域的误差。最后取平方 <span
+class="math inline">\(L_2\)</span> 范数：</p>
+<p><span class="math display">\[
+\left\|M * (x-\hat{x})\right\|_2^2
+\]</span></p>
+<p>所以 <span class="math inline">\(L_{\text{recon}}\)</span>
+的完整含义是：<strong>让模型根据上下文生成缺失区域，并只在缺失区域上惩罚预测像素与真实像素的差异</strong>。</p>
+<h3 id="对抗损失">2.3.2 对抗损失</h3>
+<p>对抗损失写为： <span class="math display">\[
+L_{\text{adv}} =
+\max_D \mathbb{E}
+\left[
+\log(D(x)) +
+\log\left(1-D(F((1-M)*x))\right)
+\right]
+\]</span></p>
+<p>这里的 <span class="math inline">\(D\)</span>
+是判别器（discriminator）。<span class="math inline">\(D(x)\)</span>
+表示判别器认为真实图像 <span class="math inline">\(x\)</span>
+是真图的概率；<span class="math inline">\(D(F((1-M)*x))\)</span>
+表示判别器认为模型补全后的图像是真图的概率。这个式子来自 GAN
+的二分类目标：</p>
+<ul>
+<li>对真实图像 <span class="math inline">\(x\)</span>，判别器希望 <span
+class="math inline">\(D(x)\)</span> 越接近 1 越好，所以 <span
+class="math inline">\(\log(D(x))\)</span> 越大越好。</li>
+<li>对补全图像 <span
+class="math inline">\(F((1-M)*x)\)</span>，判别器希望判断它是假的，也就是
+<span class="math inline">\(D(F((1-M)*x))\)</span> 越接近 0 越好，所以
+<span class="math inline">\(\log(1-D(F((1-M)*x)))\)</span>
+越大越好。</li>
+</ul>
+<p><span class="math inline">\(\max_D\)</span>
+表示对判别器来说，它要最大化这个目标，也就是尽量分清真实图像和 inpainted
+image。与此同时，生成补全图像的网络 <span
+class="math inline">\(F_\theta\)</span> 会被训练得尽量骗过判别器，使
+<span class="math inline">\(D(F((1-M)*x))\)</span>
+变大。这样就形成了对抗学习：判别器越来越会识别假图，生成网络越来越会补出逼真的缺失区域。</p>
+<p><strong>直观地说，<span
+class="math inline">\(L_{\text{recon}}\)</span>
+负责“补的位置和颜色是否接近答案”，<span
+class="math inline">\(L_{\text{adv}}\)</span>
+负责“补出来的东西看起来是否自然”。只用 <span
+class="math inline">\(L_{\text{recon}}\)</span>
+容易得到模糊的平均结果；加入 <span
+class="math inline">\(L_{\text{adv}}\)</span>
+可以让纹理和局部结构更真实。</strong></p>
+<p>以下是一个对比结果：</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704152535836.png"
+alt="image-20260704152535609" />
+<figcaption aria-hidden="true">image-20260704152535609</figcaption>
+</figure>
+<h2 id="图像上色与-split-brain-autoencoder">2.4 图像上色与 Split-Brain
+Autoencoder</h2>
+<p>图像上色（colorization）把灰度或部分颜色通道作为输入，让模型预测缺失颜色。这个任务要求模型理解物体语义，因为不同物体具有不同的颜色先验：天空常为蓝色，草地常为绿色，香蕉常为黄色。</p>
+<p>Split-Brain Autoencoder
+的思想是做跨通道预测：把图像通道分成两组，让一组预测另一组。模型如果要从亮度预测颜色，或者从颜色预测亮度，就需要学习跨通道的语义和外观关系。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704152629542.png"
+alt="image-20260704152629312" />
+<figcaption aria-hidden="true">image-20260704152629312</figcaption>
+</figure>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704152712789.png"
+alt="image-20260704152712638" />
+<figcaption aria-hidden="true">image-20260704152712638</figcaption>
+</figure>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704152738077.png"
+alt="image-20260704152737877" />
+<figcaption aria-hidden="true">image-20260704152737877</figcaption>
+</figure>
+<p>这个任务的一个重要特点是答案可能不唯一。一张灰度衣服可以是红色、蓝色或黑色。因此上色任务不能简单理解为确定性重建，它更像是在学习“哪些颜色与哪些语义区域相容”。</p>
+<h2 id="视频上色与无监督跟踪">2.5 视频上色与无监督跟踪</h2>
+<p>视频上色扩展了图像上色：给定一个有颜色的参考帧和之后的灰度目标帧，模型需要把参考帧颜色传播到目标帧。核心假设是视频中同一物体或区域在相邻帧之间应保持颜色一致。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704152935426.png"
+alt="image-20260704152935239" />
+<figcaption aria-hidden="true">image-20260704152935239</figcaption>
+</figure>
+<p>模型会在学习到的特征空间中建立参考帧与目标帧之间的对应关系。目标位置的颜色可以表示为参考帧颜色的加权和：</p>
+<p><span class="math display">\[
+y_i = \sum_j A_{ij} c_j
+\]</span></p>
+<p>其中 <span class="math inline">\(A_{ij}\)</span> 是目标位置 <span
+class="math inline">\(i\)</span> 对参考位置 <span
+class="math inline">\(j\)</span>
+的注意力权重。训练目标是让预测颜色接近目标帧真实颜色。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704153046027.png"
+alt="image-20260704153045864" />
+<figcaption aria-hidden="true">image-20260704153045864</figcaption>
+</figure>
+<p>这个任务的有趣结果是：<strong>跟踪能力会从上色任务中涌现出来</strong>。因为要正确传播颜色，模型必须学会在帧间找到同一物体或同一区域，所以可以用学到的注意力传播分割
+mask 或人体关键点。</p>
+<h2 id="图像变换类任务的小结">2.6 图像变换类任务的小结</h2>
+<p>这类 pretext task 的共同点是让模型学习视觉常识。例如：</p>
+<ul>
+<li>旋转预测要求理解物体通常朝向。</li>
+<li>拼图任务要求理解局部部件与全局结构。</li>
+<li>inpainting 要求从上下文推断缺失内容。</li>
+<li>colorization 要求理解语义区域与颜色先验。</li>
+<li>视频上色要求建立跨帧区域对应关系。</li>
+</ul>
+<p>它们的主要问题是：<strong>每个任务都需要人为设计，而且学到的表示可能强烈绑定到某个特定任务，不一定足够通用</strong>。这引出了更一般的自监督目标：对比表示学习。</p>
+<h1 id="masked-autoencodermae">3 Masked Autoencoder（MAE）</h1>
+<h2 id="mae-的基本思想">3.1 MAE 的基本思想</h2>
+<p>Masked Autoencoder（MAE）是一种重建式自监督方法，尤其适合 Vision
+Transformer（ViT）。它把输入图像切成不重叠 patch，随机遮住很大比例的
+patch，例如 <span class="math inline">\(75\%\)</span>，只把剩下可见的
+<span class="math inline">\(25\%\)</span> patch 输入 encoder，再让
+decoder 重建被遮住的 patch。</p>
+<p>与普通 autoencoder 不同，MAE
+的遮挡比例非常高。高遮挡比例让任务更难，也迫使模型学习更全局、更语义化的表示，而不是只根据局部纹理补一点细节。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704153219878.png"
+alt="image-20260704153219599" />
+<figcaption aria-hidden="true">image-20260704153219599</figcaption>
+</figure>
+<h2 id="mae-的非对称结构">3.2 MAE 的非对称结构</h2>
+<p>MAE 使用非对称 encoder-decoder 设计：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">组件</th>
+<th style="text-align: left;">输入</th>
+<th style="text-align: left;">作用</th>
+<th style="text-align: left;">训练后是否保留</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Encoder</td>
+<td style="text-align: left;">只接收未遮挡 patch</td>
+<td style="text-align: left;">学习表示</td>
+<td style="text-align: left;">保留，用于下游任务</td>
+</tr>
+<tr>
+<td style="text-align: left;">Decoder</td>
+<td style="text-align: left;">接收 encoder 输出与 mask token</td>
+<td style="text-align: left;">重建像素</td>
+<td style="text-align: left;">通常丢弃</td>
+</tr>
+</tbody>
+</table>
+<p>encoder 只处理可见 patch，因此计算量显著下降，可以做得很大。decoder
+负责重建任务，但它只在预训练时使用，下游任务一般使用 encoder
+的表示。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704153330716.png" alt="image-20260704153330574" style="zoom:50%;" /></p>
+<h2 id="mae-的重建目标">3.3 MAE 的重建目标</h2>
+<p>MAE 使用像素空间的均方误差（MSE）作为损失，并且只在被 mask 的 patch
+上计算：</p>
+<p><span class="math display">\[
+L_{\text{MAE}} = \frac{1}{|\Omega_M|}\sum_{i \in \Omega_M} \|x_i -
+\hat{x}_i\|_2^2
+\]</span></p>
+<p>其中 <span class="math inline">\(\Omega_M\)</span> 表示被遮挡 patch
+的集合。只对遮挡区域计算损失可以防止模型把精力浪费在复制已经可见的输入上。</p>
+<h2 id="linear-probing-与-fine-tuning">3.4 Linear probing 与
+fine-tuning</h2>
+<p>在 MAE 或其他自监督方法中，经常使用两种评价方式：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">是否更新预训练 encoder</th>
+<th style="text-align: left;">新增层</th>
+<th style="text-align: left;">评估意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Linear probing</td>
+<td style="text-align: left;">不更新</td>
+<td style="text-align: left;">一个线性层</td>
+<td style="text-align: left;">测试表示是否线性可分</td>
+</tr>
+<tr>
+<td style="text-align: left;">Full fine-tuning</td>
+<td style="text-align: left;">更新</td>
+<td style="text-align: left;">一个或多个任务层</td>
+<td style="text-align: left;">测试模型适配下游任务后的能力</td>
+</tr>
+</tbody>
+</table>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704153827169.png" alt="image-20260704153827049" style="zoom:50%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704153841813.png" alt="image-20260704153841689" style="zoom:50%;" /></p>
+<blockquote>
+<p>Linear probing 和 Full fine-tuning，前者冻结
+Encoder，微调线性层；后者全部都要微调</p>
+</blockquote>
+<p>这里的 linear probing 和 fine-tuning 与 1.3
+中的评价方式是同一组概念。1.3 是自监督学习的一般评价方法；3.4
+是把这两个方法放到 MAE 语境下，说明 MAE encoder
+预训练完成后如何评估。</p>
+<p>linear probing 条件更严格，因为 encoder 完全冻结；fine-tuning
+更接近真实部署，因为模型可以根据下游任务调整。</p>
+<h2 id="mae-的设计变量">3.5 MAE 的设计变量</h2>
+<p>MAE 的性能受多种超参数影响，包括 mask ratio、decoder 深度、decoder
+宽度、是否在 encoder 中使用 mask token、重建目标、数据增强、mask
+采样方法和训练时长。</p>
+<p>MAE 的关键设计是：<strong>高比例随机遮挡 + 只编码可见 patch + 轻量
+decoder + 只在遮挡 patch 上计算重建损失</strong>。</p>
+<h1 id="对比表示学习">4 对比表示学习</h1>
+<h2 id="从特定-pretext-task-到通用-pretext-task">4.1 从特定 pretext task
+到通用 pretext task</h2>
+<p>图像变换类任务需要为每种数据设计特定任务。对比学习试图构造一个更通用的目标：给定一个参考样本
+<span class="math inline">\(x\)</span>，让它的表示靠近正样本 <span
+class="math inline">\(x^+\)</span>，远离负样本 <span
+class="math inline">\(x^-\)</span>。</p>
+<p>在视觉任务中，正样本通常是同一图像的不同增强视图，负样本是其他图像。直观地说，模型应该学会：同一物体或同一实例在裁剪、颜色扰动、模糊等变化后仍然相似，而不同实例应该相互区分。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704154107107.png"
+alt="image-20260704154106912" />
+<figcaption aria-hidden="true">image-20260704154106912</figcaption>
+</figure>
+<h2 id="对比学习的一般形式">4.2 对比学习的一般形式</h2>
+<p>设 <span class="math inline">\(f\)</span> 是 encoder，<span
+class="math inline">\(s(\cdot,\cdot)\)</span>
+是相似度函数。我们希望：</p>
+<p><span class="math display">\[
+s(f(x), f(x^+))  &gt;&gt; s(f(x), f(x^-))
+\]</span></p>
+<p>给定一个正样本和 <span class="math inline">\(N-1\)</span>
+个负样本，常见的 InfoNCE 损失为：</p>
+<p><span class="math display">\[
+L = -\log \frac{\exp(s(f(x), f(x^+))/\tau)}
+{\exp(s(f(x), f(x^+))/\tau) + \sum_{i=1}^{N-1}\exp(s(f(x),
+f(x_i^-))/\tau)}
+\]</span></p>
+<p>其中 <span class="math inline">\(\tau\)</span> 是温度参数，用来控制
+softmax 分布的尖锐程度。</p>
+<p>这个损失可以理解为一个 <span class="math inline">\(N\)</span> 类
+softmax 分类问题：在 <span class="math inline">\(N\)</span>
+个候选样本中，模型要找出哪个是参考样本的正样本。因此对比学习虽然没有人工标签，但训练目标仍然像监督分类。</p>
+<p>这里通常写成 1 个正样本和很多负样本，是因为 InfoNCE
+最常见的设置是“给定 reference，在候选集合里找唯一正样本”。例如 SimCLR
+中，一张图像做两次增强，其中一个视图作为 <span
+class="math inline">\(x\)</span>，另一个就是它的 <span
+class="math inline">\(x^+\)</span>；同一 batch
+里其他图像的增强视图都可以作为 <span
+class="math inline">\(x^-\)</span>。这不意味着所有对比学习方法都只能有一个正样本，只是单正样本形式最标准，也最容易写成
+softmax 分类问题。</p>
+<h2 id="infonce-与互信息">4.3 InfoNCE 与互信息</h2>
+<p>InfoNCE 不只是一个“把正样本分类出来”的
+loss，它还有一个信息论解释：<strong>InfoNCE 是 <span
+class="math inline">\(f(x)\)</span> 和 <span
+class="math inline">\(f(x^+)\)</span> 之间互信息（mutual information,
+MI）的下界</strong>。</p>
+<h3 id="互信息">4.3.1 互信息</h3>
+<p>互信息衡量两个随机变量之间共享信息的多少。对离散随机变量 <span
+class="math inline">\(X\)</span> 和 <span
+class="math inline">\(Y\)</span>，互信息定义为：</p>
+<p><span class="math display">\[
+I(X;Y)=\sum_{x}\sum_{y}p(x,y)\log\frac{p(x,y)}{p(x)p(y)}
+\]</span></p>
+<p>其中 <span class="math inline">\(p(x,y)\)</span> 是联合分布，<span
+class="math inline">\(p(x)\)</span> 和 <span
+class="math inline">\(p(y)\)</span> 是边缘分布。如果 <span
+class="math inline">\(X\)</span> 和 <span
+class="math inline">\(Y\)</span> 相互独立，那么 <span
+class="math inline">\(p(x,y)=p(x)p(y)\)</span>，所以对数项为 <span
+class="math inline">\(\log 1=0\)</span>，互信息为
+0；如果二者相关，那么联合分布会偏离边缘分布的乘积，互信息就会变大。</p>
+<p>对连续随机变量，求和会变成积分：</p>
+<p><span class="math display">\[
+I(X;Y)=\int\int p(x,y)\log\frac{p(x,y)}{p(x)p(y)}\,dx\,dy
+\]</span></p>
+<p>互信息也可以用熵来写：</p>
+<p><span class="math display">\[
+I(X;Y)=H(X)-H(X|Y)=H(Y)-H(Y|X)
+\]</span></p>
+<p>这个形式的含义是：知道 <span class="math inline">\(Y\)</span>
+之后，<span class="math inline">\(X\)</span>
+的不确定性减少了多少；或者知道 <span class="math inline">\(X\)</span>
+之后，<span class="math inline">\(Y\)</span>
+的不确定性减少了多少。互信息是对称的，即 <span
+class="math inline">\(I(X;Y)=I(Y;X)\)</span>。</p>
+<p>在对比学习中，我们关心的随机变量不是原始 <span
+class="math inline">\(X,Y\)</span>，而是两种增强视图经过 encoder
+后的表示，例如：</p>
+<p><span class="math display">\[
+Z=f(x), \quad Z^+=f(x^+)
+\]</span></p>
+<p>因此更准确地说，目标是让 <span
+class="math inline">\(I(Z;Z^+)\)</span>
+尽可能大，也就是让同一图像两个增强视图的表示共享足够多的稳定信息。</p>
+<p>如果知道 <span class="math inline">\(f(x)\)</span>
+之后，能显著减少我们对 <span class="math inline">\(f(x^+)\)</span>
+的不确定性，那么它们的互信息就高。在对比学习里，<span
+class="math inline">\(x\)</span> 和 <span
+class="math inline">\(x^+\)</span>
+通常是同一张图像的两个增强版本。我们希望 encoder 学到的表示满足：</p>
+<ul>
+<li>同一图像的不同增强视图仍然保留共同语义信息；</li>
+<li>数据增强带来的无关变化，例如裁剪位置、颜色扰动、轻微模糊，不应该主导表示；</li>
+<li>不同图像的表示应该容易区分。</li>
+</ul>
+<p>因此，最大化 <span class="math inline">\(f(x)\)</span> 与 <span
+class="math inline">\(f(x^+)\)</span>
+的互信息，直觉上就是让模型学到“两个视图共同拥有的稳定信息”。在视觉自监督学习中，这些稳定信息往往对应物体类别、形状、部件结构和场景语义。</p>
+<h3 id="infocne">4.3.2 InfoCNE</h3>
+<p>InfoNCE 的形式是：</p>
+<p><span class="math display">\[
+L_{\text{InfoNCE}}= -\log \frac{\exp(s(f(x), f(x^+))/\tau)}
+{\sum_{j=1}^{N} \exp(s(f(x), f(x_j))/\tau)}
+\]</span></p>
+<p>其中候选集合 <span class="math inline">\(\{x_j\}_{j=1}^{N}\)</span>
+包含 <span class="math inline">\(1\)</span> 个正样本和 <span
+class="math inline">\(N-1\)</span>
+个负样本。这个式子可以看成一个分类问题：给定 reference <span
+class="math inline">\(x\)</span>，模型要在 <span
+class="math inline">\(N\)</span> 个候选里找出真正相关的 <span
+class="math inline">\(x^+\)</span>。</p>
+<p>为什么这和互信息有关？直觉是：如果 <span
+class="math inline">\(f(x)\)</span> 和 <span
+class="math inline">\(f(x^+)\)</span> 真的共享很多信息，那么只看 <span
+class="math inline">\(f(x)\)</span> 就应该能在很多候选中准确找出 <span
+class="math inline">\(f(x^+)\)</span>。反过来，如果表示没有保留语义信息，正样本和负样本的相似度差不多，模型就无法判断哪个候选与
+<span class="math inline">\(x\)</span> 对应。</p>
+<p>理论上，InfoNCE
+给互信息提供了一个下界。结合上面的记号，常见写法是：</p>
+<p><span class="math display">\[
+I(Z; Z^+) \ge \log N - L_{\text{InfoNCE}}
+\]</span></p>
+<p>这个式子表达了两点：</p>
+<ul>
+<li>当 <span class="math inline">\(L_{\text{InfoNCE}}\)</span>
+越小，右侧越大，说明模型得到的互信息下界越高。</li>
+<li>当候选样本数量 <span class="math inline">\(N\)</span> 越大，<span
+class="math inline">\(\log N\)</span>
+越大，这个下界有机会变得更紧。</li>
+</ul>
+<p>所以 “The larger the negative sample size <span
+class="math inline">\(N\)</span>, the tighter the bound”。这里的 <span
+class="math inline">\(N\)</span>
+可以理解为分类题的候选数。候选越多，模型越难从中找出正样本；如果它仍然能找对，就说明表示中保留了更有辨别力的信息。</p>
+<p>不过，更多负样本也会带来实际训练成本。SimCLR 直接用大 batch，让同一
+batch 中其他样本都成为负样本，因此需要大量显存和分布式训练资源。MoCo
+则用一个队列保存历史 key 作为负样本，使负样本数量不再受当前 minibatch
+size 限制。这也是为什么 InfoNCE 的理论需求会直接影响后面 SimCLR 和 MoCo
+的系统设计。</p>
+<h1 id="simclr实例级对比学习的简单框架">5
+SimCLR：实例级对比学习的简单框架</h1>
+<h2 id="simclr-的训练流程">5.1 SimCLR 的训练流程</h2>
+<p>SimCLR（A Simple Framework for Contrastive Learning of Visual
+Representations）的核心流程是：</p>
+<ol type="1">
+<li>从一个 minibatch 中采样 <span class="math inline">\(N\)</span>
+张图像。</li>
+<li>对每张图像采样两次随机数据增强，得到 <span
+class="math inline">\(2N\)</span> 个视图。</li>
+<li>同一原图产生的两个视图构成正样本对。</li>
+<li>batch 中其他视图作为负样本。</li>
+<li>用 encoder <span class="math inline">\(f(\cdot)\)</span>
+提取表示，再用 projection head <span
+class="math inline">\(g(\cdot)\)</span> 投影到对比学习空间。</li>
+<li>在投影后的表示上计算 InfoNCE / NT-Xent 损失。</li>
+</ol>
+<p>常用数据增强包括 random crop、color distortion 和 random blur。SimCLR
+的一个重要经验结论是：<strong>强数据增强对视觉对比学习非常关键</strong>。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704155446723.png" alt="image-20260704155446546" style="zoom: 33%;" /></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260706135445850.png" style="zoom:33%;" /></p>
+<h2 id="相似度函数与投影头">5.2 相似度函数与投影头</h2>
+<p>SimCLR 常用余弦相似度：</p>
+<p><span class="math display">\[
+\operatorname{sim}(u, v) = \frac{u^\top v}{\|u\|\|v\|}
+\]</span></p>
+<p>projection head <span class="math inline">\(g(\cdot)\)</span>
+通常是一个小的非线性 MLP。它把 encoder 输出 <span
+class="math inline">\(h=f(x)\)</span> 投影成 <span
+class="math inline">\(z=g(h)\)</span>，对比损失作用在 <span
+class="math inline">\(z\)</span> 上，但下游任务常使用 <span
+class="math inline">\(h\)</span>。</p>
+<p>projection head
+有助于表示学习的一个解释是：对比目标会鼓励表示对某些数据增强不变，但这些被丢弃的信息可能对下游任务仍有用。让
+<span class="math inline">\(g\)</span> 承担对比目标，可以让 <span
+class="math inline">\(h\)</span> 保留更多通用信息。</p>
+<h2 id="simclr-的-batch-训练">5.3 SimCLR 的 batch 训练</h2>
+<p>对于 <span class="math inline">\(2N\)</span>
+个增强视图，每个视图都轮流作为
+reference。它的正样本是同一原图的另一个视图，其余 <span
+class="math inline">\(2N-2\)</span> 个视图是负样本。整个 batch
+的损失是所有 reference 损失的平均。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704160540679.png"
+alt="image-20260704160540472" />
+<figcaption aria-hidden="true">image-20260704160540472</figcaption>
+</figure>
+<p>可以把这个过程看成构造一个 affinity matrix：矩阵每一行表示某个
+reference 与所有候选视图的相似度，正确分类标签指向它的正样本列。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704160415155.png"
+alt="image-20260704160414970" />
+<figcaption aria-hidden="true">image-20260704160414970</figcaption>
+</figure>
+<h2 id="simclr-的优缺点">5.4 SimCLR 的优缺点</h2>
+<p>SimCLR 简洁、有效，并展示了数据增强、投影头和大 batch
+对对比学习的重要性。但它的主要缺点是：<strong>为了获得足够多负样本，需要非常大的
+batch size</strong>。大 batch 会带来很高显存占用，并且 ImageNet
+级实验常需要分布式 TPU 训练。</p>
+<h1 id="moco动量对比学习">6 MoCo：动量对比学习</h1>
+<h2 id="moco-解决的问题">6.1 MoCo 解决的问题</h2>
+<p>MoCo（Momentum Contrast）针对 SimCLR 对大 batch
+的依赖，提出用一个运行队列保存大量负样本的 key
+表示。这样负样本数量不再等于当前 minibatch 大小。</p>
+<p>MoCo 的关键组件包括：</p>
+<ul>
+<li>query encoder <span class="math inline">\(f_q\)</span>：对当前 query
+编码，并通过反向传播更新。</li>
+<li>key encoder <span class="math inline">\(f_k\)</span>：对 key
+编码，不直接通过梯度更新。</li>
+<li>FIFO queue：保存之前 minibatch 的 key 表示，作为大量负样本。</li>
+<li>momentum update：用 query encoder 的参数缓慢更新 key encoder。</li>
+</ul>
+<h2 id="query-和-key-是什么">6.2 query 和 key 是什么</h2>
+<p>MoCo 里的 <strong>query</strong> 和 <strong>key</strong>
+不是人工标签，也不是两类不同的数据。它们来自同一批原始图像的两种随机增强视图。</p>
+<p>以一张原始图像 <span class="math inline">\(x\)</span> 为例，MoCo
+会对它做两次随机数据增强：</p>
+<p><span class="math display">\[
+x_q = t_q(x), \quad x_k = t_k(x)
+\]</span></p>
+<p>其中 <span class="math inline">\(t_q\)</span> 和 <span
+class="math inline">\(t_k\)</span> 可以是 random crop、color
+jitter、blur 等增强函数。<span class="math inline">\(x_q\)</span> 叫
+<strong>query view</strong>，<span class="math inline">\(x_k\)</span> 叫
+<strong>key view</strong>。然后它们分别进入两个 encoder：</p>
+<p><span class="math display">\[
+q = f_q(x_q), \quad k^+ = f_k(x_k)
+\]</span></p>
+<p>这里的 <span class="math inline">\(q\)</span> 就是 query 表示，<span
+class="math inline">\(k^+\)</span> 是它对应的 positive key。因为 <span
+class="math inline">\(x_q\)</span> 和 <span
+class="math inline">\(x_k\)</span>
+来自同一张原图，所以它们应该表示同一个语义对象或场景，构成正样本对。</p>
+<p>MoCo 还维护一个队列，里面存放很多过去 batch 产生的 key：</p>
+<p><span class="math display">\[
+\{k_1, k_2, \dots, k_K\}
+\]</span></p>
+<p>这些 key 大多来自其他图像，所以对当前 query <span
+class="math inline">\(q\)</span> 来说，它们是负样本。训练目标就是让当前
+query <span class="math inline">\(q\)</span> 更接近它自己的 positive key
+<span class="math inline">\(k^+\)</span>，远离队列里的 negative
+keys。</p>
+<p>可以把 MoCo 想成一个检索任务：<strong>query
+是当前要拿去搜索的表示，key 是候选库里的表示</strong>。模型要在一堆 key
+里找出哪个 key 和 query 来自同一张原图。</p>
+<h2 id="动量更新">6.3 动量更新</h2>
+<p>key encoder 通过动量规则更新：</p>
+<p><span class="math display">\[
+\theta_k \leftarrow m\theta_k + (1-m)\theta_q
+\]</span></p>
+<p>其中 <span class="math inline">\(\theta_k\)</span> 是 key encoder
+参数，<span class="math inline">\(\theta_q\)</span> 是 query encoder
+参数，<span class="math inline">\(m\)</span> 通常接近 1。这样 key
+encoder 变化较慢，队列中的旧 key 与当前 key encoder
+仍然保持相对一致。</p>
+<p>为什么要有两个 encoder？因为 MoCo
+的负样本来自一个较长的历史队列。如果 key encoder 更新得太快，队列里旧
+key 的表示空间会和当前模型不一致，训练就会不稳定。动量更新让 key encoder
+缓慢跟随 query encoder，从而让队列中的 key 表示更加一致。</p>
+<h2 id="moco-的训练流程">6.4 MoCo 的训练流程</h2>
+<p>MoCo 对同一图像做两次数据增强，得到 query view 和 key view。query
+view 经过 <span class="math inline">\(f_q\)</span>，key view 经过 <span
+class="math inline">\(f_k\)</span>。正样本是同一图像的
+key，负样本来自队列中的其他 key。计算 InfoNCE 后，只通过 query encoder
+更新梯度；随后用动量规则更新 key encoder，并更新 FIFO 队列。</p>
+<p>更具体地说，一次训练可以理解为：</p>
+<ol type="1">
+<li>对图像 <span class="math inline">\(x\)</span> 做两次随机增强，得到
+<span class="math inline">\(x_q\)</span> 和 <span
+class="math inline">\(x_k\)</span>。</li>
+<li>用 query encoder 得到 <span
+class="math inline">\(q=f_q(x_q)\)</span>。</li>
+<li>用 key encoder 得到 positive key <span
+class="math inline">\(k^+=f_k(x_k)\)</span>。</li>
+<li>从队列中取出很多 old keys 作为 negative keys。</li>
+<li>用 InfoNCE 让 <span class="math inline">\(q\)</span> 匹配 <span
+class="math inline">\(k^+\)</span>，同时远离 negative keys。</li>
+<li>反向传播只更新 <span class="math inline">\(f_q\)</span>。</li>
+<li>用动量公式更新 <span class="math inline">\(f_k\)</span>。</li>
+<li>把当前 batch 的 key 加入队列，同时弹出最旧的 key。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704160914468.png" alt="image-20260704160914309" style="zoom:50%;" /></p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704162855484.png"
+alt="image-20260704162855267" />
+<figcaption aria-hidden="true">image-20260704162855267</figcaption>
+</figure>
+<p>MoCo 的核心优点是：<strong>把负样本数量与 minibatch size
+解耦</strong>。因此它能在较小 batch 下使用大量负样本，显存压力比 SimCLR
+小。</p>
+<h2 id="moco-v2-与-simclr-的结合">6.5 MoCo v2 与 SimCLR 的结合</h2>
+<p>MoCo v2 吸收了 SimCLR 的两个关键经验：</p>
+<ul>
+<li>使用非线性 projection head。</li>
+<li>使用更强的数据增强。</li>
+</ul>
+<p>同时保留 MoCo
+的动量队列机制。非线性投影头和强数据增强对对比学习很重要；而 MoCo v2
+通过队列机制，可以用远小于 SimCLR 的 batch size
+获得强性能和更小内存占用。</p>
+<h1 id="cpc序列级对比预测编码">7 CPC：序列级对比预测编码</h1>
+<h2 id="instance-level-与-sequence-level-contrastive-learning">7.1
+Instance-level 与 sequence-level contrastive learning</h2>
+<p>SimCLR 和 MoCo
+是实例级对比学习：正负样本主要基于“是否来自同一实例”。CPC（Contrastive
+Predictive
+Coding）是序列级对比学习：它利用序列或时序结构，让模型根据当前上下文预测未来表示，并在正确未来片段和错误未来片段之间做对比。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704163031752.png"
+alt="image-20260704163031544" />
+<figcaption aria-hidden="true">image-20260704163031544</figcaption>
+</figure>
+<p>CPC 名称中三个词的含义是：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">词</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Contrastive</td>
+<td style="text-align: left;">在正确序列与错误序列之间做对比</td>
+</tr>
+<tr>
+<td style="text-align: left;">Predictive</td>
+<td style="text-align: left;">根据当前上下文预测未来模式</td>
+</tr>
+<tr>
+<td style="text-align: left;">Coding</td>
+<td style="text-align: left;">学习可迁移的特征编码</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cpc-的模型结构">7.2 CPC 的模型结构</h2>
+<p>CPC 的基本步骤是：</p>
+<ol type="1">
+<li>用 encoder 把序列中每个样本 <span class="math inline">\(x_t\)</span>
+编码为 <span class="math inline">\(z_t =
+g_{\text{enc}}(x_t)\)</span>。</li>
+<li>用自回归模型（原论文使用 GRU-RNN）把过去上下文汇总为 <span
+class="math inline">\(c_t = g_{\text{ar}}(z_{\le t})\)</span>。</li>
+<li>用 <span class="math inline">\(c_t\)</span>
+同时预测未来多个步长的表示，即 <span
+class="math inline">\(z_{t+1},z_{t+2},\ldots,z_{t+K}\)</span>。</li>
+<li>在真实未来表示和负样本表示之间计算 InfoNCE。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260704163218811.png" style="zoom:50%;" /></p>
+<p><span class="math inline">\(g_{enc}\)</span> 对所有时间步 <span
+class="math inline">\(t\)</span> 都是一样的，即共享参数；<span
+class="math inline">\(g_{ar}\)</span> 也是一样。</p>
+<p>时间相关的得分函数常写为： <span class="math display">\[
+s_k(z_{t+k}, c_t) = z_{t+k}^{\top} W_k c_t
+\]</span></p>
+<p>其中，<span class="math inline">\(k\)</span> 表示预测跨度。CPC
+通常不是只选择一个 <span class="math inline">\(k\)</span>，而是令 <span
+class="math inline">\(k=1,2,\ldots,K\)</span>，让同一个上下文 <span
+class="math inline">\(c_t\)</span> 同时完成多个未来时刻的预测。例如
+<span class="math inline">\(K=12\)</span> 表示分别预测 <span
+class="math inline">\(z_{t+1}\)</span> 到 <span
+class="math inline">\(z_{t+12}\)</span>，而不是只预测 <span
+class="math inline">\(z_{t+12}\)</span>。</p>
+<p>如果 <span
+class="math inline">\(z_{t+k}\in\mathbb{R}^{d_z}\)</span>、<span
+class="math inline">\(c_t\in\mathbb{R}^{d_c}\)</span>，那么：</p>
+<p><span class="math display">\[
+W_k\in\mathbb{R}^{d_z\times d_c}
+\]</span></p>
+<p><span class="math inline">\(W_k\)</span> 是与预测跨度 <span
+class="math inline">\(k\)</span>
+对应的可学习线性预测头。得分函数可以拆成两步理解：</p>
+<p><span class="math display">\[
+\hat z_{t+k}=W_kc_t
+\]</span></p>
+<p><span class="math display">\[
+s_k(z_{t+k},c_t)=z_{t+k}^{\top}\hat z_{t+k}
+\]</span></p>
+<p>首先，<span class="math inline">\(W_k\)</span> 把上下文 <span
+class="math inline">\(c_t\)</span> 转换为模型对未来第 <span
+class="math inline">\(k\)</span> 步的预测向量 <span
+class="math inline">\(\hat z_{t+k}\)</span>；然后计算候选表示 <span
+class="math inline">\(z_{t+k}\)</span>
+与该预测向量的内积。内积越大，候选表示与当前上下文所暗示的未来越匹配。</p>
+<p>每个预测跨度使用不同的矩阵 <span
+class="math inline">\(W_k\)</span>：<span
+class="math inline">\(W_1\)</span> 学习如何预测紧邻的未来，<span
+class="math inline">\(W_2\)</span>
+学习如何预测未来第二步，依此类推。这是因为近距离预测主要依赖局部连续性，而较远距离预测需要更长期、更抽象的信息。<span
+class="math inline">\(W_k\)</span> 不是 encoder 的参数，也不是 GRU
+的状态转移矩阵，而是连接上下文空间与未来 latent 空间的预测头。</p>
+<p>预测范围 <span class="math inline">\(K\)</span>
+没有固定值，需要根据数据的时间分辨率和任务选择。原始 CPC 的语音实验使用
+<span class="math inline">\(K=12\)</span>：每个 latent step 大约对应
+<span class="math inline">\(10\text{ ms}\)</span>，因而最远预测约 <span
+class="math inline">\(120\text{ ms}\)</span>。消融实验比较了 <span
+class="math inline">\(K=2,4,8,12,16\)</span>，其中 <span
+class="math inline">\(K=12\)</span>
+的音素分类效果最好。图像实验把图像编码为 <span
+class="math inline">\(7\times7\)</span> 的 patch 网格，并向下预测最多 5
+行。一般来说，<span class="math inline">\(K\)</span>
+太小容易让模型只学习局部平滑性；<span class="math inline">\(K\)</span>
+太大则会使未来与当前上下文的相关性过弱，导致预测任务过难。</p>
+<h2 id="cpc-的-infonce-损失函数">7.3 CPC 的 InfoNCE 损失函数</h2>
+<p>对于固定的上下文 <span class="math inline">\(c_t\)</span> 和预测跨度
+<span class="math inline">\(k\)</span>，CPC 构造一个候选集合 <span
+class="math inline">\(\mathcal X_k\)</span>。其中包含一个真实未来表示
+<span class="math inline">\(z_{t+k}\)</span>，以及 <span
+class="math inline">\(N-1\)</span> 个从其他位置或其他序列采样的负样本
+<span class="math inline">\(z_j^-\)</span>。模型需要从这 <span
+class="math inline">\(N\)</span>
+个候选表示中识别真正属于当前上下文的未来。</p>
+<p>第 <span class="math inline">\(k\)</span> 个预测跨度的 InfoNCE
+损失为：</p>
+<p><span class="math display">\[
+\mathcal L_k
+=
+-\log
+\frac{
+\exp\left(z_{t+k}^{\top}W_kc_t\right)
+}{
+\exp\left(z_{t+k}^{\top}W_kc_t\right)
++
+\sum_{j=1}^{N-1}
+\exp\left((z_j^-)^{\top}W_kc_t\right)
+}
+\]</span></p>
+<p>分子是真实未来表示与预测向量的指数得分，分母则包含真实未来和所有负样本的指数得分。因此，这个公式可以看成一个
+<span class="math inline">\(N\)</span> 分类交叉熵：正确类别是真实的
+<span class="math inline">\(z_{t+k}\)</span>。最小化 <span
+class="math inline">\(\mathcal L_k\)</span>
+会提高真实未来的得分，同时让它相对于负样本更加突出。</p>
+<p>如果同时预测未来 <span class="math inline">\(K\)</span>
+步，则总损失通常对所有预测跨度求和或取平均：</p>
+<p><span class="math display">\[
+\mathcal L_{\text{CPC}}
+=
+\frac{1}{K}\sum_{k=1}^{K}\mathcal L_k
+\]</span></p>
+<p>训练时，梯度会共同更新 encoder <span
+class="math inline">\(g_{\text{enc}}\)</span>、自回归模型 <span
+class="math inline">\(g_{\text{ar}}\)</span> 和所有预测矩阵 <span
+class="math inline">\(W_1,\ldots,W_K\)</span>。因此，模型不会被要求逐像素或逐采样点生成未来，而是学习判断“哪个
+latent representation
+最符合当前上下文所暗示的未来”。这种目标让表示更多地保留跨时间共享的高层信息。</p>
+<p>原始 CPC 还把指数形式的得分写为：</p>
+<p><span class="math display">\[
+f_k(x_{t+k},c_t)
+=
+\exp\left(z_{t+k}^{\top}W_kc_t\right)
+\]</span></p>
+<p>它近似下面的密度比：</p>
+<p><span class="math display">\[
+f_k(x_{t+k},c_t)
+\propto
+\frac{p(x_{t+k}\mid c_t)}{p(x_{t+k})}
+\]</span></p>
+<p>如果某个未来片段在给定上下文 <span class="math inline">\(c_t\)</span>
+后变得明显更可能，它的密度比和匹配得分都应该较高。InfoNCE
+正是通过“一个条件分布中的正样本与多个边缘分布中的负样本”来学习这个密度比，并最大化当前上下文与未来之间互信息的下界：</p>
+<p><span class="math display">\[
+I(x_{t+k};c_t)\geq \log N-\mathcal L_k
+\]</span></p>
+<h2 id="cpc-的应用">7.4 CPC 的应用</h2>
+<p>CPC
+可以用于音频、语言、图像等序列或可序列化数据。音频天然是时间序列；图像也可以切成
+patch，并把上方 patch 行作为上下文，预测下方 patch 行。</p>
+<p>CPC 可以应用到多种学习问题，并且能与其他 pretext task
+方法相比取得不错效果；但在图像表示学习上，它通常不如更新的实例级对比学习方法强。</p>
+<h1 id="dino-与其他自监督方法">8 DINO 与其他自监督方法</h1>
+<h2 id="dino-的目标与核心思想">8.1 DINO 的目标与核心思想</h2>
+<p>DINO（Self-Distillation with No
+Labels）是一种<strong>无标签自蒸馏</strong>方法。它使用两个结构相同、参数不同的网络：学生网络（student）和教师网络（teacher）。同一张图像经过不同随机增强后分别输入两个网络，学生需要预测教师对另一视图给出的输出分布。</p>
+<p>传统知识蒸馏通常先训练一个性能较强且固定的 teacher，再让 student 模仿
+teacher 的软标签。DINO 中没有预训练 teacher，也没有人工类别标签。teacher
+在训练过程中由 student
+参数的指数移动平均逐步构造，因此监督信号来自模型自身过去一段时间的集成状态，这就是“self-distillation
+with no labels”的含义。</p>
+<p>DINO 的基本目标可以概括为：</p>
+<p><span class="math display">\[
+\text{同一图像的不同视图}
+\longrightarrow
+\text{相似的输出分布}
+\]</span></p>
+<p>这种跨视图一致性迫使模型忽略裁剪、颜色扰动和尺度变化，同时保留不同视图共享的物体语义。DINO
+不使用类别标签，也不显式构造负样本，而是通过 teacher-student
+一致性、动量更新和防坍塌机制学习表示。</p>
+<h2 id="student-teacher-网络结构">8.2 Student-Teacher 网络结构</h2>
+<p>设 student 和 teacher 的参数分别为 <span
+class="math inline">\(\theta_s\)</span> 和 <span
+class="math inline">\(\theta_t\)</span>。两个网络通常具有相同的 backbone
+和 projection head，可以使用 Vision Transformer（ViT）或卷积网络：</p>
+<p><span class="math display">\[
+g_s(x;\theta_s),\qquad g_t(x;\theta_t)
+\]</span></p>
+<p>其中 <span class="math inline">\(g_s(x)\)</span> 和 <span
+class="math inline">\(g_t(x)\)</span> 是 <span
+class="math inline">\(K\)</span> 维 logits。这里的 <span
+class="math inline">\(K\)</span>
+个输出维度没有人工指定的语义类别，可以把它们理解为模型在训练过程中自行形成的潜在语义方向。projection
+head 只在自监督预训练阶段用于计算蒸馏损失，下游任务通常使用 backbone
+的特征。</p>
+<p>两个网络的更新方式不同：</p>
+<ul>
+<li><strong>Student</strong>：通过损失函数反向传播，用优化器直接更新。</li>
+<li><strong>Teacher</strong>：停止梯度，不进行反向传播，由 student
+参数的指数移动平均更新。</li>
+</ul>
+<p>因此 teacher 虽然不断变化，却比当前 student
+更平滑、更稳定。它相当于近期多个 student 模型的参数集成，能够为 student
+提供质量更高的训练目标。</p>
+<h2 id="multi-crop-与局部到全局学习">8.3 Multi-Crop
+与局部到全局学习</h2>
+<p>对于一张输入图像 <span class="math inline">\(x\)</span>，DINO
+生成多个不同尺度的视图。典型设置包括两个覆盖图像较大区域的全局视图（global
+views），以及若干覆盖较小区域的局部视图（local views）：</p>
+<p><span class="math display">\[
+\mathcal V=
+\{x_1^g,x_2^g,x_1^l,\ldots,x_m^l\}
+\]</span></p>
+<p>其中 <span class="math inline">\(x_1^g,x_2^g\)</span>
+是全局视图，<span class="math inline">\(x_i^l\)</span>
+是局部视图。两类网络接收的视图范围不同：</p>
+<ul>
+<li>teacher 只处理两个全局视图；</li>
+<li>student 处理所有全局视图和局部视图。</li>
+</ul>
+<p>teacher 的全局视图输出会监督 student 对其他视图的输出。例如，teacher
+看到了包含整只狗的大范围裁剪，而 student
+可能只看到狗头或狗腿的局部裁剪。student 仍需预测与 teacher
+相近的语义分布，因此必须建立<strong>局部到全局（local-to-global）</strong>的语义联系。</p>
+<p>Multi-crop
+不只是增加数据增强数量。它同时带来两个重要作用：一方面，不同视图覆盖范围不同，使模型学习尺度不变性；另一方面，多个小尺寸局部视图的计算成本低于多个大尺寸视图，可以在可控计算量下提供更多训练配对。</p>
+<h2 id="输出概率与蒸馏损失">8.4 输出概率与蒸馏损失</h2>
+<p>student 和 teacher 首先输出 <span class="math inline">\(K\)</span> 维
+logits，再通过带温度的 softmax 转换为概率分布。student
+的输出分布为：</p>
+<p><span class="math display">\[
+P_s(x)^{(i)}
+=
+\frac{
+\exp\left(g_s(x)^{(i)}/\tau_s\right)
+}{
+\sum_{j=1}^{K}
+\exp\left(g_s(x)^{(j)}/\tau_s\right)
+}
+\]</span></p>
+<p>teacher 的输出还需要先减去中心向量 <span
+class="math inline">\(c\)</span>：</p>
+<p><span class="math display">\[
+P_t(x)^{(i)}
+=
+\frac{
+\exp\left((g_t(x)^{(i)}-c^{(i)})/\tau_t\right)
+}{
+\sum_{j=1}^{K}
+\exp\left((g_t(x)^{(j)}-c^{(j)})/\tau_t\right)
+}
+\]</span></p>
+<p>其中 <span class="math inline">\(\tau_s\)</span> 和 <span
+class="math inline">\(\tau_t\)</span> 分别是 student temperature 和
+teacher temperature。teacher
+通常使用较低温度，使输出分布更尖锐，形成信息更明确的软目标。</p>
+<p>给定 teacher 视图 <span class="math inline">\(x\)</span> 和不同的
+student 视图 <span class="math inline">\(v\)</span>，DINO 使用交叉熵让
+student 模仿 teacher：</p>
+<p><span class="math display">\[
+H(P_t(x),P_s(v))
+=
+-\sum_{i=1}^{K}
+P_t(x)^{(i)}\log P_s(v)^{(i)}
+\]</span></p>
+<p>总损失对所有允许的跨视图组合求平均：</p>
+<p><span class="math display">\[
+\mathcal L_{\text{DINO}}
+=
+\sum_{x\in\{x_1^g,x_2^g\}}
+\sum_{\substack{v\in\mathcal V\\v\neq x}}
+H(P_t(x),P_s(v))
+\]</span></p>
+<p>实际实现中还会除以有效视图配对数量和 batch size。条件 <span
+class="math inline">\(v\neq x\)</span> 表示不让 student 与 teacher
+对完全相同的视图做直接匹配，而是重点学习不同视图之间的一致性。</p>
+<p>计算损失时，teacher 分支应用停止梯度（stop-gradient）：</p>
+<p><span class="math display">\[
+P_t(x)=\operatorname{sg}(P_t(x))
+\]</span></p>
+<p>因此交叉熵的梯度只更新 student。teacher
+输出在当前迭代中被当作固定目标。</p>
+<h2 id="momentum-teacher-的更新">8.5 Momentum Teacher 的更新</h2>
+<p>teacher 参数不是由梯度下降直接优化，而是由 student
+参数的指数移动平均（Exponential Moving Average, EMA）更新：</p>
+<p><span class="math display">\[
+\theta_t
+\leftarrow
+m\theta_t+(1-m)\theta_s
+\]</span></p>
+<p>其中动量系数 <span class="math inline">\(m\)</span> 接近 1。较大的
+<span class="math inline">\(m\)</span> 表示 teacher
+更新较慢，保留更长时间范围内的 student 信息；较小的 <span
+class="math inline">\(m\)</span> 则会让 teacher 更快跟随 student。</p>
+<p>这一机制与 MoCo 的 momentum encoder 形式相同，但用途不同：MoCo
+用它保持队列中 key 表示的一致性，DINO 用它构造稳定的蒸馏目标。EMA
+teacher 可以近似看成多个历史 student 的集成：</p>
+<p><span class="math display">\[
+\theta_t^{(n)}
+\approx
+(1-m)\sum_{r=0}^{n-1}m^r\theta_s^{(n-r)}
+\]</span></p>
+<p>最近的 student 权重较大，更早的 student
+权重按指数衰减。相比直接复制当前 student，EMA 减少了单个 minibatch
+梯度噪声造成的目标剧烈变化，使训练目标更稳定。</p>
+<h2 id="为什么不会表示坍塌">8.6 为什么不会表示坍塌</h2>
+<p>如果只要求 student 和 teacher
+输出一致，模型可能找到没有意义的平凡解：无论输入什么图像，所有样本都输出同一个分布。这种现象称为<strong>表示坍塌（representation
+collapse）</strong>。DINO 主要通过 momentum teacher、centering 和
+sharpening 的组合避免坍塌。</p>
+<h3 id="centering">8.6.1 Centering</h3>
+<p>teacher logits 在 softmax 前减去中心向量 <span
+class="math inline">\(c\)</span>。中心向量由 teacher 在 batch
+中的平均输出进行指数移动平均：</p>
+<p><span class="math display">\[
+c
+\leftarrow
+m_c c
++
+(1-m_c)
+\frac{1}{B}
+\sum_{b=1}^{B}g_t(x_b)
+\]</span></p>
+<p>如果某个输出维度在几乎所有图像上都长期很大，centering
+会减去该维度的平均偏置，防止所有样本都集中到同一个输出维度。它有助于维持不同输出维度之间的平衡，但单独使用时可能把输出推向接近均匀分布。</p>
+<h3 id="sharpening">8.6.2 Sharpening</h3>
+<p>Sharpening 通过较小的 teacher temperature <span
+class="math inline">\(\tau_t\)</span> 实现。温度越低，softmax
+分布越尖锐：</p>
+<p><span class="math display">\[
+\tau_t\downarrow
+\quad\Longrightarrow\quad
+P_t(x)\text{ 更集中}
+\]</span></p>
+<p>尖锐的 teacher 输出可以避免所有样本都得到完全均匀的目标，但如果没有
+centering，又可能使所有样本集中在同一个维度。</p>
+<p>因此两者具有互补作用：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">机制</th>
+<th style="text-align: left;">主要抑制的坍塌</th>
+<th style="text-align: left;">单独使用的风险</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Centering</td>
+<td style="text-align: left;">所有样本被同一个维度支配</td>
+<td style="text-align: left;">输出趋向均匀</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sharpening</td>
+<td style="text-align: left;">所有样本都输出均匀分布</td>
+<td style="text-align: left;">所有样本集中到同一维度</td>
+</tr>
+<tr>
+<td style="text-align: left;">两者结合</td>
+<td style="text-align: left;">同时抑制两种平凡解</td>
+<td style="text-align: left;">需要合理设置温度和动量</td>
+</tr>
+</tbody>
+</table>
+<p>Momentum teacher 进一步稳定目标，使 centering 和 sharpening
+能够形成有效的动态平衡。DINO 因此不需要显式负样本、负样本队列或额外的
+predictor 网络，也能避免坍塌并学习有区分力的表示。</p>
+<h2 id="dino-的完整训练流程">8.7 DINO 的完整训练流程</h2>
+<p>一次训练迭代可以概括为：</p>
+<ol type="1">
+<li>对每张图像生成两个全局视图和若干局部视图。</li>
+<li>把所有视图输入 student，只把全局视图输入 teacher。</li>
+<li>两个网络通过 backbone 和 projection head 产生 logits。</li>
+<li>对 teacher logits 进行 centering，并分别对 student 和 teacher
+使用温度 softmax。</li>
+<li>计算 teacher 全局视图与 student 其他视图之间的交叉熵损失。</li>
+<li>停止 teacher 梯度，只通过反向传播更新 student。</li>
+<li>使用 student 参数的 EMA 更新 teacher。</li>
+<li>使用当前 batch 的 teacher logits 更新中心向量 <span
+class="math inline">\(c\)</span>。</li>
+</ol>
+<p>整个训练过程形成一个闭环：student 学习 teacher 的稳定目标，teacher
+又由 student 的历史平均构成。随着 student 改进，teacher
+的目标也逐渐改进，因此不需要外部标签或预训练模型。</p>
+<h2 id="dino-学到的-vit-表示">8.8 DINO 学到的 ViT 表示</h2>
+<p>DINO 与 Vision Transformer 结合时出现了两项重要性质。</p>
+<p>第一，ViT 最后一层中 <span
+class="math inline">\([\mathrm{CLS}]\)</span> token
+的自注意力图能够自动聚焦前景物体，并较清楚地勾勒物体边界。训练过程没有使用分割标签，因此这种空间结构是自监督目标产生的涌现性质。注意力图不等同于完整的语义分割模型，但说明
+DINO 特征同时包含图像级语义和较强的局部空间信息。</p>
+<p>第二，DINO
+特征在不训练额外分类器的情况下也具有很好的近邻结构。使用冻结特征进行
+<span class="math inline">\(k\)</span>-近邻分类（<span
+class="math inline">\(k\)</span>-NN）时，同类图像往往已经聚集在表示空间中。这说明语义信息可以直接从特征距离中读取，而不只是在线性分类器训练后才显现。</p>
+<p>较小的 ViT patch size 通常会产生更细粒度的 token
+和更准确的物体边界，也能提高表示质量，但 token 数量随 patch
+变小而增加，从而显著提高自注意力的计算成本。DINO
+的优势来自自监督目标、momentum teacher、multi-crop 和 ViT
+结构的协同，而不是某一个组件单独决定。</p>
+<h2 id="dino-与其他自监督方法的区别">8.9 DINO
+与其他自监督方法的区别</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">正样本或目标来源</th>
+<th style="text-align: left;">是否显式使用负样本</th>
+<th style="text-align: left;">目标网络更新</th>
+<th style="text-align: left;">主要损失</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">SimCLR</td>
+<td style="text-align: left;">同一图像的不同增强</td>
+<td style="text-align: left;">是，来自 batch</td>
+<td style="text-align: left;">无 teacher</td>
+<td style="text-align: left;">InfoNCE</td>
+</tr>
+<tr>
+<td style="text-align: left;">MoCo</td>
+<td style="text-align: left;">同一图像的 query-key</td>
+<td style="text-align: left;">是，来自队列</td>
+<td style="text-align: left;">key encoder 使用 EMA</td>
+<td style="text-align: left;">InfoNCE</td>
+</tr>
+<tr>
+<td style="text-align: left;">BYOL</td>
+<td style="text-align: left;">target 网络的表示</td>
+<td style="text-align: left;">否</td>
+<td style="text-align: left;">target encoder 使用 EMA</td>
+<td style="text-align: left;">表示回归损失</td>
+</tr>
+<tr>
+<td style="text-align: left;">DINO</td>
+<td style="text-align: left;">teacher 的软输出分布</td>
+<td style="text-align: left;">否</td>
+<td style="text-align: left;">teacher 使用 EMA</td>
+<td style="text-align: left;">交叉熵蒸馏损失</td>
+</tr>
+<tr>
+<td style="text-align: left;">MAE</td>
+<td style="text-align: left;">被遮挡 patch 的像素或特征</td>
+<td style="text-align: left;">否</td>
+<td style="text-align: left;">无 teacher</td>
+<td style="text-align: left;">重建损失</td>
+</tr>
+</tbody>
+</table>
+<p>DINO 与 MoCo 都使用 momentum encoder，但 DINO 不维护负样本队列。DINO
+与 BYOL 都让 online/student 网络追随 EMA teacher，但 DINO 匹配的是温度
+softmax 后的概率分布，并使用 centering 与 sharpening 防止坍塌。DINO 与
+MAE 都不需要负样本，但 MAE 学习重建缺失内容，DINO
+学习不同视图之间的语义一致性。</p>
+<h2 id="dense-object-net">8.10 Dense Object Net</h2>
+<p>Dense Object Net 是 Dense Object Descriptors
+的例子，目标是在像素级或点级学习密集对应关系。它可以看作把对比学习用于像素级特征描述符：同一物体表面对应点应具有相似表示，不同点或不同物体应被区分。</p>
+<p>这种思想与视频上色中“通过对应关系传播颜色、mask
+或关键点”相呼应：自监督目标如果设计得好，模型会学到可用于跟踪、对应和机器人感知的结构化表示。</p>
+<h1 id="复习重点与方法对比">9 复习重点与方法对比</h1>
+<h2 id="核心概念">9.1 核心概念</h2>
+<p><strong>自监督学习</strong>的关键不是没有监督目标，而是监督信号来自数据本身。它通过
+pretext task 学习 encoder，再迁移到 downstream task。</p>
+<p><strong>评价自监督模型时，下游任务表现通常比 pretext task
+表现更重要</strong>。pretext task 是手段，表示质量才是目的。</p>
+<p><strong>对比学习的本质</strong>是拉近正样本、推远负样本。InfoNCE
+可以看作在候选样本中识别正样本的 softmax 分类损失。</p>
+<p><strong>负样本数量很重要</strong>，但获取大量负样本会带来计算成本。SimCLR
+用大 batch，MoCo 用队列。</p>
+<h2 id="方法对比表">9.2 方法对比表</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">自监督信号</th>
+<th style="text-align: left;">关键机制</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Rotation Prediction</td>
+<td style="text-align: left;">预测旋转角度</td>
+<td style="text-align: left;">四分类</td>
+<td style="text-align: left;">简单，标签自动生成</td>
+<td style="text-align: left;">任务特异性强</td>
+</tr>
+<tr>
+<td style="text-align: left;">Jigsaw / Patch Location</td>
+<td style="text-align: left;">恢复空间关系</td>
+<td style="text-align: left;">patch 排列或相对位置</td>
+<td style="text-align: left;">学习局部-全局结构</td>
+<td style="text-align: left;">可能利用低层线索作弊</td>
+</tr>
+<tr>
+<td style="text-align: left;">Inpainting</td>
+<td style="text-align: left;">重建缺失区域</td>
+<td style="text-align: left;">encoder-decoder，重建损失 + 对抗损失</td>
+<td style="text-align: left;">学习上下文语义，补全更真实</td>
+<td style="text-align: left;">像素重建可能偏低层</td>
+</tr>
+<tr>
+<td style="text-align: left;">Colorization</td>
+<td style="text-align: left;">从灰度或部分通道预测颜色</td>
+<td style="text-align: left;">语义到颜色先验</td>
+<td style="text-align: left;">学习物体语义</td>
+<td style="text-align: left;">多解问题，评价复杂</td>
+</tr>
+<tr>
+<td style="text-align: left;">Video Colorization</td>
+<td style="text-align: left;">跨帧传播颜色</td>
+<td style="text-align: left;">注意力对应关系</td>
+<td style="text-align: left;">可涌现跟踪能力</td>
+<td style="text-align: left;">依赖视频时序</td>
+</tr>
+<tr>
+<td style="text-align: left;">MAE</td>
+<td style="text-align: left;">重建高比例 mask patch</td>
+<td style="text-align: left;">非对称 ViT autoencoder</td>
+<td style="text-align: left;">可扩展，适合大模型</td>
+<td style="text-align: left;">重建目标与语义目标仍有差距</td>
+</tr>
+<tr>
+<td style="text-align: left;">SimCLR</td>
+<td style="text-align: left;">同图不同增强为正样本</td>
+<td style="text-align: left;">大 batch + projection head</td>
+<td style="text-align: left;">简洁有效</td>
+<td style="text-align: left;">显存需求大</td>
+</tr>
+<tr>
+<td style="text-align: left;">MoCo</td>
+<td style="text-align: left;">同图不同增强为正样本</td>
+<td style="text-align: left;">动量 encoder + queue</td>
+<td style="text-align: left;">负样本多且省显存</td>
+<td style="text-align: left;">队列一致性需动量维护</td>
+</tr>
+<tr>
+<td style="text-align: left;">CPC</td>
+<td style="text-align: left;">根据上下文预测未来</td>
+<td style="text-align: left;">序列级 InfoNCE</td>
+<td style="text-align: left;">适合时序数据</td>
+<td style="text-align: left;">图像表示上通常弱于实例级方法</td>
+</tr>
+<tr>
+<td style="text-align: left;">DINO</td>
+<td style="text-align: left;">teacher-student 一致性</td>
+<td style="text-align: left;">无标签自蒸馏</td>
+<td style="text-align: left;">不显式依赖负样本</td>
+<td style="text-align: left;">需要防止输出坍塌，训练机制较复杂</td>
+</tr>
+</tbody>
+</table>
+<h2 id="常见考试问题">9.3 常见考试问题</h2>
+<ol type="1">
+<li><p><strong>pretext task 和 downstream task
+的区别是什么？</strong></p>
+<p>pretext task 用未标注数据和自动生成目标训练表示；downstream task
+是最终关心的应用，通常有人工标注，使用或微调预训练表示。</p></li>
+<li><p><strong>为什么不能只看 pretext task accuracy？</strong></p>
+<p>因为 pretext task
+表现高不等于表示通用。自监督学习真正目标是让表示在分类、检测、分割等下游任务中有用。</p></li>
+<li><p><strong>InfoNCE 为什么像交叉熵？</strong></p>
+<p>因为它把“从 <span class="math inline">\(N\)</span>
+个候选样本中选出正样本”写成 softmax
+分类问题，正样本得分应最大，负样本得分应较小。</p></li>
+<li><p><strong>SimCLR 为什么需要大 batch？</strong></p>
+<p>因为 batch 中非正样本被用作负样本。batch
+越大，负样本越多，通常对比学习效果越好，但显存开销也越大。</p></li>
+<li><p><strong>MoCo 如何减少对大 batch 的依赖？</strong></p>
+<p>MoCo 使用 FIFO 队列保存历史 key 作为负样本，并用 momentum encoder
+保持 key 表示稳定，从而把负样本数量和当前 minibatch size 解耦。</p></li>
+<li><p><strong>projection head 为什么有帮助？</strong></p>
+<p>对比目标需要不变性，可能丢弃对下游有用的信息。projection head
+让对比损失主要作用在 <span class="math inline">\(z=g(h)\)</span> 上，使
+encoder 表示 <span class="math inline">\(h\)</span>
+能保留更多信息。</p></li>
+<li><p><strong>MAE 为什么使用高 mask ratio？</strong></p>
+<p>高遮挡比例使任务足够困难，模型不能只靠局部复制，而需要利用更全局的图像结构和语义信息。同时只编码少量可见
+patch，可以降低 encoder 计算量。</p></li>
+<li><p><strong>CPC 与 SimCLR / MoCo 的主要区别是什么？</strong></p>
+<p>SimCLR 和 MoCo
+是实例级对比学习，重点区分同一实例的不同视图与其他实例；CPC
+是序列级对比学习，重点根据上下文预测未来序列表示。</p></li>
+<li><p><strong>linear probing 和 fine-tuning 有什么区别？</strong></p>
+<p>linear probing 冻结
+encoder，只训练线性层，用来测表示本身；fine-tuning 会继续更新
+encoder，用来测模型适配下游任务后的最终能力。</p></li>
+<li><p><strong>InfoNCE 和互信息有什么关系？</strong></p></li>
+</ol>
+<p>InfoNCE
+可以看作互信息的下界。负样本越多，候选集合越大，如果模型仍能找出正样本，就说明表示中保留了更强的共享信息和区分能力。</p>
+<ol start="11" type="1">
+<li><strong>DINO 的 teacher
+没有标签，也不进行反向传播，它如何得到更新？</strong></li>
+</ol>
+<p>DINO 使用 student 参数的指数移动平均更新 teacher。teacher
+相当于近期多个 student 的平滑集成，为当前 student
+提供比直接复制自身更稳定的软目标。</p>
+<ol start="12" type="1">
+<li><strong>DINO 没有负样本，如何避免表示坍塌？</strong></li>
+</ol>
+<p>Momentum teacher 提供稳定目标；centering
+防止所有样本集中到同一个输出维度；sharpening
+防止所有样本都输出均匀分布。三者配合，使不同图像能够形成有区分力的输出分布。</p>
+<h2 id="一句话总览">9.4 一句话总览</h2>
+<p>自监督学习的发展主线是：先通过人工设计的图像变换任务学习视觉常识，再发展到更通用的对比学习目标；SimCLR
+表明大 batch、强增强和 projection head 十分关键，MoCo
+用动量队列解决负样本规模问题，CPC 把对比思想推广到序列预测，而 MAE 和
+DINO 则代表了重建式与蒸馏式自监督视觉学习的重要方向。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Self-Supervised-Learning/"># Self-Supervised Learning</a>
+                    
+                        <a href="/tags/Representation-Learning/"># Representation Learning</a>
+                    
+                        <a href="/tags/Contrastive-Learning/"># Contrastive Learning</a>
+                    
+                        <a href="/tags/Pretext-Tasks/"># Pretext Tasks</a>
+                    
+                        <a href="/tags/SimCLR/"># SimCLR</a>
+                    
+                        <a href="/tags/MoCo/"># MoCo</a>
+                    
+                        <a href="/tags/BYOL/"># BYOL</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/15%203D%20Vision/">15 3D Vision</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

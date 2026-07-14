@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>13-14 Generative Models | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">13-14 Generative Models</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="生成模型的基本问题">1 生成模型的基本问题</h1>
+<p>Lecture 13 从监督学习和无监督学习的区别切入：监督学习的数据是 <span
+class="math inline">\((x, y)\)</span>，目标是学习从输入 <span
+class="math inline">\(x\)</span> 到标签或输出 <span
+class="math inline">\(y\)</span>
+的映射，例如分类、检测、语义分割、图像字幕等；无监督学习只有数据 <span
+class="math inline">\(x\)</span>，目标是学习数据中的隐藏结构，例如聚类、降维和密度估计。</p>
+<p>生成模型（Generative
+Model）属于无监督或条件生成学习的核心方向。它不是只回答“这个输入是什么类别”，而是试图学习数据本身的分布，或者学习在某个条件下数据会如何出现。</p>
+<h2 id="判别模型生成模型与条件生成模型">1.1
+判别模型、生成模型与条件生成模型</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">模型类型</th>
+<th style="text-align: left;">学习对象</th>
+<th style="text-align: left;">典型用途</th>
+<th style="text-align: left;">关键直觉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">判别模型（Discriminative Model）</td>
+<td style="text-align: left;"><span class="math inline">\(p(y \mid
+x)\)</span></td>
+<td style="text-align: left;">分类、检测、分割</td>
+<td style="text-align: left;">给定输入后，在可能标签之间分配概率</td>
+</tr>
+<tr>
+<td style="text-align: left;">无条件生成模型（Generative Model）</td>
+<td style="text-align: left;"><span
+class="math inline">\(p(x)\)</span></td>
+<td style="text-align: left;">采样新数据、异常检测、无标签特征学习</td>
+<td style="text-align: left;">所有可能数据样本竞争概率质量</td>
+</tr>
+<tr>
+<td style="text-align: left;">条件生成模型（Conditional Generative
+Model）</td>
+<td style="text-align: left;"><span class="math inline">\(p(x \mid
+y)\)</span></td>
+<td style="text-align: left;">文生图、图像到视频、按类别生成</td>
+<td style="text-align: left;">给定条件 <span
+class="math inline">\(y\)</span> 后，生成符合条件的数据 <span
+class="math inline">\(x\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>判别模型必须对任何输入给出标签分布，即使输入是不合理的噪声图像，它也会在已有类别中分配概率。生成模型则可以给“不像真实数据”的输入很低的概率，因此它天然适合做异常检测、数据建模和采样。</p>
+<p>条件生成模型在实践中最常见。比如语言模型根据上文生成下一个
+token，文生图模型根据文本提示生成图像，视频生成模型根据文本或前几帧预测后续内容。它们都在建模
+<span class="math inline">\(p(x \mid y)\)</span>，其中 <span
+class="math inline">\(y\)</span> 是条件，<span
+class="math inline">\(x\)</span> 是多种可能输出之一。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260706162129714.png" alt="image-20260706162129509" style="zoom: 20%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260706162156880.png" alt="image-20260706162156686" style="zoom:25%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260706162224172.png" alt="image-20260706162223974" style="zoom:23%;" /></p>
+<blockquote>
+<p>判别模型、无条件生成模型与条件生成模型</p>
+</blockquote>
+<h2 id="为什么需要生成模型">1.2 为什么需要生成模型</h2>
+<p>生成模型的核心价值是<strong>建模不确定性和多模态输出</strong>。很多任务不是“一题一个标准答案”：同一句文字可以对应很多合理图像，同一段视频开头可以有很多可能后续，同一个类别也可以有无限多种视觉表现。若只预测一个平均结果，模型会丢失真实世界的多样性。</p>
+<p>例如文本提示“一个人在白板前讲生成模型”并不唯一：人物姿势、教室布局、白板内容、光照都可以不同。条件生成模型要学的不是某一张图，而是条件
+<span class="math inline">\(y\)</span> 下所有合理图像的分布 <span
+class="math inline">\(p(x \mid y)\)</span>。</p>
+<h1 id="生成模型的分类谱系">2 生成模型的分类谱系</h1>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260706162455526.png"
+alt="image-20260706162455342" />
+<figcaption aria-hidden="true">image-20260706162455342</figcaption>
+</figure>
+<h1 id="自回归模型autoregressive-models">3 自回归模型（Autoregressive
+Models）</h1>
+<h2 id="引入">3.1 引入</h2>
+<p>自回归模型的输入和输出是：</p>
+<ul>
+<li><strong>输入：</strong> 已经看到的前缀，也就是 <span
+class="math inline">\(x_1,\dots,x_{t-1}\)</span>。</li>
+<li><strong>输出：</strong> 下一个元素 <span
+class="math inline">\(x_t\)</span> 的概率分布，也就是 <span
+class="math inline">\(p(x_t\mid x_1,\dots,x_{t-1})\)</span>。</li>
+</ul>
+<p>例如有一句话：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我 喜欢 吃 苹果</span><br></pre></td></tr></table></figure>
+<p>训练语言模型时，这句话会被拆成一系列“根据前文预测下一个词”的任务：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">输入给模型的内容</th>
+<th style="text-align: left;">模型应该输出什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>我</code></td>
+<td style="text-align: left;">下一个词是 <code>喜欢</code>
+的概率要高</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>我 喜欢</code></td>
+<td style="text-align: left;">下一个词是 <code>吃</code> 的概率要高</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>我 喜欢 吃</code></td>
+<td style="text-align: left;">下一个词是 <code>苹果</code>
+的概率要高</td>
+</tr>
+</tbody>
+</table>
+<p>生成时也一样：模型先根据已有前缀输出下一个 token
+的概率分布，从中选择或采样一个 token，把它接到序列后面，再继续预测下一个
+token。这样一步一步生成完整句子。</p>
+<p>计算机视觉里的例子是 PixelCNN /
+PixelRNN。它们把图像按某种顺序展开成序列，例如从左到右、从上到下扫描像素。模型看到前面已经扫描过的像素，输出下一个像素值的概率分布。若每个像素通道是
+8-bit，则下一个子像素可以看成 <span class="math inline">\(0\)</span> 到
+<span class="math inline">\(255\)</span> 的 256
+类分类问题。更现代的图像生成系统常不直接预测原始像素，而是先把图像压缩成较短的
+latent tokens，再自回归地预测下一个 latent token。</p>
+<p>所以，自回归模型的目标是把复杂联合分布拆成一串条件分布。只要数据能被看作序列，就可以用概率链式法则：</p>
+<p><span class="math display">\[
+p(x) = p(x_1, x_2, \dots, x_T)
+     = \prod_{t=1}^{T} p(x_t \mid x_1, \dots, x_{t-1})
+\]</span></p>
+<p>这个公式是自回归模型的核心。它把“直接学习整个高维分布”变成“每一步预测下一个元素”。</p>
+<h2 id="最大似然估计">3.2 最大似然估计</h2>
+<p>上面的链式法则本身只是概率恒等式，它没有说明模型长什么样，也没有参数
+<span class="math inline">\(W\)</span>。它只告诉我们：如果 <span
+class="math inline">\(x\)</span>
+是一个序列，那么联合分布可以拆成一串条件分布：</p>
+<p><span class="math display">\[
+p(x)=\prod_{t=1}^{T}p(x_t\mid x_{&lt;t})
+\]</span></p>
+<p>自回归模型进一步做一个建模假设：每个条件分布都由一个带参数的模型来估计。例如神经网络参数记为
+<span class="math inline">\(W\)</span>，那么模型学习的是：</p>
+<p><span class="math display">\[
+p(x_t\mid x_{&lt;t})\approx p_W(x_t\mid x_{&lt;t})
+\]</span></p>
+<p>因此，模型自己定义出来的序列概率是：</p>
+<p><span class="math display">\[
+p_W(x)=\prod_{t=1}^{T}p_W(x_t\mid x_{&lt;t})
+\]</span></p>
+<p>这时就可以把整个右边看成一个显式函数：</p>
+<p><span class="math display">\[
+f(x,W)=\prod_{t=1}^{T}p_W(x_t\mid x_{&lt;t})
+\]</span></p>
+<p>生成模型若能写成这样的显式密度 <span
+class="math inline">\(p_W(x)=f(x,W)\)</span>，通常可以用最大似然估计（Maximum
+Likelihood Estimation, MLE）训练。给定训练集 <span
+class="math inline">\(\{x^{(i)}\}_{i=1}^{N}\)</span>，目标是最大化训练数据的概率：</p>
+<p><span class="math display">\[
+W^* = \arg\max_W \prod_i p(x^{(i)})
+\]</span></p>
+<p>实际优化时使用 log trick，把乘积变成求和：</p>
+<p><span class="math display">\[
+W^* = \arg\max_W \sum_i \log p(x^{(i)})
+      = \arg\max_W \sum_i \log f(x^{(i)}, W)
+\]</span></p>
+<p>这样更稳定，也方便用梯度下降优化。</p>
+<h2 id="图像上的自回归模型">3.3 图像上的自回归模型</h2>
+<p>图像也可以被看成序列。例如按扫描线顺序，把图像拆成 8-bit
+子像素值，每个子像素是 <span class="math inline">\(0\)</span> 到 <span
+class="math inline">\(255\)</span> 的分类问题。PixelRNN 和 PixelCNN
+就属于这种思路。</p>
+<p>问题是原始像素序列太长。<span class="math inline">\(1024 \times
+1024\)</span> RGB
+图像有大约三百万个子像素，如果逐个预测，训练和采样都非常昂贵。因此后来的图像生成系统常把图像先压缩成
+latent tile 或离散 token，再在这些更短的表示上做自回归建模。Lecture 14
+末尾提到“Autoregressive Models Strike Back”，指的就是自回归模型在离散
+latent 上重新变得实用。</p>
+<h1 id="变分自编码器variational-autoencoders-vae">4
+变分自编码器（Variational Autoencoders, VAE）</h1>
+<h2 id="ae普通的自编码器">4.1 AE：普通的自编码器</h2>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260706164730212.png" alt="image-20260706164730029" style="zoom: 33%;" /></p>
+<p>普通自编码器学习的是</p>
+<p><span class="math display">\[
+x \rightarrow z \rightarrow \hat{x}
+\]</span></p>
+<p>即用 encoder 把输入压缩成特征 <span
+class="math inline">\(z\)</span>，再用 decoder 重建输入。如果把 AE
+当成生成模型来用，需要先找一个 latent code <span
+class="math inline">\(z\)</span>，然后把 <span
+class="math inline">\(z\)</span> 输入 decoder，最后得到生成样本 <span
+class="math inline">\(\hat{x}\)</span>。但问题在于，latent
+空间可能是断裂的、稀疏的、不规则的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">有效 z 区域      空洞       有效 z 区域</span><br><span class="line">   ●●●●                     ●●●</span><br><span class="line">   ●●                       ●●●●●</span><br><span class="line">        （这里随便采样可能生成怪东西）</span><br></pre></td></tr></table></figure>
+<p>因此如果随便采样一个 <span class="math inline">\(z\)</span>，decoder
+可能从没在训练中见过这个区域，就会输出不合理图像。</p>
+<p>VAE 是对普通自编码器的概率化改造。它的想法是：假设数据由潜变量 <span
+class="math inline">\(z\)</span> 生成，先从简单先验 <span
+class="math inline">\(p(z)\)</span> 中采样，再通过 decoder 得到 <span
+class="math inline">\(x\)</span>。常见先验是标准高斯：</p>
+<p><span class="math display">\[
+z \sim p(z)=\mathcal{N}(0,I), \quad x \sim p_\theta(x \mid z)
+\]</span></p>
+<h2 id="补充多维高斯分布的基本知识">4.2
+补充：多维高斯分布的基本知识</h2>
+<p>VAE 里反复出现 <span
+class="math inline">\(\mathcal{N}(\mu,\Sigma)\)</span>，它表示多维高斯分布（Multivariate
+Gaussian / Multivariate Normal）。一维高斯分布写作：</p>
+<p><span class="math display">\[
+x\sim \mathcal{N}(\mu,\sigma^2)
+\]</span></p>
+<p>其中 <span class="math inline">\(\mu\)</span>
+是均值，决定分布中心；<span class="math inline">\(\sigma^2\)</span>
+是方差，决定分布有多分散。它的概率密度函数是：</p>
+<p><span class="math display">\[
+p(x)=\frac{1}{\sqrt{2\pi\sigma^2}}
+\exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right)
+\]</span></p>
+<p>多维高斯处理的是向量。若 <span
+class="math inline">\(z\in\mathbb{R}^d\)</span>，则：</p>
+<p><span class="math display">\[
+z\sim \mathcal{N}(\mu,\Sigma)
+\]</span></p>
+<p>其中 <span class="math inline">\(\mu\in\mathbb{R}^d\)</span>
+是均值向量，表示每个维度的中心位置；<span
+class="math inline">\(\Sigma\in\mathbb{R}^{d\times d}\)</span>
+是协方差矩阵（covariance
+matrix），描述每个维度的方差以及不同维度之间的相关性。</p>
+<p>例如二维时：</p>
+<p><span class="math display">\[
+\Sigma=
+\begin{bmatrix}
+\sigma_1^2 &amp; \mathrm{cov}(z_1,z_2)\\
+\mathrm{cov}(z_2,z_1) &amp; \sigma_2^2
+\end{bmatrix}
+\]</span></p>
+<p>对角线上的 <span class="math inline">\(\sigma_1^2,\sigma_2^2\)</span>
+是各维度自己的方差；非对角线上的协方差表示两个维度是否倾向于一起变大或一起变小。协方差为正，两个维度倾向于同向变化；协方差为负，两个维度倾向于反向变化；协方差接近
+0，则二者相关性弱。</p>
+<p><span class="math inline">\(d\)</span> 维高斯的概率密度函数是：</p>
+<p><span class="math display">\[
+p(z)=
+\frac{1}{(2\pi)^{d/2}|\Sigma|^{1/2}}
+\exp\left(
+-\frac{1}{2}(z-\mu)^T\Sigma^{-1}(z-\mu)
+\right)
+\]</span></p>
+<p>这里 <span class="math inline">\(|\Sigma|\)</span>
+是协方差矩阵的行列式，<span class="math inline">\(\Sigma^{-1}\)</span>
+是协方差矩阵的逆。中间的二次型</p>
+<p><span class="math display">\[
+(z-\mu)^T\Sigma^{-1}(z-\mu)
+\]</span></p>
+<p>可以理解为“考虑了方差和相关性之后，<span
+class="math inline">\(z\)</span> 离均值 <span
+class="math inline">\(\mu\)</span> 有多远”。它不是普通欧氏距离，而是
+Mahalanobis distance 的平方形式。</p>
+<p>VAE 中通常不用完整协方差矩阵，而是用对角高斯：</p>
+<p><span class="math display">\[
+\Sigma=\operatorname{diag}(\sigma_1^2,\sigma_2^2,\dots,\sigma_d^2)
+\]</span></p>
+<p>这表示各 latent 维度之间近似独立。这样 encoder
+只需要输出每个维度的均值和方差，而不用输出完整的 <span
+class="math inline">\(d\times d\)</span> 协方差矩阵。若 latent 维度
+<span class="math inline">\(d_z=128\)</span>，完整协方差每个样本需要
+<span class="math inline">\(128\times128\)</span>
+个数，而对角协方差只需要 <span class="math inline">\(128\)</span>
+个方差参数。</p>
+<p>VAE 的先验常设为标准高斯：</p>
+<p><span class="math display">\[
+p(z)=\mathcal{N}(0,I)
+\]</span></p>
+<p>意思是均值向量为 0，协方差矩阵为单位矩阵 <span
+class="math inline">\(I\)</span>，即每个维度方差为
+1，维度之间互不相关。直觉上，二维标准高斯是以原点为中心、各方向均匀扩散的圆形分布；若协方差不是单位矩阵，分布可能被拉伸成椭圆。</p>
+<h2 id="vae-的两个网络">4.3 VAE 的两个网络</h2>
+<h3 id="网络结构">4.3.1 网络结构</h3>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260706174035661.png" alt="image-20260706174035406" style="zoom:50%;" /></p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">网络</th>
+<th style="text-align: left;">数学记号</th>
+<th style="text-align: left;">输入</th>
+<th style="text-align: left;">输出</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Encoder / inference network</td>
+<td style="text-align: left;"><span class="math inline">\(q_\phi(z \mid
+x)\)</span></td>
+<td style="text-align: left;">数据 <span
+class="math inline">\(x\)</span></td>
+<td style="text-align: left;">latent 分布参数，如 <span
+class="math inline">\(\mu_{z\mid x}, \Sigma_{z\mid
+x}\)</span>；再从该分布 <strong>采样</strong> 得到 <span
+class="math inline">\(z\)</span></td>
+<td style="text-align: left;">近似真实后验 <span
+class="math inline">\(p_\theta(z \mid x)\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Decoder / generative network</td>
+<td style="text-align: left;"><span class="math inline">\(p_\theta(x
+\mid z)\)</span></td>
+<td style="text-align: left;">latent code <span
+class="math inline">\(z\)</span></td>
+<td style="text-align: left;">数据分布参数，如 <span
+class="math inline">\(\mu_{x\mid z}\)</span>；再取均值或
+<strong>采样</strong> 得到 <span
+class="math inline">\(\hat{x}\)</span></td>
+<td style="text-align: left;">从潜变量生成数据</td>
+</tr>
+</tbody>
+</table>
+<p><strong>VAE 输出的是分布参数，而不是 <span
+class="math inline">\(\hat{x}\)</span> 本身。</strong>常见设定是： <span
+class="math display">\[
+q_\phi(z \mid x)=\mathcal{N}(\mu_{z\mid x}, \Sigma_{z\mid x})
+\]</span></p>
+<p><span class="math display">\[
+p_\theta(x \mid z)=\mathcal{N}(\mu_{x\mid z}, \sigma^2 I)
+\]</span></p>
+<p>若 decoder 的输出分布是高斯，最大化 <span class="math inline">\(\log
+p_\theta(x\mid z)\)</span> 等价于最小化重建误差 <span
+class="math inline">\(\|x-\mu_{x\mid z}\|_2^2\)</span>。这解释了为什么
+VAE 训练目标里会出现 reconstruction loss。</p>
+<h3 id="参数形状">4.3.2 参数形状</h3>
+<p>从张量形状看，假设输入图像 <span class="math inline">\(x\)</span>
+的形状是 <span class="math inline">\((B,C,H,W)\)</span>，其中 <span
+class="math inline">\(B\)</span> 是 batch size，latent 维度是 <span
+class="math inline">\(d_z\)</span>。最常见的 VAE 使用对角协方差： <span
+class="math display">\[
+q_\phi(z\mid
+x)=\mathcal{N}(\mu_\phi(x),\operatorname{diag}(\sigma_\phi^2(x)))
+\]</span></p>
+<p>因此 encoder 通常输出两组形状相同的向量：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">常见张量形状</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(\mu_{z\mid
+x}\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((B,d_z)\)</span></td>
+<td style="text-align: left;">每个样本对应一个 latent 均值向量</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(\log\sigma^2_{z\mid x}\)</span> 或 <span
+class="math inline">\(\sigma^2_{z\mid x}\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((B,d_z)\)</span></td>
+<td style="text-align: left;">每个 latent 维度一个方差；实践中常输出
+log-variance</td>
+</tr>
+</tbody>
+</table>
+<p>理论上完整协方差矩阵 <span class="math inline">\(\Sigma_{z\mid
+x}\)</span> 的形状可以是 <span
+class="math inline">\((B,d_z,d_z)\)</span>，但这会带来较高计算成本，所以实践中通常只学习对角协方差，也就是每个
+latent 维度一个独立方差。</p>
+<p>decoder 的输出形状取决于对 <span class="math inline">\(p_\theta(x\mid
+z)\)</span> 的假设。若使用高斯输出分布：</p>
+<p><span class="math display">\[
+p_\theta(x\mid z)=\mathcal{N}(\mu_\theta(z),\sigma^2I)
+\]</span></p>
+<p>那么 decoder 通常输出：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">参数</th>
+<th style="text-align: left;">常见张量形状</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span class="math inline">\(\mu_{x\mid
+z}\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\((B,C,H,W)\)</span></td>
+<td style="text-align: left;">重建图像或数据的均值，常被直接当作 <span
+class="math inline">\(\hat{x}\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(\sigma^2I\)</span></td>
+<td style="text-align: left;">固定标量，或可广播到 <span
+class="math inline">\((B,C,H,W)\)</span></td>
+<td style="text-align: left;">入门 VAE
+中常固定不学；若学习方差，也可输出 <span
+class="math inline">\(\log\sigma^2_{x\mid z}\)</span>，形状为 <span
+class="math inline">\((B,C,H,W)\)</span></td>
+</tr>
+</tbody>
+</table>
+<h2 id="vae-损失函数推导">4.4 VAE 损失函数推导</h2>
+<p>VAE 的训练目标是最大化数据的边缘似然（marginal likelihood）<span
+class="math inline">\(p_\theta(x)\)</span>，也就是希望模型给真实训练样本较高概率：</p>
+<p><span class="math display">\[
+p_\theta(x)=\int p_\theta(x,z)\,dz
+           =\int p_\theta(x\mid z)p(z)\,dz
+\]</span></p>
+<p>这里的 <span class="math inline">\(p_\theta(x)\)</span> 不是 decoder
+单独直接输出的量。decoder 给出的是条件分布 <span
+class="math inline">\(p_\theta(x\mid z)\)</span>，再结合先验 <span
+class="math inline">\(p(z)\)</span>，对所有可能的 latent code <span
+class="math inline">\(z\)</span> 积分后，才得到边缘分布 <span
+class="math inline">\(p_\theta(x)\)</span>。难点在于这个积分通常不可计算。</p>
+<p>不过可以把 <span class="math inline">\(p_\theta(x)\)</span>
+写成：</p>
+<p><span class="math display">\[
+p_\theta(x)=\frac{p_\theta(x,z)}{p_\theta(z\mid x)}
+\]</span></p>
+<p>对两边取对数：</p>
+<p><span class="math display">\[
+\log p_\theta(x)
+=
+\log p_\theta(x,z)-\log p_\theta(z\mid x)
+\]</span></p>
+<p>这个式子仍然包含真实后验 <span class="math inline">\(p_\theta(z\mid
+x)\)</span>，它不可计算。于是引入可计算的近似后验 <span
+class="math inline">\(q_\phi(z\mid x)\)</span>，并在右边加减同一项 <span
+class="math inline">\(\log q_\phi(z\mid x)\)</span>：</p>
+<p><span class="math display">\[
+\log p_\theta(x)
+=
+\log p_\theta(x,z)
+-\log q_\phi(z\mid x)
++
+\log q_\phi(z\mid x)
+-\log p_\theta(z\mid x)
+\]</span></p>
+<p>因为左边 <span class="math inline">\(\log p_\theta(x)\)</span> 与
+<span class="math inline">\(z\)</span> 无关，所以可以对 <span
+class="math inline">\(z\sim q_\phi(z\mid x)\)</span> 取期望：</p>
+<p><span class="math display">\[
+\log p_\theta(x)
+=
+\mathbb{E}_{z\sim q_\phi(z\mid x)}
+\left[
+\log p_\theta(x,z)-\log q_\phi(z\mid x)
+\right]
++
+\mathbb{E}_{z\sim q_\phi(z\mid x)}
+\left[
+\log q_\phi(z\mid x)-\log p_\theta(z\mid x)
+\right]
+\]</span></p>
+<p>第二项正是 KL 散度：</p>
+<p><span class="math display">\[
+\mathbb{E}_{z\sim q_\phi(z\mid x)}
+\left[
+\log q_\phi(z\mid x)-\log p_\theta(z\mid x)
+\right]
+=
+D_{\mathrm{KL}}(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x))
+\]</span></p>
+<p>因此有：</p>
+<p><span class="math display">\[
+\log p_\theta(x)
+=
+\underbrace{
+\mathbb{E}_{z\sim q_\phi(z\mid x)}
+\left[
+\log p_\theta(x,z)-\log q_\phi(z\mid x)
+\right]
+}_{\mathrm{ELBO}}
++
+D_{\mathrm{KL}}(q_\phi(z\mid x)\,\|\,p_\theta(z\mid x))
+\]</span></p>
+<p>KL 散度永远非负，所以：</p>
+<p><span class="math display">\[
+\log p_\theta(x)\ge \mathrm{ELBO}
+\]</span></p>
+<p>这就是“证据下界”（Evidence Lower Bound, ELBO）这个名字的来源：它是
+log-likelihood <span class="math inline">\(\log p_\theta(x)\)</span>
+的一个下界。由于真实后验 <span class="math inline">\(p_\theta(z\mid
+x)\)</span> 不可计算，不能直接最大化 <span class="math inline">\(\log
+p_\theta(x)\)</span>；但 ELBO 可计算，所以 VAE 转而最大化 ELBO。</p>
+<p>接下来把联合概率拆开：</p>
+<p><span class="math display">\[
+p_\theta(x,z)=p_\theta(x\mid z)p(z)
+\]</span></p>
+<p>代入 ELBO：</p>
+<p><span class="math display">\[
+\mathrm{ELBO}
+=
+\mathbb{E}_{z\sim q_\phi(z\mid x)}
+\left[
+\log p_\theta(x\mid z)+\log p(z)-\log q_\phi(z\mid x)
+\right]
+\]</span></p>
+<p>整理后得到最常见的形式：</p>
+<p><span class="math display">\[
+\mathrm{ELBO}
+=
+\mathbb{E}_{z\sim q_\phi(z\mid x)}[\log p_\theta(x\mid z)]
+-
+D_{\mathrm{KL}}(q_\phi(z\mid x)\,\|\,p(z))
+\]</span></p>
+<ul>
+<li>第一项是 <strong>重建项</strong>：要求 decoder 能从 <span
+class="math inline">\(z\)</span> 还原 <span
+class="math inline">\(x\)</span>。</li>
+<li>第二项是 <strong>KL 正则项</strong>：要求 encoder 输出的 latent
+分布不要偏离先验 <span class="math inline">\(p(z)\)</span> 太远。</li>
+<li>两者的张力很重要：重建项追求保留信息，KL 项追求 latent
+空间规整、可采样。</li>
+</ul>
+<p>实际训练通常写成最小化 loss，也就是最大化 ELBO 的相反数：</p>
+<p><span class="math display">\[
+\mathcal{L}_{\mathrm{VAE}}(x)
+=
+-
+\mathbb{E}_{z\sim q_\phi(z\mid x)}[\log p_\theta(x\mid z)]
++
+D_{\mathrm{KL}}(q_\phi(z\mid x)\,\|\,p(z))
+\]</span></p>
+<p>这就是常说的 <strong>VAE loss = reconstruction loss + KL
+loss</strong>。如果 <span class="math inline">\(p_\theta(x\mid
+z)\)</span> 设为高斯分布，那么负的重建 log-likelihood 常对应 L2
+重建误差；如果 <span class="math inline">\(x\)</span>
+是二值图像或归一化像素，也可能使用 Bernoulli
+likelihood，对应交叉熵形式的重建损失。</p>
+<h2 id="vae-的训练过程">4.5 VAE 的训练过程</h2>
+<p>VAE 训练过程是，encoder 和 decoder 联合训练，目标是最大化
+ELBO，或者等价地最小化 reconstruction loss + KL loss。对一个 mini-batch
+的输入 <span class="math inline">\(x\)</span>，训练步骤如下。</p>
+<ol type="1">
+<li><p><strong>Encoder 输入数据 <span
+class="math inline">\(x\)</span>，输出 latent 分布参数。</strong></p>
+<p><span class="math display">\[
+q_\phi(z\mid x)=\mathcal{N}(\mu_{z\mid x}, \Sigma_{z\mid x})
+\]</span></p>
+<p>实践中常用对角高斯，所以 encoder 通常输出 <span
+class="math inline">\(\mu_{z\mid x}\)</span> 和 <span
+class="math inline">\(\log\sigma^2_{z\mid x}\)</span>。</p></li>
+<li><p><strong>从 encoder 给出的分布中得到 latent code <span
+class="math inline">\(z\)</span>。</strong></p>
+<p>直接写是：</p>
+<p><span class="math display">\[
+z\sim q_\phi(z\mid x)
+\]</span></p>
+<p>但普通采样操作不可直接反向传播，所以训练时使用
+<strong>重参数化技巧（reparameterization trick）</strong>：</p>
+<p><span class="math display">\[
+\epsilon\sim\mathcal{N}(0,I),\quad
+z=\mu_{z\mid x}+\sigma_{z\mid x}\odot \epsilon
+\]</span></p>
+<p>这样随机性来自外部噪声 <span
+class="math inline">\(\epsilon\)</span>，而 <span
+class="math inline">\(z\)</span> 仍然是 <span
+class="math inline">\(\mu_{z\mid x}\)</span> 和 <span
+class="math inline">\(\sigma_{z\mid x}\)</span> 的可微函数，梯度可以传回
+encoder。</p></li>
+<li><p><strong>Decoder 输入 <span
+class="math inline">\(z\)</span>，输出数据分布参数。</strong></p>
+<p><span class="math display">\[
+p_\theta(x\mid z)=\mathcal{N}(\mu_{x\mid z},\sigma^2I)
+\]</span></p>
+<p>常见实现中 decoder 输出 <span class="math inline">\(\mu_{x\mid
+z}\)</span>，也就是重建图像 <span class="math inline">\(\hat{x}\)</span>
+的均值。</p></li>
+<li><p><strong>计算重建项。</strong></p>
+<p>重建项来自：</p>
+<p><span class="math display">\[
+-\mathbb{E}_{z\sim q_\phi(z\mid x)}[\log p_\theta(x\mid z)]
+\]</span></p>
+<p>如果 decoder 的输出分布设为高斯，这一项常对应 MSE；如果设为
+Bernoulli，则常对应 binary cross-entropy。它要求 decoder 能从采样到的
+<span class="math inline">\(z\)</span> 还原原始输入 <span
+class="math inline">\(x\)</span>。</p></li>
+<li><p><strong>计算 KL 正则项。</strong></p>
+<p><span class="math display">\[
+D_{\mathrm{KL}}(q_\phi(z\mid x)\,\|\,p(z))
+\]</span></p>
+<p>其中 <span class="math inline">\(p(z)\)</span> 通常是标准高斯 <span
+class="math inline">\(\mathcal{N}(0,I)\)</span>。这一项要求 encoder
+产生的 latent 分布不要离标准高斯太远，从而让训练后的 latent
+空间可以被稳定采样。</p></li>
+<li><p><strong>反向传播并同时更新 encoder 和 decoder。</strong></p>
+<p>总损失为：</p>
+<p><span class="math display">\[
+\mathcal{L}_{\mathrm{VAE}}
+=
+\text{reconstruction loss}
++
+\text{KL loss}
+\]</span></p>
+<p>反向传播时，重建项主要推动 decoder 学会从 <span
+class="math inline">\(z\)</span> 生成 <span
+class="math inline">\(x\)</span>，也推动 encoder 保留有用信息；KL 项推动
+encoder 输出的分布靠近先验 <span
+class="math inline">\(p(z)\)</span>。两者共同决定 latent
+表示既要有信息，又要规整可采样。</p></li>
+</ol>
+<p>这就是 VAE 和普通 AE 在训练上的关键区别：普通 AE 只训练 <span
+class="math inline">\(x\rightarrow z\rightarrow \hat{x}\)</span>
+的重建；VAE 训练的是两个概率分布 <span
+class="math inline">\(q_\phi(z\mid x)\)</span> 和 <span
+class="math inline">\(p_\theta(x\mid z)\)</span>，并通过 KL 项把 latent
+空间约束到一个可采样的先验附近。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260706202642407.png" alt="image-20260706202642126" style="zoom: 33%;" /></p>
+<h2 id="vae-的解耦表示">4.6 VAE 的解耦表示</h2>
+<p>latent vector <span
+class="math inline">\(z=(z_1,z_2,\dots,z_d)\)</span>
+的不同维度可能会对应数据中不同的变化因素（factors of
+variation）。例如在人脸图像中，某些维度可能控制脸的朝向，某些维度可能控制表情、光照或发型。</p>
+<p>观察这种性质的常见方法是：固定其他维度，只改变某一个 latent
+维度，然后看 decoder 生成图像发生什么变化。例如固定 <span
+class="math inline">\(z_2\)</span>，只改变 <span
+class="math inline">\(z_1\)</span>：</p>
+<p><span class="math display">\[
+(z_1,z_2)=(-2,0),(-1,0),(0,0),(1,0),(2,0)
+\]</span></p>
+<p>如果生成图像主要只在“朝向”上变化，就可以说 <span
+class="math inline">\(z_1\)</span>
+学到了某种较独立的变化因素。类似地，固定 <span
+class="math inline">\(z_1\)</span> 只改变 <span
+class="math inline">\(z_2\)</span>，如果生成图像主要改变表情，就说明
+<span class="math inline">\(z_2\)</span> 可能对应表情因素。</p>
+<p>VAE 常用标准高斯先验 <span
+class="math inline">\(p(z)=\mathcal{N}(0,I)\)</span>。这个先验的协方差矩阵是单位矩阵，意味着不同
+latent 维度在先验中相互独立。训练中的 KL 项会鼓励 <span
+class="math inline">\(q_\phi(z\mid x)\)</span> 靠近这个独立的先验，因此
+VAE 有倾向把不同变化因素分散到不同维度里。</p>
+<p>不过要注意：普通 VAE <strong>不保证</strong>
+一定学到完美解耦表示。标准高斯先验和 KL
+正则只是提供了这种倾向；如果想更强地解耦，后续方法如 <span
+class="math inline">\(\beta\)</span>-VAE 会增大 KL 项权重，让 latent
+表示更规整，但也可能牺牲重建质量。</p>
+<h2 id="vae-的采样与局限">4.7 VAE 的采样与局限</h2>
+<p>训练完成后，生成过程很简单：</p>
+<ol type="1">
+<li>从先验中采样 <span
+class="math inline">\(z\sim\mathcal{N}(0,I)\)</span>。</li>
+<li>输入 decoder，得到 <span class="math inline">\(p_\theta(x\mid
+z)\)</span> 或其均值。</li>
+<li>从输出分布采样或直接取均值作为生成结果。</li>
+</ol>
+<p>VAE 的优点是有明确概率解释、训练相对稳定、latent
+空间连续；缺点是生成图像常偏模糊。直观原因是高斯 likelihood
+与重建损失鼓励输出“平均合理结果”，当真实图像有多种可能细节时，平均会变糊。</p>
+<h1 id="生成对抗网络generative-adversarial-networks-gan">5
+生成对抗网络（Generative Adversarial Networks, GAN）</h1>
+<p>GAN 由 Goodfellow 等人在 2014 年提出，目标是从真实数据分布 <span
+class="math inline">\(p_{\mathrm{data}}(x)\)</span> 中采样，但不显式计算
+<span class="math inline">\(p(x)\)</span>。</p>
+<p>GAN 引入简单 latent prior：</p>
+<p><span class="math display">\[
+z \sim p(z)
+\]</span></p>
+<p>这里 <span class="math inline">\(p(z)\)</span>
+一般就是一个简单、容易采样的先验分布，通常采用多维标准高斯分布或均匀分布，高斯分布用得多一些。</p>
+<p>然后用 <strong>生成器（Generator）</strong>把 <span
+class="math inline">\(z\)</span> 映射为样本： <span
+class="math display">\[
+x_{\mathrm{fake}} = G(z)
+\]</span></p>
+<p>同时训练 <strong>判别器（Discriminator）</strong><span
+class="math inline">\(D(x)\)</span>，让它判断输入是真实样本还是生成样本。<span
+class="math inline">\(D(x)\)</span> 的取值范围是 <span
+class="math inline">\([0,1]\)</span>，越接近 1 说明 <span
+class="math inline">\(x\)</span> 越可能是正样本；越接近 <span
+class="math inline">\(0\)</span> 说明 <span
+class="math inline">\(x\)</span> 越可能是负样本。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707131803191.png"
+alt="image-20260707131802744" />
+<figcaption aria-hidden="true">image-20260707131802744</figcaption>
+</figure>
+<h2 id="gan-的-minimax-目标">5.1 GAN 的 minimax 目标</h2>
+<p>经典 GAN 目标是：</p>
+<p><span class="math display">\[
+\min_G \max_D
+\mathbb{E}_{x\sim p_{\mathrm{data}}}[\log D(x)]
++
+\mathbb{E}_{z\sim p(z)}[\log(1-D(G(z)))]
+\]</span></p>
+<p>判别器希望真实样本得分高、生成样本得分低；生成器希望骗过判别器，让
+<span class="math inline">\(D(G(z))\)</span>
+尽可能高。这就是“对抗”的含义。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707131857888.png"
+alt="image-20260707131857594" />
+<figcaption aria-hidden="true">image-20260707131857594</figcaption>
+</figure>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707131931749.png"
+alt="image-20260707131931455" />
+<figcaption aria-hidden="true">image-20260707131931455</figcaption>
+</figure>
+<p>可以把训练理解成一个动态游戏：</p>
+<ul>
+<li><strong>固定 <span class="math inline">\(G\)</span> 训练 <span
+class="math inline">\(D\)</span>：</strong>
+判别器学习区分真实和生成样本。</li>
+<li><strong>固定 <span class="math inline">\(D\)</span> 训练 <span
+class="math inline">\(G\)</span>：</strong>
+生成器学习产生更像真实数据的样本。</li>
+<li><strong>循环迭代：</strong>
+如果训练理想，生成分布逐渐接近真实分布。</li>
+</ul>
+<h2 id="交替梯度更新gan-不是普通的单一-loss-最小化">5.2
+交替梯度更新：GAN 不是普通的单一 loss 最小化</h2>
+<h3 id="更新梯度">5.2.1 更新梯度</h3>
+<p>GAN 的训练不是在最小化一个所有网络共享的普通 loss，而是在做一个
+<strong>minimax game</strong>。令</p>
+<p><span class="math display">\[
+V(G,D)=
+\mathbb{E}_{x\sim p_{\mathrm{data}}}[\log D(x)]
++
+\mathbb{E}_{z\sim p(z)}[\log(1-D(G(z)))]
+\]</span></p>
+<p>则训练目标可以写作：</p>
+<p><span class="math display">\[
+\min_G\max_D V(G,D)
+\]</span></p>
+<p>因此两个网络的更新方向相反：</p>
+<p><span class="math display">\[
+D \leftarrow D+\alpha_D\frac{\partial V}{\partial D}
+\]</span></p>
+<p><span class="math display">\[
+G \leftarrow G-\alpha_G\frac{\partial V}{\partial G}
+\]</span></p>
+<p>判别器 <span class="math inline">\(D\)</span>
+要<strong>增大</strong>目标函数，因为它在 <span
+class="math inline">\(\max_D\)</span>；生成器 <span
+class="math inline">\(G\)</span>
+要<strong>减小</strong>目标函数，因为它在 <span
+class="math inline">\(\min_G\)</span>。这和普通监督学习里“所有参数一起最小化一个训练损失”不同。</p>
+<p>这个差异带来一个实践后果：<strong>GAN 没有一个简单可靠的总 loss
+曲线可以直接看训练是否变好。</strong> 判别器 loss
+下降不一定代表生成器变好；生成器 loss 变化也会受到判别器强弱影响。GAN
+训练更像两个玩家不断追逐对方的策略，而不是一个模型朝固定目标稳步下降。</p>
+<h3 id="如何交替">5.2.2 如何交替</h3>
+<p>一次 GAN
+训练并不是把真实图片和噪声一起送进一个普通网络，然后统一反向传播；它更像是在同一个
+mini-batch 级别上轮流训练两个玩家。设真实图片 batch size 为 <span
+class="math inline">\(m\)</span>，一次常见训练 step 可以写成：</p>
+<p><strong>第一步：训练判别器 <span
+class="math inline">\(D\)</span>，暂时固定生成器 <span
+class="math inline">\(G\)</span>。</strong></p>
+<p>从真实数据集中采样一批图片：</p>
+<p><span class="math display">\[
+x_1,\dots,x_m\sim p_{\mathrm{data}}(x)
+\]</span></p>
+<p>再从 latent prior 中采样一批噪声：</p>
+<p><span class="math display">\[
+z_1,\dots,z_m\sim p(z)
+\]</span></p>
+<p>通过生成器得到一批假图片：</p>
+<p><span class="math display">\[
+\hat{x}_i=G(z_i)
+\]</span></p>
+<p>然后把真实图片和假图片都送入判别器：</p>
+<p><span class="math display">\[
+D(x_i),\qquad D(G(z_i))
+\]</span></p>
+<p>判别器的目标是让真实图片输出接近 <span
+class="math inline">\(1\)</span>，让假图片输出接近 <span
+class="math inline">\(0\)</span>。如果把最大化目标改写成常见的最小化
+loss，可以写成：</p>
+<p><span class="math display">\[
+\mathcal{L}_D
+=
+-\frac{1}{m}\sum_{i=1}^m \log D(x_i)
+-\frac{1}{m}\sum_{i=1}^m \log(1-D(G(z_i)))
+\]</span></p>
+<p>这一步反向传播时，<strong>只更新判别器 <span
+class="math inline">\(D\)</span> 的参数</strong>。虽然假图片来自 <span
+class="math inline">\(G(z)\)</span>，但在训练 <span
+class="math inline">\(D\)</span> 时通常把 <span
+class="math inline">\(G(z)\)</span> 当成已经生成好的样本，不让梯度更新到
+<span class="math inline">\(G\)</span>。</p>
+<p><strong>第二步：训练生成器 <span
+class="math inline">\(G\)</span>，暂时固定判别器 <span
+class="math inline">\(D\)</span>。</strong></p>
+<p>再采样一批噪声：</p>
+<p><span class="math display">\[
+z_1,\dots,z_m\sim p(z)
+\]</span></p>
+<p>生成假图片并送入判别器：</p>
+<p><span class="math display">\[
+D(G(z_i))
+\]</span></p>
+<p>此时判别器只负责给出训练信号，<strong>不更新 <span
+class="math inline">\(D\)</span>
+的参数</strong>。生成器希望自己的假图片被判别器认为是真的，所以希望
+<span class="math inline">\(D(G(z_i))\)</span> 越接近 <span
+class="math inline">\(1\)</span> 越好。实践中常用非饱和生成器损失：</p>
+<p><span class="math display">\[
+\mathcal{L}_G
+=
+-\frac{1}{m}\sum_{i=1}^m \log D(G(z_i))
+\]</span></p>
+<p>这一步反向传播时，梯度会穿过判别器的计算图传回生成器，但优化器只更新
+<span class="math inline">\(G\)</span> 的参数。也就是说，<span
+class="math inline">\(D\)</span> 在这里像一个“可微的评分器”：它告诉
+<span class="math inline">\(G\)</span>
+当前假图片哪里不够像真图，但自己暂时不学习。</p>
+<p>把整个过程写成伪代码就是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">for each epoch:</span><br><span class="line">    for each real image batch x:</span><br><span class="line">        # 1. update D</span><br><span class="line">        sample z</span><br><span class="line">        fake = G(z)</span><br><span class="line">        update D to increase log D(x) + log(1 - D(fake))</span><br><span class="line"></span><br><span class="line">        # 2. update G</span><br><span class="line">        sample z</span><br><span class="line">        fake = G(z)</span><br><span class="line">        update G to increase log D(fake)</span><br></pre></td></tr></table></figure>
+<p>这里的 <span class="math inline">\(m\)</span> 通常就是 mini-batch
+size。理论上，真实样本数 <span class="math inline">\(N_x\)</span>
+和噪声样本数 <span class="math inline">\(N_z\)</span>
+不一定必须相等，因为两个期望可以分别用不同数量的 Monte Carlo samples
+估计：</p>
+<p><span class="math display">\[
+\frac{1}{N_x}\sum_{i=1}^{N_x}\log D(x_i)
++
+\frac{1}{N_z}\sum_{j=1}^{N_z}\log(1-D(G(z_j)))
+\]</span></p>
+<p>但实践中通常直接取：</p>
+<p><span class="math display">\[
+N_x=N_z=m
+\]</span></p>
+<p>这样实现最简单，也让判别器在一个 step 中看到的 real/fake
+数量比较平衡。</p>
+<p>还有一些实现会每更新一次 <span
+class="math inline">\(G\)</span>，先更新 <span
+class="math inline">\(D\)</span> 多次，比如 <span
+class="math inline">\(k\)</span> 次 <span
+class="math inline">\(D\)</span> step 对应 <span
+class="math inline">\(1\)</span> 次 <span
+class="math inline">\(G\)</span>
+step。这可以控制两个玩家的相对强弱：如果 <span
+class="math inline">\(D\)</span> 太弱，给不出有用信号；如果 <span
+class="math inline">\(D\)</span> 太强，<span
+class="math inline">\(G\)</span> 可能很难得到有效梯度。所以 GAN
+的交替训练本质上是在维护一个动态平衡。</p>
+<h2 id="原始-generator-loss-的梯度饱和问题">5.3 原始 generator loss
+的梯度饱和问题</h2>
+<p>GAN 的原始 minimax 形式中，生成器通过最小化</p>
+<p><span class="math display">\[
+\mathbb{E}_{z\sim p(z)}[\log(1-D(G(z)))]
+\]</span></p>
+<p>来训练。但在训练早期会出现问题。刚初始化时，<span
+class="math inline">\(G\)</span> 和 <span
+class="math inline">\(D\)</span> 都是随机的。<span
+class="math inline">\(G(z)\)</span>
+生成出来的东西通常离真实图像分布很远，比如噪声块、奇怪纹理、没有结构的图像。对
+<span class="math inline">\(D\)</span>
+来说，区分“真实训练图像”和“随机生成图像”是一个相对简单的二分类任务，所以经过少量更新后，<span
+class="math inline">\(D(G(z))\)</span> 很容易接近 <span
+class="math inline">\(0\)</span>。</p>
+<p><span class="math display">\[
+D(G(z))\approx 0
+\]</span></p>
+<p>在这种情况下，<span class="math inline">\(\log(1-D(G(z)))\)</span>
+对生成器参数的有效梯度可能非常小，导致生成器学得很慢。</p>
+<p>常用解决方法是改用非饱和生成器损失（non-saturating generator loss）：
+<span class="math display">\[
+\mathcal{L}_G=-\mathbb{E}_{z\sim p(z)}[\log D(G(z))]
+\]</span></p>
+<p>直觉上，生成器的目标仍然是让判别器认为 fake 是 real，也就是让 <span
+class="math inline">\(D(G(z))\)</span> 越接近 <span
+class="math inline">\(1\)</span> 越好。但把目标写成最小化 <span
+class="math inline">\(-\log D(G(z))\)</span> 后，当 <span
+class="math inline">\(D(G(z))\)</span>
+很小时，生成器能得到更强的梯度信号。</p>
+<h2 id="为什么-minimax-目标是合理的">5.4 为什么 minimax
+目标是合理的</h2>
+<p>给定一个固定的生成器 <span
+class="math inline">\(G\)</span>，它生成分布 <span
+class="math inline">\(p_G(x)\)</span>。此时判别器要在真实样本和生成样本之间做最优二分类。数学上可以证明，对任意固定的
+<span class="math inline">\(p_G\)</span>，最优判别器（即内层 max
+的最优解）为：</p>
+<p><span class="math display">\[
+D_G^*(x)=
+\frac{p_{\mathrm{data}}(x)}
+{p_{\mathrm{data}}(x)+p_G(x)}
+\]</span></p>
+<p>这个式子很有直觉：</p>
+<ul>
+<li>如果某个 <span class="math inline">\(x\)</span>
+只出现在真实数据中，<span
+class="math inline">\(p_{\mathrm{data}}(x)\)</span> 大而 <span
+class="math inline">\(p_G(x)\)</span> 小，则 <span
+class="math inline">\(D_G^*(x)\)</span> 接近 <span
+class="math inline">\(1\)</span>。</li>
+<li>如果某个 <span class="math inline">\(x\)</span>
+主要由生成器产生，<span class="math inline">\(p_G(x)\)</span> 大而 <span
+class="math inline">\(p_{\mathrm{data}}(x)\)</span> 小，则 <span
+class="math inline">\(D_G^*(x)\)</span> 接近 <span
+class="math inline">\(0\)</span>。</li>
+<li>如果生成分布已经等于真实分布，即 <span
+class="math inline">\(p_G(x)=p_{\mathrm{data}}(x)\)</span>，则</li>
+</ul>
+<p><span class="math display">\[
+D_G^*(x)=\frac{1}{2}
+\]</span></p>
+<p>这意味着判别器无法判断输入是真实还是生成，只能像随机猜测一样输出
+<span class="math inline">\(0.5\)</span>。因此，外层对 <span
+class="math inline">\(G\)</span> 的优化最终希望达到：</p>
+<p><span class="math display">\[
+p_G(x)=p_{\mathrm{data}}(x)
+\]</span></p>
+<p>这说明 GAN
+的目标在理想条件下是合理的：如果判别器和生成器都有足够能力、优化能成功收敛，那么生成器分布会匹配真实数据分布，判别器已经无法区分真实数据和生成数据，只能给出
+<span class="math inline">\(\frac{1}{2}\)</span> 的概率。</p>
+<p>但课件也给出了两个警告：</p>
+<ul>
+<li><strong>有限容量问题：</strong> 实际神经网络不一定能表示理论上的最优
+<span class="math inline">\(D\)</span> 和最优 <span
+class="math inline">\(G\)</span>。</li>
+<li><strong>有限数据与优化问题：</strong> 理论最优不保证用有限数据、有限
+batch、梯度下降交替更新时一定收敛。</li>
+</ul>
+<p>所以 GAN 的理论目标很漂亮，但训练过程并不自动稳定。这也是后面许多 GAN
+变体改进 loss、正则化、归一化和网络结构的原因。</p>
+<h2 id="gan-架构dcgan">5.5 GAN 架构：DCGAN</h2>
+<p>GAN 中生成器 <span class="math inline">\(G\)</span> 和判别器 <span
+class="math inline">\(D\)</span>
+都是神经网络。在图像生成任务里，早期常用卷积神经网络（CNN）来构造二者。课件指出，GAN
+在 ViT 大规模流行之前已经逐渐退潮，所以经典 GAN 架构主要还是 CNN
+风格。</p>
+<p>DCGAN（Deep Convolutional
+GAN）是第一个能在真实的、复杂的数据集上比较稳定工作的 GAN
+架构之一。它的基本思想是：</p>
+<ul>
+<li>生成器从 latent vector <span class="math inline">\(z\)</span>
+出发，经过一系列上采样或转置卷积，逐步生成图像。</li>
+<li>判别器接收真实图像或生成图像，经过卷积下采样，输出 real/fake
+概率。</li>
+<li>卷积结构利用图像的局部空间相关性，比纯 MLP 更适合生成自然图像。</li>
+</ul>
+<p>从生成模型发展史看，DCGAN 的意义不只是“用了卷积”，而是证明了 GAN
+可以从简单数据集走向更真实的图像生成任务。它为后续更强的图像 GAN
+架构奠定了基础。</p>
+<h2 id="gan-架构stylegan-与-adain">5.6 GAN 架构：StyleGAN 与 AdaIN</h2>
+<p>StyleGAN 使用更复杂的生成器设计，是高质量人脸生成中非常有代表性的 GAN
+架构。StyleGAN 通过自适应归一化（Adaptive Instance Normalization,
+AdaIN）在每一层注入风格信息和噪声。</p>
+<p>AdaIN 的形式为：</p>
+<p><span class="math display">\[
+\operatorname{AdaIN}(x,w,b)_i
+=
+w_i\frac{x_i-\mu_i(x)}{\sigma_i(x)}+b_i
+\]</span></p>
+<p>其中：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">含义</th>
+<th style="text-align: left;">PyTorch 风格形状</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(x\)</span></td>
+<td style="text-align: left;">当前层的 feature map</td>
+<td style="text-align: left;"><code>[N, C, H, W]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(x_i\)</span></td>
+<td style="text-align: left;">第 <span class="math inline">\(i\)</span>
+个通道的 feature map</td>
+<td style="text-align: left;"><code>[N, H, W]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(\mu_i(x)\)</span></td>
+<td style="text-align: left;">对每个样本、每个通道，在空间维度 <span
+class="math inline">\(H,W\)</span> 上计算的均值</td>
+<td style="text-align: left;"><code>[N, C, 1, 1]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(\sigma_i(x)\)</span></td>
+<td style="text-align: left;">对每个样本、每个通道，在空间维度 <span
+class="math inline">\(H,W\)</span> 上计算的标准差</td>
+<td style="text-align: left;"><code>[N, C, 1, 1]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(w_i\)</span></td>
+<td
+style="text-align: left;">对每个样本、每个通道归一化后特征的缩放（scale），由
+style code 生成</td>
+<td style="text-align: left;"><code>[N, C, 1, 1]</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(b_i\)</span></td>
+<td
+style="text-align: left;">对每个样本、每个通道归一化后特征的平移（shift），由
+style code 生成</td>
+<td style="text-align: left;"><code>[N, C, 1, 1]</code></td>
+</tr>
+</tbody>
+</table>
+<p>style code 对应图中的 <span class="math inline">\(\mathbf{w} \in
+\mathcal{W}\)</span>。 这个操作可以理解为：先把中间特征标准化，再用由
+latent code（对应图中的 <span class="math inline">\(\mathbf{z} \in
+\mathcal{Z}\)</span> 预测出的 scale 和 shift 重新调制特征。这样 latent
+不只是作为网络最开始的输入，而是可以在生成器的多个层级控制图像属性。粗层可能影响姿态、脸型、整体布局；细层可能影响纹理、发丝、局部细节。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707184209249.png" alt="image-20260707184208787" style="zoom: 50%;" /></p>
+<p>StyleGAN 的重要直觉是：<strong>好的生成器不只是把 <span
+class="math inline">\(z\)</span>
+一次性解码成图像，而是在多尺度特征生成过程中持续注入可控的风格信息。</strong></p>
+<h2 id="latent-space-interpolationlatent-空间插值">5.7 Latent Space
+Interpolation：latent 空间插值</h2>
+<p>课件第 33-34 页展示了 GAN 的一个重要现象：训练好的 GAN 往往有较平滑的
+latent space。给定两个 latent vectors <span
+class="math inline">\(z_0\)</span> 和 <span
+class="math inline">\(z_1\)</span>，可以在二者之间做线性插值：</p>
+<p><span class="math display">\[
+z_t=t z_0+(1-t)z_1
+\]</span></p>
+<p>再输入生成器：</p>
+<p><span class="math display">\[
+x_t=G(z_t)
+\]</span></p>
+<p>如果 latent 空间学得好，随着 <span class="math inline">\(t\)</span>
+连续变化，生成图像 <span class="math inline">\(x_t\)</span>
+也会在语义上平滑变化。例如一张人脸可能逐渐改变年龄、姿态、发型或表情，而不是突然跳到完全无关的图像。<a
+target="_blank" rel="noopener" href="https://nvlabs.github.io/stylegan3/">这里</a>有一些demo。</p>
+<p>这个现象说明生成器学到的不是简单记忆训练集图片，而是把连续 latent
+空间映射到了数据流形（data manifold）附近。它也是 GAN
+常被用于图像编辑、属性控制和语义方向探索的重要原因。</p>
+<p>不过插值平滑并不等于模型完美。GAN 可能会发生模式崩塌（mode
+collapse）问题，即 latent
+空间可能只覆盖真实分布的一小部分模式，此时插值看起来平滑，但多样性不足。例如单张人脸图很清晰、很真实，但采样
+100 张以后发现它们都长得差不多。</p>
+<h2 id="gan-的优缺点">5.8 GAN 的优缺点</h2>
+<table>
+<colgroup>
+<col style="width: 6%" />
+<col style="width: 93%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方面</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">优点</td>
+<td
+style="text-align: left;">形式简单；采样快；生成结果可以很锐利；图像质量曾长期非常强；latent
+空间通常有平滑插值性质</td>
+</tr>
+<tr>
+<td style="text-align: left;">缺点</td>
+<td style="text-align: left;">没有可靠的整体 loss
+曲线；训练不稳定；可能模式崩塌（mode collapse）；<br>不能直接计算样本
+likelihood；评估困难；难以稳定扩展到特别大的模型和数据</td>
+</tr>
+</tbody>
+</table>
+<p>GAN 大约在 2016 到 2021
+年间是图像生成的主流方法之一。后来扩散模型逐渐成为高质量图像与视频生成的主流，但
+GAN 的思想仍然重要：它展示了可以不显式建模 <span
+class="math inline">\(p(x)\)</span>，而通过判别器提供训练信号来学习从简单噪声分布到真实数据分布的直接采样映射。</p>
+<h1 id="扩散模型">6 扩散模型</h1>
+<p>扩散模型这个领域，术语和记号比较混乱，不同论文可能用
+DDPM、score-based model、flow matching、rectified flow
+等不同形式描述相关思想。课程用 Rectified Flow
+给出一个较直观、现代的解释，再继续讲条件生成、Classifier-Free
+Guidance、noise schedule、Latent Diffusion、DiT、文生图/视频和蒸馏。</p>
+<p>核心思路是：从真实数据 <span class="math inline">\(x\sim
+p_{\mathrm{data}}\)</span>
+出发，构造一个从数据到噪声的连续路径；然后训练神经网络学习如何沿反方向从噪声回到数据。扩散模型和
+GAN 一样通常不能直接给出简单的 <span class="math inline">\(p(x)\)</span>
+公式，但它能通过一个迭代过程从简单噪声分布中采样出高质量数据。</p>
+<h2 id="扩散模型的基本直觉从加噪到去噪">6.1
+扩散模型的基本直觉：从加噪到去噪</h2>
+<p>扩散模型的 <strong>第一步</strong> 是选择一个简单的噪声分布：</p>
+<p><span class="math display">\[
+z\sim p_{\mathrm{noise}}
+\]</span></p>
+<p>实际中最常见的是单位高斯分布（unit Gaussian），也就是 <span
+class="math inline">\(z\sim p_{\text{noise}}
+=\mathcal{N}(0,I)\)</span>。这类分布容易采样、形状规则，因此适合作为生成过程的起点。</p>
+<p><strong>第二步 </strong>是把真实数据 <span
+class="math inline">\(x\)</span> 在不同噪声等级 <span
+class="math inline">\(t\)</span> 下逐渐腐蚀，得到带噪样本 <span
+class="math inline">\(x_t\)</span>。这里 <span
+class="math inline">\(t\)</span> 可以理解为“噪声强度”或“时间步”：</p>
+<ul>
+<li>当 <span class="math inline">\(t=0\)</span> 时，几乎没有噪声，<span
+class="math inline">\(x_t\)</span> 接近真实干净数据 <span
+class="math inline">\(x\)</span>。</li>
+<li>当 <span class="math inline">\(t=1\)</span>
+时，样本几乎完全变成噪声，<span class="math inline">\(x_t\)</span>
+接近从 <span class="math inline">\(p_{\mathrm{noise}}\)</span>
+采样得到的随机噪声。</li>
+<li>当 <span class="math inline">\(0&lt;t&lt;1\)</span> 时，<span
+class="math inline">\(x_t\)</span>
+是介于真实图像和纯噪声之间的中间状态。</li>
+</ul>
+<p>这一步叫前向加噪过程（forward noising / diffusion
+process）。它不是模型要学习的部分，而是人为设计出来的训练数据构造方式。给定一张真实图像，我们可以按不同
+<span class="math inline">\(t\)</span> 生成许多不同噪声程度的版本。</p>
+<p><strong>第三步</strong> 是训练一个神经网络： <span
+class="math display">\[
+f_\theta(x_t,t)
+\]</span></p>
+<p>它的输入是带噪样本 <span class="math inline">\(x_t\)</span>
+和当前噪声等级 <span class="math inline">\(t\)</span>，目标是
+<strong>去掉一点噪声</strong>，也就是预测从当前状态往更干净状态移动的方向。对于每个中间步
+<span class="math inline">\(x_t\)</span>，<span
+class="math inline">\(f_\theta\)</span>
+都是一样的，也就是它们共享同一个神经网络。注意这里的“去噪”不是传统图像处理里把一张噪声图恢复清晰，而是在学习数据分布的反向动力学：模型需要知道在当前噪声程度下，哪些结构更像真实图像，哪些成分更像随机噪声。</p>
+<p><strong>第四步</strong> 发生在推理或采样阶段。此时没有真实图像 <span
+class="math inline">\(x\)</span>，只有从噪声分布中采样的初始点： <span
+class="math display">\[
+x_1\sim p_{\mathrm{noise}}
+\]</span></p>
+<p>然后反复应用 <span
+class="math inline">\(f_\theta\)</span>，让样本从高噪声状态一步步走向低噪声状态，最终生成近似无噪声的样本
+<span
+class="math inline">\(x_0\)</span>。因此扩散模型的生成过程可以概括为：</p>
+<p><span class="math display">\[
+x_1\rightarrow x_{t_k}\rightarrow \cdots \rightarrow x_{t_1}\rightarrow
+x_0
+\]</span></p>
+<p>其中 <span class="math inline">\(x_1\)</span> 是纯噪声，<span
+class="math inline">\(x_0\)</span>
+是最终生成图像。<strong>训练时，模型学习如何从任意噪声等级的 <span
+class="math inline">\(x_t\)</span>
+往更干净的数据方向移动；采样时，模型把这个局部去噪能力重复很多次，组合成完整生成过程。</strong></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707140720494.png" alt="image-20260707140720129" style="zoom: 33%;" /></p>
+<p>这个直觉也解释了扩散模型为什么通常采样较慢：一次网络前向传播只完成一小步去噪，高质量生成往往需要多步迭代。后面讲到的
+Rectified Flow、Generalized Diffusion
+和扩散蒸馏，本质上都在尝试用更好的路径、更好的预测目标或更少的步骤来实现从噪声到数据的生成。</p>
+<h2 id="rectified-flow-的训练公式datanoise">6.2 Rectified Flow
+的训练公式：data→noise</h2>
+<p>Rectified Flow 假设我们有一个简单噪声分布 <span
+class="math inline">\(p_{\mathrm{noise}}\)</span>，例如单位高斯分布，以及真实数据分布
+<span class="math inline">\(p_{\mathrm{data}}\)</span>
+的训练样本。在每次训练迭代中，先采样真实数据、噪声和时间：</p>
+<p><span class="math display">\[
+x\sim p_{\mathrm{data}}, \quad z\sim p_{\mathrm{noise}}, \quad t\sim
+U(0,1)
+\]</span></p>
+<p>这里 <span class="math inline">\(t\)</span>
+表示路径上的位置。课程先用均匀分布 <span
+class="math inline">\(U(0,1)\)</span>，后面再讨论为什么实践中常改成非均匀
+noise schedule。</p>
+<p>构造中间状态： <span class="math display">\[
+x_t=(1-t)x+tz
+\]</span></p>
+<p>当 <span class="math inline">\(t=0\)</span> 时，<span
+class="math inline">\(x_t=x\)</span>，是干净数据；当 <span
+class="math inline">\(t=1\)</span> 时，<span
+class="math inline">\(x_t=z\)</span>，是纯噪声。</p>
+<p>目标速度为： <span class="math display">\[
+v_{\mathrm{gt}}=z-x
+\]</span></p>
+<p>在二维空间中可视化如下：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707141104052.png" alt="image-20260707141103692" style="zoom:33%;" /></p>
+<p>网络预测： <span class="math display">\[
+v_{\mathrm{pred}}=f_\theta(x_t,t)
+\]</span></p>
+<p>损失函数：</p>
+<p><span class="math display">\[
+\mathcal{L}=\|v_{\mathrm{gt}}-v_{\mathrm{pred}}\|_2^2
+\]</span></p>
+<p>直觉上，模型看到一个带噪中间点 <span
+class="math inline">\(x_t\)</span> 和时间 <span
+class="math inline">\(t\)</span>，要预测从真实数据点 <span
+class="math inline">\(x\)</span> 指向噪声点 <span
+class="math inline">\(z\)</span> 的速度 <span
+class="math inline">\(v=z-x\)</span>。训练目标看起来非常简单，只要让网络预测这个向量即可。Rectified
+Flow
+的核心训练循环只有几行代码，因此它是一个简单、可扩展的生成建模框架。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> dataset:</span><br><span class="line">    z = torch.randn_like(x)</span><br><span class="line">    t = random.uniform(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    xt = (<span class="number">1</span> - t) * x + t * z</span><br><span class="line">    v = model(xt, t)</span><br><span class="line">    loss = (z - x - v).square().<span class="built_in">sum</span>()</span><br></pre></td></tr></table></figure>
+<h2 id="rectified-flow-的采样过程noisedata">6.3 Rectified Flow
+的采样过程：noise→data</h2>
+<p><strong>训练时学的是数据到噪声的速度；采样时实际要反过来走，从噪声到数据。</strong></p>
+<p>训练好 <span class="math inline">\(f_\theta\)</span>
+后，采样时没有真实图像 <span
+class="math inline">\(x\)</span>，只有噪声。Rectified Flow
+从噪声端开始，逐步沿着模型预测的反方向走回数据端。</p>
+<p>设采样步数为 <span class="math inline">\(T\)</span>。常见选择大约是
+<span class="math inline">\(T=50\)</span>。采样过程可以写成：</p>
+<ol type="1">
+<li><p>从噪声分布采样初始点：</p>
+<p><span class="math display">\[
+x_1\sim p_{\mathrm{noise}}
+\]</span></p></li>
+<li><p>令时间从 <span class="math inline">\(1\)</span> 逐步走到 <span
+class="math inline">\(0\)</span>，例如：</p>
+<p><span class="math display">\[
+t=1,1-\frac{1}{T},1-\frac{2}{T},\dots,0
+\]</span></p></li>
+<li><p>在每个时间步，用网络预测速度：</p>
+<p><span class="math display">\[
+v_t=f_\theta(x_t,t)
+\]</span></p></li>
+<li><p>沿着去噪方向更新样本：</p>
+<p><span class="math display">\[
+x\leftarrow x-\frac{v_t}{T}
+\]</span></p></li>
+<li><p>最后返回 <span class="math inline">\(x_0\)</span>
+作为生成样本。</p></li>
+</ol>
+<p>第四步中，这里的负号很重要。训练时 <span
+class="math inline">\(v=z-x\)</span>
+是从数据指向噪声的方向；采样时我们从噪声出发，要往数据方向走，所以更新时要减去预测速度。可以把这个过程理解成用
+Euler 方法求解一个从噪声分布流向数据分布的连续动力系统。</p>
+<p>此外，<span class="math inline">\(v_t\)</span> 除以的是 <span
+class="math inline">\(T\)</span> 而不是什么别的数，是为了保持 scale
+一致。如果不除以 <span
+class="math inline">\(T\)</span>，每一步都走一个完整的 <span
+class="math inline">\(v_t\)</span>，走 <span
+class="math inline">\(T\)</span> 次会严重过冲（ overshoot）。除以 <span
+class="math inline">\(T\)</span> 后，<span
+class="math inline">\(T\)</span> 步加起来才覆盖约 <span
+class="math inline">\(1\)</span>
+个单位的时间区间，从噪声端走到数据端。</p>
+<p>在二维空间中可视化如下（<span
+class="math inline">\(T=3\)</span>）：</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707221051539.png" alt="image-20260707221051090" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707221110529.png" alt="image-20260707221110083" style="zoom:33%;" /><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707221133110.png" alt="image-20260707221132646" style="zoom:33%;" /></p>
+<p>伪代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sample = torch.randn(x_shape)</span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> torch.linspace(<span class="number">1</span>, <span class="number">0</span>, num_steps):</span><br><span class="line">    v = model(sample, t)</span><br><span class="line">    sample = sample - v / num_steps</span><br></pre></td></tr></table></figure>
+<h2 id="conditional-rectified-flow">6.4 Conditional Rectified Flow</h2>
+<p>无条件生成模型学习的是 <span
+class="math inline">\(p(x)\)</span>，而条件生成模型学习的是：</p>
+<p><span class="math display">\[
+p(x\mid y)
+\]</span></p>
+<p>其中 <span class="math inline">\(y\)</span>
+可以是类别标签、文本提示词、图像条件、视频首帧等。Conditional Rectified
+Flow 的训练和无条件版本非常像，只是模型额外接收条件 <span
+class="math inline">\(y\)</span>：</p>
+<p><span class="math display">\[
+v_{\mathrm{pred}}=f_\theta(x_t,y,t)
+\]</span></p>
+<p>目标仍然是预测真实速度：</p>
+<p><span class="math display">\[
+v_{\mathrm{gt}}=z-x
+\]</span></p>
+<p>因此损失可以写成：</p>
+<p><span class="math display">\[
+\mathcal{L}=\|f_\theta(x_t,y,t)-v_{\mathrm{gt}}\|_2^2
+\]</span></p>
+<p>这样训练后，采样时给定条件 <span
+class="math inline">\(y\)</span>，模型就会把噪声推向符合该条件的数据区域。例如
+<span class="math inline">\(y\)</span>
+是“猫”，采样路径会朝猫图像分布移动；<span
+class="math inline">\(y\)</span> 是文本
+prompt，采样路径会朝符合文本描述的图像或视频移动。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707142535149.png" alt="image-20260707142534708" style="zoom:33%;" /></p>
+<p>Conditional training 伪代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (x, y) <span class="keyword">in</span> dataset:</span><br><span class="line">    z = torch.randn_like(x)</span><br><span class="line">    t = random.uniform(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    xt = (<span class="number">1</span> - t) * x + t * z</span><br><span class="line">    v = model(xt, y, t)		<span class="comment"># 这里增加了一个y</span></span><br><span class="line">    loss = (z - x - v).square().<span class="built_in">sum</span>()</span><br></pre></td></tr></table></figure>
+<p>Conditional sampling 伪代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">y = user_input()	<span class="comment"># 这里增加了一个y</span></span><br><span class="line">sample = torch.randn(x_shape)</span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> torch.linspace(<span class="number">1</span>, <span class="number">0</span>, num_steps):</span><br><span class="line">    v = model(sample, y, t)		<span class="comment"># 这里增加了一个y</span></span><br><span class="line">    sample = sample - v / num_steps</span><br></pre></td></tr></table></figure>
+<h2 id="classifier-free-guidancecfg">6.5 Classifier-Free
+Guidance（CFG）</h2>
+<h3 id="改进">6.5.1 改进</h3>
+<p>条件生成里一个关键问题是：能不能控制模型“多强调条件 <span
+class="math inline">\(y\)</span>”？如果条件强调得弱，生成结果可能多样但不够贴合提示；如果条件强调得强，结果更贴合提示，但可能牺牲多样性或产生伪影。</p>
+<p>Classifier-Free
+Guidance（CFG）的训练技巧是：<strong>训练时随机丢弃条件 <span
+class="math inline">\(y\)</span></strong>。这样同一个模型既能做条件预测，也能做无条件预测：</p>
+<p><span class="math display">\[
+v_{\emptyset}=f_\theta(x_t,y_{\emptyset},t)
+\]</span></p>
+<p><span class="math display">\[
+v_y=f_\theta(x_t,y,t)
+\]</span></p>
+<p>其中 <span class="math inline">\(y_{\emptyset}\)</span>
+表示空条件或被丢弃的条件。直观上：</p>
+<ul>
+<li><span class="math inline">\(v_{\emptyset}\)</span>
+指向无条件数据分布 <span
+class="math inline">\(p(x)\)</span>，也就是“生成一个像真实数据的东西”。</li>
+<li><span class="math inline">\(v_y\)</span> 指向条件数据分布 <span
+class="math inline">\(p(x\mid y)\)</span>，也就是“生成一个符合条件 <span
+class="math inline">\(y\)</span> 的东西”。</li>
+</ul>
+<p>在数值上，<span class="math inline">\(y_\phi\)</span> 是一个空条件的
+embedding，它可以由上游的编码器得到。例如，如果条件 <span
+class="math inline">\(y\)</span> 是文本 prompt，那么 <span
+class="math inline">\(y_\phi\)</span> 就可以是空字符串的 embedding，即：
+<span class="math display">\[
+y_\phi = \text{text-encoder}(\text{&#39;&#39;})
+\]</span></p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707142904725.png" alt="image-20260707142904308" style="zoom:33%;" /></p>
+<p>采样时，CFG 把这两个方向线性组合： <span class="math display">\[
+v_{\mathrm{cfg}}=(1+w)v_y-wv_{\emptyset}
+\]</span></p>
+<p>其中 <span class="math inline">\(w\)</span> 是 guidance
+scale。这个公式也可以写成：</p>
+<p><span class="math display">\[
+v_{\mathrm{cfg}}=v_y+w(v_y-v_{\emptyset})
+\]</span></p>
+<p>所以 CFG 的直觉是：先走条件方向 <span
+class="math inline">\(v_y\)</span>，再额外沿着“条件方向和无条件方向的差”多推一把。这个差值可以理解为“条件
+<span class="math inline">\(y\)</span> 带来的额外约束”。<span
+class="math inline">\(w\)</span>
+越大，模型越强调条件。但是也不能太大，否则 <span
+class="math inline">\(v_{cfg}\)</span> 的 scale 也会很大。</p>
+<h3 id="为啥就-classifier-free-了">6.5.2 为啥就 classifier free 了</h3>
+<p>CFG 叫 classifier-free，重点在 <strong>free from
+classifier</strong>，也就是“不需要额外分类器”。早期的 classifier
+guidance 会额外训练一个判别/分类模型 <span class="math inline">\(p(y\mid
+x)\)</span>，让它判断图像 <span class="math inline">\(x\)</span>
+有多符合条件 <span
+class="math inline">\(y\)</span>。采样时，再用这个分类器对图像的梯度来推生成过程：</p>
+<p><span class="math display">\[
+\nabla_x\log p(y\mid x)
+\]</span></p>
+<p>这个梯度的意思是：“如果想让当前样本更像类别/条件 <span
+class="math inline">\(y\)</span>，应该往哪个方向改 <span
+class="math inline">\(x\)</span>？”所以早期方法需要两个模型：一个扩散模型负责生成，一个分类器负责告诉它怎么更符合条件。</p>
+<p>CFG 的做法是把这个额外分类器省掉。训练时随机把 <span
+class="math inline">\(y\)</span> 替换成 <span
+class="math inline">\(y_{\emptyset}\)</span>，于是同一个扩散模型同时学会两种输出：有条件时的方向
+<span class="math inline">\(v_y\)</span>，以及无条件时的方向 <span
+class="math inline">\(v_{\emptyset}\)</span>。采样时用二者的差 <span
+class="math inline">\(v_y-v_{\emptyset}\)</span>
+近似“条件带来的额外推动”，因此不再需要单独的 <span
+class="math inline">\(p(y\mid x)\)</span> 分类器。</p>
+<p>CFG
+在实践中非常重要，几乎是现代高质量条件扩散生成的标配。但它也有代价：每个采样步通常要分别计算
+<span class="math inline">\(v_y\)</span> 和 <span
+class="math inline">\(v_{\emptyset}\)</span>，因此采样成本大约翻倍。</p>
+<p>CFG training 伪代码是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (x, y) <span class="keyword">in</span> dataset:</span><br><span class="line">    z = torch.randn_like(x)</span><br><span class="line">    t = random.uniform(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    xt = (<span class="number">1</span> - t) * x + t * z</span><br><span class="line">    <span class="keyword">if</span> random.random() &lt; <span class="number">0.5</span>: </span><br><span class="line">        y = y_null	<span class="comment"># 多了随机抛弃</span></span><br><span class="line">    v = model(xt, y, t)</span><br><span class="line">    loss = (z - x - v).square().<span class="built_in">sum</span>()</span><br></pre></td></tr></table></figure>
+<h2 id="中间噪声与-noise-schedule">6.6 中间噪声与 Noise Schedule</h2>
+<h3 id="optimal-prediction为什么中间噪声最难">6.6.1 Optimal
+Prediction：为什么中间噪声最难</h3>
+<p>这里的“最难”，指的是模型最难从输入 <span
+class="math inline">\((x_t,t)\)</span> 中预测出正确的去噪方向 <span
+class="math inline">\(v\)</span>。在 <span
+class="math inline">\(t=0\)</span> 附近，样本几乎是干净数据；在 <span
+class="math inline">\(t=1\)</span>
+附近，样本几乎是纯噪声。这两端相对容易，因为 <span
+class="math inline">\(x_t\)</span> 的状态比较明确：</p>
+<ul>
+<li><strong>满噪声端 <span class="math inline">\(t=1\)</span>：</strong>
+此时 <span
+class="math inline">\(x_t=z\)</span>。给定纯噪声点，最优方向大致和真实数据分布的均值有关。</li>
+<li><strong>无噪声端 <span class="math inline">\(t=0\)</span>：</strong>
+此时 <span
+class="math inline">\(x_t=x\)</span>。给定真实数据点，最优方向大致和噪声分布的均值有关。</li>
+</ul>
+<p>但中间噪声最困难，因为 <span class="math inline">\(x_t\)</span>
+同时混合了数据的结构和噪声，很多不同的 <span
+class="math inline">\((x,z)\)</span> 组合可能产生相似甚至相同的 <span
+class="math inline">\(x_t\)</span>，网络面对的是高度模糊的反推问题。</p>
+<p><img src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707223534271.png" alt="image-20260707223533801" style="zoom:33%;" /></p>
+<p>更具体地说，训练目标是 MSE：</p>
+<p><span class="math display">\[
+\|f_\theta(x_t,t)-v\|_2^2
+\]</span></p>
+<p>对于同一个 <span
+class="math inline">\(x_t\)</span>，可能存在很多不同的真实数据 <span
+class="math inline">\(x\)</span> 和噪声 <span
+class="math inline">\(z\)</span> 能产生它，而这些不同组合对应的真实速度
+<span class="math inline">\(v=z-x\)</span> 并不相同。MSE
+下的最优预测不是任选一个可能方向，而是对所有可能方向取平均。也就是说，中间噪声难在模型不能确定“这个带噪样本到底应该往哪个真实数据模式移动”。</p>
+<h3 id="noise-schedule如何采样时间-t">6.6.2 Noise Schedule：如何采样时间
+<span class="math inline">\(t\)</span></h3>
+<p>如果训练时简单使用</p>
+<p><span class="math display">\[
+t\sim U(0,1)
+\]</span></p>
+<p>那么所有噪声等级获得相同训练权重。但之前说了，中间噪声更难、更重要。于是实践中常用非均匀
+noise schedule，让训练更关注困难区域。</p>
+<p>一种常见选择是 <strong>logit-normal sampling</strong>。它不是直接让
+<span class="math inline">\(t\)</span> 服从高斯，因为 <span
+class="math inline">\(t\)</span> 必须在 <span
+class="math inline">\([0,1]\)</span> 内；而是先采样一个实数 <span
+class="math inline">\(u\)</span>：</p>
+<p><span class="math display">\[
+u\sim\mathcal{N}(\mu,\sigma^2)
+\]</span></p>
+<p>再通过 sigmoid 映射到 <span
+class="math inline">\((0,1)\)</span>：</p>
+<p><span class="math display">\[
+t=\operatorname{sigmoid}(u)=\frac{1}{1+e^{-u}}
+\]</span></p>
+<p>等价地说：</p>
+<p><span class="math display">\[
+\operatorname{logit}(t)=\log\frac{t}{1-t}
+\]</span></p>
+<p>服从高斯分布。通过调整 <span
+class="math inline">\(\mu,\sigma\)</span>，可以让 <span
+class="math inline">\(t\)</span> 更多落在中间噪声区域。</p>
+<p>一个 batch 中 <span class="math inline">\(t\)</span>
+的采样过程是，先从 <span
+class="math inline">\(u\sim\mathcal{N}(\mu,\sigma^2)\)</span> 中采样
+<span class="math inline">\(N\)</span> 个 <span
+class="math inline">\(u\)</span>，然后根据 <span
+class="math inline">\(t=\operatorname{sigmoid}(u)\)</span> 生成 <span
+class="math inline">\(N\)</span> 个 <span
+class="math inline">\(T\)</span>。至于 <span
+class="math inline">\(\mu\)</span> 和 <span
+class="math inline">\(\sigma\)</span> 怎么取，可以有以下几种情况：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="math inline">\(\mu=0,\sigma\)</span> 较小</td>
+<td>大量 <span class="math inline">\(t\)</span> 在 <span
+class="math inline">\(0.5\)</span> 附近，强烈关注中间噪声</td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mu=0,\sigma\)</span> 较大</td>
+<td><span class="math inline">\(t\)</span>
+覆盖更宽，既有中间也有两端</td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mu&lt;0\)</span></td>
+<td><span class="math inline">\(u\)</span> 偏负，所以 <span
+class="math inline">\(t\)</span> 更多靠近 <span
+class="math inline">\(0\)</span>，更关注低噪声</td>
+</tr>
+<tr>
+<td><span class="math inline">\(\mu&gt;0\)</span></td>
+<td><span class="math inline">\(u\)</span> 偏正，所以 <span
+class="math inline">\(t\)</span> 更多靠近 <span
+class="math inline">\(1\)</span>，更关注高噪声</td>
+</tr>
+</tbody>
+</table>
+<p>对于高分辨率数据，常把采样分布向更高噪声区域移动，用来处理像素之间的强相关性。高分辨率图像里相邻像素高度相关，低噪声区域的局部预测可能太容易，模型更需要在较高噪声下学习全局结构和语义。</p>
+<h2 id="latent-diffusion-modelsldm">6.8 Latent Diffusion
+Models（LDM）</h2>
+<h3 id="基本-pipeline">6.8.1 基本 Pipeline</h3>
+<p>Rectified Flow / diffusion
+直接在高分辨率像素空间上运行会非常昂贵。假设图像是 <span
+class="math inline">\(1024\times1024\times3\)</span>，像素维度巨大，扩散模型每一步都要处理完整图像，计算和显存压力很高。因此现代图像生成常使用
+Latent Diffusion Models（LDMs）。</p>
+<p>LDM 的核心做法是：<strong>先训练一个
+encoder-decoder，把图像压缩到低分辨率 latent 空间，再在 latent
+空间里做扩散。</strong></p>
+<p><img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707150805699.png" /></p>
+<p>第一阶段训练 encoder 和 decoder，得到 latent
+表示，这会显著降低扩散模型需要处理的空间分辨率。Encoder / decoder
+通常是带 attention 的 CNN。</p>
+<p>第二阶段训练 diffusion model。此时 encoder 固定不动，真实图像先被
+encoder 压缩成 latent，再给 latent 加噪，扩散模型学习在 latent
+空间去噪。</p>
+<p>第三阶段进行采样，流程是：</p>
+<ol type="1">
+<li>随机采样一个 latent 噪声。（通常从标准高斯分布采样）</li>
+<li>在 latent 空间迭代地用扩散模型去噪。</li>
+<li>用 decoder 把干净 latent 解码成最终图像。</li>
+</ol>
+<p>LDM 现在非常常见，因为它把高分辨率图像生成的主要计算转移到更小的
+latent 空间中，在质量和效率之间取得较好平衡。</p>
+<h3 id="现代-pipeline">6.8.2 现代 Pipeline</h3>
+<p>那么 encoder-decoder 怎么训练？答案是：它通常是一个 VAE，但和前面入门
+VAE 有一些工程差异。</p>
+<p>LDM 的 encoder-decoder 需要满足两个目标：</p>
+<ul>
+<li>latent 要足够紧凑，方便扩散模型处理。</li>
+<li>decoder 要能从 latent 重建出清晰图像。</li>
+</ul>
+<p>因此它通常使用 VAE 式训练，并带有很小的 KL prior 权重。KL 项仍然约束
+latent 空间不要太乱，但权重较小，避免过强正则导致重建质量下降。</p>
+<p>问题是：普通 VAE 的 decoder 输出容易偏模糊。为了解决这个问题，现代
+LDM pipeline 往往加入 GAN
+discriminator，让重建图像不仅在像素或感知损失上接近原图，还要能骗过判别器，从而提升纹理和细节锐度。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707151241022.png"
+alt="image-20260707151240554" />
+<figcaption aria-hidden="true">image-20260707151240554</figcaption>
+</figure>
+<p>所以现代的 LDM pipeline 为：</p>
+<p><span class="math display">\[
+\text{Modern LDM pipelines}=\text{VAE}+\text{GAN}+\text{diffusion}
+\]</span></p>
+<h2 id="diffusion-transformerdit">6.9 Diffusion Transformer（DiT）</h2>
+<p>Diffusion Transformer（DiT）把扩散模型的主干网络换成标准 Transformer
+block。关键问题不在于 Transformer
+能不能用于扩散，而在于<strong>如何把条件信息注入
+Transformer</strong>。</p>
+<p>扩散模型里的条件信息至少包括：</p>
+<ul>
+<li>diffusion timestep <span class="math inline">\(t\)</span>；</li>
+<li>文本 embedding；</li>
+<li>图像条件；</li>
+<li>类别标签或其他控制信号。</li>
+</ul>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707151417438.png"
+alt="image-20260707151416977" />
+<figcaption aria-hidden="true">image-20260707151416977</figcaption>
+</figure>
+<p>常见注入方式有两类：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">条件注入方式</th>
+<th style="text-align: left;">常见用途</th>
+<th style="text-align: left;">直觉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Predict scale/shift</td>
+<td style="text-align: left;">diffusion timestep <span
+class="math inline">\(t\)</span></td>
+<td style="text-align: left;">用时间步 embedding 生成归一化层或 block
+内部的缩放和平移参数</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cross-Attention / Joint Attention</td>
+<td style="text-align: left;">文本、图像等条件</td>
+<td style="text-align: left;">让 noisy latent tokens 和条件 tokens 通过
+attention 交互</td>
+</tr>
+</tbody>
+</table>
+<p>Predict scale/shift 和前面讨论的 AdaLN 思想接近：先把条件 <span
+class="math inline">\(c\)</span>
+编码成向量，再用小网络或线性层生成每一层需要的
+scale/shift，让网络知道当前处在什么时间步或什么条件下。</p>
+<p>Cross-Attention / Joint Attention
+则更适合文本和图像条件。例如文生图中，文本编码器会输出一串 text
+embeddings；图像 latent patch 形成 image tokens；扩散 Transformer 通过
+attention 让 image tokens 查询文本信息，从而生成符合 prompt 的内容。</p>
+<h2 id="文生图系统">6.10 文生图系统</h2>
+<p>现代文生图系统通常是 LDM + DiT + 文本编码器的组合。整体流程如下：</p>
+<ol type="1">
+<li>输入文本 prompt。</li>
+<li>预训练文本编码器将 prompt 转成 text embeddings，例如 T5 或
+CLIP。</li>
+<li>从随机 noisy latents 开始。</li>
+<li>Diffusion Transformer 接收 noisy latents、diffusion timestep 和 text
+embeddings。</li>
+<li>Transformer 逐步预测 clean latents 或速度方向。</li>
+<li>Decoder 把 clean latents 解码成图像。</li>
+</ol>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707151602689.png"
+alt="image-20260707151602196" />
+<figcaption aria-hidden="true">image-20260707151602196</figcaption>
+</figure>
+<p>这个例子说明：现代高分辨率文生图并不是直接在像素上扩散，而是在压缩
+latent 上运行大型 Transformer，再由 decoder 还原图像。</p>
+<h2 id="文生视频">6.11 文生视频</h2>
+<p>文生视频可以看作把图像 latent 扩展到时间维：</p>
+<p><span class="math display">\[
+t_{\mathrm{video}}\times h\times w\times c
+\]</span></p>
+<p>输出视频则是：</p>
+<p><span class="math display">\[
+T\times H\times W\times 3
+\]</span></p>
+<p>相比图像，视频生成多了时间一致性问题：模型不仅要每一帧好看，还要保证物体运动、相机运动、身份、背景和物理关系在时间上连贯。因此
+token 数量和计算成本都会显著增加。</p>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707151648565.png"
+alt="image-20260707151648050" />
+<figcaption aria-hidden="true">image-20260707151648050</figcaption>
+</figure>
+<p>视频扩散模型的规模会迅速变大。2024-2025
+年视频扩散模型，快速发展，例如 Sora、MovieGen、HunyuanVideo、Cosmos、Wan
+等。<strong>视频生成正在沿着大规模 latent diffusion + DiT +
+多模态条件的路线快速扩展。</strong></p>
+<h2 id="diffusion-distillation减少采样步数">6.12 Diffusion
+Distillation：减少采样步数</h2>
+<p>扩散模型质量高，但一个主要缺点是采样慢。即使是 Rectified
+Flow，采样时也常需要运行扩散模型约 30 到 50
+步。每一步都要做一次大型神经网络前向传播，文生图已经昂贵，文生视频更昂贵。</p>
+<p>Diffusion Distillation
+的目标是：把多步采样模型压缩成少步模型，甚至一步模型。直觉上，原模型像一个老师，学生模型学习老师从噪声到数据的整体轨迹，用更少步完成类似效果。</p>
+<p>常见蒸馏方向包括：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">方法方向</th>
+<th style="text-align: left;">直觉</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Progressive distillation</td>
+<td style="text-align: left;">逐渐把多步采样压缩成更少步</td>
+</tr>
+<tr>
+<td style="text-align: left;">Consistency models</td>
+<td
+style="text-align: left;">训练模型在不同噪声时间之间保持一致映射</td>
+</tr>
+<tr>
+<td style="text-align: left;">Adversarial diffusion distillation</td>
+<td style="text-align: left;">引入对抗目标，改善少步生成质量</td>
+</tr>
+<tr>
+<td style="text-align: left;">Moment matching 等多步蒸馏</td>
+<td style="text-align: left;">让学生模型匹配老师采样分布的统计性质</td>
+</tr>
+</tbody>
+</table>
+<p>课件还提到，蒸馏有时可以把 CFG 的效果也 bake in
+到模型里。也就是说，学生模型不一定还需要每一步分别跑条件和无条件预测，而是直接学到带
+guidance 的生成行为，从而进一步降低采样成本。</p>
+<p>总结起来，扩散模型的现代工程路线是：</p>
+<p><span class="math display">\[
+\text{高质量训练}
+\rightarrow
+\text{latent 空间降低成本}
+\rightarrow
+\text{DiT 扩展模型容量}
+\rightarrow
+\text{CFG 提升条件符合度}
+\rightarrow
+\text{distillation 加速采样}
+\]</span></p>
+<h2 id="diffusion-的通用框架">6.13 Diffusion 的通用框架</h2>
+<p>本小节介绍扩散模型的统一框架。先采样真实数据、噪声和时间：</p>
+<p><span class="math display">\[
+x\sim p_{\mathrm{data}},\quad z\sim p_{\mathrm{noise}},\quad t\sim p_t
+\]</span></p>
+<p>然后用一组时间相关函数构造带噪样本：</p>
+<p><span class="math display">\[
+x_t=a(t)x+b(t)z
+\]</span></p>
+<p>再构造模型要预测的目标：</p>
+<p><span class="math display">\[
+v_{\mathrm{gt}}=c(t)x+d(t)z
+\]</span></p>
+<p>模型输入 <span class="math inline">\(x_t\)</span> 和 <span
+class="math inline">\(t\)</span>，输出预测：</p>
+<p><span class="math display">\[
+v_{\mathrm{pred}}=f_\theta(x_t,t)
+\]</span></p>
+<p>训练损失为：</p>
+<p><span class="math display">\[
+\mathcal{L}=\|v_{\mathrm{gt}}-v_{\mathrm{pred}}\|_2^2
+\]</span></p>
+<p>这里继续用 <span class="math inline">\(v_{\mathrm{gt}}\)</span>
+表示广义预测目标，是为了避免和条件生成里的标签 / prompt <span
+class="math inline">\(y\)</span>
+混淆；但它不一定总是严格意义上的速度。比如 <span
+class="math inline">\(x\)</span>-prediction 预测的是干净数据，<span
+class="math inline">\(\epsilon\)</span>-prediction 预测的是噪声。</p>
+<p>不同的扩散模型可以选择不同的 <span
+class="math inline">\(a(t),b(t),c(t),d(t)\)</span>。首先是带噪路径 <span
+class="math inline">\(x_t=a(t)x+b(t)z\)</span> 的常见选择：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">形式</th>
+<th style="text-align: left;"><span
+class="math inline">\(a(t)\)</span></th>
+<th style="text-align: left;"><span
+class="math inline">\(b(t)\)</span></th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Rectified Flow</td>
+<td style="text-align: left;"><span
+class="math inline">\(1-t\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(t\)</span></td>
+<td style="text-align: left;">在数据 <span
+class="math inline">\(x\)</span> 和噪声 <span
+class="math inline">\(z\)</span> 之间做线性插值；<span
+class="math inline">\(t=0\)</span> 是数据，<span
+class="math inline">\(t=1\)</span> 是噪声</td>
+</tr>
+<tr>
+<td style="text-align: left;">Variance Preserving (VP)</td>
+<td style="text-align: left;"><span
+class="math inline">\(\sigma(t)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(\sqrt{1-\sigma(t)^2}\)</span></td>
+<td style="text-align: left;">若 <span
+class="math inline">\(x,z\)</span> 独立且方差都为 <span
+class="math inline">\(1\)</span>，则 <span
+class="math inline">\(x_t\)</span> 的方差仍约为 <span
+class="math inline">\(1\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">Variance Exploding (VE)</td>
+<td style="text-align: left;"><span
+class="math inline">\(1\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(\sigma(t)\)</span></td>
+<td style="text-align: left;">保留数据项，同时逐渐增大噪声强度；<span
+class="math inline">\(\sigma(1)\)</span>
+需要足够大以淹没数据中的信号</td>
+</tr>
+</tbody>
+</table>
+<p>然后是预测目标 <span
+class="math inline">\(v_{\mathrm{gt}}=c(t)x+d(t)z\)</span>
+的常见选择：</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">预测目标</th>
+<th style="text-align: left;"><span
+class="math inline">\(v_{\mathrm{gt}}\)</span></th>
+<th style="text-align: left;"><span
+class="math inline">\(c(t)\)</span></th>
+<th style="text-align: left;"><span
+class="math inline">\(d(t)\)</span></th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(x\)</span>-prediction</td>
+<td style="text-align: left;"><span
+class="math inline">\(x\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(1\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(0\)</span></td>
+<td style="text-align: left;">直接预测干净数据</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(\epsilon\)</span>-prediction</td>
+<td style="text-align: left;"><span
+class="math inline">\(z\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(0\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(1\)</span></td>
+<td style="text-align: left;">预测加入的噪声</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(v\)</span>-prediction</td>
+<td style="text-align: left;"><span
+class="math inline">\(b(t)z-a(t)x\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(-a(t)\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(b(t)\)</span></td>
+<td style="text-align: left;">预测数据项和噪声项的组合方向</td>
+</tr>
+</tbody>
+</table>
+<h2 id="扩散模型的三种理解视角">6.14 扩散模型的三种理解视角</h2>
+<p>扩散模型还可以从几个角度理解：</p>
+<ul>
+<li><strong>Latent variable model：</strong>
+已知前向加噪过程，学习近似反向去噪过程，并可优化类似 VAE
+的变分下界。</li>
+<li><strong>Score matching：</strong> 学习 score function <span
+class="math inline">\(s(x)=\nabla_x\log
+p(x)\)</span>，即指向高概率密度区域的向量场。</li>
+<li><strong>SDE 视角：</strong> 连续加噪可写成随机微分方程 <span
+class="math inline">\(d\mathbf{x}=f(\mathbf{x},t)dt+g(t)d\mathbf{w}\)</span>，模型学习近似求解反向过程。</li>
+</ul>
+<h3 id="扩散模型是一种-latent-variable-model">6.14.1 扩散模型是一种
+Latent Variable Model</h3>
+<figure>
+<img
+src="https://raw.githubusercontent.com/Fqmmm/my-image-bed/main/img/20260707232459861.png"
+alt="image-20260707232459314" />
+<figcaption aria-hidden="true">image-20260707232459314</figcaption>
+</figure>
+<p>从 latent variable model 的角度看，扩散模型像一个有很多层 latent
+variables 的生成模型。前向过程从真实数据 <span
+class="math inline">\(x_0\)</span> 出发，逐步加噪得到</p>
+<p><span class="math display">\[
+x_0 \rightarrow x_1 \rightarrow \cdots \rightarrow x_T
+\]</span></p>
+<p>其中 <span class="math inline">\(x_T\)</span>
+接近简单噪声分布，例如标准高斯。这个前向加噪过程是人为设计的，所以我们知道如何从
+<span class="math inline">\(x_0\)</span> 得到不同噪声等级的 <span
+class="math inline">\(x_t\)</span>。</p>
+<p>生成时则要学习反向过程：</p>
+<p><span class="math display">\[
+x_T \rightarrow x_{T-1} \rightarrow \cdots \rightarrow x_0
+\]</span></p>
+<p>也就是从噪声一步步还原到数据。这里的中间状态 <span
+class="math inline">\(x_1,\dots,x_{T-1}\)</span> 可以看作 latent
+variables。因为真实反向分布通常不可直接计算，所以用神经网络近似每一步的反向去噪分布或反向更新方向。这个视角和
+VAE 有相似之处：两者都可以被看作带 latent variables
+的概率模型，并且都可以推导出类似变分下界的训练目标。</p>
+<h3 id="扩散模型学习-score-function">6.14.2 扩散模型学习 Score
+Function</h3>
+<p>从 score matching
+的角度看，扩散模型学习的是数据分布在不同噪声等级下的 score
+function：</p>
+<p><span class="math display">\[
+s(x_t,t)=\nabla_{x_t}\log p_t(x_t)
+\]</span></p>
+<p>这里 <span class="math inline">\(p_t(x_t)\)</span> 表示加噪到时间
+<span class="math inline">\(t\)</span> 后的样本分布。score function
+的方向可以理解为：“如果想让当前点 <span
+class="math inline">\(x_t\)</span>
+变得更像高概率样本，应该往哪里移动。”</p>
+<p>这个视角解释了为什么去噪和生成有关。一个带噪样本里既有数据的结构，也有随机噪声；如果模型能估计当前位置附近概率密度上升最快的方向，就可以把样本从低概率的噪声区域推向高概率的数据流形。反复应用这个方向，就能从纯噪声逐步走向真实数据分布附近。</p>
+<h3 id="扩散模型解决了随机微分方程">6.14.3
+扩散模型解决了随机微分方程</h3>
+<p>从 SDE（Stochastic Differential
+Equation，随机微分方程）的角度看，连续时间加噪过程可以写成：</p>
+<p><span class="math display">\[
+d\mathbf{x}=f(\mathbf{x},t)dt+g(t)d\mathbf{w}
+\]</span></p>
+<p>其中 <span class="math inline">\(f(\mathbf{x},t)\)</span> 是确定性的
+drift 项，<span class="math inline">\(g(t)d\mathbf{w}\)</span>
+是随机噪声项。这个方程描述了样本如何随着时间逐渐从数据分布扩散到噪声分布。</p>
+<p>生成时需要反过来求解从噪声到数据的过程。反向 SDE
+的形式依赖于前面提到的 score function，所以神经网络学习 score
+或等价的去噪目标后，就可以作为反向过程的一部分来采样。这个视角把扩散模型和连续动力系统、数值积分联系起来，也解释了为什么采样时会出现多步更新、步长、solver
+等概念。</p>
+<h1 id="总结与易考点">7 总结与易考点</h1>
+<h2 id="四类生成模型对比">7.1 四类生成模型对比</h2>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">密度形式</th>
+<th style="text-align: left;">训练目标</th>
+<th style="text-align: left;">采样方式</th>
+<th style="text-align: left;">主要优点</th>
+<th style="text-align: left;">主要缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">自回归模型</td>
+<td style="text-align: left;">显式、可计算</td>
+<td style="text-align: left;">最大似然 / NLL</td>
+<td style="text-align: left;">逐 token 采样</td>
+<td style="text-align: left;">概率清楚、效果强</td>
+<td style="text-align: left;">长序列采样慢</td>
+</tr>
+<tr>
+<td style="text-align: left;">VAE</td>
+<td style="text-align: left;">显式但需近似</td>
+<td style="text-align: left;">ELBO</td>
+<td style="text-align: left;">从 prior 采样 latent 后 decode</td>
+<td style="text-align: left;">训练稳定、latent 连续</td>
+<td style="text-align: left;">图像容易模糊</td>
+</tr>
+<tr>
+<td style="text-align: left;">GAN</td>
+<td style="text-align: left;">隐式</td>
+<td style="text-align: left;">生成器-判别器 minimax</td>
+<td style="text-align: left;">一次前向生成</td>
+<td style="text-align: left;">样本锐利、采样快</td>
+<td style="text-align: left;">训练不稳定、无显式 likelihood</td>
+</tr>
+<tr>
+<td style="text-align: left;">扩散模型</td>
+<td style="text-align: left;">隐式或多视角解释</td>
+<td style="text-align: left;">去噪/flow/score matching 目标</td>
+<td style="text-align: left;">从噪声迭代去噪</td>
+<td style="text-align: left;">质量高、训练稳定</td>
+<td style="text-align: left;">多步采样慢</td>
+</tr>
+</tbody>
+</table>
+<h2 id="必须掌握的公式">7.2 必须掌握的公式</h2>
+<p>自回归分解：</p>
+<p><span class="math display">\[
+p(x)=\prod_{t=1}^{T}p(x_t\mid x_{&lt;t})
+\]</span></p>
+<p>最大似然：</p>
+<p><span class="math display">\[
+W^*=\arg\max_W\sum_i\log p(x^{(i)})
+\]</span></p>
+<p>VAE 的 ELBO：</p>
+<p><span class="math display">\[
+\mathbb{E}_{z\sim q_\phi(z\mid x)}[\log p_\theta(x\mid z)]
+-
+D_{\mathrm{KL}}(q_\phi(z\mid x)\,\|\,p(z))
+\]</span></p>
+<p>GAN 目标：</p>
+<p><span class="math display">\[
+\min_G\max_D
+\mathbb{E}_{x\sim p_{\mathrm{data}}}[\log D(x)]
++
+\mathbb{E}_{z\sim p(z)}[\log(1-D(G(z)))]
+\]</span></p>
+<p>Rectified Flow：</p>
+<p><span class="math display">\[
+x_t=(1-t)x+tz,\quad v_{\mathrm{gt}}=z-x,\quad
+\mathcal{L}=\|f_\theta(x_t,t)-v_{\mathrm{gt}}\|_2^2
+\]</span></p>
+<p>Classifier-Free Guidance：</p>
+<p><span class="math display">\[
+v_{\mathrm{cfg}}=(1+w)v_y-wv_{\emptyset}
+\]</span></p>
+<h2 id="易混点">7.3 易混点</h2>
+<ul>
+<li><strong>生成模型不一定都能算 <span
+class="math inline">\(p(x)\)</span>。</strong> 自回归模型可以显式算；GAN
+通常不能；扩散模型可从多个数学视角解释，但实践重点常是采样过程。</li>
+<li><strong>VAE 不是普通 autoencoder 加噪声。</strong>
+它有明确的潜变量概率模型，并通过 ELBO 同时训练 encoder 和 decoder。</li>
+<li><strong>GAN 的 discriminator 不是最终分类器。</strong>
+它是训练信号来源，最终生成时只需要 generator。</li>
+<li><strong>扩散的“去噪”不是简单滤波。</strong>
+模型学习的是从噪声分布到数据分布的反向生成动力学。</li>
+<li><strong>CFG 提升条件符合度，但有代价。</strong>
+它通常增加采样计算量，并可能降低多样性。</li>
+<li><strong>现代图像生成常在 latent 空间完成。</strong>
+这样比直接在像素空间扩散更省计算，也更适合高分辨率输出。</li>
+</ul>
+<h2 id="一句话串联两讲">7.4 一句话串联两讲</h2>
+<p>Lecture 13 建立生成模型的概率基础：从 <span
+class="math inline">\(p(y\mid x)\)</span> 到 <span
+class="math inline">\(p(x)\)</span> / <span
+class="math inline">\(p(x\mid y)\)</span>，再讲自回归模型和 VAE
+如何用显式或近似似然训练。Lecture 14 转向更强的现代生成方法：GAN
+用对抗训练实现隐式采样，扩散模型用逐步去噪或 flow
+学习从噪声到数据的路径，而 LDM、DiT、CFG
+和蒸馏共同构成了今天图像与视频生成系统的主流工程形态。</p>
+<p><span class="math display">\[\bar{\alpha}t =
+\prod_{s=1}^{t}\alpha_s\]</span></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Generative-Models/"># Generative Models</a>
+                    
+                        <a href="/tags/Autoregressive-Models/"># Autoregressive Models</a>
+                    
+                        <a href="/tags/Variational-Autoencoders/"># Variational Autoencoders</a>
+                    
+                        <a href="/tags/Generative-Adversarial-Networks/"># Generative Adversarial Networks</a>
+                    
+                        <a href="/tags/Diffusion-Models/"># Diffusion Models</a>
+                    
+                        <a href="/tags/Image-Generation/"># Image Generation</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/17%20Robot%20Learning/">17 Robot Learning</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/11%20Large-Scale%20Distributed%20Training/">11 Large-Scale Distributed Training</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>

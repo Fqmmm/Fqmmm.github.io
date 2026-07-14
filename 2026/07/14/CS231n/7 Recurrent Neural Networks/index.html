@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Fqmmm">
+
+
+
+
+
+<title>7 Recurrent Neural Networks | Fqmmm&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+<body>
+    <script>
+        // this function is used to check current theme before page loaded.
+        (() => {
+            const pagebody = document.getElementsByTagName('body')[0]
+
+            function setTheme(status) {
+
+                if (status === 'dark') {
+                    window.sessionStorage.theme = 'dark'
+                    pagebody.classList.add('dark-theme');
+
+                } else if (status === 'light') {
+                    window.sessionStorage.theme = 'light'
+                    pagebody.classList.remove('dark-theme');
+                }
+            };
+
+            setTheme(window.sessionStorage.theme)
+        })();
+    </script>
+
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Fqmmm&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Fqmmm&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">
+                    <svg class="menu-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><path fill="currentColor" d="M4.5 17.27q-.213 0-.356-.145T4 16.768t.144-.356t.356-.143h15q.213 0 .356.144q.144.144.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.144T4 11.999t.144-.356t.356-.143h15q.213 0 .356.144t.144.357t-.144.356t-.356.143zm0-4.77q-.213 0-.356-.143Q4 7.443 4 7.23t.144-.356t.356-.143h15q.213 0 .356.144T20 7.23t-.144.356t-.356.144z"/></svg>
+                    <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><!-- Icon from Material Symbols Light by Google - https://github.com/google/material-design-icons/blob/master/LICENSE --><path fill="currentColor" d="m12 12.708l-5.246 5.246q-.14.14-.344.15t-.364-.15t-.16-.354t.16-.354L11.292 12L6.046 6.754q-.14-.14-.15-.344t.15-.364t.354-.16t.354.16L12 11.292l5.246-5.246q.14-.14.345-.15q.203-.01.363.15t.16.354t-.16.354L12.708 12l5.246 5.246q.14.14.15.345q.01.203-.15.363t-.354.16t-.354-.16z"/></svg>
+                </div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                <a class="menu-item" href="/archives">Posts</a>
+                
+                <a class="menu-item" href="/categories">Categories</a>
+                
+                <a class="menu-item" href="/tags">Tags</a>
+                
+                <a class="menu-item" href="/about">About</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if (toggleMenu.classList.contains("active")) {
+            toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        } else {
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+            <div class="main">
+                <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    var tocbot_timer;
+    var DEPTH_MAX = 6; // 为 6 时展开所有
+    var tocbot_default_config = {
+        tocSelector: '.tocbot-list',
+        contentSelector: '.post-content',
+        headingSelector: 'h1, h2, h3, h4, h5',
+        orderedList: false,
+        scrollSmooth: true,
+        onClick: extend_click,
+    };
+
+    function extend_click() {
+        clearTimeout(tocbot_timer);
+        tocbot_timer = setTimeout(function() {
+            tocbot.refresh(obj_merge(tocbot_default_config, {
+                hasInnerContainers: true
+            }));
+        }, 420); // 这个值是由 tocbot 源码里定义的 scrollSmoothDuration 得来的
+    }
+
+    document.ready(function() {
+        tocbot.init(obj_merge(tocbot_default_config, {
+            collapseDepth: 1
+        }));
+    });
+
+    function expand_toc() {
+        var b = document.querySelector('.tocbot-toc-expand');
+        var expanded = b.getAttribute('data-expanded');
+        expanded ? b.removeAttribute('data-expanded') : b.setAttribute('data-expanded', true);
+        tocbot.refresh(obj_merge(tocbot_default_config, {
+            collapseDepth: expanded ? 1 : DEPTH_MAX
+        }));
+        b.innerText = expanded ? 'Expand all' : 'Collapse all';
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function obj_merge(target, source) {
+        for (var item in source) {
+            if (source.hasOwnProperty(item)) {
+                target[item] = source[item];
+            }
+        }
+        return target;
+    }
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">7 Recurrent Neural Networks</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Fqmmm</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">July 14, 2026&nbsp;&nbsp;13:47:57</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/CS231n/">CS231n</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <h1 id="上节内容补充dropout-与归一化">1 上节内容补充：Dropout
+与归一化</h1>
+<h2 id="dropout-的训练与测试行为">1.1 Dropout 的训练与测试行为</h2>
+<p><strong>Dropout</strong>
+是一种常用正则化方法。在训练阶段，每次前向传播都会以某个概率随机把一部分神经元输出置为
+<span
+class="math inline">\(0\)</span>。这个“丢弃概率”是超参数，常见选择是
+<span class="math inline">\(p=0.5\)</span>。直观上，Dropout
+会阻止网络过度依赖某些特定神经元，使不同特征之间形成更稳健的组合，从而降低过拟合风险。</p>
+<p>训练时某个激活值 <span class="math inline">\(a\)</span>
+可能被保留，也可能被置零。如果保留概率为 <span
+class="math inline">\(q=1-p\)</span>，那么训练阶段的期望激活大约是 <span
+class="math inline">\(q
+a\)</span>。但测试阶段所有神经元都始终启用，因此需要让测试阶段的输出尺度与训练阶段的期望输出一致。常见做法有两种：</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">做法</th>
+<th style="text-align: left;">训练阶段</th>
+<th style="text-align: left;">测试阶段</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">标准 Dropout</td>
+<td style="text-align: left;">随机置零</td>
+<td style="text-align: left;">将激活乘以保留概率 <span
+class="math inline">\(q\)</span></td>
+<td style="text-align: left;">测试时补偿训练时的期望缩小</td>
+</tr>
+<tr>
+<td style="text-align: left;">Inverted Dropout</td>
+<td style="text-align: left;">随机置零后除以 <span
+class="math inline">\(q\)</span></td>
+<td style="text-align: left;">不做额外缩放</td>
+<td style="text-align: left;">深度学习框架中更常见，测试更方便</td>
+</tr>
+</tbody>
+</table>
+<p><strong>考试重点</strong>：Dropout
+的核心不是简单“减少神经元数量”，而是在训练时引入随机子网络；测试时要处理尺度匹配问题，使测试输出接近训练时的期望输出。</p>
+<h2 id="归一化不能完全弥补错误初始化">1.2
+归一化不能完全弥补错误初始化</h2>
+<p>归一化方法，例如 LayerNorm 或
+BatchNorm，通常能改善优化过程，让激活尺度更稳定，也可能减轻错误初始化带来的训练困难。在二维输入、两层
+ReLU 网络的玩具例子中，加入归一化可以显著降低误差。</p>
+<p>但归一化并不能彻底解决初始化不合适的问题。权重初始化仍然会影响优化路径、梯度传播和可学习表示的形状。特别是在非线性网络中，如果初始化让一部分神经元长期处于无效区域，或让信号在层间过度放大/衰减，归一化只能缓解部分现象，不能保证模型一定达到同样好的解。</p>
+<p>一个有用的直觉是：归一化有时在几何上不会改变输入所在的关键区域。例如二维
+ReLU 问题中，LayerNorm
+不改变输入点所在象限时，它可能保留了分类所需的结构。但这也说明归一化是否合适依赖任务和表示形式，不能机械套用。</p>
+<h1 id="序列建模问题与-rnn-的基本思想">2 序列建模问题与 RNN
+的基本思想</h1>
+<h2 id="为什么需要序列模型">2.1 为什么需要序列模型</h2>
+<p>前面讨论的普通神经网络、卷积网络等模型通常默认输入有固定形状，例如一张固定大小的图像，输出一个类别分数。许多真实任务的输入或输出却天然是<strong>序列（sequence）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">任务</th>
+<th style="text-align: left;">输入</th>
+<th style="text-align: left;">输出</th>
+<th style="text-align: left;">类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">图像字幕（Image Captioning）</td>
+<td style="text-align: left;">单张图像</td>
+<td style="text-align: left;">单词序列</td>
+<td style="text-align: left;">one-to-many</td>
+</tr>
+<tr>
+<td style="text-align: left;">动作预测</td>
+<td style="text-align: left;">视频帧序列</td>
+<td style="text-align: left;">动作类别</td>
+<td style="text-align: left;">many-to-one</td>
+</tr>
+<tr>
+<td style="text-align: left;">视频字幕</td>
+<td style="text-align: left;">视频帧序列</td>
+<td style="text-align: left;">文本序列</td>
+<td style="text-align: left;">many-to-many</td>
+</tr>
+<tr>
+<td style="text-align: left;">帧级视频分类</td>
+<td style="text-align: left;">视频帧序列</td>
+<td style="text-align: left;">每帧类别</td>
+<td style="text-align: left;">many-to-many</td>
+</tr>
+<tr>
+<td style="text-align: left;">语言模型</td>
+<td style="text-align: left;">字符/词序列前缀</td>
+<td style="text-align: left;">下一个字符/词</td>
+<td style="text-align: left;">many-to-many 或自回归</td>
+</tr>
+</tbody>
+</table>
+<p>序列建模的关键困难是：序列长度可变，而且当前输出常常依赖过去的信息。例如在视频中判断动作，需要整合多帧的运动线索；在语言中预测下一个词，需要记住前面已经出现的语义和语法结构。</p>
+<h2 id="rnn-的核心思想内部状态">2.2 RNN 的核心思想：内部状态</h2>
+<p><strong>循环神经网络（Recurrent Neural Network, RNN）</strong>
+的核心是维护一个随时间更新的<strong>隐藏状态（hidden
+state）</strong>。当模型逐步读取序列 <span
+class="math inline">\(x_1,x_2,\dots,x_T\)</span>
+时，隐藏状态像“记忆”一样把过去的信息压缩到向量中。</p>
+<p>最一般地，可以写成：</p>
+<p><span class="math display">\[
+h_t = f_W(h_{t-1}, x_t)
+\]</span></p>
+<p>其中：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">符号</th>
+<th style="text-align: left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(x_t\)</span></td>
+<td style="text-align: left;">第 <span class="math inline">\(t\)</span>
+个时间步的输入向量</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(h_{t-1}\)</span></td>
+<td style="text-align: left;">上一个时间步的隐藏状态</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(h_t\)</span></td>
+<td style="text-align: left;">当前时间步的新隐藏状态</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(f_W\)</span></td>
+<td style="text-align: left;">带参数 <span
+class="math inline">\(W\)</span> 的状态更新函数</td>
+</tr>
+</tbody>
+</table>
+<p>如果每个时间步都需要输出，还可以加一个输出函数：</p>
+<p><span class="math display">\[
+y_t = g_{W_{hy}}(h_t)
+\]</span></p>
+<p><strong>最重要的结构特点</strong>是：所有时间步共享同一组参数。无论序列长度是
+5 还是 500，RNN
+都反复应用同一个状态更新规则。这让模型能够处理任意长度输入，并对不同时间位置使用相同的模式识别机制。</p>
+<h1 id="vanilla-rnn-的数学形式与手工例子">3 Vanilla RNN
+的数学形式与手工例子</h1>
+<h2 id="vanilla-elman-rnn">3.1 Vanilla / Elman RNN</h2>
+<p>最经典的 RNN 常称为 <strong>Vanilla RNN</strong> 或 <strong>Elman
+RNN</strong>。它的隐藏状态通常是一个向量，并使用类似下面的更新公式：</p>
+<p><span class="math display">\[
+h_t = \tanh(W_{hh}h_{t-1} + W_{xh}x_t + b_h)
+\]</span></p>
+<p>输出可以写为：</p>
+<p><span class="math display">\[
+y_t = W_{hy}h_t + b_y
+\]</span></p>
+<p>若输出表示类别分数，再接 softmax 得到概率：</p>
+<p><span class="math display">\[
+p_t = \mathrm{softmax}(y_t)
+\]</span></p>
+<p>这里 <span class="math inline">\(W_{hh}\)</span>
+控制历史状态如何传递，<span class="math inline">\(W_{xh}\)</span>
+控制当前输入如何写入状态，<span class="math inline">\(W_{hy}\)</span>
+控制隐藏状态如何映射到输出。RNN 的表达能力来自“当前输入 +
+历史状态”的组合。</p>
+<h2 id="检测连续两个-1-的手工-rnn">3.2 检测连续两个 1 的手工 RNN</h2>
+<p>一个简单例子是输入二进制序列，输出当前位置是否出现了连续两个 <span
+class="math inline">\(1\)</span>。例如：</p>
+<p><span class="math display">\[
+X = 010111011
+\]</span></p>
+<p>对应输出可以是：</p>
+<p><span class="math display">\[
+Y = 000011001
+\]</span></p>
+<p>这个任务是 many-to-many
+序列建模：每个输入位置都对应一个输出。要判断当前位置是否应该输出 <span
+class="math inline">\(1\)</span>，模型至少要知道两件事：</p>
+<ol type="1">
+<li>当前输入 <span class="math inline">\(x_t\)</span> 是否为 <span
+class="math inline">\(1\)</span>。</li>
+<li>上一个输入 <span class="math inline">\(x_{t-1}\)</span> 是否为 <span
+class="math inline">\(1\)</span>。</li>
+</ol>
+<p>因此隐藏状态可以设计成保存“前一个输入”和“当前输入”等信息。使用 ReLU
+作为简化激活函数时，可以手工构造权重，使状态在每一步复制、更新并计算类似</p>
+<p><span class="math display">\[
+\max(x_t + x_{t-1} - 1, 0)
+\]</span></p>
+<p>的逻辑。这个式子只有在 <span class="math inline">\(x_t=1\)</span> 且
+<span class="math inline">\(x_{t-1}=1\)</span> 时才为 <span
+class="math inline">\(1\)</span>，因此能检测连续的 <span
+class="math inline">\(1\)</span>。</p>
+<p>这个例子的重点不是手工权重本身，而是说明 RNN
+的隐藏状态可以被看成一个可学习的、随时间移动的信息寄存器。实际训练中，这些权重不会手工设定，而是通过反向传播从数据中学习。</p>
+<h1 id="rnn-的计算图与常见输入输出结构">4 RNN
+的计算图与常见输入输出结构</h1>
+<h2 id="展开后的计算图">4.1 展开后的计算图</h2>
+<p>虽然 RNN
+在定义上是“循环”的，但训练时通常会把它沿时间展开成一个很深的计算图：</p>
+<p><span class="math display">\[
+h_1 = f_W(h_0,x_1),\quad
+h_2 = f_W(h_1,x_2),\quad
+\dots,\quad
+h_T = f_W(h_{T-1},x_T)
+\]</span></p>
+<p>每个时间步看起来像一层网络，但它们共享同一组权重 <span
+class="math inline">\(W\)</span>。这带来两个后果：</p>
+<ol type="1">
+<li><strong>模型大小不随序列长度增长</strong>：长序列只是重复使用同一个模块。</li>
+<li><strong>梯度会跨很多时间步传播</strong>：训练长依赖时容易出现梯度消失或梯度爆炸。</li>
+</ol>
+<h2 id="many-to-many">4.2 Many-to-many</h2>
+<p>Many-to-many
+指每个输入时间步都有一个输出，例如帧级视频分类、词性标注、字符级语言建模等。总损失通常是各时间步损失之和：</p>
+<p><span class="math display">\[
+L = \sum_{t=1}^{T} L_t
+\]</span></p>
+<p>每个 <span class="math inline">\(L_t\)</span> 会通过对应的输出 <span
+class="math inline">\(y_t\)</span>
+反向传播，同时梯度还会沿隐藏状态链条传回更早时间步。</p>
+<h2 id="many-to-one">4.3 Many-to-one</h2>
+<p>Many-to-one
+指读完整个序列后只输出一个结果，例如视频动作分类或情感分类。模型通常使用最后一个隐藏状态
+<span class="math inline">\(h_T\)</span> 作为整个序列的表示：</p>
+<p><span class="math display">\[
+y = g(h_T)
+\]</span></p>
+<p>这种结构要求 <span class="math inline">\(h_T\)</span>
+能保留前面所有重要信息。如果序列很长，Vanilla RNN
+往往难以把早期信息稳定传到最后。</p>
+<h2 id="one-to-many-与自回归生成">4.4 One-to-many 与自回归生成</h2>
+<p>One-to-many
+指输入一次条件信息，然后生成一个序列。图像字幕就是典型例子：先用 CNN
+得到图像特征，再让 RNN 逐词生成描述。</p>
+<p>生成时有两种常见输入方式：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">时间步输入</th>
+<th style="text-align: left;">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">固定条件向量</td>
+<td style="text-align: left;">每一步都接收同一个图像或上下文特征</td>
+</tr>
+<tr>
+<td style="text-align: left;">上一步生成结果</td>
+<td
+style="text-align: left;">把上一步预测的词作为下一步输入，形成自回归生成</td>
+</tr>
+</tbody>
+</table>
+<p>在语言生成中，模型通常先输入
+<code>&lt;START&gt;</code>，预测第一个词；再把采样出的词输入下一步，直到生成
+<code>&lt;END&gt;</code>。</p>
+<h1 id="通过时间反向传播bptt与截断-bptt">5
+通过时间反向传播（BPTT）与截断 BPTT</h1>
+<h2 id="backpropagation-through-time">5.1 Backpropagation Through
+Time</h2>
+<p><strong>通过时间反向传播（Backpropagation Through Time,
+BPTT）</strong> 是训练 RNN
+的标准方法。做法是先沿整个序列前向计算隐藏状态和损失，再沿展开后的时间计算图反向传播梯度。</p>
+<p>对于长度为 <span class="math inline">\(T\)</span>
+的序列，损失可能依赖所有时间步：</p>
+<p><span class="math display">\[
+L = \sum_{t=1}^{T} L_t
+\]</span></p>
+<p>由于所有时间步共享参数 <span class="math inline">\(W\)</span>，最终对
+<span class="math inline">\(W\)</span> 的梯度是各时间步贡献的累加：</p>
+<p><span class="math display">\[
+\frac{\partial L}{\partial W}
+= \sum_{t=1}^{T} \frac{\partial L_t}{\partial W}
+\]</span></p>
+<p>BPTT
+的优点是理论上能把后面时间步的监督信号传回前面时间步。缺点是长序列会消耗大量内存和计算，而且梯度跨很多步传播时很不稳定。</p>
+<h2 id="truncated-bptt">5.2 Truncated BPTT</h2>
+<p><strong>截断 BPTT（Truncated BPTT）</strong>
+把长序列分成较短片段。模型前向时可以把隐藏状态持续传下去，但反向传播只在当前片段内进行，不追溯到无限远的过去。</p>
+<p>例如序列长度为 <span class="math inline">\(1000\)</span>，可以每
+<span class="math inline">\(50\)</span>
+个时间步做一次反向传播。这样模型仍然能在前向过程中携带长期状态，但梯度只回传
+<span class="math inline">\(50\)</span> 步，计算和显存压力更可控。</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方法</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">完整 BPTT</td>
+<td style="text-align: left;">梯度覆盖整个序列，理论上最完整</td>
+<td style="text-align: left;">长序列代价高，梯度不稳定</td>
+</tr>
+<tr>
+<td style="text-align: left;">截断 BPTT</td>
+<td style="text-align: left;">更省内存和计算，实践中常用</td>
+<td style="text-align: left;">难以直接学习超过截断窗口的依赖</td>
+</tr>
+</tbody>
+</table>
+<p>对于 many-to-one
+的单输出任务，即使只有最后一步有显式损失，反向传播仍然会沿隐藏状态链条把梯度传到前面的时间步。截断后，早期时间步只能通过较短范围内的梯度更新获得学习信号。</p>
+<h1 id="字符级语言模型character-level-language-model">6
+字符级语言模型（Character-level Language Model）</h1>
+<h2 id="训练目标">6.1 训练目标</h2>
+<p>字符级语言模型把文本看成字符序列。假设词表是</p>
+<p><span class="math display">\[
+\mathcal{V}=\{h,e,l,o\}
+\]</span></p>
+<p>训练序列是
+<code>hello</code>。模型在每个时间步读入当前字符，并预测下一个字符：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">输入</th>
+<th style="text-align: left;">目标输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>h</code></td>
+<td style="text-align: left;"><code>e</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>e</code></td>
+<td style="text-align: left;"><code>l</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>l</code></td>
+<td style="text-align: left;"><code>l</code></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>l</code></td>
+<td style="text-align: left;"><code>o</code></td>
+</tr>
+</tbody>
+</table>
+<p>每个字符通常表示成 one-hot 向量。RNN 输出经过 softmax
+后得到对下一个字符的概率分布，再用交叉熵损失训练。</p>
+<h2 id="采样过程">6.2 采样过程</h2>
+<p>测试时，字符级语言模型可以逐字符生成文本：</p>
+<ol type="1">
+<li>给定起始字符或起始 token。</li>
+<li>RNN 输出下一个字符的概率分布。</li>
+<li>从该分布中采样或选择概率最高的字符。</li>
+<li>把生成的字符作为下一步输入。</li>
+<li>重复直到达到长度限制或生成结束符。</li>
+</ol>
+<p>这种生成方式是<strong>自回归（autoregressive）</strong>
+的：每一步的输入依赖上一步模型自己生成的结果。因此早期错误可能会影响后续生成，采样温度、贪心解码、beam
+search 等策略都会改变生成质量。</p>
+<h2 id="embedding-层的意义">6.3 Embedding 层的意义</h2>
+<p>如果输入是 one-hot 向量 <span
+class="math inline">\(x_t\)</span>，乘以矩阵 <span
+class="math inline">\(W\)</span> 时，本质上只是取出 <span
+class="math inline">\(W\)</span> 的某一列：</p>
+<p><span class="math display">\[
+W x_t = W_{[:,i]}
+\]</span></p>
+<p>其中 <span class="math inline">\(i\)</span>
+是当前字符的索引。因此，语言模型常在输入和 RNN
+隐藏层之间加入<strong>嵌入层（embedding layer）</strong>。Embedding
+层把离散字符或词映射成连续向量，使模型能学习字符/词之间的相似性和统计结构。</p>
+<p><strong>考试重点</strong>：one-hot 乘矩阵等价于查表；embedding layer
+是一个可学习查表操作，而不是复杂的非线性变换。</p>
+<h2 id="min-char-rnn-与生成代码">6.4 min-char-rnn 与生成代码</h2>
+<p>Karpathy 的 <code>min-char-rnn.py</code> 用很短的 Python
+代码实现字符级 RNN，展示了 RNN
+语言模型的基本训练和采样过程。训练初期生成文本通常混乱；随着训练进行，模型会先学到局部字符模式，再逐渐学到更长的格式结构。例如在代码数据上训练时，模型可能逐渐学会缩进、括号、关键字和注释风格。</p>
+<p>这说明 RNN
+的隐藏状态确实能捕捉某些跨时间的模式，但捕捉非常长距离、严格逻辑一致的依赖仍然困难。</p>
+<h1 id="rnn-的可解释性优缺点与视觉语言应用">7 RNN
+的可解释性、优缺点与视觉语言应用</h1>
+<h2 id="可解释隐藏单元">7.1 可解释隐藏单元</h2>
+<p>对训练好的 RNN
+进行分析时，有时可以找到具有明显语义的隐藏单元。例如在代码或文本上训练的字符级
+RNN 中，某些单元可能近似追踪：</p>
+<ul>
+<li>当前是否位于引号内部。</li>
+<li>当前行长度或换行结构。</li>
+<li>是否处于 <code>if</code> 语句相关区域。</li>
+<li>代码嵌套深度。</li>
+<li>注释或字符串范围。</li>
+</ul>
+<p>这些现象说明隐藏状态不是完全不可理解的黑箱。某些维度可能自动学到类似有限状态机的功能，用连续值表示离散结构。但这种可解释性并不保证每个单元都有清晰含义，也不保证模型真正理解程序语义。</p>
+<h2 id="rnn-的优点与局限">7.2 RNN 的优点与局限</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">方面</th>
+<th style="text-align: left;">优点</th>
+<th style="text-align: left;">局限</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">序列长度</td>
+<td
+style="text-align: left;">可处理任意长度输入，没有固定上下文窗口</td>
+<td style="text-align: left;">实际训练中长距离信息难以保留</td>
+</tr>
+<tr>
+<td style="text-align: left;">参数规模</td>
+<td
+style="text-align: left;">同一组参数跨时间共享，长度增加不增加参数量</td>
+<td style="text-align: left;">重复计算导致并行性差</td>
+</tr>
+<tr>
+<td style="text-align: left;">信息使用</td>
+<td style="text-align: left;">理论上第 <span
+class="math inline">\(t\)</span> 步能利用很久以前的信息</td>
+<td style="text-align: left;">梯度消失使长期依赖难学</td>
+</tr>
+<tr>
+<td style="text-align: left;">结构归纳偏置</td>
+<td style="text-align: left;">对时间顺序有天然建模能力</td>
+<td style="text-align: left;">逐步递推慢，难充分利用现代并行硬件</td>
+</tr>
+</tbody>
+</table>
+<p>RNN
+的一个根本张力是：它用固定大小的隐藏状态压缩任意长历史。对短序列或强局部依赖任务，这种机制有效；对复杂长序列，固定状态容易成为信息瓶颈。</p>
+<h2 id="图像字幕">7.3 图像字幕</h2>
+<p>图像字幕任务把 CNN 和 RNN 结合起来：</p>
+<ol type="1">
+<li>CNN 读取图像，提取视觉特征向量 <span
+class="math inline">\(v\)</span>。</li>
+<li>RNN 以 <code>&lt;START&gt;</code>
+作为初始输入，并接收图像特征作为条件。</li>
+<li>每一步输出一个词的概率分布。</li>
+<li>采样或选择一个词，再输入下一步。</li>
+<li>生成 <code>&lt;END&gt;</code> 后停止。</li>
+</ol>
+<p>一种简单更新形式是：</p>
+<p><span class="math display">\[
+h_t = \tanh(W_{xh}x_t + W_{hh}h_{t-1} + W_{ih}v + b_h)
+\]</span></p>
+<p>其中 <span class="math inline">\(W_{ih}v\)</span>
+把图像信息注入语言生成过程。这样模型可以生成类似“a cat sitting on a
+suitcase on the floor”的句子。</p>
+<p>失败案例也很重要。模型可能把物体识别错，或生成符合语言统计但不符合图像内容的描述。例如把手持物体、动物、运动场景等混淆。这反映出早期
+CNN-RNN 图像字幕模型的两类困难：视觉识别错误和语言先验过强。</p>
+<h2 id="其他视觉语言任务">7.4 其他视觉语言任务</h2>
+<p>RNN 曾广泛用于多种视觉语言任务：</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">任务</th>
+<th style="text-align: left;">基本形式</th>
+<th style="text-align: left;">关键挑战</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">VQA（Visual Question Answering）</td>
+<td style="text-align: left;">图像 + 问题文本 <span
+class="math inline">\(\rightarrow\)</span> 答案</td>
+<td style="text-align: left;">同时理解视觉内容和问题语义</td>
+</tr>
+<tr>
+<td style="text-align: left;">Visual Dialog</td>
+<td style="text-align: left;">围绕图像进行多轮问答</td>
+<td style="text-align: left;">需要记住对话历史</td>
+</tr>
+<tr>
+<td style="text-align: left;">Vision-Language Navigation</td>
+<td style="text-align: left;">根据语言指令在环境中移动</td>
+<td style="text-align: left;">需要把语言、视觉观察和动作序列结合</td>
+</tr>
+</tbody>
+</table>
+<p>这些任务都体现了 RNN 的通用性：只要数据可以表示成时间序列，RNN
+就能作为编码器、解码器或策略生成器使用。后来 Transformer
+在许多场景中取代了
+RNN，但这些任务的基本输入输出结构仍然是理解多模态模型的重要基础。</p>
+<h1 id="多层-rnn梯度流问题与-lstm">8 多层 RNN、梯度流问题与 LSTM</h1>
+<h2 id="多层-rnn">8.1 多层 RNN</h2>
+<p><strong>多层 RNN（Multilayer RNN）</strong>
+在时间维度之外增加深度维度。第 <span class="math inline">\(l\)</span>
+层在时间 <span class="math inline">\(t\)</span>
+的隐藏状态可以依赖同层上一时间步和下一层/上一层的当前时间步表示。</p>
+<p>直观上，底层可以处理局部、低级的序列模式，高层可以整合更抽象的信息。多层结构提升表达能力，但也加剧训练难度，因为梯度既要跨时间传播，也要跨层传播。</p>
+<h2 id="vanilla-rnn-的梯度消失与爆炸">8.2 Vanilla RNN
+的梯度消失与爆炸</h2>
+<p>Vanilla RNN 的隐藏状态反向传播从 <span
+class="math inline">\(h_t\)</span> 到 <span
+class="math inline">\(h_{t-1}\)</span> 时，会反复乘以与 <span
+class="math inline">\(W_{hh}\)</span>
+和激活函数导数相关的矩阵。跨多个时间步时，梯度大致包含连乘项：</p>
+<p><span class="math display">\[
+\frac{\partial h_T}{\partial h_t}
+= \prod_{k=t+1}^{T} \frac{\partial h_k}{\partial h_{k-1}}
+\]</span></p>
+<p>如果暂时忽略非线性，反复乘以同一个矩阵 <span
+class="math inline">\(W_{hh}\)</span> 的效果与奇异值有关：</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">条件</th>
+<th style="text-align: left;">后果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">最大奇异值 <span
+class="math inline">\(&gt;1\)</span></td>
+<td
+style="text-align: left;">梯度可能指数级放大，出现<strong>梯度爆炸（exploding
+gradients）</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;">最大奇异值 <span
+class="math inline">\(&lt;1\)</span></td>
+<td
+style="text-align: left;">梯度可能指数级衰减，出现<strong>梯度消失（vanishing
+gradients）</strong></td>
+</tr>
+</tbody>
+</table>
+<p><code>tanh</code> 或 sigmoid 的导数通常小于等于 <span
+class="math inline">\(1\)</span>，会进一步加剧梯度消失。因此 Vanilla RNN
+很难学习长距离依赖。</p>
+<h2 id="gradient-clipping">8.3 Gradient clipping</h2>
+<p>梯度爆炸相对容易处理，常用方法是<strong>梯度裁剪（gradient
+clipping）</strong>。若梯度范数超过阈值，就按比例缩小：</p>
+<p><span class="math display">\[
+\tilde{g} = g \cdot \frac{\tau}{\lVert g \rVert}
+\quad \text{if } \lVert g \rVert &gt; \tau
+\]</span></p>
+<p>其中 <span class="math inline">\(\tau\)</span>
+是裁剪阈值。梯度裁剪不能解决梯度消失，但能防止参数更新突然过大导致训练崩溃。</p>
+<h2 id="lstm-的动机">8.4 LSTM 的动机</h2>
+<p><strong>长短期记忆网络（Long Short-Term Memory, LSTM）</strong>
+被设计来缓解 Vanilla RNN
+难以保留长期信息的问题。它在普通隐藏状态之外引入<strong>细胞状态（cell
+state）</strong>，并通过门控机制控制信息写入、遗忘和输出。</p>
+<p>LSTM 的关键直觉是：让某些信息沿着 cell state
+以更接近“加法路径”的方式传递，减少每一步都必须经过完整矩阵乘法和非线性压缩的压力。</p>
+<h2 id="lstm-的四个门">8.5 LSTM 的四个门</h2>
+<p>LSTM 通常把上一隐藏状态 <span class="math inline">\(h_{t-1}\)</span>
+和当前输入 <span class="math inline">\(x_t\)</span>
+拼接后，一次线性变换得到四组向量：</p>
+<p><span class="math display">\[
+\begin{aligned}
+i_t &amp;= \sigma(W_i [h_{t-1}, x_t] + b_i) \\
+f_t &amp;= \sigma(W_f [h_{t-1}, x_t] + b_f) \\
+o_t &amp;= \sigma(W_o [h_{t-1}, x_t] + b_o) \\
+g_t &amp;= \tanh(W_g [h_{t-1}, x_t] + b_g)
+\end{aligned}
+\]</span></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">门</th>
+<th style="text-align: left;">名称</th>
+<th style="text-align: left;">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(i_t\)</span></td>
+<td style="text-align: left;">输入门（input gate）</td>
+<td style="text-align: left;">决定新候选信息写入多少</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(f_t\)</span></td>
+<td style="text-align: left;">遗忘门（forget gate）</td>
+<td style="text-align: left;">决定旧 cell state 保留多少</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(o_t\)</span></td>
+<td style="text-align: left;">输出门（output gate）</td>
+<td style="text-align: left;">决定 cell state 暴露给隐藏状态多少</td>
+</tr>
+<tr>
+<td style="text-align: left;"><span
+class="math inline">\(g_t\)</span></td>
+<td style="text-align: left;">候选门 / gate gate</td>
+<td style="text-align: left;">产生准备写入 cell 的候选内容</td>
+</tr>
+</tbody>
+</table>
+<p>更新公式为：</p>
+<p><span class="math display">\[
+c_t = f_t \odot c_{t-1} + i_t \odot g_t
+\]</span></p>
+<p><span class="math display">\[
+h_t = o_t \odot \tanh(c_t)
+\]</span></p>
+<p>其中 <span class="math inline">\(\odot\)</span> 表示逐元素乘法。若
+<span class="math inline">\(f_t \approx 1\)</span> 且 <span
+class="math inline">\(i_t \approx 0\)</span>，则</p>
+<p><span class="math display">\[
+c_t \approx c_{t-1}
+\]</span></p>
+<p>信息可以在 cell state 中长期保存。</p>
+<h2 id="lstm-的梯度流">8.6 LSTM 的梯度流</h2>
+<p>LSTM 从 <span class="math inline">\(c_t\)</span> 反向传播到 <span
+class="math inline">\(c_{t-1}\)</span> 时，主要经过逐元素乘法 <span
+class="math inline">\(f_t\)</span>，而不是每一步都乘以完整的 recurrent
+weight matrix。这使梯度更容易沿 cell state 传播。</p>
+<p>这并不意味着 LSTM 完全解决梯度消失或爆炸。若遗忘门长期小于 <span
+class="math inline">\(1\)</span>，梯度仍会衰减；若其他路径不稳定，也可能有训练问题。但相比
+Vanilla RNN，LSTM 提供了更容易学习长期依赖的架构路径。</p>
+<p><strong>类比 ResNet</strong>：LSTM 的 cell state
+像一条较直接的信息通道，ResNet
+的残差连接也为梯度提供了更顺畅的传播路径。两者都体现了深层模型训练中的一个重要设计原则：为信息和梯度保留较少阻碍的通路。</p>
+<h1 id="现代-rnn-状态空间模型与总结">9 现代 RNN /
+状态空间模型与总结</h1>
+<h2 id="现代-rnn-与-state-space-models">9.1 现代 RNN 与 State Space
+Models</h2>
+<p>现代一些序列模型有时被称为<strong>状态空间模型（State Space Models,
+SSMs）</strong>，例如 RWKV、Mamba
+等。它们延续了“维护隐藏状态并随序列更新”的思想，但在参数化、并行训练、选择性信息传递等方面做了改进。</p>
+<p>这些模型常被关注的原因包括：</p>
+<ul>
+<li>上下文长度理论上不受固定窗口限制。</li>
+<li>推理时可以按序列长度线性扩展。</li>
+<li>隐藏状态使增量生成更高效。</li>
+<li>通过新的门控或状态更新机制改善长距离建模。</li>
+</ul>
+<p>Transformer 依靠自注意力直接比较所有 token，表达强但标准复杂度约为
+<span
+class="math inline">\(O(T^2)\)</span>。状态空间类模型试图在长序列上取得更好的计算扩展性，同时保留足够的表达能力。</p>
+<h2 id="本讲总结">9.2 本讲总结</h2>
+<p>RNN
+提供了一种处理序列数据的基本范式：用共享参数反复更新隐藏状态，从而把任意长度历史压缩到状态向量中。它能自然表达
+many-to-many、many-to-one、one-to-many
+等结构，并曾在语言模型、图像字幕、VQA、视觉导航等任务中广泛使用。</p>
+<p>Vanilla RNN
+的问题也很突出：递归计算难并行，长距离依赖难学，梯度容易消失或爆炸。BPTT
+是训练 RNN 的核心方法，截断 BPTT 是处理长序列的实践折中。LSTM 通过 cell
+state
+和门控机制，为长期信息保留和梯度传播提供更好的路径。现代状态空间模型则可以看作对“带状态序列模型”这一思想的延续和重新设计。</p>
+<h1 id="复习重点与易混点">10 复习重点与易混点</h1>
+<h2 id="必须掌握的概念">10.1 必须掌握的概念</h2>
+<ol type="1">
+<li><strong>RNN 的隐藏状态</strong>：<span
+class="math inline">\(h_t=f_W(h_{t-1},x_t)\)</span>，当前状态由过去状态和当前输入共同决定。</li>
+<li><strong>参数共享</strong>：同一组参数在所有时间步重复使用，因此模型可处理不同长度序列。</li>
+<li><strong>展开计算图</strong>：RNN
+训练时沿时间展开，变成共享权重的深层网络。</li>
+<li><strong>BPTT</strong>：先完整前向，再沿时间反向传播；共享参数的梯度来自所有时间步累加。</li>
+<li><strong>截断
+BPTT</strong>：隐藏状态继续前传，但反向传播只回传有限步。</li>
+<li><strong>梯度消失/爆炸</strong>：长时间链上的矩阵连乘导致梯度指数衰减或放大。</li>
+<li><strong>LSTM 门控</strong>：输入门、遗忘门、输出门、候选门共同控制
+cell state 更新。</li>
+<li><strong>Embedding</strong>：one-hot 乘矩阵等价于查表，embedding
+是可学习的离散符号向量表示。</li>
+</ol>
+<h2 id="rnn-结构类型对比">10.2 RNN 结构类型对比</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">类型</th>
+<th style="text-align: left;">输入</th>
+<th style="text-align: left;">输出</th>
+<th style="text-align: left;">例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">one-to-one</td>
+<td style="text-align: left;">单个输入</td>
+<td style="text-align: left;">单个输出</td>
+<td style="text-align: left;">普通图像分类</td>
+</tr>
+<tr>
+<td style="text-align: left;">one-to-many</td>
+<td style="text-align: left;">单个输入</td>
+<td style="text-align: left;">序列输出</td>
+<td style="text-align: left;">图像字幕</td>
+</tr>
+<tr>
+<td style="text-align: left;">many-to-one</td>
+<td style="text-align: left;">序列输入</td>
+<td style="text-align: left;">单个输出</td>
+<td style="text-align: left;">视频动作分类、情感分类</td>
+</tr>
+<tr>
+<td style="text-align: left;">many-to-many，同步</td>
+<td style="text-align: left;">序列输入</td>
+<td style="text-align: left;">每步输出</td>
+<td style="text-align: left;">帧级分类、序列标注</td>
+</tr>
+<tr>
+<td style="text-align: left;">many-to-many，编码-解码</td>
+<td style="text-align: left;">序列输入</td>
+<td style="text-align: left;">序列输出</td>
+<td style="text-align: left;">机器翻译、视频字幕</td>
+</tr>
+</tbody>
+</table>
+<h2 id="vanilla-rnn-与-lstm-对比">10.3 Vanilla RNN 与 LSTM 对比</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">项目</th>
+<th style="text-align: left;">Vanilla RNN</th>
+<th style="text-align: left;">LSTM</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">状态</td>
+<td style="text-align: left;">只有隐藏状态 <span
+class="math inline">\(h_t\)</span></td>
+<td style="text-align: left;">隐藏状态 <span
+class="math inline">\(h_t\)</span> + 细胞状态 <span
+class="math inline">\(c_t\)</span></td>
+</tr>
+<tr>
+<td style="text-align: left;">更新方式</td>
+<td style="text-align: left;">矩阵乘法 + 非线性</td>
+<td style="text-align: left;">门控写入、遗忘、输出</td>
+</tr>
+<tr>
+<td style="text-align: left;">长期依赖</td>
+<td style="text-align: left;">难学，易梯度消失</td>
+<td style="text-align: left;">更容易保存长期信息</td>
+</tr>
+<tr>
+<td style="text-align: left;">参数量</td>
+<td style="text-align: left;">较少</td>
+<td style="text-align: left;">较多，通常约有四组门参数</td>
+</tr>
+<tr>
+<td style="text-align: left;">训练稳定性</td>
+<td style="text-align: left;">较差</td>
+<td style="text-align: left;">通常更好，但不是绝对稳定</td>
+</tr>
+</tbody>
+</table>
+<h2 id="常见误解">10.4 常见误解</h2>
+<ul>
+<li><strong>误解 1：RNN 一定能记住任意长历史。</strong>
+结构上可以处理任意长度，但固定维度隐藏状态和梯度消失会限制实际长期记忆能力。</li>
+<li><strong>误解 2：LSTM 完全解决梯度消失。</strong> LSTM
+只是提供更容易的梯度通路，并不保证所有任务上都没有梯度问题。</li>
+<li><strong>误解 3：截断 BPTT 等于丢弃隐藏状态。</strong>
+截断的是反向传播范围，隐藏状态仍然可以在前向中继续传递。</li>
+<li><strong>误解 4：Embedding 是为了让输入更复杂。</strong> Embedding
+的核心是把离散符号映射到可学习连续向量；对 one-hot
+输入来说，它本质上是查表。</li>
+<li><strong>误解 5：Dropout
+测试时可以直接照常使用训练输出尺度。</strong>
+测试阶段所有神经元启用，必须通过训练时 inverted dropout
+或测试时缩放来匹配期望尺度。</li>
+</ul>
+<h2 id="简短自测题">10.5 简短自测题</h2>
+<ol type="1">
+<li>为什么 RNN 可以处理可变长度序列？</li>
+<li>在 many-to-one 任务中，为什么 Vanilla RNN
+容易丢失早期输入信息？</li>
+<li>完整 BPTT 和截断 BPTT 的主要区别是什么？</li>
+<li>one-hot 向量乘以 embedding 矩阵为什么等价于查表？</li>
+<li>梯度爆炸为什么可以用 gradient clipping
+缓解，而梯度消失更难处理？</li>
+<li>LSTM 中 <span class="math inline">\(f_t=1\)</span>、<span
+class="math inline">\(i_t=0\)</span> 时，cell state 会发生什么？</li>
+<li>图像字幕模型中，CNN 特征如何影响 RNN 的词生成过程？</li>
+</ol>
+<h2 id="一句话抓住本讲">10.6 一句话抓住本讲</h2>
+<p><strong>RNN 用共享参数反复更新隐藏状态来处理序列；BPTT
+负责训练这种时间展开的计算图；Vanilla RNN 的长距离依赖受梯度流限制，而
+LSTM
+和现代状态空间模型都可以看作对“如何更好地传递状态与梯度”的改进。</strong></p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Fqmmm</span>
+                    </p>
+                
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/Recurrent-Neural-Networks/"># Recurrent Neural Networks</a>
+                    
+                        <a href="/tags/Sequence-Modeling/"># Sequence Modeling</a>
+                    
+                        <a href="/tags/LSTM/"># LSTM</a>
+                    
+                        <a href="/tags/GRU/"># GRU</a>
+                    
+                        <a href="/tags/Language-Modeling/"># Language Modeling</a>
+                    
+                        <a href="/tags/Image-Captioning/"># Image Captioning</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+                <a class="prev" rel="prev" href="/2026/07/14/CS231n/8%20Attention%20and%20Transformers/">8 Attention and Transformers</a>
+            
+            
+            <a class="next" rel="next" href="/2026/07/14/CS231n/6%20Training%20CNNs%20and%20CNN%20Architectures/">6 Training CNNs and CNN Architectures</a>
+            
+        </section>
+
+
+    </article>
+</div>
+
+            </div>
+            <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Fqmmm | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+
+</html>
